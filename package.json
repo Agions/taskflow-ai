@@ -1,6 +1,6 @@
 {
   "name": "taskflow-ai",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "TaskFlow AI - 智能PRD文档解析与任务管理助手，专为开发团队设计的AI驱动任务编排工具",
   "logo": "assets/logo.svg",
   "main": "dist/index.js",
