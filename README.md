@@ -1,13 +1,17 @@
-# TaskFlow AI
+<div align="center">
+  <img src="./assets/logo.png" alt="TaskFlow AI Logo" width="200" height="200">
 
-![版本](https://img.shields.io/npm/v/taskflow-ai.svg)
-![下载量](https://img.shields.io/npm/dt/taskflow-ai.svg)
-![协议](https://img.shields.io/badge/license-MIT-blue.svg)
-![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)
+  # TaskFlow AI
+
+  ![版本](https://img.shields.io/npm/v/taskflow-ai.svg)
+  ![下载量](https://img.shields.io/npm/dt/taskflow-ai.svg)
+  ![协议](https://img.shields.io/badge/license-MIT-blue.svg)
+  ![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
+  ![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)
+
+</div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/agions/taskflow-ai/main/assets/logo.png" alt="TaskFlow AI" width="200">
 </p>
 
 <h2 align="center">🚀 智能PRD解析与任务管理AI助手</h2>
@@ -420,5 +424,5 @@ copies or substantial portions of the Software.
 </p>
 
 <p align="center">
-  Made with ❤️ by <a href="https://github.com/agions">TaskFlow AI Team</a>
+  Made with ❤️ by <a href="https://github.com/agions">Agions</a>
 </p>
