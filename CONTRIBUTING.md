@@ -367,7 +367,6 @@ async parsePRD(
 如果您在贡献过程中遇到问题，可以通过以下方式获取帮助：
 
 - 💬 [GitHub Discussions](https://github.com/agions/taskflow-ai/discussions)
-- 📧 [邮件联系](mailto:dev@taskflow-ai.com)
 - 🐛 [创建Issue](https://github.com/agions/taskflow-ai/issues/new)
 
 ## 📄 许可证
