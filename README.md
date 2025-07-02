@@ -14,12 +14,12 @@
 <p align="center">
 </p>
 
-<h2 align="center">🚀 智能PRD解析与任务管理AI助手</h2>
+<h2 align="center">🚀 专业的CLI任务管理工具</h2>
 
 <p align="center">
-  <strong>TaskFlow AI</strong> 是专为开发团队设计的AI驱动任务编排工具<br>
-  基于MCP协议在AI编辑器中运行，将产品需求文档智能转换为结构化任务流程<br>
-  实现从PRD到代码的全流程AI自动编排
+  <strong>TaskFlow AI</strong> 是专为开发团队设计的命令行任务管理工具<br>
+  智能PRD文档解析与AI驱动的任务编排，提升团队开发效率<br>
+  支持多种国产大模型，实现从需求到任务的智能转换
 </p>
 
 <p align="center">
