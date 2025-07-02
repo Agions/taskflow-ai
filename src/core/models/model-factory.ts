@@ -15,6 +15,8 @@ import { BaiduWenxinProvider } from './providers/baidu-wenxin';
 import { AlibabaQwenProvider } from './providers/alibaba-qwen';
 import { DeepSeekProvider } from './providers/deepseek';
 import { ZhipuProvider } from './providers/zhipu';
+import { SparkProvider } from './providers/spark';
+import { MoonshotProvider } from './providers/moonshot';
 
 /**
  * 模型提供商配置接口
@@ -391,11 +393,15 @@ export class ModelFactory {
 
       case ChineseLLMType.ZHIPU_GLM:
         return new ZhipuProvider(config, this.logger);
+
+      case ChineseLLMType.XUNFEI_SPARK:
+        return new SparkProvider(config as any, this.logger);
+
+      case ChineseLLMType.MOONSHOT:
+        return new MoonshotProvider(config as any, this.logger);
+
       // case ChineseLLMType.TENCENT_HUNYUAN:
       //   return new TencentHunyuanProvider(config, this.logger);
-
-      // case ChineseLLMType.ZHIPU_GLM:
-      //   return new ZhipuGLMProvider(config, this.logger);
 
       default:
         throw new Error(`不支持的提供商类型: ${type}`);

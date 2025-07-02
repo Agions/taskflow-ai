@@ -13,6 +13,7 @@ import * as fs from 'fs-extra';
 import { visualizeCommand } from './commands/visualize';
 import { statusCommand } from './commands/status';
 import { interactiveCommand } from './commands/interactive';
+import modelsCommand from './commands/models';
 import ora from 'ora';
 import path from 'path';
 import { ModelType } from './types/config';
@@ -47,6 +48,7 @@ ${chalk.yellow('更多信息:')}
 visualizeCommand.register(program);
 statusCommand.register(program);
 interactiveCommand.register(program);
+modelsCommand(program);
 
 // 快速开始命令
 program
@@ -546,37 +548,7 @@ program
     }
   });
 
-// 模型命令
-program
-  .command('models')
-  .description('查看可用的模型')
-  .action(async () => {
-    try {
-      const result = await yasiService.getAvailableModelTypes();
-
-      if (!result.success) {
-        console.error(chalk.red(`获取可用模型失败: ${result.error}`));
-        process.exit(1);
-      }
-
-      console.log(chalk.cyan('\n可用模型:'));
-      result.data?.forEach(model => {
-        console.log(`- ${model}`);
-      });
-
-      // 获取当前默认模型
-      const configResult = await yasiService.getConfig();
-
-      if (configResult.success && configResult.data) {
-        const defaultModel = configResult.data.models?.default;
-        console.log(chalk.cyan(`\n默认模型: ${defaultModel}`));
-      }
-
-    } catch (error) {
-      console.error(chalk.red(`错误: ${(error as Error).message}`));
-      process.exit(1);
-    }
-  });
+// 旧的模型命令已被新的 modelsCommand 替代
 
 // 解析命令行参数
 program.parse(process.argv);

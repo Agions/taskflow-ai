@@ -14,7 +14,12 @@ export default function parseCommand(program: Command): void {
   program
     .command('parse <file>')
     .description('解析PRD文档并提取结构化信息')
-    .option('-m, --model <model>', '使用指定的模型类型', 'baidu')
+    .option('-m, --model <model>', '使用指定的模型类型', 'deepseek')
+    .option('--multi-model', '启用多模型协作模式', false)
+    .option('--primary <model>', '主要模型', 'deepseek')
+    .option('--fallback <models>', '备用模型列表，用逗号分隔', 'zhipu,qwen')
+    .option('--load-balancing', '启用负载均衡', false)
+    .option('--cost-optimization', '启用成本优化', false)
     .option('-o, --output <output>', '输出文件路径')
     .option('-p, --pretty', '格式化输出结果', false)
     .action(async (file, options) => {
@@ -35,16 +40,42 @@ export default function parseCommand(program: Command): void {
         }
 
         // 开始解析
-        const spinner = ora('正在解析PRD文档...').start();
+        let spinner: any;
+        let result: any;
 
-        // 解析文档
-        const modelType = options.model.toLowerCase() as ModelType;
-        const result = await taskFlowService.parsePRDFromFile(filePath, {
-          modelType,
-          extractSections: true,
-          extractFeatures: true,
-          prioritize: true,
-        });
+        if (options.multiModel) {
+          spinner = ora('正在启动多模型协作解析...').start();
+
+          // 解析备用模型列表
+          const fallbackModels = options.fallback.split(',').map((m: string) => m.trim().toLowerCase());
+
+          spinner.text = `使用主模型 ${options.primary}，备用模型: ${fallbackModels.join(', ')}`;
+
+          result = await taskFlowService.parsePRDFromFile(filePath, {
+            modelType: options.primary.toLowerCase() as ModelType,
+            multiModel: {
+              enabled: true,
+              primary: options.primary.toLowerCase() as ModelType,
+              fallback: fallbackModels as ModelType[],
+              loadBalancing: options.loadBalancing,
+              costOptimization: options.costOptimization
+            },
+            extractSections: true,
+            extractFeatures: true,
+            prioritize: true,
+          });
+        } else {
+          spinner = ora('正在解析PRD文档...').start();
+
+          // 单模型解析
+          const modelType = options.model.toLowerCase() as ModelType;
+          result = await taskFlowService.parsePRDFromFile(filePath, {
+            modelType,
+            extractSections: true,
+            extractFeatures: true,
+            prioritize: true,
+          });
+        }
 
         // 检查解析结果
         if (result.error) {

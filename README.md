@@ -142,13 +142,14 @@ taskflow-ai plan docs/example.md --output tasks/project-plan.json
 taskflow-ai tasks list
 ```
 
-### 第四步：启动Web界面（可选）
+### 第四步：生成项目文档
 
 ```bash
-# 启动本地Web服务
-taskflow-ai serve --port 3000
+# 生成项目文档和开发指南
+taskflow-ai docs generate
 
-# 在浏览器中打开 http://localhost:3000
+# 查看项目状态和进度
+taskflow-ai status
 ```
 
 ## 🔧 AI编辑器集成
@@ -244,7 +245,7 @@ taskflow-ai visualize --type dependency --output deps.svg
 |------|------|------|
 | 📖 快速开始指南 | 5分钟快速上手教程 | [getting-started.md](docs/getting-started.md) |
 | 📋 用户使用指南 | 详细的功能说明和使用方法 | [user-guide.md](docs/user-guide.md) |
-| 🔧 API参考文档 | 完整的API接口文档 | [api-reference.md](docs/api-reference.md) |
+| 🔧 CLI命令参考 | 完整的命令行接口文档 | [cli-reference.md](docs/cli-reference.md) |
 | 💡 使用示例 | 各种场景的使用示例 | [examples.md](docs/examples.md) |
 | 🚨 故障排除 | 常见问题和解决方案 | [troubleshooting.md](docs/troubleshooting.md) |
 | 📄 产品需求文档 | TaskFlow AI的完整PRD | [TaskFlow-AI-PRD.md](docs/TaskFlow-AI-PRD.md) |
@@ -257,95 +258,119 @@ taskflow-ai visualize --type dependency --output deps.svg
 |-----|------|-----|----------|
 | 🚀 DeepSeek | ✅ 完全支持 | 强大的代码生成和理解能力 | 代码项目、技术文档 |
 | 🧠 智谱GLM | ✅ 完全支持 | 优秀的推理和分析能力 | 复杂逻辑、业务分析 |
-| 💬 通义千问 | ✅ 完全支持 | 创新的逻辑推理能力 | 产品规划、需求分析 |
-| 🔥 文心一言 | 🚧 开发中 | 全面的知识图谱和语义理解 | 知识密集型项目 |
-| ⭐ 讯飞星火 | 🚧 开发中 | 强大的中文理解和生成 | 中文内容处理 |
+| 💬 通义千问 | ✅ 完全支持 | 多模态支持，长文本处理 | 产品规划、需求分析 |
+| ⭐ 讯飞星火 | ✅ 完全支持 | 语音交互优化，教育场景 | 中文内容处理、教育项目 |
+| 🌙 月之暗面Kimi | ✅ 完全支持 | 超长上下文，文档处理专家 | 长文档分析、信息提取 |
+| 🔥 百度文心一言 | ✅ 完全支持 | 全面的知识图谱和语义理解 | 知识密集型项目 |
+
+### 🔄 多模型协作功能
+
+- **智能模型选择** - 根据任务复杂度自动选择最适合的模型
+- **负载均衡** - 分散请求到多个模型，提升响应速度
+- **故障转移** - 主模型失败时自动切换到备用模型
+- **成本优化** - 智能路由到性价比最高的模型
+- **性能监控** - 实时监控各模型的性能指标
 
 ### 模型配置示例
 
 ```bash
-# 配置DeepSeek（推荐，性价比高）
-taskflow-ai config set models.apiKeys.deepseek "sk-your-api-key"
+# 配置多个模型的API密钥
+taskflow-ai config set models.apiKeys.deepseek "sk-your-deepseek-key"
+taskflow-ai config set models.apiKeys.zhipu "your-zhipu-key"
+taskflow-ai config set models.apiKeys.qwen "your-qwen-key"
+taskflow-ai config set models.apiKeys.spark "your-spark-key"
+taskflow-ai config set models.apiKeys.moonshot "your-moonshot-key"
+taskflow-ai config set models.apiKeys.baidu "your-baidu-key"
+
+# 设置默认模型
 taskflow-ai config set models.default "deepseek"
 
-# 配置智谱GLM
-taskflow-ai config set models.apiKeys.zhipu "your-zhipu-key"
+# 启用多模型协作
+taskflow-ai config set models.multiModel.enabled true
+taskflow-ai config set models.multiModel.primary "deepseek"
+taskflow-ai config set models.multiModel.fallback "zhipu,qwen"
+taskflow-ai config set models.multiModel.loadBalancing true
+taskflow-ai config set models.multiModel.costOptimization true
+```
 
-# 配置通义千问
-taskflow-ai config set models.apiKeys.qwen "your-qwen-key"
+### 多模型使用示例
+
+```bash
+# 使用多模型协作解析复杂PRD
+taskflow-ai parse ./docs/complex-prd.md \
+  --multi-model \
+  --primary deepseek \
+  --fallback zhipu,qwen \
+  --load-balancing \
+  --cost-optimization
+
+# 查看模型性能统计
+taskflow-ai models stats --period week
+
+# 运行模型基准测试
+taskflow-ai models benchmark --models deepseek,zhipu,qwen --iterations 5
+
+# 测试模型连接
+taskflow-ai models test deepseek
 ```
 
 ## 🧩 示例项目
 
-### 基础用法
+### 基础CLI用法
 
-```javascript
-// 使用TaskFlow AI API
-const { TaskFlowService } = require('taskflow-ai');
+```bash
+# 解析PRD文档
+taskflow-ai parse ./docs/ecommerce-prd.md --output ./tasks/plan.json
 
-const service = new TaskFlowService();
+# 查看解析结果
+taskflow-ai tasks list --format table
 
-// 解析PRD文档
-const prdContent = `
-# 电商平台
-## 功能需求
-### 用户管理
-- 用户注册和登录
-- 个人信息管理
-### 商品管理
-- 商品展示和搜索
-- 购物车功能
-`;
+# 生成详细的任务计划
+taskflow-ai plan ./docs/ecommerce-prd.md --include-tests --output ./tasks/detailed-plan.json
 
-const result = await service.parsePRD(prdContent, 'markdown');
-if (result.success) {
-  console.log('解析成功:', result.data);
-
-  // 生成任务计划
-  const taskPlan = await service.generateTaskPlan(result.data);
-  console.log('任务计划:', taskPlan.data);
-}
+# 查看项目状态
+taskflow-ai status --detailed
 ```
 
 ### 高级用法
 
-```javascript
-// 自定义配置
-const service = new TaskFlowService();
+```bash
+# 配置多个AI模型
+taskflow-ai config set models.apiKeys.deepseek "your-deepseek-key"
+taskflow-ai config set models.apiKeys.zhipu "your-zhipu-key"
+taskflow-ai config set models.apiKeys.qwen "your-qwen-key"
 
-// 配置AI模型
-await service.updateConfig({
-  models: {
-    default: 'deepseek',
-    apiKeys: {
-      deepseek: process.env.DEEPSEEK_API_KEY
-    }
-  }
-});
+# 使用多模型协作解析复杂PRD
+taskflow-ai parse ./docs/complex-prd.md \
+  --multi-model \
+  --primary deepseek \
+  --fallback zhipu \
+  --output ./tasks/complex-plan.json
 
-// 解析PRD并生成任务
-const result = await service.parsePRDFromFile('./docs/prd.md');
-const tasks = await service.generateTaskPlan(result.data, {
-  includeTests: true,
-  includeDocs: true,
-  teamSize: 5,
-  sprintDuration: 14
-});
+# 生成包含测试和文档的完整任务计划
+taskflow-ai plan ./docs/prd.md \
+  --include-tests \
+  --include-docs \
+  --team-size 5 \
+  --sprint-duration 14 \
+  --output ./tasks/complete-plan.json
 
-// 任务管理
-const allTasks = service.getAllTasks();
-const highPriorityTasks = service.filterTasks({
-  priority: 'high',
-  status: 'not_started'
-});
+# 任务管理和筛选
+taskflow-ai tasks list --priority high --status not_started
+taskflow-ai tasks filter --assignee "developer" --due-date "2024-01-31"
+
+# 可视化任务依赖关系
+taskflow-ai visualize ./tasks/complete-plan.json \
+  --format mermaid \
+  --output ./docs/task-flow.md
 ```
 
 ## 🎯 使用场景
 
 ### 适用项目类型
-- 🌐 **Web应用开发** - React、Vue、Angular等前端项目
+- 💻 **软件开发项目** - 前端、后端、全栈应用开发
 - 📱 **移动应用开发** - React Native、Flutter等跨平台应用
-- 🔧 **API服务开发** - RESTful API、GraphQL、微服务架构
+- 🔧 **系统架构设计** - 微服务、分布式系统、云原生应用
 - 🤖 **AI/ML项目** - 机器学习、深度学习、推荐系统
 - 🏢 **企业级应用** - ERP、CRM、数据分析平台
 

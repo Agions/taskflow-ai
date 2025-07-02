@@ -81,15 +81,6 @@ taskflow-ai plan docs/example.md --output tasks/project-plan.json
 taskflow-ai tasks list
 ```
 
-### 第五步：启动Web界面（可选）
-
-```bash
-# 启动本地Web服务
-taskflow-ai serve --port 3000
-
-# 在浏览器中打开 http://localhost:3000
-```
-
 ## 🎯 常用命令速查
 
 ### 项目初始化

@@ -10,6 +10,9 @@ export enum ModelType {
   XUNFEI = 'xunfei',
   ZHIPU = 'zhipu',
   DEEPSEEK = 'deepseek',
+  QWEN = 'qwen',
+  SPARK = 'spark',
+  MOONSHOT = 'moonshot',
 }
 
 /**
@@ -61,14 +64,53 @@ export interface DeepseekModelConfig extends ModelConfig {
 }
 
 /**
+ * 阿里通义千问模型配置
+ */
+export interface QwenModelConfig extends ModelConfig {
+  modelVersion?: string;
+  region?: string;
+}
+
+/**
+ * 讯飞星火模型配置（扩展版）
+ */
+export interface SparkModelConfig extends ModelConfig {
+  appId: string;
+  apiSecret: string;
+  domain?: string;
+}
+
+/**
+ * 月之暗面模型配置
+ */
+export interface MoonshotModelConfig extends ModelConfig {
+  modelVersion?: string;
+}
+
+/**
+ * 多模型协作配置
+ */
+export interface MultiModelConfig {
+  enabled: boolean;
+  primary: ModelType;
+  fallback: ModelType[];
+  loadBalancing: boolean;
+  costOptimization: boolean;
+}
+
+/**
  * 所有模型配置映射
  */
 export interface ModelsConfig {
   default: ModelType;
+  multiModel?: MultiModelConfig;
   [ModelType.BAIDU]?: BaiduModelConfig;
   [ModelType.XUNFEI]?: XunfeiModelConfig;
   [ModelType.ZHIPU]?: ZhipuModelConfig;
   [ModelType.DEEPSEEK]?: DeepseekModelConfig;
+  [ModelType.QWEN]?: QwenModelConfig;
+  [ModelType.SPARK]?: SparkModelConfig;
+  [ModelType.MOONSHOT]?: MoonshotModelConfig;
 }
 
 /**
