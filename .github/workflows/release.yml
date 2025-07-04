@@ -109,13 +109,38 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
         cache: 'npm'
         
-    - name: Clean and install dependencies
+    - name: Clean environment
       run: |
-        rm -rf node_modules package-lock.json
-        npm install --omit=optional --legacy-peer-deps
+        rm -rf node_modules package-lock.json dist bin/index.js bin/index.js.map
+        npm cache clean --force || true
 
-    - name: Build project
-      run: npm run build
+    - name: Install dependencies with force
+      run: |
+        npm install --legacy-peer-deps
+        npm install rollup@^4.12.1 --force
+        npm install @rollup/rollup-linux-x64-gnu@4.12.1 --force
+        npm install @rollup/plugin-typescript@^11.1.6 --force
+        npm install @rollup/plugin-node-resolve@^15.2.3 --force
+        npm install @rollup/plugin-commonjs@^25.0.7 --force
+        npm install @rollup/plugin-json@^6.1.0 --force
+        npm install @rollup/plugin-terser@^0.4.4 --force
+
+    - name: Verify Rollup installation
+      run: |
+        npx rollup --version
+        node -e "console.log('Rollup check:', require('rollup'))"
+
+    - name: Build project with fallback
+      run: |
+        echo "🚀 尝试Rollup构建..."
+        if npm run build; then
+          echo "✅ Rollup构建成功"
+        else
+          echo "❌ Rollup构建失败，使用esbuild备用方案..."
+          npm install esbuild --force
+          npm run build:fallback
+          echo "✅ esbuild备用构建完成"
+        fi
       
     - name: Publish to NPM
       run: npm publish

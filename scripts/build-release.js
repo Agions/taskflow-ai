@@ -62,17 +62,39 @@ function main() {
     console.log('⚠️  npm缓存清理失败，继续执行...\n');
   }
 
-  // 3. 重新安装依赖
-  runCommand('npm install --no-optional --legacy-peer-deps', '安装依赖（跳过可选依赖）');
+  // 3. 强制安装核心依赖
+  runCommand('npm install --legacy-peer-deps', '安装基础依赖');
 
-  // 4. 验证关键依赖
+  // 4. 强制安装Rollup和相关插件
+  console.log('🔧 强制安装Rollup生态...');
+  const rollupPackages = [
+    'rollup@^4.12.1',
+    '@rollup/rollup-linux-x64-gnu@4.12.1',
+    '@rollup/plugin-typescript@^11.1.6',
+    '@rollup/plugin-node-resolve@^15.2.3',
+    '@rollup/plugin-commonjs@^25.0.7',
+    '@rollup/plugin-json@^6.1.0',
+    '@rollup/plugin-terser@^0.4.4'
+  ];
+
+  rollupPackages.forEach(pkg => {
+    try {
+      console.log(`  安装: ${pkg}`);
+      execSync(`npm install ${pkg} --force`, { stdio: 'inherit' });
+    } catch (error) {
+      console.log(`  ⚠️  ${pkg} 安装失败，继续...`);
+    }
+  });
+
+  // 5. 验证关键依赖
   console.log('🔍 验证关键依赖...');
   try {
     require('rollup');
     console.log('✅ Rollup 可用');
   } catch (error) {
-    console.log('⚠️  Rollup 不可用，尝试手动安装...');
-    runCommand('npm install rollup --force', '强制安装Rollup');
+    console.log('❌ Rollup 仍然不可用，尝试备用方案...');
+    // 备用方案：使用esbuild
+    runCommand('npm install esbuild --force', '安装esbuild作为备用');
   }
 
   // 5. 检查TypeScript编译

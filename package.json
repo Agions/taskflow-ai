@@ -14,6 +14,8 @@
   "scripts": {
     "dev": "rollup -c -w",
     "build": "rollup -c",
+    "build:esbuild": "node esbuild.config.js",
+    "build:fallback": "npm run build:esbuild",
     "build:release": "node scripts/build-release.js",
     "build:analyze": "ANALYZE=true rollup -c",
     "test": "jest",
