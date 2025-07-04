@@ -4,15 +4,13 @@
  */
 
 import axios, { AxiosInstance } from 'axios';
-import { 
-  ChineseLLMProvider, 
-  ChineseLLMType, 
-  ModelConfig, 
-  ChatRequest, 
-  ChatResponse, 
-  StreamResponse,
-  ChatMessage,
-  TokenUsage
+import {
+  ChineseLLMProvider,
+  ChineseLLMType,
+  ModelConfig,
+  ChatRequest,
+  ChatResponse,
+  StreamResponse
 } from '../chinese-llm-provider';
 import { Logger } from '../../../infra/logger';
 
@@ -333,7 +331,7 @@ export class BaiduWenxinProvider extends ChineseLLMProvider {
   /**
    * 格式化消息为百度文心格式
    */
-  private formatMessagesForBaidu(messages: ChatMessage[]): any[] {
+  private formatMessagesForBaidu(messages: { role: string; content: string }[]): unknown[] {
     return messages.map(msg => ({
       role: msg.role,
       content: msg.content

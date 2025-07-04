@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * 性能优化器 - 提升TaskFlow AI系统性能
  * 包括缓存优化、并发处理、内存管理、算法优化等
@@ -135,7 +136,7 @@ export class PerformanceOptimizer {
   public async optimizeTaskGeneration(
     generateFunction: (requirements: Requirement[], options?: any) => Promise<TaskPlan>,
     requirements: Requirement[],
-    options?: any
+    options?: unknown
   ): Promise<TaskPlan> {
     const startTime = Date.now();
     const cacheKey = this.generateCacheKey('task_generation', requirements, options);

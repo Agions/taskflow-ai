@@ -1,10 +1,9 @@
 import { ModelFactory } from './factory';
 import { ConfigManager } from '../../infra/config';
 import { ModelType } from '../../types/config';
-import { 
-  ChatMessage, 
-  ModelCallOptions, 
-  ModelRequestParams, 
+import {
+  ChatMessage,
+  ModelCallOptions,
   ModelResponse,
   ParseOptions,
   PlanningOptions,

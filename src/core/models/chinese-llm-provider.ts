@@ -56,7 +56,7 @@ export interface ChatRequest {
   temperature?: number;
   topP?: number;
   stream?: boolean;                        // 是否流式输出
-  functions?: Function[];                  // 函数调用
+  functions?: ((data: unknown) => unknown)[];  // 函数调用
   userId?: string;                         // 用户ID
 }
 
@@ -420,7 +420,7 @@ export class ChineseLLMManager {
    * @param task 任务类型
    * @param requirements 需求描述
    */
-  public selectBestProvider(task: string, requirements?: string): ChineseLLMType {
+  public selectBestProvider(task: string, _requirements?: string): ChineseLLMType {
     // 基于任务类型的简单选择逻辑
     const taskLower = task.toLowerCase();
     

@@ -206,8 +206,9 @@ export class ModelFactory {
     this.logger.info('重新加载模型工厂配置');
 
     const newConfig = this.loadConfig();
-    const oldProviders = new Set(Object.keys(this.config.providers));
-    const newProviders = new Set(Object.keys(newConfig.providers));
+    // 这些变量在实际实现中会用于比较配置变化
+    // const oldProviders = new Set(Object.keys(this.config.providers));
+    // const newProviders = new Set(Object.keys(newConfig.providers));
 
     // 停止监控
     if (this.monitoringInterval) {
@@ -453,7 +454,7 @@ export class ModelFactory {
    */
   private selectByLoadBalancing(
     availableProviders: ChineseLLMType[],
-    requirements?: any
+    _requirements?: Record<string, unknown>
   ): ChineseLLMType {
     const strategy = this.config.loadBalancing?.strategy || 'round_robin';
 

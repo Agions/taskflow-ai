@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { ModelCoordinator } from '../models/coordinator';
@@ -362,7 +363,7 @@ export class TaskPlanner {
    * @param taskPlan 任务计划
    * @param options 优化选项
    */
-  private optimizePriorities(taskPlan: TaskPlan, options?: PlanningOptions): void {
+  private optimizePriorities(taskPlan: TaskPlan, _options?: PlanningOptions): void {
     this.logger.info('优化任务优先级');
 
     // 基于依赖关系调整优先级
@@ -454,7 +455,7 @@ export class TaskPlanner {
    * @param taskPlan 任务计划
    * @param options 优化选项
    */
-  private identifyParallelTasks(taskPlan: TaskPlan, options?: PlanningOptions): void {
+  private identifyParallelTasks(taskPlan: TaskPlan, _options?: PlanningOptions): void {
     this.logger.info('识别并行任务');
 
     const maxParallel = 3; // Default maximum parallel tasks

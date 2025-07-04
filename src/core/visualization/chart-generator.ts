@@ -5,7 +5,7 @@
 
 import { Logger } from '../../infra/logger';
 import { Task, TaskPlan, TaskStatus, TaskPriority, TaskType } from '../../types/task';
-import { OrchestrationResult, ExecutionPath } from '../ai/intelligent-orchestrator';
+import { ExecutionPath } from '../ai/intelligent-orchestrator';
 
 /**
  * 图表类型枚举
@@ -787,7 +787,7 @@ export class ChartGenerator {
       ...config
     };
 
-    const milestoneData: ChartDataPoint[] = executionPath.milestones.map((milestone, index) => ({
+    const milestoneData: ChartDataPoint[] = executionPath.milestones.map((milestone) => ({
       x: milestone.targetDate.getTime(),
       y: 1,
       label: milestone.name,

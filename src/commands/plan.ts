@@ -6,6 +6,7 @@ import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import { taskFlowService } from '../mcp/index';
 import { ModelType } from '../types/config';
+import { Task } from '../types/task';
 
 /**
  * 生成任务计划命令
@@ -148,8 +149,8 @@ export default function planCommand(program: Command): void {
 
             // 输出任务列表
             console.log(chalk.cyan('\n任务列表:'));
-            const printTasks = (tasks: any[], level = 0) => {
-              tasks.forEach((task: any) => {
+            const printTasks = (tasks: Task[], level = 0) => {
+              tasks.forEach((task: Task) => {
                 const indent = '  '.repeat(level);
                 console.log(`${indent}- ${chalk.bold(task.name)} [${task.priority}]`);
 

@@ -296,7 +296,7 @@ export class TaskVisualizer {
    * @param taskPlan 任务计划
    * @param options 选项
    */
-  private generateKanbanBoard(taskPlan: TaskPlan, options: VisualizationOptions): KanbanData {
+  private generateKanbanBoard(taskPlan: TaskPlan, _options: VisualizationOptions): KanbanData {
     const columns: KanbanColumn[] = [
       { id: 'not_started', title: '待开始', tasks: [] },
       { id: 'in_progress', title: '进行中', tasks: [] },
@@ -328,7 +328,7 @@ export class TaskVisualizer {
    * @param taskPlan 任务计划
    * @param options 选项
    */
-  private generateTimeline(taskPlan: TaskPlan, options: VisualizationOptions): any {
+  private generateTimeline(taskPlan: TaskPlan, _options: VisualizationOptions): any {
     // 简化的时间线实现
     const timeline = {
       title: taskPlan.name || '项目时间线',
@@ -350,7 +350,7 @@ export class TaskVisualizer {
    * @param taskPlan 任务计划
    * @param options 选项
    */
-  private generateProgressChart(taskPlan: TaskPlan, options: VisualizationOptions): any {
+  private generateProgressChart(taskPlan: TaskPlan, _options: VisualizationOptions): any {
     const stats = {
       total: taskPlan.tasks.length,
       completed: 0,

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://agions.github.io/taskflow-ai/sitemap.xml
+
+# 禁止访问的路径
+Disallow: /.vitepress/
+Disallow: /node_modules/
+Disallow: /_temp/

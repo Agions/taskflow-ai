@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * TaskFlow AI CLI入口
  */
@@ -14,11 +12,38 @@ import { visualizeCommand } from './commands/visualize';
 import { statusCommand } from './commands/status';
 import { interactiveCommand } from './commands/interactive';
 import modelsCommand from './commands/models';
+import { createMCPCommand } from './cli/commands/mcp';
 import ora from 'ora';
 import path from 'path';
-import { ModelType } from './types/config';
+import { ModelType, LogLevel } from './types/config';
 import { yasiService } from './mcp/index';
+import { JSONObject } from './types/strict-types';
+import { ErrorHandler } from './core/error-handling/typed-errors';
 import { TaskStatus } from './types/task';
+
+// 全局错误处理器
+function handleGlobalError(error: unknown): never {
+  const taskFlowError = ErrorHandler.handleUnknownError(error, 'cli');
+  const userMessage = ErrorHandler.formatUserMessage(taskFlowError);
+
+  console.error(chalk.red('❌ 错误:'), userMessage);
+
+  // 在开发模式下显示详细错误信息
+  if (process.env.NODE_ENV === 'development') {
+    console.error(chalk.gray('详细错误信息:'));
+    console.error(taskFlowError.stack);
+  }
+
+  // 记录错误报告
+  const errorReport = ErrorHandler.createErrorReport(taskFlowError);
+  console.error(chalk.gray(`错误ID: ${errorReport.id}`));
+
+  process.exit(1);
+}
+
+// 捕获未处理的异常
+process.on('uncaughtException', handleGlobalError);
+process.on('unhandledRejection', handleGlobalError);
 
 // 创建命令行程序
 const program = new Command();
@@ -50,11 +75,15 @@ statusCommand.register(program);
 interactiveCommand.register(program);
 modelsCommand(program);
 
+// 注册MCP命令
+program.addCommand(createMCPCommand());
+
 // 快速开始命令
 program
   .command('init')
-  .description('初始化TaskFlow AI项目')
-  .option('-d, --dir <directory>', '项目目录', './taskflow')
+  .description('初始化TaskFlow AI项目并生成MCP配置')
+  .option('--editor <editor>', '指定编辑器 (windsurf/trae/cursor/vscode)', 'all')
+  .option('--force', '覆盖现有配置文件')
   .action(async (options) => {
     console.log(chalk.blue('🚀 TaskFlow AI - 项目初始化'));
     console.log();
@@ -62,14 +91,21 @@ program
     try {
       const fs = await import('fs-extra');
       const path = await import('path');
+      const { Logger } = await import('./infra/logger');
+      const { ConfigManager } = await import('./infra/config/config-manager');
 
-      const projectDir = path.resolve(process.cwd(), options.dir);
+      const projectDir = process.cwd(); // 在当前目录初始化
+      const logger = Logger.getInstance({
+        level: LogLevel.INFO,
+        output: 'console'
+      });
+      const config = new ConfigManager(logger);
 
-      // 创建项目目录结构
-      await fs.ensureDir(projectDir);
-      await fs.ensureDir(path.join(projectDir, 'docs'));
-      await fs.ensureDir(path.join(projectDir, 'tasks'));
-      await fs.ensureDir(path.join(projectDir, 'output'));
+      // 创建基本目录结构
+      await fs.default.ensureDir(path.join(projectDir, '.taskflow'));
+      await fs.default.ensureDir(path.join(projectDir, 'docs'));
+      await fs.default.ensureDir(path.join(projectDir, 'tasks'));
+      await fs.default.ensureDir(path.join(projectDir, 'output'));
 
       // 创建示例PRD文件
       const samplePRD = `# 示例产品需求文档
@@ -123,10 +159,33 @@ program
 - MongoDB
 `;
 
-      await fs.writeFile(path.join(projectDir, 'docs', 'sample-prd.md'), samplePRD, 'utf-8');
+      await fs.default.writeFile(path.join(projectDir, 'docs', 'sample-prd.md'), samplePRD);
+
+      // 生成MCP配置文件
+      console.log(chalk.blue('📝 生成MCP配置文件...'));
+
+      if (options.editor === 'all') {
+        // 生成所有编辑器配置
+        await config.generateAllMCPConfigs(projectDir, {
+          includeAllModels: true,
+          enableStreaming: true,
+          enableHealthCheck: true
+        });
+
+        console.log(chalk.green('✅ 所有编辑器MCP配置生成完成'));
+      } else {
+        // 生成特定编辑器配置
+        await config.writeMCPConfigFiles(options.editor, projectDir, {
+          includeAllModels: true,
+          enableStreaming: true,
+          enableHealthCheck: true
+        });
+
+        console.log(chalk.green(`✅ ${options.editor} MCP配置生成完成`));
+      }
 
       // 创建配置文件
-      const config = {
+      const taskflowConfig = {
         project: {
           name: "示例项目",
           description: "TaskFlow AI 示例项目"
@@ -140,22 +199,61 @@ program
         }
       };
 
-      await fs.writeFile(path.join(projectDir, 'taskflow.config.json'), JSON.stringify(config, null, 2), 'utf-8');
+      await fs.default.writeFile(path.join(projectDir, 'taskflow.config.json'), JSON.stringify(taskflowConfig, null, 2));
 
-      console.log(chalk.green('✅ 项目初始化完成!'));
+      // 创建环境变量模板
+      const envTemplate = `# TaskFlow AI 环境变量配置
+# 请填入您的API密钥
+
+# DeepSeek API
+DEEPSEEK_API_KEY=your-deepseek-api-key
+
+# 智谱AI API
+ZHIPU_API_KEY=your-zhipu-api-key
+
+# 通义千问 API
+QWEN_API_KEY=your-qwen-api-key
+
+# 文心一言 API
+BAIDU_API_KEY=your-baidu-api-key
+BAIDU_SECRET_KEY=your-baidu-secret-key
+
+# 月之暗面 API
+MOONSHOT_API_KEY=your-moonshot-api-key
+
+# 讯飞星火 API
+SPARK_APP_ID=your-spark-app-id
+SPARK_API_KEY=your-spark-api-key
+SPARK_API_SECRET=your-spark-api-secret
+
+# TaskFlow 配置
+TASKFLOW_LOG_LEVEL=info
+TASKFLOW_CACHE_ENABLED=true
+`;
+
+      await fs.default.writeFile(path.join(projectDir, '.env.example'), envTemplate);
+
+      console.log(chalk.green('🎉 TaskFlow AI 项目初始化完成！'));
       console.log();
-      console.log(chalk.cyan('📁 项目结构:'));
-      console.log(chalk.gray(`   ${options.dir}/`));
-      console.log(chalk.gray(`   ├── docs/`));
-      console.log(chalk.gray(`   │   └── sample-prd.md`));
-      console.log(chalk.gray(`   ├── tasks/`));
-      console.log(chalk.gray(`   ├── output/`));
-      console.log(chalk.gray(`   └── taskflow.config.json`));
+      console.log(chalk.yellow('📁 生成的文件：'));
+      console.log('  ├── .cursor/mcp.json          # Cursor MCP配置');
+      console.log('  ├── .cursor-rules             # Cursor AI规则');
+      console.log('  ├── .windsurf/mcp.json        # Windsurf MCP配置');
+      console.log('  ├── .trae/mcp-config.json     # Trae MCP配置');
+      console.log('  ├── .vscode/settings.json     # VSCode MCP配置');
+      console.log('  ├── .vscode/extensions.json   # VSCode扩展推荐');
+      console.log('  ├── .taskflow/                # TaskFlow配置目录');
+      console.log('  ├── docs/sample-prd.md        # 示例PRD文档');
+      console.log('  ├── taskflow.config.json      # TaskFlow配置');
+      console.log('  └── .env.example              # 环境变量模板');
       console.log();
-      console.log(chalk.cyan('🎯 下一步:'));
-      console.log(chalk.gray(`   1. cd ${options.dir}`));
-      console.log(chalk.gray(`   2. taskflow parse docs/sample-prd.md`));
-      console.log(chalk.gray(`   3. taskflow status`));
+      console.log(chalk.blue('🔧 下一步设置：'));
+      console.log('  1. 复制 .env.example 为 .env');
+      console.log('  2. 在 .env 中填入您的API密钥');
+      console.log('  3. 打开您的AI编辑器（Cursor/Windsurf/Trae/VSCode）');
+      console.log('  4. 编辑器会自动启动TaskFlow AI MCP服务');
+      console.log();
+      console.log(chalk.green('🚀 现在可以开始使用AI驱动的开发体验了！'));
 
     } catch (error) {
       console.error(chalk.red('❌ 初始化失败:'));
@@ -184,7 +282,7 @@ program
       const spinner = ora.default('正在解析PRD文档...').start();
 
       // 检查文件是否存在
-      if (!fs.existsSync(file)) {
+      if (!fs.default.existsSync(file)) {
         spinner.fail(`文件不存在: ${file}`);
         process.exit(1);
       }
@@ -197,7 +295,7 @@ program
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       const outputPath = path.resolve(process.cwd(), options.output);
-      await fs.ensureDir(path.dirname(outputPath));
+      await fs.default.ensureDir(path.dirname(outputPath));
 
       // 生成示例任务计划
       const taskPlan = {
@@ -250,7 +348,7 @@ program
         status: 'active'
       };
 
-      await fs.writeFile(outputPath, JSON.stringify(taskPlan, null, 2), 'utf-8');
+      await fs.default.writeFile(outputPath, JSON.stringify(taskPlan, null, 2));
 
       spinner.succeed(`成功解析PRD并生成任务计划`);
 
@@ -422,7 +520,7 @@ program
       if (options.priority) updateData.priority = options.priority;
 
       // 更新任务
-      const updateResult = await yasiService.updateTask(options.id, updateData as any);
+      const updateResult = await yasiService.updateTask(options.id, updateData);
 
       if (!updateResult.success) {
         spinner.fail(`更新任务失败: ${updateResult.error}`);
@@ -506,7 +604,7 @@ program
         const modelType = options.modelType as ModelType;
         const apiKey = options.setApiKey;
 
-        const config: any = {
+        const config: JSONObject = {
           models: {
             [modelType]: {
               apiKey: apiKey
@@ -517,10 +615,12 @@ program
         // 百度文心模型需要设置secretKey
         if (modelType === ModelType.BAIDU && apiKey.includes(':')) {
           const [key, secret] = apiKey.split(':');
-          config.models[modelType] = {
-            apiKey: key,
-            secretKey: secret
-          };
+          if (config.models && typeof config.models === 'object') {
+            (config.models as JSONObject)[modelType] = {
+              apiKey: key,
+              secretKey: secret
+            };
+          }
         }
 
         const result = await yasiService.updateConfig(config);

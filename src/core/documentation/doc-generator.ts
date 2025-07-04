@@ -3,6 +3,9 @@
  * 支持多种文档格式和模板，包括技术文档、用户手册、API文档等
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { Logger } from '../../infra/logger';
 import { ConfigManager } from '../../infra/config';
 import { Task, TaskPlan, TaskType } from '../../types/task';
@@ -1167,7 +1170,7 @@ export class DocumentGenerator {
    * @param phase 阶段名称
    * @param tasks 阶段任务
    */
-  private getPhaseDeliverables(phase: string, tasks: Task[]): string[] {
+  private getPhaseDeliverables(phase: string, _tasks: Task[]): string[] {
     const deliverables: Record<string, string[]> = {
       '需求分析': ['需求规格说明书', '用户故事', '验收标准'],
       '设计阶段': ['系统架构图', '数据库设计', 'UI设计稿', 'API设计文档'],
@@ -1293,7 +1296,7 @@ export class DocumentGenerator {
   /**
    * 生成架构设计章节
    */
-  private generateArchitectureSection(taskPlan: TaskPlan, requirements: Requirement[]): string {
+  private generateArchitectureSection(__taskPlan: TaskPlan, __requirements: Requirement[]): string {
     const sections = [];
 
     sections.push('## 系统架构概述');
@@ -1311,7 +1314,7 @@ export class DocumentGenerator {
   /**
    * 生成技术栈章节
    */
-  private generateTechnologyStackSection(taskPlan: TaskPlan, requirements: Requirement[]): string {
+  private generateTechnologyStackSection(__taskPlan: TaskPlan, __requirements: Requirement[]): string {
     const sections = [];
 
     sections.push('## 技术栈选择');
@@ -1333,7 +1336,7 @@ export class DocumentGenerator {
   /**
    * 生成数据模型章节
    */
-  private generateDataModelSection(requirements: Requirement[]): string {
+  private generateDataModelSection(_requirements: Requirement[]): string {
     const sections = [];
 
     sections.push('## 数据模型设计');
@@ -1350,7 +1353,7 @@ export class DocumentGenerator {
   /**
    * 生成API设计章节
    */
-  private generateApiDesignSection(requirements: Requirement[]): string {
+  private generateApiDesignSection(_requirements: Requirement[]): string {
     const sections = [];
 
     sections.push('## API设计规范');
@@ -1367,7 +1370,7 @@ export class DocumentGenerator {
   /**
    * 生成安全设计章节
    */
-  private generateSecuritySection(requirements: Requirement[]): string {
+  private generateSecuritySection(_requirements: Requirement[]): string {
     const sections = [];
 
     sections.push('## 安全设计');
@@ -1384,7 +1387,7 @@ export class DocumentGenerator {
   /**
    * 生成性能设计章节
    */
-  private generatePerformanceSection(requirements: Requirement[]): string {
+  private generatePerformanceSection(_requirements: Requirement[]): string {
     const sections = [];
 
     sections.push('## 性能设计');
@@ -1463,7 +1466,7 @@ export class DocumentGenerator {
   /**
    * 生成任务时间线章节
    */
-  private generateTaskTimelineSection(taskPlan: TaskPlan, orchestrationResult?: any): string {
+  private generateTaskTimelineSection(_taskPlan: TaskPlan, _orchestrationResult?: unknown): string {
     const sections = [];
 
     sections.push('## 任务时间线');
@@ -1528,7 +1531,7 @@ export class DocumentGenerator {
   /**
    * 提取API端点信息
    */
-  private extractApiEndpoints(requirements: Requirement[]): any[] {
+  private extractApiEndpoints(_requirements: Requirement[]): any[] {
     // 简化实现，返回示例API端点
     return [
       {
@@ -1551,14 +1554,14 @@ export class DocumentGenerator {
   /**
    * 生成API概览章节
    */
-  private generateApiOverviewSection(apiEndpoints: any[]): string {
+  private generateApiOverviewSection(apiEndpoints: unknown[]): string {
     const sections = [];
 
     sections.push('## API概览');
     sections.push(`系统提供 ${apiEndpoints.length} 个API接口。`);
 
     sections.push('\n### 接口列表');
-    apiEndpoints.forEach(endpoint => {
+    apiEndpoints.forEach((endpoint: any) => {
       sections.push(`- **${endpoint.method} ${endpoint.path}**: ${endpoint.description}`);
     });
 
@@ -1568,7 +1571,7 @@ export class DocumentGenerator {
   /**
    * 生成认证章节
    */
-  private generateAuthenticationSection(requirements: Requirement[]): string {
+  private generateAuthenticationSection(_requirements: Requirement[]): string {
     const sections = [];
 
     sections.push('## 认证机制');
@@ -1585,12 +1588,12 @@ export class DocumentGenerator {
   /**
    * 生成端点详情章节
    */
-  private generateEndpointsSection(apiEndpoints: any[]): string {
+  private generateEndpointsSection(apiEndpoints: unknown[]): string {
     const sections = [];
 
     sections.push('## 接口详情');
 
-    apiEndpoints.forEach(endpoint => {
+    apiEndpoints.forEach((endpoint: any) => {
       sections.push(`\n### ${endpoint.method} ${endpoint.path}`);
       sections.push(`**描述**: ${endpoint.description}`);
 
@@ -1610,7 +1613,7 @@ export class DocumentGenerator {
   /**
    * 生成API数据模型章节
    */
-  private generateApiDataModelsSection(apiEndpoints: any[]): string {
+  private generateApiDataModelsSection(_apiEndpoints: unknown[]): string {
     const sections = [];
 
     sections.push('## 数据模型');
@@ -1650,7 +1653,7 @@ export class DocumentGenerator {
   /**
    * 生成API示例章节
    */
-  private generateApiExamplesSection(apiEndpoints: any[]): string {
+  private generateApiExamplesSection(_apiEndpoints: unknown[]): string {
     const sections = [];
 
     sections.push('## 使用示例');
@@ -1668,7 +1671,7 @@ export class DocumentGenerator {
   /**
    * 提取用户功能
    */
-  private extractUserFeatures(requirements: Requirement[]): any[] {
+  private extractUserFeatures(_requirements: Requirement[]): any[] {
     // 简化实现，返回示例功能
     return [
       {
@@ -1687,7 +1690,7 @@ export class DocumentGenerator {
   /**
    * 生成快速开始章节
    */
-  private generateGettingStartedSection(userFeatures: any[]): string {
+  private generateGettingStartedSection(_userFeatures: unknown[]): string {
     const sections = [];
 
     sections.push('## 快速开始');
@@ -1705,13 +1708,13 @@ export class DocumentGenerator {
   /**
    * 生成功能说明章节
    */
-  private generateFeaturesSection(userFeatures: any[]): string {
+  private generateFeaturesSection(userFeatures: unknown[]): string {
     const sections = [];
 
     sections.push('## 功能说明');
     sections.push('系统主要功能介绍：');
 
-    userFeatures.forEach(feature => {
+    userFeatures.forEach((feature: any) => {
       sections.push(`\n### ${feature.name}`);
       sections.push(`**描述**: ${feature.description}`);
       sections.push(`**优先级**: ${feature.priority}`);
@@ -1723,7 +1726,7 @@ export class DocumentGenerator {
   /**
    * 生成教程章节
    */
-  private generateTutorialsSection(userFeatures: any[]): string {
+  private generateTutorialsSection(_userFeatures: unknown[]): string {
     const sections = [];
 
     sections.push('## 使用教程');
@@ -1740,7 +1743,7 @@ export class DocumentGenerator {
   /**
    * 生成FAQ章节
    */
-  private generateFaqSection(userFeatures: any[]): string {
+  private generateFaqSection(_userFeatures: unknown[]): string {
     const sections = [];
 
     sections.push('## 常见问题');

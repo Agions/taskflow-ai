@@ -5,8 +5,10 @@ node_modules/
 dist/
 build/
 lib/
-bin/
 examples/
+
+# 保留 bin 目录中的可执行文件
+# bin/ 目录包含重要的可执行文件，不应被忽略
 # 编译缓存
 *.tsbuildinfo
 
@@ -16,7 +18,6 @@ logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-*-lock.json
 
 # 运行时数据
 .pnp.*
@@ -67,4 +68,4 @@ dev-debug.log
 
 # Task files
 # tasks.json
-# tasks/ 
+# tasks/

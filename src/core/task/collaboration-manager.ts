@@ -1,3 +1,5 @@
+/* eslint-disable no-case-declarations */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * 协作管理器 - 处理团队协作功能
  * 支持多人协作、实时同步、冲突解决等功能
@@ -432,8 +434,8 @@ export class CollaborationManager extends EventEmitter {
    */
   private sendNotifications(event: TaskEvent): void {
     switch (event.type) {
-      case TaskEventType.TASK_ASSIGNED:
-        const { newAssignee } = event.data;
+      case TaskEventType.TASK_ASSIGNED: {
+        const { newAssignee } = event.data||{};
         if (newAssignee) {
           this.createNotification({
             type: NotificationType.TASK_ASSIGNED,
@@ -444,6 +446,7 @@ export class CollaborationManager extends EventEmitter {
           });
         }
         break;
+      }
 
       case TaskEventType.TASK_COMPLETED:
         // 通知项目相关人员
@@ -502,7 +505,7 @@ export class CollaborationManager extends EventEmitter {
    * @param task 任务
    * @param notificationData 通知数据
    */
-  private notifyProjectMembers(task: Task, notificationData: Omit<Notification, 'id' | 'userId' | 'isRead' | 'createdAt'>): void {
+  private notifyProjectMembers(_task: Task, notificationData: Omit<Notification, 'id' | 'userId' | 'isRead' | 'createdAt'>): void {
     // 获取项目相关用户（简化实现）
     const projectMembers = Array.from(this.users.values()).filter(user =>
       user.role === UserRole.PROJECT_MANAGER || user.role === UserRole.ADMIN
@@ -711,6 +714,6 @@ export class CollaborationManager extends EventEmitter {
    * 生成ID
    */
   private generateId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
   }
 }

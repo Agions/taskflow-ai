@@ -6,12 +6,57 @@
 import { Command } from 'commander';
 import * as fs from 'fs-extra';
 import chalk from 'chalk';
-import inquirer from 'inquirer';
+
 import { Logger } from '../infra/logger';
 import { ConfigManager } from '../infra/config';
 import { TaskManager } from '../core/task/task-manager';
-import { TaskStatus, TaskPriority } from '../types/task';
+import { TaskStatus, TaskPriority, Task, TaskPlan } from '../types/task';
 import { LogLevel } from '../types/config';
+
+interface StatusOptions {
+  format?: string;
+  output?: string;
+  filter?: string;
+  sort?: string;
+  limit?: number;
+  verbose?: boolean;
+  input?: string;
+}
+
+interface UpdateStatusOptions {
+  force?: boolean;
+  notify?: boolean;
+  comment?: string;
+  input?: string; // 任务计划文件路径
+}
+
+interface ProgressOptions {
+  detailed?: boolean;
+  chart?: boolean;
+  export?: string;
+}
+
+interface NextTaskOptions {
+  count?: number;
+  priority?: string;
+  assignee?: string;
+}
+
+interface ListOptions {
+  status?: string;
+  type?: string;
+  assignee?: string;
+  priority?: string;
+  format?: string;
+  output?: string;
+}
+
+interface TaskFilter {
+  status?: TaskStatus | TaskStatus[];
+  type?: string;
+  assignee?: string;
+  priority?: TaskPriority | TaskPriority[];
+}
 
 /**
  * 状态命令处理器
@@ -90,7 +135,7 @@ export class StatusCommand {
    * 处理状态命令
    * @param options 命令选项
    */
-  private async handleStatus(options: any): Promise<void> {
+  private async handleStatus(options: StatusOptions): Promise<void> {
     try {
       console.log(chalk.blue('📊 TaskFlow AI - 任务状态'));
       console.log();
@@ -127,7 +172,7 @@ export class StatusCommand {
    * @param status 新状态
    * @param options 选项
    */
-  private async handleUpdateStatus(taskId: string, status: string, options: any): Promise<void> {
+  private async handleUpdateStatus(taskId: string, status: string, options: UpdateStatusOptions): Promise<void> {
     try {
       console.log(chalk.blue('🔄 TaskFlow AI - 更新任务状态'));
       console.log();
@@ -184,7 +229,7 @@ export class StatusCommand {
    * 处理进度命令
    * @param options 选项
    */
-  private async handleProgress(options: any): Promise<void> {
+  private async handleProgress(options: ProgressOptions & { input?: string }): Promise<void> {
     try {
       console.log(chalk.blue('📈 TaskFlow AI - 项目进度'));
       console.log();
@@ -207,7 +252,7 @@ export class StatusCommand {
    * 处理下一个任务命令
    * @param options 选项
    */
-  private async handleNext(options: any): Promise<void> {
+  private async handleNext(options: NextTaskOptions & { input?: string }): Promise<void> {
     try {
       console.log(chalk.blue('🎯 TaskFlow AI - 推荐任务'));
       console.log();
@@ -226,7 +271,7 @@ export class StatusCommand {
         return;
       }
 
-      const count = Math.min(parseInt(options.number) || 3, nextTasks.length);
+      const count = Math.min(parseInt(String(options.count)) || 3, nextTasks.length);
       console.log(chalk.green(`✅ 推荐的 ${count} 个任务:`));
       console.log();
 
@@ -252,7 +297,7 @@ export class StatusCommand {
    * 处理列表命令
    * @param options 选项
    */
-  private async handleList(options: any): Promise<void> {
+  private async handleList(options: ListOptions & { input?: string }): Promise<void> {
     try {
       console.log(chalk.blue('📋 TaskFlow AI - 任务列表'));
       console.log();
@@ -266,11 +311,11 @@ export class StatusCommand {
       this.taskManager.setTaskPlan(taskPlan);
 
       // 应用过滤器
-      const filter: any = {};
-      if (options.status) filter.status = options.status;
+      const filter: TaskFilter = {};
+      if (options.status) filter.status = options.status as TaskStatus;
       if (options.type) filter.type = options.type;
       if (options.assignee) filter.assignee = options.assignee;
-      if (options.priority) filter.priority = options.priority;
+      if (options.priority) filter.priority = options.priority as TaskPriority;
 
       const tasks = Object.keys(filter).length > 0
         ? this.taskManager.filterTasks(filter)
@@ -296,7 +341,7 @@ export class StatusCommand {
    * 加载任务计划
    * @param inputPath 输入路径
    */
-  private async loadTaskPlan(inputPath?: string): Promise<any> {
+  private async loadTaskPlan(inputPath?: string): Promise<TaskPlan | null> {
     try {
       if (inputPath) {
         if (!fs.existsSync(inputPath)) {
@@ -331,7 +376,7 @@ export class StatusCommand {
    * 显示进度统计
    * @param taskPlan 任务计划
    */
-  private async showProgressStats(taskPlan: any): Promise<void> {
+  private async showProgressStats(taskPlan: TaskPlan): Promise<void> {
     const stats = {
       total: taskPlan.tasks.length,
       completed: 0,
@@ -340,7 +385,7 @@ export class StatusCommand {
       blocked: 0
     };
 
-    taskPlan.tasks.forEach((task: any) => {
+    taskPlan.tasks.forEach((task: Task) => {
       switch (task.status) {
         case TaskStatus.COMPLETED:
           stats.completed++;
@@ -379,8 +424,8 @@ export class StatusCommand {
    * @param tasks 任务列表
    * @param options 选项
    */
-  private displayTaskList(tasks: any[], options: any): void {
-    tasks.forEach((task, index) => {
+  private displayTaskList(tasks: Task[], _options: ListOptions): void {
+    tasks.forEach((task, _index) => {
       const statusIcon = this.getStatusIcon(task.status);
       const priorityColor = this.getPriorityColor(task.priority);
 

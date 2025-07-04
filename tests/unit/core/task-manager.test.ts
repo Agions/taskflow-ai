@@ -20,12 +20,12 @@ describe('TaskManager', () => {
 
   describe('任务创建', () => {
     it('应该能够创建新任务', () => {
-      const taskData = TestDataFactory.createTask({
+      const taskData = TestDataFactory.addTask({
         title: '新任务',
         description: '任务描述'
       });
 
-      const task = taskManager.createTask(taskData);
+      const task = taskManager.addTask(taskData);
 
       expect(task).toBeValidTask();
       expect(task.title).toBe('新任务');
@@ -34,8 +34,8 @@ describe('TaskManager', () => {
     });
 
     it('应该为新任务生成唯一ID', () => {
-      const task1 = taskManager.createTask(TestDataFactory.createTask());
-      const task2 = taskManager.createTask(TestDataFactory.createTask());
+      const task1 = taskManager.addTask(TestDataFactory.addTask());
+      const task2 = taskManager.addTask(TestDataFactory.addTask());
 
       expect(task1.id).not.toBe(task2.id);
       expect(task1.id).toMatch(/^task-/);
@@ -43,7 +43,7 @@ describe('TaskManager', () => {
     });
 
     it('应该设置任务的默认值', () => {
-      const task = taskManager.createTask({
+      const task = taskManager.addTask({
         title: '测试任务',
         description: '测试描述'
       });
@@ -60,21 +60,21 @@ describe('TaskManager', () => {
   describe('任务查询', () => {
     beforeEach(() => {
       // 创建测试任务
-      taskManager.createTask(TestDataFactory.createTask({
+      taskManager.addTask(TestDataFactory.addTask({
         id: 'task-1',
         title: '任务1',
         status: TaskStatus.NOT_STARTED,
         priority: TaskPriority.HIGH
       }));
 
-      taskManager.createTask(TestDataFactory.createTask({
+      taskManager.addTask(TestDataFactory.addTask({
         id: 'task-2',
         title: '任务2',
         status: TaskStatus.IN_PROGRESS,
         priority: TaskPriority.MEDIUM
       }));
 
-      taskManager.createTask(TestDataFactory.createTask({
+      taskManager.addTask(TestDataFactory.addTask({
         id: 'task-3',
         title: '任务3',
         status: TaskStatus.COMPLETED,
@@ -138,7 +138,7 @@ describe('TaskManager', () => {
     let taskId: string;
 
     beforeEach(() => {
-      const task = taskManager.createTask(TestDataFactory.createTask({
+      const task = taskManager.addTask(TestDataFactory.addTask({
         title: '原始任务',
         status: TaskStatus.NOT_STARTED
       }));
@@ -198,7 +198,7 @@ describe('TaskManager', () => {
     let taskId: string;
 
     beforeEach(() => {
-      const task = taskManager.createTask(TestDataFactory.createTask());
+      const task = taskManager.addTask(TestDataFactory.addTask());
       taskId = task.id;
     });
 
@@ -222,9 +222,9 @@ describe('TaskManager', () => {
     let task3Id: string;
 
     beforeEach(() => {
-      const task1 = taskManager.createTask(TestDataFactory.createTask({ title: '任务1' }));
-      const task2 = taskManager.createTask(TestDataFactory.createTask({ title: '任务2' }));
-      const task3 = taskManager.createTask(TestDataFactory.createTask({ title: '任务3' }));
+      const task1 = taskManager.addTask(TestDataFactory.addTask({ title: '任务1' }));
+      const task2 = taskManager.addTask(TestDataFactory.addTask({ title: '任务2' }));
+      const task3 = taskManager.addTask(TestDataFactory.addTask({ title: '任务3' }));
 
       task1Id = task1.id;
       task2Id = task2.id;
@@ -272,10 +272,10 @@ describe('TaskManager', () => {
 
   describe('任务统计', () => {
     beforeEach(() => {
-      taskManager.createTask(TestDataFactory.createTask({ status: TaskStatus.NOT_STARTED }));
-      taskManager.createTask(TestDataFactory.createTask({ status: TaskStatus.IN_PROGRESS }));
-      taskManager.createTask(TestDataFactory.createTask({ status: TaskStatus.COMPLETED }));
-      taskManager.createTask(TestDataFactory.createTask({ status: TaskStatus.COMPLETED }));
+      taskManager.addTask(TestDataFactory.addTask({ status: TaskStatus.NOT_STARTED }));
+      taskManager.addTask(TestDataFactory.addTask({ status: TaskStatus.IN_PROGRESS }));
+      taskManager.addTask(TestDataFactory.addTask({ status: TaskStatus.COMPLETED }));
+      taskManager.addTask(TestDataFactory.addTask({ status: TaskStatus.COMPLETED }));
     });
 
     it('应该能够获取任务统计信息', () => {
@@ -291,7 +291,7 @@ describe('TaskManager', () => {
 
   describe('任务计划管理', () => {
     it('应该能够设置任务计划', () => {
-      const taskPlan = TestDataFactory.createTaskPlan();
+      const taskPlan = TestDataFactory.addTaskPlan();
 
       taskManager.setTaskPlan(taskPlan);
 
@@ -299,7 +299,7 @@ describe('TaskManager', () => {
     });
 
     it('应该能够获取任务计划', () => {
-      const taskPlan = TestDataFactory.createTaskPlan();
+      const taskPlan = TestDataFactory.addTaskPlan();
       taskManager.setTaskPlan(taskPlan);
 
       const retrievedPlan = taskManager.getTaskPlan();
@@ -309,7 +309,7 @@ describe('TaskManager', () => {
     });
 
     it('应该能够清空任务计划', () => {
-      const taskPlan = TestDataFactory.createTaskPlan();
+      const taskPlan = TestDataFactory.addTaskPlan();
       taskManager.setTaskPlan(taskPlan);
 
       taskManager.clearTaskPlan();

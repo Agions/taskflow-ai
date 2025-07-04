@@ -4,8 +4,18 @@
  */
 
 import { readFileSync, writeFileSync, existsSync, watchFile } from 'fs';
-import { join, resolve } from 'path';
+import { resolve } from 'path';
 import { Logger } from '../logger';
+import { JSONValue } from '../../types/strict-types';
+// InputValidator, ValidationRule, JSONObject 未使用，已移除
+import { MCPConfigGenerator } from './mcp-config-generator';
+import {
+  EditorType,
+  MCPConfig,
+  MCPConfigOptions,
+  ValidationResult,
+  TestResult
+} from '../../types/mcp';
 
 /**
  * 配置环境枚举
@@ -33,11 +43,11 @@ export enum ConfigSource {
  */
 export interface ConfigItem {
   key: string;
-  value: any;
+  value: JSONValue;
   type: 'string' | 'number' | 'boolean' | 'object' | 'array';
   description?: string;
   required?: boolean;
-  defaultValue?: any;
+  defaultValue?: JSONValue;
   validation?: ConfigValidation;
   source: ConfigSource;
   lastModified: Date;
@@ -52,9 +62,9 @@ export interface ConfigValidation {
   min?: number;
   max?: number;
   pattern?: string;
-  enum?: any[];
+  enum?: JSONValue[];
   required?: boolean;
-  custom?: (value: any) => boolean | string;
+  custom?: (value: JSONValue) => boolean | string;
 }
 
 /**
@@ -62,8 +72,8 @@ export interface ConfigValidation {
  */
 export interface ConfigChangeEvent {
   key: string;
-  oldValue: any;
-  newValue: any;
+  oldValue: JSONValue | undefined;
+  newValue: JSONValue | undefined;
   source: ConfigSource;
   timestamp: Date;
   environment: ConfigEnvironment;
@@ -91,10 +101,11 @@ export class ConfigManager {
   private logger: Logger;
   private options: ConfigManagerOptions;
   private configs: Map<string, ConfigItem> = new Map();
-  private watchers: Map<string, Function[]> = new Map();
-  private cache: Map<string, { value: any; timestamp: number }> = new Map();
+  private watchers: Map<string, ((event: ConfigChangeEvent) => void)[]> = new Map();
+  private cache: Map<string, { value: JSONValue; timestamp: number }> = new Map();
   private validationRules: Map<string, ConfigValidation> = new Map();
   private changeListeners: Array<(event: ConfigChangeEvent) => void> = [];
+  private mcpGenerator: MCPConfigGenerator;
 
   constructor(logger: Logger, options?: Partial<ConfigManagerOptions>) {
     this.logger = logger;
@@ -111,6 +122,9 @@ export class ConfigManager {
       ...options
     };
 
+    // 初始化MCP配置生成器
+    this.mcpGenerator = new MCPConfigGenerator(logger);
+
     this.initializeDefaultConfigs();
     this.loadConfigurations();
 
@@ -124,12 +138,12 @@ export class ConfigManager {
    * @param key 配置键
    * @param defaultValue 默认值
    */
-  public get<T = any>(key: string, defaultValue?: T): T {
+  public get<T extends JSONValue = JSONValue>(key: string, defaultValue?: T): T {
     // 检查缓存
     if (this.options.enableCache) {
       const cached = this.cache.get(key);
       if (cached && Date.now() - cached.timestamp < this.options.cacheTimeout) {
-        return cached.value;
+        return cached.value as T;
       }
     }
 
@@ -137,12 +151,12 @@ export class ConfigManager {
     let value: T;
 
     if (configItem) {
-      value = configItem.value;
+      value = configItem.value as T;
     } else {
       // 尝试从环境变量获取
       const envValue = this.getFromEnvironment(key);
       if (envValue !== undefined) {
-        value = envValue;
+        value = envValue as T;
       } else {
         value = defaultValue as T;
       }
@@ -162,7 +176,7 @@ export class ConfigManager {
    * @param value 配置值
    * @param source 配置源
    */
-  public set(key: string, value: any, source: ConfigSource = ConfigSource.MEMORY): void {
+  public set(key: string, value: JSONValue, source: ConfigSource = ConfigSource.MEMORY): void {
     const oldValue = this.get(key);
 
     // 验证配置值
@@ -279,8 +293,8 @@ export class ConfigManager {
   /**
    * 获取所有配置
    */
-  public getAll(): Record<string, any> {
-    const result: Record<string, any> = {};
+  public getAll(): Record<string, JSONValue> {
+    const result: Record<string, JSONValue> = {};
 
     this.configs.forEach((item, key) => {
       result[key] = item.value;
@@ -294,7 +308,7 @@ export class ConfigManager {
    * @param configs 配置对象
    * @param source 配置源
    */
-  public setMany(configs: Record<string, any>, source: ConfigSource = ConfigSource.MEMORY): void {
+  public setMany(configs: Record<string, JSONValue>, source: ConfigSource = ConfigSource.MEMORY): void {
     Object.entries(configs).forEach(([key, value]) => {
       this.set(key, value, source);
     });
@@ -381,7 +395,7 @@ export class ConfigManager {
       const configs = JSON.parse(content);
 
       Object.entries(configs).forEach(([key, value]) => {
-        this.set(key, value, ConfigSource.FILE);
+        this.set(key, value as JSONValue, ConfigSource.FILE);
       });
 
       this.logger.info(`配置已从文件加载: ${configPath}`);
@@ -589,7 +603,7 @@ export class ConfigManager {
    * 从环境变量获取值
    * @param key 配置键
    */
-  private getFromEnvironment(key: string): any {
+  private getFromEnvironment(key: string): JSONValue | undefined {
     const envKey = `TASKFLOW_${key.toUpperCase().replace(/\./g, '_')}`;
     const envValue = process.env[envKey];
 
@@ -604,7 +618,7 @@ export class ConfigManager {
    * 解析环境变量值
    * @param value 环境变量值
    */
-  private parseEnvironmentValue(value: string): any {
+  private parseEnvironmentValue(value: string): JSONValue {
     // 尝试解析为JSON
     if (value.startsWith('{') || value.startsWith('[')) {
       try {
@@ -629,7 +643,7 @@ export class ConfigManager {
    * 推断值类型
    * @param value 值
    */
-  private inferType(value: any): 'string' | 'number' | 'boolean' | 'object' | 'array' {
+  private inferType(value: JSONValue): 'string' | 'number' | 'boolean' | 'object' | 'array' {
     if (Array.isArray(value)) return 'array';
     const type = typeof value;
     if (type === 'string' || type === 'number' || type === 'boolean') {
@@ -643,7 +657,7 @@ export class ConfigManager {
    * @param value 配置值
    * @param validation 验证规则
    */
-  private validateValue(value: any, validation: ConfigValidation): true | string {
+  private validateValue(value: JSONValue, validation: ConfigValidation): true | string {
     // 必填检查
     if (validation.required && (value === undefined || value === null)) {
       return '配置值不能为空';
@@ -754,5 +768,116 @@ export class ConfigManager {
         }
       });
     }
+  }
+
+  // ==================== MCP 配置管理方法 ====================
+
+  /**
+   * 为指定编辑器生成MCP配置
+   * @param editor 编辑器类型
+   * @param options 配置选项
+   * @returns MCP配置对象
+   */
+  public generateMCPConfig(editor: EditorType, options?: MCPConfigOptions): MCPConfig {
+    this.logger.info(`生成 ${editor} 编辑器的MCP配置`);
+    return this.mcpGenerator.generateMCPConfig(editor, options);
+  }
+
+  /**
+   * 验证MCP配置
+   * @param config MCP配置对象
+   * @returns 验证结果
+   */
+  public validateMCPConfig(config: MCPConfig): ValidationResult {
+    this.logger.debug(`验证 ${config.editor} 编辑器的MCP配置`);
+    return this.mcpGenerator.validateMCPConfig(config);
+  }
+
+  /**
+   * 导出MCP配置为JSON字符串
+   * @param editor 编辑器类型
+   * @param options 配置选项
+   * @returns JSON格式的配置字符串
+   */
+  public exportMCPConfig(editor: EditorType, options?: MCPConfigOptions): string {
+    const config = this.generateMCPConfig(editor, options);
+    return this.mcpGenerator.exportMCPConfig(config);
+  }
+
+  /**
+   * 导入MCP配置
+   * @param editor 编辑器类型
+   * @param configJson JSON格式的配置字符串
+   */
+  public importMCPConfig(editor: EditorType, configJson: string): void {
+    try {
+      const config = JSON.parse(configJson);
+      this.logger.info(`导入 ${editor} 编辑器的MCP配置`);
+      // 这里可以添加配置导入逻辑
+      this.logger.debug('MCP配置导入成功', config);
+    } catch (error) {
+      this.logger.error(`导入MCP配置失败: ${(error as Error).message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * 测试MCP配置
+   * @param editor 编辑器类型
+   * @param options 配置选项
+   * @returns 测试结果
+   */
+  public async testMCPConfiguration(editor: EditorType, options?: MCPConfigOptions): Promise<TestResult> {
+    this.logger.info(`测试 ${editor} 编辑器的MCP配置`);
+    const config = this.generateMCPConfig(editor, options);
+    return await this.mcpGenerator.testMCPConfiguration(config);
+  }
+
+  /**
+   * 获取MCP服务支持的能力
+   * @returns MCP能力对象
+   */
+  public getMCPCapabilities() {
+    return this.mcpGenerator.getMCPCapabilities();
+  }
+
+  /**
+   * 写入MCP配置文件到磁盘
+   * @param editor 编辑器类型
+   * @param projectRoot 项目根目录
+   * @param options 配置选项
+   */
+  public async writeMCPConfigFiles(
+    editor: EditorType,
+    projectRoot: string = '.',
+    options?: MCPConfigOptions
+  ): Promise<void> {
+    const config = this.generateMCPConfig(editor, options);
+    await this.mcpGenerator.writeMCPConfigFiles(config, projectRoot);
+  }
+
+  /**
+   * 为所有支持的编辑器生成MCP配置文件
+   * @param projectRoot 项目根目录
+   * @param options 配置选项
+   */
+  public async generateAllMCPConfigs(
+    projectRoot: string = '.',
+    options?: MCPConfigOptions
+  ): Promise<void> {
+    const editors: EditorType[] = ['windsurf', 'trae', 'cursor', 'vscode'];
+
+    this.logger.info('开始生成所有编辑器的MCP配置文件');
+
+    for (const editor of editors) {
+      try {
+        await this.writeMCPConfigFiles(editor, projectRoot, options);
+        this.logger.info(`✅ ${editor} MCP配置生成成功`);
+      } catch (error) {
+        this.logger.error(`❌ ${editor} MCP配置生成失败: ${(error as Error).message}`);
+      }
+    }
+
+    this.logger.info('所有编辑器的MCP配置文件生成完成');
   }
 }

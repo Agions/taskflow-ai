@@ -3,9 +3,9 @@
  * 配置全局测试环境、模拟对象和测试工具
  */
 
-import 'reflect-metadata';
 import { config } from 'dotenv';
-import { Logger } from '../src/infra/logger';
+import fs from 'fs-extra';
+import path from 'path';
 
 // 加载测试环境变量
 config({ path: '.env.test' });
@@ -174,7 +174,9 @@ export class TestDataFactory {
 }
 
 // 全局模拟对象
-export class MockLogger implements Logger {
+export class MockLogger {
+  logger = jest.fn();
+  updateConfig = jest.fn();
   debug = jest.fn();
   info = jest.fn();
   warn = jest.fn();
@@ -238,7 +240,7 @@ export function delay(ms: number): Promise<void> {
 
 export function createMockStream() {
   const events: { [key: string]: Function[] } = {};
-  
+
   return {
     on: jest.fn((event: string, callback: Function) => {
       if (!events[event]) events[event] = [];
@@ -257,11 +259,11 @@ export function createMockStream() {
 // 异步测试工具
 export async function waitFor(condition: () => boolean, timeout = 5000): Promise<void> {
   const start = Date.now();
-  
+
   while (!condition() && Date.now() - start < timeout) {
     await delay(10);
   }
-  
+
   if (!condition()) {
     throw new Error(`Condition not met within ${timeout}ms`);
   }
@@ -298,9 +300,79 @@ process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
 });
 
-// 导出测试工具
-export {
-  MockLogger,
-  MockConfigManager,
-  TestDataFactory
-};
+// AI编辑器配置测试工具
+class EditorConfigTestUtilsClass {
+  /**
+   * 创建临时测试目录
+   */
+  static createTempDir(prefix: string = 'test-'): string {
+    const tempDir = path.join(__dirname, '..', 'temp', `${prefix}${Date.now()}`);
+    fs.ensureDirSync(tempDir);
+    return tempDir;
+  }
+
+  /**
+   * 清理临时测试目录
+   */
+  static cleanupTempDir(dir: string): void {
+    if (fs.existsSync(dir)) {
+      fs.removeSync(dir);
+    }
+  }
+
+  /**
+   * 创建模拟项目模板
+   */
+  static createMockProjectTemplate(templateDir: string): void {
+    const templateStructure = {
+      name: 'test-template',
+      displayName: 'Test Template',
+      description: 'Test template for unit testing',
+      type: 'test',
+      features: {
+        typescript: true,
+        testing: true
+      },
+      directories: ['src', 'tests', 'docs'],
+      files: [
+        {
+          path: 'package.json',
+          template: 'test/package.json'
+        }
+      ],
+      editorConfigs: {
+        cursor: {
+          variables: {
+            PROJECT_TYPE: 'Test Project',
+            TYPESCRIPT: true
+          }
+        }
+      }
+    };
+
+    fs.ensureDirSync(templateDir);
+    fs.writeFileSync(
+      path.join(templateDir, 'structure.json'),
+      JSON.stringify(templateStructure, null, 2)
+    );
+  }
+
+  /**
+   * 验证生成的配置文件内容
+   */
+  static validateGeneratedConfig(filePath: string, expectedVariables: Record<string, any>): void {
+    expect(fs.existsSync(filePath)).toBe(true);
+
+    const content = fs.readFileSync(filePath, 'utf-8');
+
+    // 验证变量已被替换
+    Object.entries(expectedVariables).forEach(([key, value]) => {
+      expect(content).not.toContain(`{{${key}}}`);
+      if (typeof value === 'string') {
+        expect(content).toContain(value);
+      }
+    });
+  }
+}
+
+export const EditorConfigTestUtils = EditorConfigTestUtilsClass;

@@ -330,7 +330,7 @@ export class DocumentProcessor {
    * @param content JSON内容
    * @param options 处理选项
    */
-  private parseJsonStructure(content: string, options: ProcessingOptions): DocumentSection[] {
+  private parseJsonStructure(content: string, _options: ProcessingOptions): DocumentSection[] {
     try {
       const data = JSON.parse(content);
       const sections: DocumentSection[] = [];
@@ -549,17 +549,20 @@ export class DocumentProcessor {
    */
   private extractTitle(content: string, documentType: DocumentType): string | null {
     switch (documentType) {
-      case DocumentType.MARKDOWN:
+      case DocumentType.MARKDOWN: {
         const mdTitleMatch = content.match(/^#\s+(.+)$/m);
         return mdTitleMatch ? mdTitleMatch[1].trim() : null;
-      
-      case DocumentType.HTML:
+      }
+
+      case DocumentType.HTML: {
         const htmlTitleMatch = content.match(/<h1[^>]*>(.*?)<\/h1>/i);
         return htmlTitleMatch ? htmlTitleMatch[1].replace(/<[^>]*>/g, '').trim() : null;
-      
-      default:
+      }
+
+      default: {
         const firstLine = content.split('\n')[0].trim();
         return firstLine.length > 0 && firstLine.length < 100 ? firstLine : null;
+      }
     }
   }
 

@@ -93,15 +93,24 @@ export class VisualizeCommand {
    * 处理可视化命令
    * @param options 命令选项
    */
-  private async handleVisualize(options: any): Promise<void> {
+  private async handleVisualize(options: {
+    input?: string;
+    output?: string;
+    format?: string;
+    type?: string;
+    includeSubtasks?: boolean;
+    showProgress?: boolean;
+    groupBy?: string;
+  }): Promise<void> {
     try {
       console.log(chalk.blue('🎨 TaskFlow AI - 任务可视化'));
       console.log();
 
       // 验证可视化类型
       const validTypes = ['gantt', 'dependency', 'kanban', 'timeline', 'progress'];
-      if (!validTypes.includes(options.type)) {
-        console.error(chalk.red(`❌ 无效的可视化类型: ${options.type}`));
+      const visualizationType = options.type || 'gantt';
+      if (!validTypes.includes(visualizationType)) {
+        console.error(chalk.red(`❌ 无效的可视化类型: ${visualizationType}`));
         console.log(chalk.gray(`支持的类型: ${validTypes.join(', ')}`));
         return;
       }
@@ -117,21 +126,22 @@ export class VisualizeCommand {
       console.log();
 
       // 生成可视化
-      console.log(chalk.blue(`🔄 生成 ${options.type} 可视化...`));
+      console.log(chalk.blue(`🔄 生成 ${visualizationType} 可视化...`));
 
       const visualizationOptions = {
-        type: options.type as VisualizationType,
-        format: options.format || 'mermaid',
+        type: visualizationType as VisualizationType,
+        format: (options.format || 'mermaid') as 'html' | 'json' | 'mermaid',
         includeSubtasks: options.includeSubtasks || false,
         showProgress: options.showProgress || false,
-        groupBy: options.groupBy
+        groupBy: options.groupBy as 'type' | 'priority' | 'assignee' | undefined
       };
 
-      const result = this.visualizer.generateVisualization(taskPlan, visualizationOptions);
+      const result = this.visualizer.generateVisualization(taskPlan as any, visualizationOptions);
 
       // 输出结果
       if (options.output) {
-        await this.saveVisualization(result, options.output, options.format);
+        const format = options.format || 'mermaid';
+        await this.saveVisualization(result, options.output, format);
         console.log(chalk.green(`✅ 可视化已保存到: ${options.output}`));
       } else {
         // 输出到控制台
@@ -150,7 +160,7 @@ export class VisualizeCommand {
       console.log(chalk.green('🎉 可视化生成完成!'));
 
       // 显示使用提示
-      this.showUsageTips(options.type, options.format);
+      this.showUsageTips(visualizationType, options.format || 'mermaid');
 
     } catch (error) {
       console.error(chalk.red('❌ 可视化生成失败:'));
@@ -163,7 +173,16 @@ export class VisualizeCommand {
    * 加载任务计划
    * @param inputPath 输入路径
    */
-  private async loadTaskPlan(inputPath?: string): Promise<any> {
+  private async loadTaskPlan(inputPath?: string): Promise<{
+    id: string;
+    name: string;
+    description: string;
+    status: 'draft' | 'active' | 'completed' | 'archived';
+    createdAt: Date;
+    updatedAt: Date;
+    tasks: unknown[];
+    metadata?: unknown;
+  } | null> {
     try {
       if (inputPath) {
         // 从指定文件加载
@@ -203,7 +222,7 @@ export class VisualizeCommand {
    * @param outputPath 输出路径
    * @param format 格式
    */
-  private async saveVisualization(result: any, outputPath: string, format: string): Promise<void> {
+  private async saveVisualization(result: string | Buffer, outputPath: string, _format: string): Promise<void> {
     // 确保输出目录存在
     await fs.ensureDir(path.dirname(outputPath));
 

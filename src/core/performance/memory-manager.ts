@@ -423,7 +423,7 @@ export class MemoryManager {
         const currentSize = pool.size();
         for (let i = 0; i < currentSize / 2; i++) {
           try {
-            const obj = pool.acquire();
+            pool.acquire();
             // 不放回池中，让其被垃圾回收
           } catch (error) {
             break;

@@ -10,8 +10,9 @@ import ora from 'ora';
 import boxen from 'boxen';
 import * as fs from 'fs-extra';
 import { taskFlowService } from '../mcp/index';
-import { ModelType } from '../types/config';
+// ModelType 未使用，已移除
 import { FileType } from '../types/model';
+import { Task, TaskStatus } from '../types/task';
 
 /**
  * 交互式命令处理器
@@ -39,7 +40,8 @@ export class InteractiveCommand {
     // 显示欢迎信息
     this.showWelcome();
 
-    while (true) {
+    let running = true;
+    while (running) {
       try {
         const { action } = await inquirer.prompt([
           {
@@ -76,7 +78,7 @@ export class InteractiveCommand {
 
         if (!shouldContinue) {
           console.log(chalk.green('\n👋 感谢使用 TaskFlow AI！'));
-          break;
+          running = false;
         }
 
         console.log('\n' + '─'.repeat(50) + '\n');
@@ -267,7 +269,7 @@ export class InteractiveCommand {
       if (result.success && result.data && result.data.length > 0) {
         console.log(chalk.green(`\n📊 共有 ${result.data.length} 个任务\n`));
 
-        result.data.forEach((task: any, index: number) => {
+        result.data.forEach((task: Task, index: number) => {
           const statusIcon = this.getStatusIcon(task.status);
           const priorityColor = this.getPriorityColor(task.priority);
 
@@ -398,7 +400,8 @@ export class InteractiveCommand {
     console.log(chalk.blue('\n🤖 AI对话模式'));
     console.log(chalk.gray('输入 "exit" 退出对话\n'));
 
-    while (true) {
+    let chatting = true;
+    while (chatting) {
       const { message } = await inquirer.prompt([
         {
           type: 'input',
@@ -409,7 +412,8 @@ export class InteractiveCommand {
       ]);
 
       if (message.toLowerCase() === 'exit') {
-        break;
+        chatting = false;
+        continue;
       }
 
       const spinner = ora('AI正在思考...').start();
@@ -451,9 +455,9 @@ export class InteractiveCommand {
 
       if (tasksResult.success && tasksResult.data) {
         const tasks = tasksResult.data;
-        const completed = tasks.filter((t: any) => t.status === 'completed').length;
-        const inProgress = tasks.filter((t: any) => t.status === 'in_progress').length;
-        const pending = tasks.filter((t: any) => t.status === 'pending').length;
+        const completed = tasks.filter((t: Task) => t.status === TaskStatus.COMPLETED || t.status === TaskStatus.DONE).length;
+        const inProgress = tasks.filter((t: Task) => t.status === TaskStatus.IN_PROGRESS || t.status === TaskStatus.RUNNING).length;
+        const pending = tasks.filter((t: Task) => t.status === TaskStatus.PENDING || t.status === TaskStatus.NOT_STARTED).length;
 
         console.log(chalk.green('\n📈 任务统计:'));
         console.log(`  ✅ 已完成: ${completed}`);

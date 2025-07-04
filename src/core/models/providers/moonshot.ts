@@ -4,16 +4,15 @@
  */
 
 import axios, { AxiosInstance } from 'axios';
+import { Logger } from '../../../infra/logger';
 import {
+  ChatRequest,
+  ChatResponse,
   ChineseLLMProvider,
   ChineseLLMType,
   ModelConfig,
-  ChatRequest,
-  ChatResponse,
-  StreamResponse,
-  ChatMessage
+  StreamResponse
 } from '../chinese-llm-provider';
-import { Logger } from '../../../infra/logger';
 
 /**
  * 月之暗面模型列表
@@ -70,16 +69,19 @@ export class MoonshotProvider extends ChineseLLMProvider {
         const choice = response.data.choices[0];
         return {
           id: `moonshot-${Date.now()}`,
-          content: choice.message.content,
-          role: 'assistant',
+          object: 'chat.completion',
+          created: Math.floor(Date.now() / 1000),
+          model: response.data.model || this.modelVersion,
+          choices: [{
+            index: 0,
+            message: choice.message,
+            finishReason: choice.finish_reason || 'stop'
+          }],
           usage: {
             promptTokens: response.data.usage?.prompt_tokens || 0,
             completionTokens: response.data.usage?.completion_tokens || 0,
             totalTokens: response.data.usage?.total_tokens || 0
-          },
-          model: response.data.model || this.modelVersion,
-          finishReason: choice.finish_reason || 'stop',
-          timestamp: new Date()
+          }
         };
       } else {
         throw new Error('Invalid response format from Moonshot API');
@@ -120,10 +122,14 @@ export class MoonshotProvider extends ChineseLLMProvider {
             if (data === '[DONE]') {
               onData({
                 id: `moonshot-${Date.now()}`,
-                content: '',
-                role: 'assistant',
-                done: true,
-                timestamp: new Date()
+                object: 'chat.completion.chunk',
+                created: Math.floor(Date.now() / 1000),
+                model: 'moonshot',
+                choices: [{
+                  index: 0,
+                  delta: {},
+                  finishReason: 'stop'
+                }]
               });
               return;
             }
@@ -133,10 +139,15 @@ export class MoonshotProvider extends ChineseLLMProvider {
               if (parsed.choices && parsed.choices[0]?.delta?.content) {
                 onData({
                   id: `moonshot-${Date.now()}`,
-                  content: parsed.choices[0].delta.content,
-                  role: 'assistant',
-                  done: false,
-                  timestamp: new Date()
+                  object: 'chat.completion.chunk',
+                  created: Math.floor(Date.now() / 1000),
+                  model: 'moonshot',
+                  choices: [{
+                    index: 0,
+                    delta: {
+                      content: parsed.choices[0].delta.content
+                    }
+                  }]
                 });
               }
             } catch (e) {
@@ -149,10 +160,14 @@ export class MoonshotProvider extends ChineseLLMProvider {
       response.data.on('end', () => {
         onData({
           id: `moonshot-${Date.now()}`,
-          content: '',
-          role: 'assistant',
-          done: true,
-          timestamp: new Date()
+          object: 'chat.completion.chunk',
+          created: Math.floor(Date.now() / 1000),
+          model: 'moonshot',
+          choices: [{
+            index: 0,
+            delta: {},
+            finishReason: 'stop'
+          }]
         });
       });
 
@@ -163,9 +178,9 @@ export class MoonshotProvider extends ChineseLLMProvider {
   }
 
   /**
-   * 验证配置
+   * 验证API密钥
    */
-  public async validateConfig(): Promise<boolean> {
+  public async validateApiKey(): Promise<boolean> {
     try {
       const testRequest: ChatRequest = {
         messages: [{ role: 'user', content: 'Hello' }],
@@ -177,6 +192,29 @@ export class MoonshotProvider extends ChineseLLMProvider {
     } catch (error) {
       return false;
     }
+  }
+
+  /**
+   * 获取模型信息
+   */
+  public async getModelInfo(): Promise<any> {
+    return {
+      provider: 'Moonshot',
+      models: this.getSupportedModels(),
+      features: ['长上下文', '文档理解', '知识问答'],
+      maxContextLength: 200000
+    };
+  }
+
+  /**
+   * 获取支持的模型列表
+   */
+  public getSupportedModels(): string[] {
+    return [
+      'moonshot-v1-8k',
+      'moonshot-v1-32k',
+      'moonshot-v1-128k'
+    ];
   }
 
   /**

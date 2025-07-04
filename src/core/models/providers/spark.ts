@@ -5,16 +5,15 @@
 
 import axios, { AxiosInstance } from 'axios';
 import crypto from 'crypto';
+import { Logger } from '../../../infra/logger';
 import {
+  ChatRequest,
+  ChatResponse,
   ChineseLLMProvider,
   ChineseLLMType,
   ModelConfig,
-  ChatRequest,
-  ChatResponse,
-  StreamResponse,
-  ChatMessage
+  StreamResponse
 } from '../chinese-llm-provider';
-import { Logger } from '../../../infra/logger';
 
 /**
  * 讯飞星火模型列表
@@ -75,16 +74,22 @@ export class SparkProvider extends ChineseLLMProvider {
         const choice = response.data.payload.choices.text[0];
         return {
           id: `spark-${Date.now()}`,
-          content: choice.content,
-          role: 'assistant',
+          object: 'chat.completion',
+          created: Math.floor(Date.now() / 1000),
+          model: this.domain,
+          choices: [{
+            index: 0,
+            message: {
+              role: 'assistant',
+              content: choice.content
+            },
+            finishReason: choice.finish_reason || 'stop'
+          }],
           usage: {
             promptTokens: response.data.payload.usage?.text?.prompt_tokens || 0,
             completionTokens: response.data.payload.usage?.text?.completion_tokens || 0,
             totalTokens: response.data.payload.usage?.text?.total_tokens || 0
-          },
-          model: this.domain,
-          finishReason: choice.finish_reason || 'stop',
-          timestamp: new Date()
+          }
         };
       } else {
         throw new Error('Invalid response format from Spark API');
@@ -108,26 +113,35 @@ export class SparkProvider extends ChineseLLMProvider {
       const response = await this.chat(request);
 
       // 模拟流式输出
-      const content = response.content;
+      const content = response.choices[0].message.content;
       const chunks = content.split('');
 
       for (let i = 0; i < chunks.length; i++) {
         await new Promise(resolve => setTimeout(resolve, 50));
         onData({
           id: response.id,
-          content: chunks.slice(0, i + 1).join(''),
-          role: 'assistant',
-          done: false,
-          timestamp: new Date()
+          object: 'chat.completion.chunk',
+          created: response.created,
+          model: response.model,
+          choices: [{
+            index: 0,
+            delta: {
+              content: chunks[i]
+            }
+          }]
         });
       }
 
       onData({
         id: response.id,
-        content: response.content,
-        role: 'assistant',
-        done: true,
-        timestamp: new Date()
+        object: 'chat.completion.chunk',
+        created: response.created,
+        model: response.model,
+        choices: [{
+          index: 0,
+          delta: {},
+          finishReason: 'stop'
+        }]
       });
     } catch (error) {
       this.logger.error('Spark流式API调用失败', error);
@@ -138,7 +152,7 @@ export class SparkProvider extends ChineseLLMProvider {
   /**
    * 验证API密钥
    */
-  public async validateConfig(): Promise<boolean> {
+  public async validateApiKey(): Promise<boolean> {
     try {
       const testRequest: ChatRequest = {
         messages: [{ role: 'user', content: 'Hello' }],
@@ -150,6 +164,29 @@ export class SparkProvider extends ChineseLLMProvider {
     } catch (error) {
       return false;
     }
+  }
+
+  /**
+   * 获取模型信息
+   */
+  public async getModelInfo(): Promise<any> {
+    return {
+      provider: 'Spark',
+      models: this.getSupportedModels(),
+      features: ['语音交互', '实时对话', '教育场景'],
+      maxContextLength: 8000
+    };
+  }
+
+  /**
+   * 获取支持的模型列表
+   */
+  public getSupportedModels(): string[] {
+    return [
+      'generalv3.5',
+      'generalv3',
+      'generalv2'
+    ];
   }
 
   /**

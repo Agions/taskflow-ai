@@ -5,12 +5,11 @@
 
 import { Logger } from '../../infra/logger';
 import { Task, TaskPlan } from '../../types/task';
-import { OrchestrationResult, ExecutionPath } from '../ai/intelligent-orchestrator';
-import { 
-  ChartGenerator, 
-  ChartType, 
-  GeneratedChart, 
-  ChartConfig 
+import { OrchestrationResult } from '../ai/intelligent-orchestrator';
+import {
+  ChartGenerator,
+  ChartType,
+  GeneratedChart
 } from './chart-generator';
 
 /**
@@ -553,8 +552,8 @@ export class DashboardGenerator {
    * 计算项目经理指标
    */
   private calculateProjectManagerMetrics(
-    taskPlan: TaskPlan,
-    orchestrationResult?: OrchestrationResult
+    _taskPlan: TaskPlan,
+    _orchestrationResult?: OrchestrationResult
   ): DashboardMetric[] {
     // 实现项目经理相关指标计算
     return [];
@@ -563,7 +562,7 @@ export class DashboardGenerator {
   /**
    * 计算开发者指标
    */
-  private calculateDeveloperMetrics(tasks: Task[]): DashboardMetric[] {
+  private calculateDeveloperMetrics(_tasks: Task[]): DashboardMetric[] {
     // 实现开发者相关指标计算
     return [];
   }
@@ -638,11 +637,12 @@ export class DashboardGenerator {
    */
   private calculatePosition(index: number, layout: DashboardLayout): { x: number; y: number; width: number; height: number } {
     switch (layout) {
-      case DashboardLayout.GRID:
+      case DashboardLayout.GRID: {
         const cols = 2;
         const x = (index % cols) * 6;
         const y = Math.floor(index / cols) * 4;
         return { x, y, width: 6, height: 4 };
+      }
       
       default:
         return { x: 0, y: index * 4, width: 12, height: 4 };

@@ -5,7 +5,7 @@
 
 import { Logger } from '../../infra/logger';
 import { DocumentStructure, DocumentSection, SectionType } from './document-processor';
-import { TaskPriority, TaskType } from '../../types/task';
+import { TaskPriority } from '../../types/task';
 
 /**
  * 需求类型枚举
@@ -430,7 +430,7 @@ export class RequirementExtractor {
     description: string,
     type: RequirementType,
     section: DocumentSection,
-    content: string
+    _content: string
   ): Requirement {
     return {
       id,
@@ -581,7 +581,7 @@ export class RequirementExtractor {
    * @param description 描述
    * @param type 类型
    */
-  private calculateConfidence(description: string, type: RequirementType): number {
+  private calculateConfidence(description: string, _type: RequirementType): number {
     let confidence = 0.5;
     
     // 基于模式匹配的置信度

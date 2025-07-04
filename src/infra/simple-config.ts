@@ -125,7 +125,7 @@ export class SimpleConfigManager {
   /**
    * 更新配置（兼容原ConfigManager接口）
    */
-  updateConfig(config: any, isProjectLevel = false): void {
+  updateConfig(config: any, _isProjectLevel = false): void {
     this.update(config);
   }
 

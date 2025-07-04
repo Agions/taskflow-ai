@@ -1,7 +1,7 @@
 import winston from 'winston';
 import path from 'path';
 import fs from 'fs-extra';
-import { LogLevel, LoggerConfig } from '../types/config';
+import {  LoggerConfig } from '../types/config';
 
 /**
  * 日志服务，用于记录应用运行日志
@@ -120,4 +120,14 @@ export class Logger {
   public debug(message: string, meta?: any): void {
     this.logger.debug(message, meta);
   }
-} 
+
+  /**
+   * 通用日志记录方法
+   * @param level 日志级别
+   * @param message 日志消息
+   * @param meta 元数据
+   */
+  public log(level: string, message: string, meta?: any): void {
+    this.logger.log(level, message, meta);
+  }
+}

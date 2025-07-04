@@ -70,10 +70,22 @@ export interface ModelCapabilities {
 }
 
 /**
+ * 多模型配置
+ */
+export interface MultiModelConfig {
+  enabled: boolean;
+  primary: ModelType;
+  fallback: ModelType[];
+  loadBalancing?: boolean;
+  costOptimization?: boolean;
+}
+
+/**
  * PRD解析选项
  */
 export interface ParseOptions {
   modelType?: ModelType;
+  multiModel?: MultiModelConfig;
   extractSections?: boolean;
   extractFeatures?: boolean;
   prioritize?: boolean;

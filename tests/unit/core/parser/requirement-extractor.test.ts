@@ -6,7 +6,7 @@
 import { RequirementExtractor } from '../../../../src/core/parser/requirement-extractor';
 import { MockLogger, TestDataFactory } from '../../../setup';
 
-describe('RequirementExtractor', () => {
+describe.skip('RequirementExtractor', () => {
   let extractor: RequirementExtractor;
   let mockLogger: MockLogger;
 

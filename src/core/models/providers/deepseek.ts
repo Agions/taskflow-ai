@@ -10,8 +10,7 @@ import {
   ModelConfig,
   ChatRequest,
   ChatResponse,
-  StreamResponse,
-  ChatMessage
+  StreamResponse
 } from '../chinese-llm-provider';
 import { Logger } from '../../../infra/logger';
 

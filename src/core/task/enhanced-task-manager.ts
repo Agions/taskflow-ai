@@ -543,7 +543,7 @@ export class EnhancedTaskManager extends EventEmitter {
     }
 
     const tasks = this.taskPlan.tasks;
-    const taskMap = new Map(tasks.map(t => [t.id, t]));
+    // const taskMap = new Map(tasks.map(t => [t.id, t])); // 暂时未使用
 
     // 检测循环依赖
     const circularDependencies = this.detectCircularDependencies(tasks);
@@ -749,7 +749,7 @@ export class EnhancedTaskManager extends EventEmitter {
    * 检测循环依赖
    * @param tasks 任务列表
    */
-  private detectCircularDependencies(tasks: Task[]): string[][] {
+  private detectCircularDependencies(_tasks: Task[]): string[][] {
     // 简化实现，实际应该使用图算法
     return [];
   }
@@ -758,7 +758,7 @@ export class EnhancedTaskManager extends EventEmitter {
    * 计算关键路径
    * @param tasks 任务列表
    */
-  private calculateCriticalPath(tasks: Task[]): string[] {
+  private calculateCriticalPath(_tasks: Task[]): string[] {
     // 简化实现，实际应该使用关键路径方法
     return [];
   }
@@ -786,7 +786,7 @@ export class EnhancedTaskManager extends EventEmitter {
    * 识别并行任务组
    * @param tasks 任务列表
    */
-  private identifyParallelGroups(tasks: Task[]): string[][] {
+  private identifyParallelGroups(_tasks: Task[]): string[][] {
     // 简化实现
     return [];
   }

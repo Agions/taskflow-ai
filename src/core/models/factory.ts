@@ -1,9 +1,10 @@
-import { ModelAdapter } from './adapter/base';
-import { BaiduModelAdapter } from './adapter/baidu';
-import { DeepseekModelAdapter } from './adapter/deepseek';
-import { ZhipuModelAdapter } from './adapter/zhipu';
 import { ConfigManager } from '../../infra/config';
 import { ModelType } from '../../types/config';
+import { BaiduModelAdapter } from './adapter/baidu';
+import { ModelAdapter } from './adapter/base';
+import { DeepseekModelAdapter } from './adapter/deepseek';
+import { ZhipuModelAdapter } from './adapter/zhipu';
+import { QwenModelAdapter } from './providers/qwen';
 
 /**
  * 模型工厂类
@@ -47,6 +48,9 @@ export class ModelFactory {
         break;
       case ModelType.ZHIPU:
         adapter = new ZhipuModelAdapter(this.configManager);
+        break;
+      case ModelType.QWEN:
+        adapter = new QwenModelAdapter(this.configManager);
         break;
       // TODO: 添加其他模型适配器
       // case ModelType.XUNFEI:
@@ -96,4 +100,4 @@ export class ModelFactory {
       return false;
     }
   }
-} 
+}

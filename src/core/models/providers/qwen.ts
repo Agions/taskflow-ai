@@ -4,16 +4,15 @@
  */
 
 import axios, { AxiosInstance } from 'axios';
+import { ConfigManager } from '../../../infra/config';
+import { ModelType, QwenModelConfig } from '../../../types/config';
 import {
-  ChineseLLMProvider,
-  ChineseLLMType,
-  ModelConfig,
-  ChatRequest,
-  ChatResponse,
-  StreamResponse,
-  ChatMessage
-} from '../chinese-llm-provider';
-import { Logger } from '../../../infra/logger';
+  MessageRole,
+  ModelCallOptions,
+  ModelRequestParams,
+  ModelResponse
+} from '../../../types/model';
+import { BaseModelAdapter } from '../adapter/base';
 
 /**
  * 阿里通义千问模型适配器
@@ -25,11 +24,17 @@ export class QwenModelAdapter extends BaseModelAdapter {
   private endpoint: string;
   private modelVersion: string;
 
-  constructor(apiKey: string, endpoint?: string, modelVersion?: string) {
+  constructor(configManager: ConfigManager) {
     super(ModelType.QWEN);
-    this.apiKey = apiKey;
-    this.endpoint = endpoint || 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation';
-    this.modelVersion = modelVersion || 'qwen-turbo';
+
+    const config = configManager.get<QwenModelConfig>(`models.${ModelType.QWEN}`);
+    if (!config) {
+      throw new Error('Qwen模型配置未找到');
+    }
+
+    this.apiKey = config.apiKey;
+    this.endpoint = config.endpoint || 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation';
+    this.modelVersion = config.modelVersion || 'qwen-turbo';
 
     this.client = axios.create({
       baseURL: this.endpoint,
@@ -45,7 +50,7 @@ export class QwenModelAdapter extends BaseModelAdapter {
   /**
    * 执行聊天请求
    */
-  public async chat(params: ModelRequestParams, options?: ModelCallOptions): Promise<ModelResponse> {
+  public async chat(params: ModelRequestParams, _options?: ModelCallOptions): Promise<ModelResponse> {
     try {
       const requestData = this.buildRequestData(params);
 
@@ -59,7 +64,6 @@ export class QwenModelAdapter extends BaseModelAdapter {
             completionTokens: response.data.usage?.output_tokens || 0,
             totalTokens: response.data.usage?.total_tokens || 0
           },
-          model: this.modelVersion,
           finishReason: response.data.output.finish_reason || 'stop'
         };
       } else {
@@ -76,7 +80,7 @@ export class QwenModelAdapter extends BaseModelAdapter {
   public async chatStream(
     params: ModelRequestParams,
     onData: (content: string, done: boolean) => void,
-    options?: ModelCallOptions
+    _options?: ModelCallOptions
   ): Promise<void> {
     try {
       const requestData = {
@@ -90,7 +94,8 @@ export class QwenModelAdapter extends BaseModelAdapter {
       // 启用SSE
       const response = await this.client.post('', requestData, {
         headers: {
-          ...this.client.defaults.headers,
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
           'X-DashScope-SSE': 'enable',
           'Accept': 'text/event-stream'
         },
@@ -139,7 +144,7 @@ export class QwenModelAdapter extends BaseModelAdapter {
   public async validateApiKey(): Promise<boolean> {
     try {
       const testParams: ModelRequestParams = {
-        messages: [{ role: 'user', content: 'Hello' }],
+        messages: [{ role: MessageRole.USER, content: 'Hello' }],
         maxTokens: 10
       };
 
@@ -179,11 +184,9 @@ export class QwenModelAdapter extends BaseModelAdapter {
  * 创建通义千问模型适配器实例
  */
 export function createQwenAdapter(
-  apiKey: string,
-  endpoint?: string,
-  modelVersion?: string
+  configManager: ConfigManager
 ): QwenModelAdapter {
-  return new QwenModelAdapter(apiKey, endpoint, modelVersion);
+  return new QwenModelAdapter(configManager);
 }
 
 /**

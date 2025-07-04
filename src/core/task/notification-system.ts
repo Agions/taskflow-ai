@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * 通知系统 - 处理各种通知和提醒
  * 支持多种通知渠道和智能提醒
@@ -5,7 +7,6 @@
 
 import { EventEmitter } from 'events';
 import { Logger } from '../../infra/logger';
-import { Task, TaskStatus } from '../../types/task';
 import { User, Notification, NotificationType } from './collaboration-manager';
 
 /**
@@ -564,7 +565,7 @@ export class NotificationSystem extends EventEmitter {
     if (!reminder.recurringPattern) return;
 
     const pattern = reminder.recurringPattern;
-    let nextDate = new Date(reminder.scheduledAt);
+    const nextDate = new Date(reminder.scheduledAt);
 
     switch (pattern.type) {
       case 'daily':

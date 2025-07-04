@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Task, TaskPlan, TaskStatus, TaskPriority, TaskType } from '../../types/task';
@@ -271,7 +272,7 @@ export class TaskManager {
 
     // 检查是否是子任务
     if (id.includes('.')) {
-      const [parentId, subtaskIdPart] = id.split('.');
+      const [parentId] = id.split('.');
 
       // 找到父任务
       const parentTaskIndex = this.taskPlan.tasks.findIndex(task => task.id === parentId);
@@ -345,7 +346,7 @@ export class TaskManager {
 
     // 检查是否是子任务
     if (id.includes('.')) {
-      const [parentId, subtaskIdPart] = id.split('.');
+      const [parentId] = id.split('.');
 
       // 找到父任务
       const parentTaskIndex = this.taskPlan.tasks.findIndex(task => task.id === parentId);

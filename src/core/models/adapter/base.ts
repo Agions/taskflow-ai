@@ -1,8 +1,7 @@
-import { 
-  ChatMessage, 
-  ModelCallOptions, 
-  ModelRequestParams, 
-  ModelResponse 
+import {
+  ModelCallOptions,
+  ModelRequestParams,
+  ModelResponse
 } from '../../../types/model';
 import { ModelType } from '../../../types/config';
 

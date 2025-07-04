@@ -32,4 +32,4 @@ export {
 export { taskFlowService } from './mcp/index';
 
 // 版本信息
-export const VERSION = '1.0.0';
+export const VERSION = '1.2.0';

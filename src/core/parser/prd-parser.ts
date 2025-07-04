@@ -3,9 +3,9 @@ import * as path from 'path';
 import { ModelCoordinator } from '../models/coordinator';
 import { FileType, ParseOptions } from '../../types/model';
 import { Logger } from '../../infra/logger';
-import { ConfigManager } from '../../infra/config';
+// ConfigManager 未使用，已移除
 import { DocumentProcessor, DocumentStructure, ProcessingOptions } from './document-processor';
-import { RequirementExtractor, ExtractionOptions, ExtractionResult, Requirement } from './requirement-extractor';
+import { RequirementExtractor, ExtractionOptions, ExtractionResult } from './requirement-extractor';
 import { ParsedPRD, Feature } from '../../types/task';
 
 /**

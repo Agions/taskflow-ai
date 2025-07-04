@@ -5,6 +5,17 @@ import path from 'path';
 import fs from 'fs-extra';
 import { taskFlowService } from '../mcp/index';
 import { ModelType } from '../types/config';
+import { Ora } from 'ora';
+
+// 导入正确的类型定义
+import { ParsedPRD } from '../types/task';
+
+// 定义服务响应接口，与TaskFlowService返回格式一致
+interface ServiceResponse {
+  success: boolean;
+  data?: ParsedPRD;
+  error?: string;
+}
 
 /**
  * 解析PRD文档命令
@@ -40,8 +51,8 @@ export default function parseCommand(program: Command): void {
         }
 
         // 开始解析
-        let spinner: any;
-        let result: any;
+        let spinner: Ora;
+        let result: ServiceResponse;
 
         if (options.multiModel) {
           spinner = ora('正在启动多模型协作解析...').start();

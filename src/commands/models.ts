@@ -1,8 +1,27 @@
-import { Command } from 'commander';
 import chalk from 'chalk';
+import { Command } from 'commander';
 import ora from 'ora';
 import { taskFlowService } from '../mcp/index';
 import { ModelType } from '../types/config';
+// JSONObject 未使用，已移除
+
+interface TestResult {
+  model: string;
+  success: boolean;
+  latency: number;
+  avgLatency?: number;
+  successRate?: number;
+  tokensPerSecond?: number;
+  error?: string;
+}
+
+interface ModelStats {
+  model: string;
+  calls: number;
+  successRate: number;
+  avgLatency: number;
+  cost: number;
+}
 
 /**
  * 模型管理命令
@@ -79,7 +98,7 @@ export default function modelsCommand(program: Command): void {
           console.log(`   ${model.description}`);
           console.log(`   状态: ${model.status}`);
           console.log(`   成本: ${model.cost}`);
-          
+
           if (options.detailed) {
             console.log(`   特性: ${model.features.join(', ')}`);
           }
@@ -100,11 +119,11 @@ export default function modelsCommand(program: Command): void {
     .description('测试指定模型的连接状态')
     .action(async (model) => {
       const spinner = ora(`正在测试 ${model} 模型连接...`).start();
-      
+
       try {
         // 这里应该调用实际的模型测试逻辑
         const isValid = await testModelConnection(model);
-        
+
         if (isValid) {
           spinner.succeed(chalk.green(`✅ ${model} 模型连接正常`));
         } else {
@@ -128,24 +147,36 @@ export default function modelsCommand(program: Command): void {
     .action(async (options) => {
       const models = options.models.split(',').map((m: string) => m.trim());
       const iterations = parseInt(options.iterations);
-      
+
       console.log(chalk.blue('🏃‍♂️ 开始模型性能基准测试'));
       console.log(`测试模型: ${models.join(', ')}`);
       console.log(`迭代次数: ${iterations}`);
       console.log();
 
-      const results: any[] = [];
+      const results: TestResult[] = [];
 
       for (const model of models) {
         const spinner = ora(`测试 ${model} 模型性能...`).start();
-        
+
         try {
           const result = await runBenchmark(model, iterations);
-          results.push({ model, ...result });
+          results.push({
+            model,
+            success: true,
+            latency: result.avgLatency,
+            avgLatency: result.avgLatency,
+            successRate: result.successRate,
+            tokensPerSecond: result.tokensPerSecond
+          });
           spinner.succeed(`✅ ${model} 测试完成`);
         } catch (error) {
           spinner.fail(`❌ ${model} 测试失败: ${error}`);
-          results.push({ model, error: error.toString() });
+          results.push({
+            model,
+            success: false,
+            latency: 0,
+            error: error instanceof Error ? error.message : String(error)
+          });
         }
       }
 
@@ -158,7 +189,7 @@ export default function modelsCommand(program: Command): void {
         if (r.error) {
           return `${r.model.padEnd(12)} | 失败: ${r.error}`;
         }
-        return `${r.model.padEnd(12)} | ${r.avgLatency}ms | ${r.successRate}% | ${r.tokensPerSecond} tokens/s`;
+        return `${r.model.padEnd(12)} | ${r.avgLatency || r.latency}ms | ${r.successRate || 0}% | ${r.tokensPerSecond || 0} tokens/s`;
       });
 
       console.log('模型        | 平均延迟 | 成功率 | 处理速度');
@@ -172,11 +203,11 @@ export default function modelsCommand(program: Command): void {
     .description('切换默认使用的模型')
     .action(async (model) => {
       const spinner = ora(`正在切换默认模型到 ${model}...`).start();
-      
+
       try {
         // 首先测试模型是否可用
         const isValid = await testModelConnection(model);
-        
+
         if (!isValid) {
           spinner.fail(chalk.red(`❌ 无法切换到 ${model}，模型连接失败`));
           return;
@@ -191,7 +222,7 @@ export default function modelsCommand(program: Command): void {
 
         spinner.succeed(chalk.green(`✅ 默认模型已切换到 ${model}`));
         console.log(chalk.yellow(`💡 使用 "taskflow-ai config list" 查看当前配置`));
-        
+
       } catch (error) {
         spinner.fail(chalk.red(`❌ 切换模型失败: ${error}`));
       }
@@ -210,11 +241,11 @@ export default function modelsCommand(program: Command): void {
 
         // 这里应该从实际的统计数据中获取
         const stats = await getModelStats(options.period);
-        
+
         console.log('模型        | 调用次数 | 成功率 | 平均延迟 | 总成本');
         console.log('------------|----------|--------|----------|--------');
-        
-        stats.forEach((stat: any) => {
+
+        stats.forEach((stat: ModelStats) => {
           console.log(
             `${stat.model.padEnd(12)} | ${stat.calls.toString().padEnd(8)} | ${stat.successRate}% | ${stat.avgLatency}ms | $${stat.cost}`
           );
@@ -229,7 +260,7 @@ export default function modelsCommand(program: Command): void {
 /**
  * 测试模型连接
  */
-async function testModelConnection(model: string): Promise<boolean> {
+async function testModelConnection(_model: string): Promise<boolean> {
   try {
     // 模拟测试逻辑
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -244,13 +275,13 @@ async function testModelConnection(model: string): Promise<boolean> {
  */
 async function runBenchmark(model: string, iterations: number) {
   const results = [];
-  
+
   for (let i = 0; i < iterations; i++) {
     const start = Date.now();
     // 模拟API调用
     await new Promise(resolve => setTimeout(resolve, Math.random() * 2000 + 500));
     const latency = Date.now() - start;
-    
+
     results.push({
       latency,
       success: Math.random() > 0.1, // 90%成功率
@@ -273,7 +304,7 @@ async function runBenchmark(model: string, iterations: number) {
 /**
  * 获取模型使用统计
  */
-async function getModelStats(period: string) {
+async function getModelStats(_period: string) {
   // 模拟统计数据
   return [
     { model: 'deepseek', calls: 156, successRate: 98, avgLatency: 1200, cost: 2.34 },
