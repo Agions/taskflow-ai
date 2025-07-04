@@ -9,13 +9,14 @@ import ora from 'ora';
 import { Logger } from '../../infra/logger';
 import { ConfigManager } from '../../infra/config/config-manager';
 import { EditorType } from '../../types/mcp';
+import { LogLevel } from '../../types/config';
 
 /**
  * 创建 MCP 命令
  */
 export function createMCPCommand(): Command {
   const logger = Logger.getInstance({
-    level: 'info' as any,
+    level: LogLevel.INFO,
     output: 'console'
   });
   const config = new ConfigManager(logger);

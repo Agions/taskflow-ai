@@ -11,7 +11,6 @@ examples/
 # bin/ 目录包含重要的可执行文件，不应被忽略
 # 编译缓存
 *.tsbuildinfo
-
 # 日志文件
 logs/
 *.log
@@ -39,6 +38,7 @@ yarn-error.log*
 *.swo
 .DS_Store
 Thumbs.db
+*.package-lock.json
 
 # 测试覆盖率
 coverage/

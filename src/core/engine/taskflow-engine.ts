@@ -9,7 +9,7 @@ import { ModelCoordinator } from '../models/coordinator';
 import { PRDParser } from '../parser/prd-parser';
 import { TaskPlanner } from '../planner/task-planner';
 import { TaskManager } from '../task/task-manager';
-import { Task, TaskPlan, ParsedPRD } from '../../types/task';
+import { Task, TaskPlan, ParsedPRD, TaskStatus } from '../../types/task';
 import { PlanningOptions } from '../../types/model';
 
 /**
@@ -38,13 +38,13 @@ export interface ParseOptions {
 /**
  * 引擎执行结果
  */
-export interface EngineResult<T = any> {
+export interface EngineResult<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
   errors?: string[];
   warnings?: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -273,7 +273,7 @@ export class TaskFlowEngine {
    */
   public async updateTaskStatus(taskId: string, status: string): Promise<EngineResult<Task>> {
     try {
-      const task = this.taskManager.updateTask(taskId, { status: status as any });
+      const task = this.taskManager.updateTask(taskId, { status: status as TaskStatus });
 
       if (!task) {
         return {

@@ -163,7 +163,14 @@ export class ZhipuModelAdapter extends BaseModelAdapter {
    * @param params 请求参数
    * @param options 调用选项
    */
-  private buildRequestBody(params: ModelRequestParams, options?: ModelCallOptions): any {
+  private buildRequestBody(params: ModelRequestParams, options?: ModelCallOptions): {
+    model: string;
+    messages: Array<{ role: string; content: string }>;
+    temperature?: number;
+    max_tokens?: number;
+    top_p?: number;
+    stream?: boolean;
+  } {
     const messages = params.messages.map(msg => ({
       role: this.mapRole(msg.role),
       content: msg.content,
@@ -183,7 +190,17 @@ export class ZhipuModelAdapter extends BaseModelAdapter {
    * 处理响应数据
    * @param response 响应数据
    */
-  private processResponse(response: any): ModelResponse {
+  private processResponse(response: {
+    choices: Array<{
+      message: { content: string };
+      finish_reason?: string;
+    }>;
+    usage?: {
+      prompt_tokens: number;
+      completion_tokens: number;
+      total_tokens: number;
+    };
+  }): ModelResponse {
     if (!response.choices || response.choices.length === 0) {
       throw new Error('无效的响应格式：没有返回choices字段');
     }

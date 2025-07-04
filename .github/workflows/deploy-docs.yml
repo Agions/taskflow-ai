@@ -7,11 +7,6 @@ on:
     paths:
       - 'docs/**'
       - '.github/workflows/deploy-docs.yml'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'docs/**'
   workflow_dispatch:
 
 # 设置GITHUB_TOKEN的权限以允许部署到GitHub Pages
@@ -45,6 +40,9 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        with:
+          # 启用静态站点生成器
+          static_site_generator: custom
 
       - name: Install dependencies
         run: |
@@ -74,20 +72,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-  # 预览作业（仅用于PR）
-  preview:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Comment PR
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '📖 文档预览构建完成！构建产物已生成，合并后将自动部署到 GitHub Pages。'
-            })

@@ -15,8 +15,8 @@ import { BaiduWenxinProvider } from './providers/baidu-wenxin';
 import { AlibabaQwenProvider } from './providers/alibaba-qwen';
 import { DeepSeekProvider } from './providers/deepseek';
 import { ZhipuProvider } from './providers/zhipu';
-import { SparkProvider } from './providers/spark';
-import { MoonshotProvider } from './providers/moonshot';
+import { SparkProvider, SparkConfig } from './providers/spark';
+import { MoonshotProvider, MoonshotConfig } from './providers/moonshot';
 
 /**
  * 模型提供商配置接口
@@ -396,10 +396,10 @@ export class ModelFactory {
         return new ZhipuProvider(config, this.logger);
 
       case ChineseLLMType.XUNFEI_SPARK:
-        return new SparkProvider(config as any, this.logger);
+        return new SparkProvider(config as SparkConfig, this.logger);
 
       case ChineseLLMType.MOONSHOT:
-        return new MoonshotProvider(config as any, this.logger);
+        return new MoonshotProvider(config as MoonshotConfig, this.logger);
 
       // case ChineseLLMType.TENCENT_HUNYUAN:
       //   return new TencentHunyuanProvider(config, this.logger);
@@ -577,20 +577,24 @@ export class ModelFactory {
   private collectMetrics(): void {
     const metrics = {
       timestamp: new Date(),
-      providers: {} as Record<string, any>
+      providers: {} as Record<string, {
+        totalCalls: number;
+        successfulCalls: number;
+        failedCalls: number;
+        averageResponseTime: number;
+        health: number;
+      }>
     };
 
     for (const [provider, stats] of this.usageStats) {
       const health = this.providerHealth.get(provider);
 
       metrics.providers[provider] = {
-        totalRequests: stats.totalRequests,
-        successRate: stats.totalRequests > 0 ? stats.successfulRequests / stats.totalRequests : 0,
-        errorRate: stats.totalRequests > 0 ? stats.failedRequests / stats.totalRequests : 0,
-        averageLatency: stats.averageLatency,
-        totalTokens: stats.totalTokens,
-        totalCost: stats.totalCost,
-        isHealthy: health?.isHealthy || false
+        totalCalls: stats.totalRequests,
+        successfulCalls: stats.successfulRequests,
+        failedCalls: stats.failedRequests,
+        averageResponseTime: stats.averageLatency,
+        health: health?.isHealthy ? 1 : 0
       };
     }
 

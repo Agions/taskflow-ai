@@ -1,0 +1,72 @@
+{
+  "app": {
+    "name": "TaskFlow AI",
+    "version": "1.2.0",
+    "environment": "development",
+    "debug": true
+  },
+  "server": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "database": {
+    "type": "sqlite",
+    "path": "./data/taskflow.db"
+  },
+  "models": {
+    "default": "deepseek",
+    "providers": {
+      "deepseek": {
+        "apiKey": "${DEEPSEEK_API_KEY}",
+        "endpoint": "https://api.deepseek.com/v1",
+        "model": "deepseek-chat"
+      },
+      "zhipu": {
+        "apiKey": "${ZHIPU_API_KEY}",
+        "endpoint": "https://open.bigmodel.cn/api/paas/v4",
+        "model": "glm-4"
+      },
+      "baidu": {
+        "apiKey": "${BAIDU_API_KEY}",
+        "secretKey": "${BAIDU_SECRET_KEY}",
+        "endpoint": "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat"
+      },
+      "qwen": {
+        "apiKey": "${QWEN_API_KEY}",
+        "endpoint": "https://dashscope.aliyuncs.com/api/v1",
+        "model": "qwen-turbo"
+      },
+      "spark": {
+        "apiKey": "${SPARK_API_KEY}",
+        "appId": "${SPARK_APP_ID}",
+        "apiSecret": "${SPARK_API_SECRET}",
+        "endpoint": "wss://spark-api.xf-yun.com/v3.5/chat"
+      },
+      "moonshot": {
+        "apiKey": "${MOONSHOT_API_KEY}",
+        "endpoint": "https://api.moonshot.cn/v1",
+        "model": "moonshot-v1-8k"
+      }
+    }
+  },
+  "logger": {
+    "level": "debug",
+    "output": "both",
+    "file": "./logs/taskflow.log"
+  },
+  "features": {
+    "multiModel": true,
+    "intelligentOrchestration": true,
+    "mcpIntegration": true,
+    "performanceOptimization": true
+  },
+  "security": {
+    "enableEncryption": false,
+    "allowedOrigins": ["http://localhost:3000"],
+    "rateLimiting": {
+      "enabled": false,
+      "maxRequests": 100,
+      "windowMs": 900000
+    }
+  }
+}

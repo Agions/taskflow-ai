@@ -40,6 +40,9 @@ var os__namespace = /*#__PURE__*/_interopNamespaceDefault(os);
 var crypto__namespace = /*#__PURE__*/_interopNamespaceDefault(crypto);
 
 /**
+ * 模型相关类型定义
+ */
+/**
  * 消息角色
  */
 var MessageRole;
@@ -301,7 +304,7 @@ class DocumentProcessor {
      * @param content JSON内容
      * @param options 处理选项
      */
-    parseJsonStructure(content, options) {
+    parseJsonStructure(content, _options) {
         try {
             const data = JSON.parse(content);
             const sections = [];
@@ -494,15 +497,18 @@ class DocumentProcessor {
      */
     extractTitle(content, documentType) {
         switch (documentType) {
-            case DocumentType.MARKDOWN:
+            case DocumentType.MARKDOWN: {
                 const mdTitleMatch = content.match(/^#\s+(.+)$/m);
                 return mdTitleMatch ? mdTitleMatch[1].trim() : null;
-            case DocumentType.HTML:
+            }
+            case DocumentType.HTML: {
                 const htmlTitleMatch = content.match(/<h1[^>]*>(.*?)<\/h1>/i);
                 return htmlTitleMatch ? htmlTitleMatch[1].replace(/<[^>]*>/g, '').trim() : null;
-            default:
+            }
+            default: {
                 const firstLine = content.split('\n')[0].trim();
                 return firstLine.length > 0 && firstLine.length < 100 ? firstLine : null;
+            }
         }
     }
     /**
@@ -838,7 +844,7 @@ class RequirementExtractor {
      * @param section 来源章节
      * @param content 章节内容
      */
-    createRequirement(id, title, description, type, section, content) {
+    createRequirement(id, title, description, type, section, _content) {
         return {
             id,
             title,
@@ -973,7 +979,7 @@ class RequirementExtractor {
      * @param description 描述
      * @param type 类型
      */
-    calculateConfidence(description, type) {
+    calculateConfidence(description, _type) {
         let confidence = 0.5;
         // 基于模式匹配的置信度
         if (this.requirementPatterns.functional.some(pattern => pattern.test(description))) {
@@ -1450,6 +1456,7 @@ class PRDParser {
     }
 }
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * 任务规划器类
  * 负责根据PRD生成任务计划
@@ -1748,7 +1755,7 @@ class TaskPlanner {
      * @param taskPlan 任务计划
      * @param options 优化选项
      */
-    optimizePriorities(taskPlan, options) {
+    optimizePriorities(taskPlan, _options) {
         this.logger.info('优化任务优先级');
         // 基于依赖关系调整优先级
         taskPlan.tasks.forEach(task => {
@@ -1824,7 +1831,7 @@ class TaskPlanner {
      * @param taskPlan 任务计划
      * @param options 优化选项
      */
-    identifyParallelTasks(taskPlan, options) {
+    identifyParallelTasks(taskPlan, _options) {
         this.logger.info('识别并行任务');
         const maxParallel = 3; // Default maximum parallel tasks
         // 为可并行的任务添加标签
@@ -1935,6 +1942,7 @@ class TaskPlanner {
     }
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * 任务管理器类
  * 负责管理任务计划中的任务
@@ -2147,7 +2155,7 @@ class TaskManager {
         }
         // 检查是否是子任务
         if (id.includes('.')) {
-            const [parentId, subtaskIdPart] = id.split('.');
+            const [parentId] = id.split('.');
             // 找到父任务
             const parentTaskIndex = this.taskPlan.tasks.findIndex(task => task.id === parentId);
             if (parentTaskIndex < 0 || !this.taskPlan.tasks[parentTaskIndex].subtasks) {
@@ -2213,7 +2221,7 @@ class TaskManager {
         }
         // 检查是否是子任务
         if (id.includes('.')) {
-            const [parentId, subtaskIdPart] = id.split('.');
+            const [parentId] = id.split('.');
             // 找到父任务
             const parentTaskIndex = this.taskPlan.tasks.findIndex(task => task.id === parentId);
             if (parentTaskIndex < 0 || !this.taskPlan.tasks[parentTaskIndex].subtasks) {
@@ -2632,7 +2640,7 @@ class TaskVisualizer {
      * @param taskPlan 任务计划
      * @param options 选项
      */
-    generateKanbanBoard(taskPlan, options) {
+    generateKanbanBoard(taskPlan, _options) {
         const columns = [
             { id: 'not_started', title: '待开始', tasks: [] },
             { id: 'in_progress', title: '进行中', tasks: [] },
@@ -2660,7 +2668,7 @@ class TaskVisualizer {
      * @param taskPlan 任务计划
      * @param options 选项
      */
-    generateTimeline(taskPlan, options) {
+    generateTimeline(taskPlan, _options) {
         // 简化的时间线实现
         const timeline = {
             title: taskPlan.name || '项目时间线',
@@ -2680,7 +2688,7 @@ class TaskVisualizer {
      * @param taskPlan 任务计划
      * @param options 选项
      */
-    generateProgressChart(taskPlan, options) {
+    generateProgressChart(taskPlan, _options) {
         const stats = {
             total: taskPlan.tasks.length,
             completed: 0,
@@ -2893,7 +2901,7 @@ class SimpleConfigManager {
     /**
      * 更新配置（兼容原ConfigManager接口）
      */
-    updateConfig(config, isProjectLevel = false) {
+    updateConfig(config, _isProjectLevel = false) {
         this.update(config);
     }
     /**
@@ -3029,10 +3037,11 @@ class BaseModelAdapter {
      * @param error 错误对象
      */
     handleRequestError(error) {
-        if (error.response) {
+        if (error && typeof error === 'object' && 'response' in error) {
             // 服务器响应了请求，但状态码不是2xx
-            const statusCode = error.response.status;
-            const data = error.response.data;
+            const response = error.response;
+            const statusCode = response === null || response === void 0 ? void 0 : response.status;
+            const data = response === null || response === void 0 ? void 0 : response.data;
             let message = `HTTP Error ${statusCode}`;
             if (data && typeof data === 'object') {
                 message += `: ${JSON.stringify(data)}`;
@@ -3047,13 +3056,15 @@ class BaseModelAdapter {
                 throw new Error(`API调用失败：${message}`);
             }
         }
-        else if (error.request) {
+        else if (error && typeof error === 'object' && 'request' in error) {
             // 请求已经发出，但没有收到响应
-            throw new Error(`请求超时或网络错误：${error.message}`);
+            const message = error.message || '网络错误';
+            throw new Error(`请求超时或网络错误：${message}`);
         }
         else {
             // 设置请求时发生了错误
-            throw new Error(`请求配置错误：${error.message}`);
+            const message = (error === null || error === void 0 ? void 0 : error.message) || '未知错误';
+            throw new Error(`请求配置错误：${message}`);
         }
     }
 }
@@ -3673,7 +3684,7 @@ class QwenModelAdapter extends BaseModelAdapter {
     /**
      * 执行聊天请求
      */
-    async chat(params, options) {
+    async chat(params, _options) {
         var _a, _b, _c;
         try {
             const requestData = this.buildRequestData(params);
@@ -3700,7 +3711,7 @@ class QwenModelAdapter extends BaseModelAdapter {
     /**
      * 流式聊天请求
      */
-    async chatStream(params, onData, options) {
+    async chatStream(params, onData, _options) {
         try {
             const requestData = {
                 ...this.buildRequestData(params),
@@ -5102,8 +5113,9 @@ class VisualizeCommand {
             console.log();
             // 验证可视化类型
             const validTypes = ['gantt', 'dependency', 'kanban', 'timeline', 'progress'];
-            if (!validTypes.includes(options.type)) {
-                console.error(chalk.red(`❌ 无效的可视化类型: ${options.type}`));
+            const visualizationType = options.type || 'gantt';
+            if (!validTypes.includes(visualizationType)) {
+                console.error(chalk.red(`❌ 无效的可视化类型: ${visualizationType}`));
                 console.log(chalk.gray(`支持的类型: ${validTypes.join(', ')}`));
                 return;
             }
@@ -5116,10 +5128,10 @@ class VisualizeCommand {
             console.log(chalk.gray(`   任务数量: ${taskPlan.tasks.length}`));
             console.log();
             // 生成可视化
-            console.log(chalk.blue(`🔄 生成 ${options.type} 可视化...`));
+            console.log(chalk.blue(`🔄 生成 ${visualizationType} 可视化...`));
             const visualizationOptions = {
-                type: options.type,
-                format: options.format || 'mermaid',
+                type: visualizationType,
+                format: (options.format || 'mermaid'),
                 includeSubtasks: options.includeSubtasks || false,
                 showProgress: options.showProgress || false,
                 groupBy: options.groupBy
@@ -5127,7 +5139,8 @@ class VisualizeCommand {
             const result = this.visualizer.generateVisualization(taskPlan, visualizationOptions);
             // 输出结果
             if (options.output) {
-                await this.saveVisualization(result, options.output, options.format);
+                const format = options.format || 'mermaid';
+                await this.saveVisualization(result, options.output, format);
                 console.log(chalk.green(`✅ 可视化已保存到: ${options.output}`));
             }
             else {
@@ -5146,7 +5159,7 @@ class VisualizeCommand {
             console.log();
             console.log(chalk.green('🎉 可视化生成完成!'));
             // 显示使用提示
-            this.showUsageTips(options.type, options.format);
+            this.showUsageTips(visualizationType, options.format || 'mermaid');
         }
         catch (error) {
             console.error(chalk.red('❌ 可视化生成失败:'));
@@ -5197,7 +5210,7 @@ class VisualizeCommand {
      * @param outputPath 输出路径
      * @param format 格式
      */
-    async saveVisualization(result, outputPath, format) {
+    async saveVisualization(result, outputPath, _format) {
         // 确保输出目录存在
         await fs__namespace.ensureDir(path__namespace.dirname(outputPath));
         if (typeof result === 'string') {
@@ -5706,7 +5719,8 @@ class InteractiveCommand {
         console.clear();
         // 显示欢迎信息
         this.showWelcome();
-        while (true) {
+        let running = true;
+        while (running) {
             try {
                 const { action } = await inquirer.prompt([
                     {
@@ -5739,7 +5753,7 @@ class InteractiveCommand {
                 ]);
                 if (!shouldContinue) {
                     console.log(chalk.green('\n👋 感谢使用 TaskFlow AI！'));
-                    break;
+                    running = false;
                 }
                 console.log('\n' + '─'.repeat(50) + '\n');
             }
@@ -6034,7 +6048,8 @@ class InteractiveCommand {
     async handleChat() {
         console.log(chalk.blue('\n🤖 AI对话模式'));
         console.log(chalk.gray('输入 "exit" 退出对话\n'));
-        while (true) {
+        let chatting = true;
+        while (chatting) {
             const { message } = await inquirer.prompt([
                 {
                     type: 'input',
@@ -6044,7 +6059,8 @@ class InteractiveCommand {
                 }
             ]);
             if (message.toLowerCase() === 'exit') {
-                break;
+                chatting = false;
+                continue;
             }
             const spinner = ora('AI正在思考...').start();
             try {
@@ -6340,7 +6356,7 @@ function modelsCommand(program) {
 /**
  * 测试模型连接
  */
-async function testModelConnection(model) {
+async function testModelConnection(_model) {
     try {
         // 模拟测试逻辑
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -6379,7 +6395,7 @@ async function runBenchmark(model, iterations) {
 /**
  * 获取模型使用统计
  */
-async function getModelStats(period) {
+async function getModelStats(_period) {
     // 模拟统计数据
     return [
         { model: 'deepseek', calls: 156, successRate: 98, avgLatency: 1200, cost: 2.34 },
@@ -6778,13 +6794,14 @@ class MCPConfigGenerator {
      */
     async generateAdditionalFiles(config, projectRoot) {
         switch (config.editor) {
-            case 'cursor':
+            case 'cursor': {
                 // 生成.cursor-rules文件
                 const cursorRulesPath = path.join(projectRoot, '.cursor-rules');
                 fs$1.writeFileSync(cursorRulesPath, CURSOR_RULES_CONTENT, 'utf-8');
                 this.logger.info(`Cursor规则文件已生成: ${cursorRulesPath}`);
                 break;
-            case 'vscode':
+            }
+            case 'vscode': {
                 // 生成extensions.json文件
                 const extensionsPath = EDITOR_EXTENSIONS_PATHS.vscode;
                 {
@@ -6794,6 +6811,7 @@ class MCPConfigGenerator {
                     this.logger.info(`VSCode扩展推荐文件已生成: ${fullExtensionsPath}`);
                 }
                 break;
+            }
         }
     }
     /**
@@ -7586,7 +7604,7 @@ var configManager = /*#__PURE__*/Object.freeze({
  */
 function createMCPCommand() {
     const logger = Logger.getInstance({
-        level: 'info',
+        level: LogLevel.INFO,
         output: 'console'
     });
     const config = new ConfigManager(logger);

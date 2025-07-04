@@ -10,6 +10,7 @@ import {
   TestGenerationOptions,
   MessageRole
 } from '../../types/model';
+import { ParsedPRD } from '../../types/task';
 
 /**
  * 模型协调器
@@ -111,7 +112,7 @@ ${content}
    * @param parsedPRD 解析后的PRD结果
    * @param options 规划选项
    */
-  public async planTasks(parsedPRD: any, options?: PlanningOptions): Promise<ModelResponse> {
+  public async planTasks(parsedPRD: ParsedPRD, options?: PlanningOptions): Promise<ModelResponse> {
     const modelType = options?.modelType || this.configManager.getDefaultModelType();
     
     // 构建系统提示词

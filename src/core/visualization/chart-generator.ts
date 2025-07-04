@@ -43,19 +43,19 @@ export interface ChartConfig {
   showTooltip?: boolean;
   interactive?: boolean;
   exportFormats?: ('png' | 'svg' | 'pdf' | 'json')[];
-  customOptions?: Record<string, any>;
+  customOptions?: Record<string, unknown>;
 }
 
 /**
  * 图表数据点接口
  */
 export interface ChartDataPoint {
-  x: any;                               // X轴值
-  y: any;                               // Y轴值
+  x: string | number | Date;            // X轴值
+  y: string | number | Date;            // Y轴值
   label?: string;                       // 标签
   color?: string;                       // 颜色
   size?: number;                        // 大小
-  metadata?: Record<string, any>;       // 元数据
+  metadata?: Record<string, unknown>;   // 元数据
 }
 
 /**
@@ -78,8 +78,8 @@ export interface ChartData {
   xAxis?: {
     title: string;
     type: 'category' | 'datetime' | 'numeric';
-    min?: any;
-    max?: any;
+    min?: string | number | Date;
+    max?: string | number | Date;
   };
   yAxis?: {
     title: string;
@@ -237,8 +237,12 @@ export class ChartGenerator {
       xAxis: {
         title: '时间',
         type: 'datetime',
-        min: Math.min(...series.map(s => s.data[0].x)),
-        max: Math.max(...series.map(s => s.data[0].x + (s.data[0].metadata?.duration || 1) * 24 * 60 * 60 * 1000))
+        min: Math.min(...series.map(s => Number(s.data[0].x))),
+        max: Math.max(...series.map(s => {
+          const x = Number(s.data[0].x);
+          const duration = Number(s.data[0].metadata?.duration) || 1;
+          return x + duration * 24 * 60 * 60 * 1000;
+        }))
       },
       yAxis: {
         title: '任务',

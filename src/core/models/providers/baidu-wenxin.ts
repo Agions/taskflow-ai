@@ -10,7 +10,8 @@ import {
   ModelConfig,
   ChatRequest,
   ChatResponse,
-  StreamResponse
+  StreamResponse,
+  ModelInfo
 } from '../chinese-llm-provider';
 import { Logger } from '../../../infra/logger';
 
@@ -230,20 +231,15 @@ export class BaiduWenxinProvider extends ChineseLLMProvider {
   /**
    * 获取模型信息
    */
-  public async getModelInfo(): Promise<any> {
+  public async getModelInfo(): Promise<ModelInfo> {
     return {
-      provider: '百度文心一言',
-      description: '百度自研的大语言模型，具备强大的中文理解和生成能力',
-      features: ['中文优化', '函数调用', '插件系统', '知识增强'],
+      name: '百度文心一言',
+      version: 'ERNIE-Bot-4.0',
+      maxTokens: 8192,
+      supportedFeatures: ['中文优化', '函数调用', '插件系统', '知识增强'],
       pricing: {
-        'ernie-bot': { input: 0.012, output: 0.012 },
-        'ernie-bot-turbo': { input: 0.008, output: 0.008 },
-        'ernie-bot-4': { input: 0.120, output: 0.120 }
-      },
-      limits: {
-        maxTokens: 8192,
-        maxRequestsPerMinute: 300,
-        maxRequestsPerDay: 50000
+        inputTokens: 0.012,
+        outputTokens: 0.012
       }
     };
   }

@@ -37,7 +37,7 @@ export class TaskPlanner {
       this.logger.info('开始生成任务计划');
 
       // 使用模型生成任务计划
-      const response = await this.modelCoordinator.planTasks(prdResult, options);
+      const response = await this.modelCoordinator.planTasks(prdResult as ParsedPRD, options);
 
       try {
         // 解析模型返回的任务计划

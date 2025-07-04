@@ -23,6 +23,20 @@ export enum ChineseLLMType {
 }
 
 /**
+ * 模型信息接口
+ */
+export interface ModelInfo {
+  name: string;
+  version: string;
+  maxTokens: number;
+  supportedFeatures: string[];
+  pricing?: {
+    inputTokens: number;
+    outputTokens: number;
+  };
+}
+
+/**
  * 模型配置接口
  */
 export interface ModelConfig {
@@ -152,7 +166,7 @@ export abstract class ChineseLLMProvider {
   /**
    * 获取模型信息
    */
-  abstract getModelInfo(): Promise<any>;
+  abstract getModelInfo(): Promise<ModelInfo>;
 
   /**
    * 获取支持的模型列表
@@ -176,10 +190,11 @@ export abstract class ChineseLLMProvider {
    * 处理API错误
    * @param error 错误对象
    */
-  protected handleApiError(error: any): string {
-    if (error.response) {
-      const status = error.response.status;
-      const data = error.response.data;
+  protected handleApiError(error: unknown): string {
+    if (error && typeof error === 'object' && 'response' in error) {
+      const response = (error as any).response;
+      const status = response?.status;
+      const data = response?.data;
       
       switch (status) {
         case 401:
@@ -195,15 +210,19 @@ export abstract class ChineseLLMProvider {
       }
     }
     
-    if (error.code === 'ECONNREFUSED') {
-      return '无法连接到API服务器';
+    if (error && typeof error === 'object' && 'code' in error) {
+      const code = (error as any).code;
+      if (code === 'ECONNREFUSED') {
+        return '无法连接到API服务器';
+      }
+
+      if (code === 'ETIMEDOUT') {
+        return 'API请求超时';
+      }
     }
-    
-    if (error.code === 'ETIMEDOUT') {
-      return 'API请求超时';
-    }
-    
-    return error.message || '未知错误';
+
+    const message = (error as any)?.message || '未知错误';
+    return message;
   }
 
   /**
@@ -242,7 +261,11 @@ export abstract class ChineseLLMProvider {
    * 格式化消息
    * @param messages 原始消息
    */
-  protected formatMessages(messages: ChatMessage[]): any[] {
+  protected formatMessages(messages: ChatMessage[]): Array<{
+    role: string;
+    content: string;
+    name?: string;
+  }> {
     return messages.map(msg => ({
       role: msg.role,
       content: msg.content,
@@ -375,17 +398,13 @@ export class ChineseLLMManager {
   /**
    * 获取模型能力对比
    */
-  public async getModelCapabilities(): Promise<Map<ChineseLLMType, any>> {
-    const capabilities = new Map<ChineseLLMType, any>();
+  public async getModelCapabilities(): Promise<Map<ChineseLLMType, ModelInfo>> {
+    const capabilities = new Map<ChineseLLMType, ModelInfo>();
     
     for (const [type, provider] of this.providers) {
       try {
         const info = await provider.getModelInfo();
-        capabilities.set(type, {
-          models: provider.getSupportedModels(),
-          info,
-          features: this.getProviderFeatures(type)
-        });
+        capabilities.set(type, info);
       } catch (error) {
         this.logger.error(`获取${type}模型信息失败: ${(error as Error).message}`);
       }

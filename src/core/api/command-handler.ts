@@ -13,7 +13,7 @@ import { cli } from '../../ui/cli-interface';
  * 命令选项接口
  */
 export interface CommandOptions {
-  [key: string]: any;
+  [key: string]: string | number | boolean | undefined;
 }
 
 /**
@@ -30,7 +30,7 @@ export interface CommandContext {
 /**
  * 命令处理器接口
  */
-export interface CommandHandler<T = any> {
+export interface CommandHandler<T = unknown> {
   execute(context: CommandContext): Promise<T>;
   validate?(context: CommandContext): Promise<void>;
   cleanup?(context: CommandContext): Promise<void>;
@@ -45,7 +45,7 @@ export class CommandExecutor {
   /**
    * 执行命令
    */
-  public static async execute<T = any>(
+  public static async execute<T = unknown>(
     command: string,
     args: string[],
     options: CommandOptions,
@@ -128,7 +128,7 @@ export class CommandExecutor {
   /**
    * 执行带进度显示的命令
    */
-  public static async executeWithProgress<T = any>(
+  public static async executeWithProgress<T = unknown>(
     command: string,
     args: string[],
     options: CommandOptions,
@@ -157,7 +157,7 @@ export class CommandExecutor {
   /**
    * 批量执行命令
    */
-  public static async executeBatch<T = any>(
+  public static async executeBatch<T = unknown>(
     commands: Array<{
       command: string;
       args: string[];
@@ -230,7 +230,7 @@ export class CommandExecutor {
 /**
  * 抽象命令处理器基类
  */
-export abstract class BaseCommandHandler<T = any> implements CommandHandler<T> {
+export abstract class BaseCommandHandler<T = unknown> implements CommandHandler<T> {
   /**
    * 执行命令（子类必须实现）
    */
@@ -280,7 +280,7 @@ export abstract class BaseCommandHandler<T = any> implements CommandHandler<T> {
    * 验证参数类型
    */
   protected validateArgType(
-    value: any,
+    value: unknown,
     expectedType: 'string' | 'number' | 'boolean',
     argName: string
   ): void {
@@ -393,7 +393,7 @@ export class InitCommandHandler extends BaseCommandHandler<{
     // 验证语言参数
     if (options.language) {
       const validLanguages = ['typescript', 'javascript', 'python', 'java', 'go', 'rust'];
-      if (!validLanguages.includes(options.language)) {
+      if (!validLanguages.includes(String(options.language))) {
         throw new ValidationError(
           `不支持的语言: ${options.language}`,
           'language',

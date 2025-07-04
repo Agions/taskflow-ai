@@ -6,9 +6,10 @@ import { ModelCoordinator } from '../core/models/coordinator';
 import { PRDParser } from '../core/parser/prd-parser';
 import { TaskPlanner } from '../core/planner/task-planner';
 import { TaskManager } from '../core/task/task-manager';
-import { FileType, ParseOptions, PlanningOptions } from '../types/model';
+import { FileType, ParseOptions, PlanningOptions, ServiceResponse } from '../types/model';
 import { TaskFilter, TaskUpdateData } from '../core/task/task-manager';
 import { LogLevel, ModelType } from '../types/config';
+import { PRDParseResult } from '../core/parser/prd-parser';
 
 /**
  * TaskFlow AI MCP 服务类
@@ -48,7 +49,7 @@ export class TaskFlowService {
    * @param fileType 文件类型
    * @param options 解析选项
    */
-  public async parsePRD(content: string, fileType: FileType = FileType.MARKDOWN, options?: ParseOptions) {
+  public async parsePRD(content: string, fileType: FileType = FileType.MARKDOWN, options?: ParseOptions): Promise<ServiceResponse<PRDParseResult>> {
     try {
       this.logger.info('开始解析PRD内容');
       const result = await this.prdParser.parseContent(content, fileType, options);

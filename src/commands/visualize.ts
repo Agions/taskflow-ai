@@ -12,6 +12,7 @@ import { ConfigManager } from '../infra/config';
 import { TaskManager } from '../core/task/task-manager';
 import { TaskVisualizer, VisualizationType } from '../core/visualizer/task-visualizer';
 import { LogLevel } from '../types/config';
+import { TaskPlan } from '../types/task';
 
 /**
  * 可视化命令处理器
@@ -136,7 +137,7 @@ export class VisualizeCommand {
         groupBy: options.groupBy as 'type' | 'priority' | 'assignee' | undefined
       };
 
-      const result = this.visualizer.generateVisualization(taskPlan as any, visualizationOptions);
+      const result = this.visualizer.generateVisualization(taskPlan as TaskPlan, visualizationOptions);
 
       // 输出结果
       if (options.output) {

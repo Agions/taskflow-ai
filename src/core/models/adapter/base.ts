@@ -86,11 +86,12 @@ export abstract class BaseModelAdapter implements ModelAdapter {
    * 处理HTTP请求错误
    * @param error 错误对象
    */
-  protected handleRequestError(error: any): never {
-    if (error.response) {
+  protected handleRequestError(error: unknown): never {
+    if (error && typeof error === 'object' && 'response' in error) {
       // 服务器响应了请求，但状态码不是2xx
-      const statusCode = error.response.status;
-      const data = error.response.data;
+      const response = (error as any).response;
+      const statusCode = response?.status;
+      const data = response?.data;
       let message = `HTTP Error ${statusCode}`;
 
       if (data && typeof data === 'object') {
@@ -104,12 +105,14 @@ export abstract class BaseModelAdapter implements ModelAdapter {
       } else {
         throw new Error(`API调用失败：${message}`);
       }
-    } else if (error.request) {
+    } else if (error && typeof error === 'object' && 'request' in error) {
       // 请求已经发出，但没有收到响应
-      throw new Error(`请求超时或网络错误：${error.message}`);
+      const message = (error as any).message || '网络错误';
+      throw new Error(`请求超时或网络错误：${message}`);
     } else {
       // 设置请求时发生了错误
-      throw new Error(`请求配置错误：${error.message}`);
+      const message = (error as any)?.message || '未知错误';
+      throw new Error(`请求配置错误：${message}`);
     }
   }
 } 

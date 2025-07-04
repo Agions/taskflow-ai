@@ -9,6 +9,27 @@ import { Task, TaskPlan, TaskPriority, TaskType } from '../../types/task';
 import { Requirement } from '../parser/requirement-extractor';
 
 /**
+ * 资源需求接口
+ */
+interface ResourceNeeds {
+  personHours: number;
+  skillLevel: 'junior' | 'mid' | 'senior' | 'expert';
+  teamSize: number;
+  technologies: string[];
+  complexity: number;
+}
+
+/**
+ * 时间估算接口
+ */
+interface TimeEstimate {
+  baseHours: number;
+  adjustedHours: number;
+  confidence: number;
+  factors: string[];
+}
+
+/**
  * 编排策略枚举
  */
 export enum OrchestrationStrategy {
@@ -176,8 +197,8 @@ interface TaskAnalysis {
     overall: number;
   }>;
   valueMapping: Map<string, number>;
-  resourceNeeds: Map<string, number>;
-  timeEstimates: Map<string, number>;
+  resourceNeeds: Map<string, ResourceNeeds>;
+  timeEstimates: Map<string, TimeEstimate>;
   criticalityScores: Map<string, number>;
 }
 
@@ -505,21 +526,53 @@ export class IntelligentOrchestrator {
    * 估算资源需求
    * @param tasks 任务列表
    */
-  private estimateResourceNeeds(tasks: Task[]): Map<string, any> {
-    const resourceMap = new Map<string, any>();
+  private estimateResourceNeeds(tasks: Task[]): Map<string, ResourceNeeds> {
+    const resourceMap = new Map<string, ResourceNeeds>();
 
     tasks.forEach(task => {
-      const needs = {
+      const needs: ResourceNeeds = {
         personHours: task.estimatedHours || 8,
         skillLevel: this.estimateRequiredSkillLevel(task),
         teamSize: this.estimateOptimalTeamSize(task),
-        specialization: this.identifySpecialization(task)
+        technologies: this.identifySpecialization(task),
+        complexity: this.calculateTaskComplexity(task)
       };
 
       resourceMap.set(task.id, needs);
     });
 
     return resourceMap;
+  }
+
+  /**
+   * 识别专业化需求
+   * @param task 任务
+   */
+  private identifySpecialization(task: Task): string[] {
+    const technologies: string[] = [];
+
+    // 基于任务类型
+    if (task.type === TaskType.FEATURE) {
+      technologies.push('编程', '软件开发');
+    }
+    if (task.type === TaskType.TEST) {
+      technologies.push('测试', '质量保证');
+    }
+    if (task.type === TaskType.DESIGN) {
+      technologies.push('设计', 'UI/UX');
+    }
+    if (task.type === TaskType.RESEARCH) {
+      technologies.push('研究', '分析');
+    }
+
+    // 基于任务描述中的关键词
+    const description = task.description.toLowerCase();
+    if (description.includes('前端')) technologies.push('前端开发');
+    if (description.includes('后端')) technologies.push('后端开发');
+    if (description.includes('数据库')) technologies.push('数据库');
+    if (description.includes('api')) technologies.push('API开发');
+
+    return technologies;
   }
 
   /**
@@ -571,44 +624,14 @@ export class IntelligentOrchestrator {
     return Math.min(5, Math.ceil(hours / 40));
   }
 
-  /**
-   * 识别专业化需求
-   * @param task 任务
-   */
-  private identifySpecialization(task: Task): string[] {
-    const specializations: string[] = [];
 
-    // 基于任务类型
-    switch (task.type) {
-      case TaskType.DESIGN:
-        specializations.push('UI/UX设计');
-        break;
-      case TaskType.TEST:
-        specializations.push('测试工程');
-        break;
-      case TaskType.DEPLOYMENT:
-        specializations.push('DevOps');
-        break;
-    }
-
-    // 基于标签和描述
-    const content = (task.title + ' ' + task.description + ' ' + task.tags.join(' ')).toLowerCase();
-
-    if (content.includes('数据库')) specializations.push('数据库');
-    if (content.includes('安全')) specializations.push('安全');
-    if (content.includes('性能')) specializations.push('性能优化');
-    if (content.includes('移动')) specializations.push('移动开发');
-    if (content.includes('机器学习') || content.includes('ai')) specializations.push('AI/ML');
-
-    return [...new Set(specializations)];
-  }
 
   /**
    * 精化时间估算
    * @param tasks 任务列表
    */
-  private refineTimeEstimates(tasks: Task[]): Map<string, any> {
-    const estimates = new Map<string, any>();
+  private refineTimeEstimates(tasks: Task[]): Map<string, TimeEstimate> {
+    const estimates = new Map<string, TimeEstimate>();
 
     tasks.forEach(task => {
       const baseHours = task.estimatedHours || 8;
@@ -626,17 +649,50 @@ export class IntelligentOrchestrator {
       const adjustedHours = baseHours * complexityMultiplier * dependencyMultiplier * uncertaintyMultiplier;
 
       estimates.set(task.id, {
-        original: baseHours,
-        adjusted: Math.round(adjustedHours),
+        baseHours: baseHours,
+        adjustedHours: Math.round(adjustedHours),
         confidence: this.calculateEstimateConfidence(task),
-        range: {
-          min: Math.round(adjustedHours * 0.8),
-          max: Math.round(adjustedHours * 1.5)
-        }
+        factors: [
+          `复杂度: ${complexityMultiplier.toFixed(2)}x`,
+          `依赖: ${dependencyMultiplier.toFixed(2)}x`,
+          `不确定性: ${uncertaintyMultiplier.toFixed(2)}x`
+        ]
       });
     });
 
     return estimates;
+  }
+
+  /**
+   * 获取任务的估算小时数（类型安全）
+   * @param taskId 任务ID
+   * @param timeEstimates 时间估算映射
+   * @returns 估算小时数
+   */
+  private getEstimatedHours(taskId: string, timeEstimates: Map<string, TimeEstimate>): number {
+    const estimate = timeEstimates.get(taskId);
+    return estimate ? estimate.adjustedHours : 8;
+  }
+
+  /**
+   * 计算任务复杂度
+   * @param task 任务
+   */
+  private calculateTaskComplexity(task: Task): number {
+    let complexity = 1;
+
+    // 基于任务类型
+    if (task.type === TaskType.FEATURE) complexity += 2;
+    if (task.type === TaskType.TEST) complexity += 1;
+    if (task.type === TaskType.RESEARCH) complexity += 3;
+
+    // 基于依赖数量
+    complexity += (task.dependencies?.length || 0) * 0.5;
+
+    // 基于描述长度（复杂度指标）
+    complexity += Math.min(task.description.length / 100, 2);
+
+    return Math.max(1, Math.min(complexity, 10));
   }
 
   /**
@@ -856,7 +912,8 @@ export class IntelligentOrchestrator {
         maxPredecessorFinish = Math.max(maxPredecessorFinish, calculateEarliest(depId, new Set(visited)));
       });
 
-      const duration = timeEstimates.get(taskId) || 8;
+      const estimate = timeEstimates.get(taskId);
+      const duration = estimate ? estimate.adjustedHours : 8;
       earliestStart.set(taskId, maxPredecessorFinish);
       earliestFinish.set(taskId, maxPredecessorFinish + duration);
 
@@ -883,7 +940,8 @@ export class IntelligentOrchestrator {
     const endTasks = tasks.filter(task => !hasSuccessors.has(task.id));
     endTasks.forEach(task => {
       latestFinish.set(task.id, projectFinish);
-      const duration = timeEstimates.get(task.id) || 8;
+      const estimate = timeEstimates.get(task.id);
+      const duration = estimate ? estimate.adjustedHours : 8;
       latestStart.set(task.id, projectFinish - duration);
     });
 
@@ -904,7 +962,8 @@ export class IntelligentOrchestrator {
         minSuccessorStart = Math.min(minSuccessorStart, calculateLatest(successor.id, new Set(visited)));
       });
 
-      const duration = timeEstimates.get(taskId) || 8;
+      const estimate = timeEstimates.get(taskId);
+      const duration = estimate ? estimate.adjustedHours : 8;
       latestFinish.set(taskId, minSuccessorStart);
       latestStart.set(taskId, minSuccessorStart - duration);
 
@@ -940,7 +999,8 @@ export class IntelligentOrchestrator {
       const phaseTasks = tasks.filter(t => taskIds.includes(t.id));
       const totalDuration = phaseTasks.reduce((sum, task) => {
         const estimate = analysis.timeEstimates.get(task.id);
-        return sum + (estimate || 8);
+        const duration = estimate ? estimate.adjustedHours : 8;
+        return sum + duration;
       }, 0);
 
       // 收集所需技能
@@ -1133,10 +1193,9 @@ export class IntelligentOrchestrator {
       const parallelTasks = this.findParallelTasks(task, tasks, analysis, processed);
 
       if (parallelTasks.length > 1 && parallelTasks.length <= options.maxParallelTasks) {
-        const totalDuration = Math.max(...parallelTasks.map(t => {
-          const estimate = analysis.timeEstimates.get(t.id);
-          return estimate || 8;
-        }));
+        const totalDuration = Math.max(...parallelTasks.map(t =>
+          this.getEstimatedHours(t.id, analysis.timeEstimates)
+        ));
 
         const requiredResources = parallelTasks.length;
         const conflictRisk = this.calculateConflictRisk(parallelTasks, analysis);
@@ -1705,8 +1764,7 @@ export class IntelligentOrchestrator {
     // 检查时间约束
     if (options.timeConstraint) {
       const totalDuration = optimizedPlan.tasks.reduce((sum, task) => {
-        const estimate = analysis.timeEstimates.get(task.id);
-        return sum + (estimate || 8);
+        return sum + this.getEstimatedHours(task.id, analysis.timeEstimates);
       }, 0) / 8; // 转换为天数
 
       if (totalDuration > options.timeConstraint) {

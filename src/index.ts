@@ -7,7 +7,7 @@
 export { TaskFlowEngine } from './core/engine/taskflow-engine';
 
 // 导出核心组件
-export { PRDParser } from './core/parser/prd-parser';
+export { PRDParser, PRDParseResult } from './core/parser/prd-parser';
 export { TaskPlanner } from './core/planner/task-planner';
 export { TaskManager } from './core/task/task-manager';
 export { TaskVisualizer, VisualizationType } from './core/visualizer/task-visualizer';
@@ -15,9 +15,12 @@ export { TaskVisualizer, VisualizationType } from './core/visualizer/task-visual
 // 导出MCP服务接口
 export * from './mcp/service';
 
+// 导出主要服务类
+export { TaskFlowService } from './mcp/index';
+
 // 导出核心类型
 export { ModelType, LogLevel } from './types/config';
-export { FileType, MessageRole, ModelCallOptions } from './types/model';
+export { FileType, MessageRole, ModelCallOptions, ServiceResponse, ParseOptions } from './types/model';
 export {
   Task,
   TaskPlan,

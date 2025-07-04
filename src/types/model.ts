@@ -1,6 +1,15 @@
 /**
  * 模型相关类型定义
  */
+
+/**
+ * 服务响应类型
+ */
+export interface ServiceResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
 import { ModelType } from './config';
 
 /**

@@ -49,8 +49,8 @@ export interface DashboardWidget {
     width: number;
     height: number;
   };
-  data?: any;
-  config?: Record<string, any>;
+  data?: unknown;
+  config?: Record<string, unknown>;
   refreshInterval?: number;           // 刷新间隔(秒)
   visible?: boolean;
   permissions?: string[];             // 权限要求
@@ -81,8 +81,8 @@ export interface DashboardFilter {
   id: string;
   name: string;
   type: 'select' | 'multiselect' | 'date' | 'daterange' | 'text' | 'number';
-  options?: Array<{ label: string; value: any }>;
-  defaultValue?: any;
+  options?: Array<{ label: string; value: string | number | boolean }>;
+  defaultValue?: string | number | boolean;
   required?: boolean;
 }
 
@@ -592,7 +592,10 @@ export class DashboardGenerator {
   /**
    * 格式化任务表格
    */
-  private formatTaskTable(tasks: Task[]): any {
+  private formatTaskTable(tasks: Task[]): {
+    columns: Array<{ key: string; label: string }>;
+    rows: Array<Record<string, string | number>>;
+  } {
     return {
       columns: [
         { key: 'title', label: '任务名称' },
@@ -606,7 +609,7 @@ export class DashboardGenerator {
         title: task.title,
         status: task.status,
         priority: task.priority,
-        dueDate: task.dueDate?.toLocaleDateString(),
+        dueDate: task.dueDate?.toLocaleDateString() || '',
         progress: `${task.progress || 0}%`
       }))
     };
