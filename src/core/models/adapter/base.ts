@@ -89,7 +89,7 @@ export abstract class BaseModelAdapter implements ModelAdapter {
   protected handleRequestError(error: unknown): never {
     if (error && typeof error === 'object' && 'response' in error) {
       // 服务器响应了请求，但状态码不是2xx
-      const response = (error as any).response;
+      const response = (error as { response?: { status?: number; data?: unknown } }).response;
       const statusCode = response?.status;
       const data = response?.data;
       let message = `HTTP Error ${statusCode}`;
@@ -107,11 +107,11 @@ export abstract class BaseModelAdapter implements ModelAdapter {
       }
     } else if (error && typeof error === 'object' && 'request' in error) {
       // 请求已经发出，但没有收到响应
-      const message = (error as any).message || '网络错误';
+      const message = (error as { message?: string }).message || '网络错误';
       throw new Error(`请求超时或网络错误：${message}`);
     } else {
       // 设置请求时发生了错误
-      const message = (error as any)?.message || '未知错误';
+      const message = (error as { message?: string })?.message || '未知错误';
       throw new Error(`请求配置错误：${message}`);
     }
   }

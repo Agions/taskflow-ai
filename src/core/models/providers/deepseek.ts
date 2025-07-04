@@ -216,7 +216,7 @@ export class DeepSeekProvider extends ChineseLLMProvider {
   /**
    * 解析流式响应
    */
-  private async *parseStreamResponse(stream: any): AsyncIterable<StreamResponse> {
+  private async *parseStreamResponse(stream: ReadableStream<Uint8Array> | NodeJS.ReadableStream): AsyncIterable<StreamResponse> {
     let buffer = '';
 
     for await (const chunk of stream) {
@@ -289,7 +289,13 @@ export class DeepSeekProvider extends ChineseLLMProvider {
   /**
    * 获取模型信息
    */
-  public async getModelInfo(): Promise<any> {
+  public async getModelInfo(): Promise<{
+    provider: string;
+    description: string;
+    models: string[];
+    capabilities: string[];
+    pricing: Record<string, unknown>;
+  }> {
     return {
       provider: 'DeepSeek',
       description: 'DeepSeek大模型API服务，专注于代码生成和数学推理',
@@ -311,7 +317,12 @@ export class DeepSeekProvider extends ChineseLLMProvider {
    * 获取特定模型信息
    */
   public getSpecificModelInfo(model: string) {
-    const modelInfo: Record<string, any> = {
+    const modelInfo: Record<string, {
+      name: string;
+      description: string;
+      maxTokens: number;
+      supportStream: boolean;
+    }> = {
       [DeepSeekModel.DEEPSEEK_CHAT]: {
         name: 'DeepSeek Chat',
         description: 'DeepSeek通用对话模型',

@@ -222,7 +222,13 @@ export class AlibabaQwenProvider extends ChineseLLMProvider {
   /**
    * 获取模型信息
    */
-  public async getModelInfo(): Promise<any> {
+  public async getModelInfo(): Promise<{
+    provider: string;
+    description: string;
+    models: string[];
+    capabilities: string[];
+    pricing: Record<string, unknown>;
+  }> {
     return {
       provider: '阿里通义千问',
       description: '阿里云自研的大语言模型，具备多模态能力和长文本处理能力',
@@ -250,7 +256,10 @@ export class AlibabaQwenProvider extends ChineseLLMProvider {
   /**
    * 格式化消息为通义千问格式
    */
-  private formatMessagesForQwen(messages: ChatMessage[]): any[] {
+  private formatMessagesForQwen(messages: ChatMessage[]): Array<{
+    role: string;
+    content: string;
+  }> {
     return messages.map(msg => ({
       role: msg.role,
       content: msg.content

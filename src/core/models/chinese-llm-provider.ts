@@ -192,7 +192,7 @@ export abstract class ChineseLLMProvider {
    */
   protected handleApiError(error: unknown): string {
     if (error && typeof error === 'object' && 'response' in error) {
-      const response = (error as any).response;
+      const response = (error as { response?: { status?: number; data?: unknown } }).response;
       const status = response?.status;
       const data = response?.data;
       
@@ -206,12 +206,12 @@ export abstract class ChineseLLMProvider {
         case 500:
           return '服务器内部错误';
         default:
-          return data?.error?.message || `API错误: ${status}`;
+          return (data as { error?: { message?: string } })?.error?.message || `API错误: ${status}`;
       }
     }
     
     if (error && typeof error === 'object' && 'code' in error) {
-      const code = (error as any).code;
+      const code = (error as { code?: string }).code;
       if (code === 'ECONNREFUSED') {
         return '无法连接到API服务器';
       }
@@ -221,7 +221,7 @@ export abstract class ChineseLLMProvider {
       }
     }
 
-    const message = (error as any)?.message || '未知错误';
+    const message = (error as { message?: string })?.message || '未知错误';
     return message;
   }
 
@@ -277,7 +277,7 @@ export abstract class ChineseLLMProvider {
    * 生成请求ID
    */
   protected generateRequestId(): string {
-    return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 
   /**
@@ -300,6 +300,9 @@ export class ChineseLLMManager {
   constructor(logger: Logger, configManager: ConfigManager) {
     this.logger = logger;
     this.configManager = configManager;
+
+    // 初始化时检查配置
+    this.validateConfiguration();
   }
 
   /**
@@ -414,10 +417,21 @@ export class ChineseLLMManager {
   }
 
   /**
+   * 验证配置
+   */
+  private validateConfiguration(): void {
+    // 使用configManager验证配置
+    const config = this.configManager.getConfig();
+    if (!config) {
+      this.logger.warn('配置管理器未初始化');
+    }
+  }
+
+  /**
    * 获取提供商特性
    * @param type 模型类型
    */
-  private getProviderFeatures(type: ChineseLLMType): string[] {
+  public getProviderFeatures(type: ChineseLLMType): string[] {
     const features: Record<ChineseLLMType, string[]> = {
       [ChineseLLMType.BAIDU_WENXIN]: ['中文优化', '函数调用', '插件系统'],
       [ChineseLLMType.ALIBABA_QWEN]: ['多模态', '长文本', '代码生成'],
