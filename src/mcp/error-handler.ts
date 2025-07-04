@@ -365,7 +365,7 @@ export class MCPErrorHandler {
   /**
    * 转换为 MCP 错误
    */
-  private convertToMCPError(error: Error, context?: Record<string, any>): MCPError {
+  private convertToMCPError(error: Error, context?: Record<string, unknown>): MCPError {
     let type = MCPErrorType.INTERNAL_ERROR;
     let severity = MCPErrorSeverity.MEDIUM;
 

@@ -12,6 +12,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 import { Logger } from '../infra/logger';
 import { TaskFlowCore } from './taskflow-core';
 import { MCPErrorHandler } from './error-handler';
+import { LogLevel } from 'config';
 
 /**
  * MCP 服务主类
@@ -24,7 +25,7 @@ class TaskFlowMCPService {
 
   constructor() {
     this.logger = Logger.getInstance({
-      level: 'info' as any,
+      level: 'info' as LogLevel,
       output: 'console'
     });
     this.taskflowCore = new TaskFlowCore(this.logger);
@@ -191,31 +192,36 @@ class TaskFlowMCPService {
     });
 
     // 处理工具调用
-    this.server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
-      const { name, arguments: args } = request.params;
+    this.server.setRequestHandler(CallToolRequestSchema, async (request: { params: { name: string; arguments?: Record<string, unknown> } }) => {
+      const { name, arguments: argsRaw } = request.params;
+      const args = argsRaw ?? {};
 
       try {
         switch (name) {
           case 'prd-parse':
-            return await this.handlePRDParse(args);
+            return await this.handlePRDParse(args as { content: string; format?: string; model?: string });
           
           case 'task-create':
-            return await this.handleTaskCreate(args);
+            return await this.handleTaskCreate(args as { title: string; description: string; priority?: 'high' | 'medium' | 'low'; assignee?: string });
           
           case 'task-list':
             return await this.handleTaskList(args);
           
           case 'code-analyze':
-            return await this.handleCodeAnalyze(args);
+            return await this.handleCodeAnalyze(args as { code: string; language?: string; analysisType?: 'quality' | 'structure' | 'dependencies' | 'security' });
           
           case 'ai-query':
-            return await this.handleAIQuery(args);
+            // 类型断言并校验 prompt 字段
+            if (typeof args.prompt !== 'string') {
+              throw new Error('ai-query 工具调用缺少必需的 prompt 字段');
+            }
+            return await this.handleAIQuery(args as { prompt: string; model?: string; context?: string; temperature?: number });
           
           default:
             throw new Error(`未知的工具: ${name}`);
         }
       } catch (error) {
-        this.logger.error(`工具调用失败 [${name}]:`, error);
+        this.logger.error(`工具调用失败 [${name}]:`, { error });
         return {
           content: [
             {
@@ -232,7 +238,7 @@ class TaskFlowMCPService {
   /**
    * 处理 PRD 解析
    */
-  private async handlePRDParse(args: any) {
+  private async handlePRDParse(args: { content: string; format?: string; model?: string }) {
     const { content, format = 'markdown', model = 'zhipu' } = args;
     
     this.logger.info(`解析 PRD 文档 [${format}] 使用模型 [${model}]`);
@@ -252,7 +258,7 @@ class TaskFlowMCPService {
   /**
    * 处理任务创建
    */
-  private async handleTaskCreate(args: any) {
+  private async handleTaskCreate(args: { title: string; description: string; priority?: 'high' | 'medium' | 'low'; assignee?: string }) {
     const { title, description, priority = 'medium', assignee } = args;
     
     this.logger.info(`创建任务: ${title}`);
@@ -277,7 +283,7 @@ class TaskFlowMCPService {
   /**
    * 处理任务列表查询
    */
-  private async handleTaskList(args: any) {
+  private async handleTaskList(args: { status?: 'pending' | 'in_progress' | 'completed' | 'cancelled'; priority?: 'high' | 'medium' | 'low'; assignee?: string }) {
     const { status, priority, assignee } = args;
     
     this.logger.info('获取任务列表');
@@ -301,7 +307,7 @@ class TaskFlowMCPService {
   /**
    * 处理代码分析
    */
-  private async handleCodeAnalyze(args: any) {
+  private async handleCodeAnalyze(args: { code: string; language?: string; analysisType?: 'quality' | 'structure' | 'dependencies' | 'security' }) {
     const { code, language, analysisType = 'quality' } = args;
     
     this.logger.info(`分析代码 [${language}] 类型 [${analysisType}]`);
@@ -321,7 +327,7 @@ class TaskFlowMCPService {
   /**
    * 处理 AI 查询
    */
-  private async handleAIQuery(args: any) {
+  private async handleAIQuery(args: { prompt: string; model?: string; context?: string; temperature?: number }) {
     const { prompt, model = 'auto', context, temperature = 0.7 } = args;
     
     this.logger.info(`AI 查询使用模型 [${model}]`);
@@ -369,7 +375,11 @@ class TaskFlowMCPService {
   /**
    * 处理工具调用错误
    */
-  private async handleToolError(error: Error, toolName: string, args: any): Promise<any> {
+  private async handleToolError(
+    error: Error,
+    toolName: string,
+    args: Record<string, unknown>
+  ): Promise<Record<string, unknown>> {
     const mcpError = this.errorHandler.handleError(error, {
       tool: toolName,
       arguments: args,
@@ -390,7 +400,7 @@ class TaskFlowMCPService {
           warning: userError.message
         };
       } catch (fallbackError) {
-        this.logger.error('恢复策略失败:', fallbackError);
+        this.logger.error('恢复策略失败:', { error: fallbackError instanceof Error ? fallbackError.message : String(fallbackError) });
       }
     }
 
@@ -459,7 +469,7 @@ async function main(): Promise<void> {
 
 // 全局错误处理
 const globalErrorHandler = new MCPErrorHandler(Logger.getInstance({
-  level: 'info' as any,
+  level: 'info' as LogLevel,
   output: 'console'
 }));
 

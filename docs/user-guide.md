@@ -33,7 +33,7 @@ npm install -g taskflow-ai
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-org/taskflow-ai.git
+git clone https://github.com/agions/taskflow-ai.git
 cd taskflow-ai
 
 # 安装依赖

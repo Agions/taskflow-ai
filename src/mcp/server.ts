@@ -19,7 +19,7 @@ interface MCPRequest {
   method: string;
   params: {
     name: string;
-    arguments: any;
+    arguments: Record<string, unknown>;
   };
 }
 
@@ -284,7 +284,7 @@ export class TaskFlowMCPServer {
         throw new Error(`不支持的方法: ${method}`);
       }
     } catch (error) {
-      this.logger.error(`MCP请求处理失败:`, error);
+      this.logger.error(`MCP请求处理失败:`, { error });
       return {
         content: [{
           type: 'text',
@@ -311,13 +311,23 @@ export class TaskFlowMCPServer {
   /**
    * 调用指定工具
    */
-  private async callTool(name: string, args: any): Promise<MCPResponse> {
+  private async callTool(name: string, args: Record<string, unknown>): Promise<MCPResponse> {
     switch (name) {
       case 'taskflow_parse_prd':
-        return await this.handleParsePRD(args);
+        return await this.handleParsePRD(args as { content: string; format?: string; options?: Record<string, unknown> });
 
       case 'taskflow_generate_tasks':
-        return await this.handleGenerateTasks(args);
+        // 类型检查，确保 args 至少有 requirements 字段
+        if (!Array.isArray(args.requirements)) {
+          throw new Error('参数缺少 requirements 字段或类型不正确');
+        }
+        return await this.handleGenerateTasks(args as {
+          requirements: string[];
+          projectType?: string;
+          complexity?: 'simple' | 'medium' | 'complex';
+          maxDepth?: number;
+          useMultiModel?: boolean;
+        });
 
       case 'taskflow_update_task_status':
         return await this.handleUpdateTaskStatus(args);
@@ -339,12 +349,33 @@ export class TaskFlowMCPServer {
   /**
    * 处理PRD解析请求
    */
-  private async handleParsePRD(args: any): Promise<MCPResponse> {
+  private async handleParsePRD(args: { content: string; format?: string; options?: Record<string, unknown> }): Promise<MCPResponse> {
     const { content, format = 'markdown', options = {} } = args;
 
     try {
       this.logger.info('开始解析PRD内容');
-      const result = await this.taskFlowService.parsePRD(content, format as any, options);
+      // Convert format string to FileType enum
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { FileType } = require('./index');
+      let fileType: typeof FileType[keyof typeof FileType] | undefined;
+      switch (format) {
+        case 'markdown':
+          fileType = FileType.MARKDOWN;
+          break;
+        case 'text':
+          fileType = FileType.TEXT;
+          break;
+        case 'json':
+          fileType = FileType.JSON;
+          break;
+        default:
+          fileType = FileType.MARKDOWN;
+      }
+      const result = await this.taskFlowService.parsePRD(
+        content,
+        fileType,
+        options
+      );
 
       return {
         content: [{
@@ -355,7 +386,7 @@ export class TaskFlowMCPServer {
         }]
       };
     } catch (error) {
-      this.logger.error('PRD解析失败:', error);
+      this.logger.error('PRD解析失败:', { error });
       return {
         content: [{
           type: 'text',
@@ -368,7 +399,13 @@ export class TaskFlowMCPServer {
   /**
    * 处理任务生成请求
    */
-  private async handleGenerateTasks(args: any): Promise<MCPResponse> {
+  private async handleGenerateTasks(args: {
+    requirements: string[];
+    projectType?: string;
+    complexity?: 'simple' | 'medium' | 'complex';
+    maxDepth?: number;
+    useMultiModel?: boolean;
+  }): Promise<MCPResponse> {
     const { requirements, projectType, complexity = 'medium', useMultiModel = true } = args;
 
     try {
@@ -394,7 +431,7 @@ export class TaskFlowMCPServer {
         }]
       };
     } catch (error) {
-      this.logger.error('任务生成失败:', error);
+      this.logger.error('任务生成失败:', { error: error instanceof Error ? error.message : String(error) });
       return {
         content: [{
           type: 'text',
@@ -430,7 +467,7 @@ export class TaskFlowMCPServer {
         };
       }
     } catch (error) {
-      this.logger.error('任务状态更新失败:', error);
+      this.logger.error('任务状态更新失败:', { error });
       return {
         content: [{
           type: 'text',
@@ -474,7 +511,7 @@ export class TaskFlowMCPServer {
         };
       }
     } catch (error) {
-      this.logger.error('获取项目状态失败:', error);
+      this.logger.error('获取项目状态失败:', {error} );
       return {
         content: [{
           type: 'text',
@@ -537,7 +574,7 @@ export class TaskFlowMCPServer {
         }]
       };
     } catch (error) {
-      this.logger.error('多模型协作处理失败:', error);
+      this.logger.error('多模型协作处理失败:', {error});
       return {
         content: [{
           type: 'text',
@@ -613,7 +650,7 @@ export class TaskFlowMCPServer {
         }]
       };
     } catch (error) {
-      this.logger.error('智能任务分解失败:', error);
+      this.logger.error('智能任务分解失败:', {error});
       return {
         content: [{
           type: 'text',
@@ -637,7 +674,7 @@ export class TaskFlowMCPServer {
         const response = await this.handleRequest(request);
         process.stdout.write(JSON.stringify(response) + '\n');
       } catch (error) {
-        this.logger.error('处理MCP请求失败:', error);
+        this.logger.error('处理MCP请求失败:', {error});
         const errorResponse: MCPResponse = {
           content: [{
             type: 'text',

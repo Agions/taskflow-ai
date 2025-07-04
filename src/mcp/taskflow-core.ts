@@ -119,7 +119,7 @@ export class TaskFlowCore {
       this.logger.info('TaskFlow 核心服务初始化完成');
 
     } catch (error) {
-      this.logger.error('TaskFlow 核心服务初始化失败:', error);
+      this.logger.error('TaskFlow 核心服务初始化失败:', { error });
       throw error;
     }
   }
@@ -186,7 +186,7 @@ export class TaskFlowCore {
       return result;
 
     } catch (error) {
-      this.logger.error('PRD 解析失败:', error);
+      this.logger.error('PRD 解析失败:', { error });
       throw new Error(`PRD 解析失败: ${(error as Error).message}`);
     }
   }
@@ -226,7 +226,7 @@ export class TaskFlowCore {
       return task;
 
     } catch (error) {
-      this.logger.error('任务创建失败:', error);
+      this.logger.error('任务创建失败:', { error });
       throw new Error(`任务创建失败: ${(error as Error).message}`);
     }
   }
@@ -269,7 +269,7 @@ export class TaskFlowCore {
       return tasks;
 
     } catch (error) {
-      this.logger.error('获取任务列表失败:', error);
+      this.logger.error('获取任务列表失败:', { error });
       throw new Error(`获取任务列表失败: ${(error as Error).message}`);
     }
   }
@@ -346,7 +346,7 @@ ${code}
       return result;
 
     } catch (error) {
-      this.logger.error('代码分析失败:', error);
+      this.logger.error('代码分析失败:', { error });
       throw new Error(`代码分析失败: ${(error as Error).message}`);
     }
   }
@@ -380,7 +380,7 @@ ${code}
       return response.content;
 
     } catch (error) {
-      this.logger.error('AI 查询失败:', error);
+      this.logger.error('AI 查询失败:', { error });
       throw new Error(`AI 查询失败: ${(error as Error).message}`);
     }
   }

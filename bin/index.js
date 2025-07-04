@@ -8020,7 +8020,7 @@ ${chalk.yellow('示例:')}
   ${chalk.gray('taskflow config set model.deepseek.apiKey <your-key>')}
 
 ${chalk.yellow('更多信息:')}
-  ${chalk.blue('https://github.com/your-org/taskflow-ai')}
+  ${chalk.blue('https://github.com/agions/taskflow-ai')}
 `);
 // 注册命令
 visualizeCommand.register(program);

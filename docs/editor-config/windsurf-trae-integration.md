@@ -535,4 +535,4 @@ npm run dev
 - 探索[高级配置选项](./advanced-configuration.md)
 - 学习[自定义工作流](./custom-workflows.md)
 - 查看[性能优化指南](./performance-optimization.md)
-- 参与[社区讨论](https://github.com/your-org/taskflow-ai/discussions)
+- 参与[社区讨论](https://github.com/agions/taskflow-ai/discussions)
