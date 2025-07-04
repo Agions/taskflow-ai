@@ -79,6 +79,18 @@ export interface ModelCapabilities {
 }
 
 /**
+ * 模型详细信息
+ */
+export interface ModelDetails {
+  name: string;
+  description: string;
+  maxTokens: number;
+  supportStream: boolean;
+  supportsFunctions?: boolean;
+  features?: string[];
+}
+
+/**
  * 多模型配置
  */
 export interface MultiModelConfig {

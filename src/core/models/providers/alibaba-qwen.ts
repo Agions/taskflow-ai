@@ -4,14 +4,15 @@
  */
 
 import axios, { AxiosInstance } from 'axios';
-import { 
-  ChineseLLMProvider, 
-  ChineseLLMType, 
-  ModelConfig, 
-  ChatRequest, 
-  ChatResponse, 
+import {
+  ChineseLLMProvider,
+  ChineseLLMType,
+  ModelConfig,
+  ChatRequest,
+  ChatResponse,
   StreamResponse,
-  ChatMessage
+  ChatMessage,
+  ModelInfo
 } from '../chinese-llm-provider';
 import { Logger } from '../../../infra/logger';
 
@@ -222,26 +223,21 @@ export class AlibabaQwenProvider extends ChineseLLMProvider {
   /**
    * 获取模型信息
    */
-  public async getModelInfo(): Promise<{
-    provider: string;
-    description: string;
-    models: string[];
-    capabilities: string[];
-    pricing: Record<string, unknown>;
-  }> {
+  public async getModelInfo(): Promise<ModelInfo> {
     return {
-      provider: '阿里通义千问',
-      description: '阿里云自研的大语言模型，具备多模态能力和长文本处理能力',
-      features: ['多模态', '长文本', '代码生成', '数学推理', '多语言'],
-      pricing: {
-        'qwen-turbo': { input: 0.008, output: 0.008 },
-        'qwen-plus': { input: 0.020, output: 0.020 },
-        'qwen-max': { input: 0.120, output: 0.120 }
+      name: '阿里通义千问',
+      version: 'v2.0',
+      maxTokens: 32768,
+      supportedFeatures: ['多模态', '长文本', '代码生成', '数学推理', '多语言'],
+      features: {
+        supportsFunctions: true,
+        supportsVision: true,
+        supportsStreaming: true,
+        supportsLongContext: true
       },
-      limits: {
-        maxTokens: 32768,
-        maxRequestsPerMinute: 600,
-        maxRequestsPerDay: 100000
+      pricing: {
+        inputTokens: 0.008,
+        outputTokens: 0.008
       }
     };
   }

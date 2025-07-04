@@ -90,7 +90,7 @@ export class Logger {
    * @param message 日志消息
    * @param meta 元数据
    */
-  public error(message: string, meta?: any): void {
+  public error(message: string, meta?: Record<string, unknown>): void {
     this.logger.error(message, meta);
   }
 
@@ -99,7 +99,7 @@ export class Logger {
    * @param message 日志消息
    * @param meta 元数据
    */
-  public warn(message: string, meta?: any): void {
+  public warn(message: string, meta?: Record<string, unknown>): void {
     this.logger.warn(message, meta);
   }
 
@@ -108,7 +108,7 @@ export class Logger {
    * @param message 日志消息
    * @param meta 元数据
    */
-  public info(message: string, meta?: any): void {
+  public info(message: string, meta?: Record<string, unknown>): void {
     this.logger.info(message, meta);
   }
 
@@ -117,7 +117,7 @@ export class Logger {
    * @param message 日志消息
    * @param meta 元数据
    */
-  public debug(message: string, meta?: any): void {
+  public debug(message: string, meta?: Record<string, unknown>): void {
     this.logger.debug(message, meta);
   }
 
@@ -127,7 +127,7 @@ export class Logger {
    * @param message 日志消息
    * @param meta 元数据
    */
-  public log(level: string, message: string, meta?: any): void {
+  public log(level: string, message: string, meta?: Record<string, unknown>): void {
     this.logger.log(level, message, meta);
   }
 }

@@ -30,6 +30,13 @@ export interface ModelInfo {
   version: string;
   maxTokens: number;
   supportedFeatures: string[];
+  features?: {
+    supportsFunctions?: boolean;
+    supportsVision?: boolean;
+    supportsStreaming?: boolean;
+    supportsLongContext?: boolean;
+    [key: string]: boolean | undefined;
+  };
   pricing?: {
     inputTokens: number;
     outputTokens: number;

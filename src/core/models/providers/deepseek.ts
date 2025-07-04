@@ -10,9 +10,11 @@ import {
   ModelConfig,
   ChatRequest,
   ChatResponse,
-  StreamResponse
+  StreamResponse,
+  ModelInfo
 } from '../chinese-llm-provider';
 import { Logger } from '../../../infra/logger';
+import { ModelDetails } from '../../../types/model';
 
 /**
  * DeepSeek模型列表
@@ -289,26 +291,20 @@ export class DeepSeekProvider extends ChineseLLMProvider {
   /**
    * 获取模型信息
    */
-  public async getModelInfo(): Promise<{
-    provider: string;
-    description: string;
-    models: string[];
-    capabilities: string[];
-    pricing: Record<string, unknown>;
-  }> {
+  public async getModelInfo(): Promise<ModelInfo> {
     return {
-      provider: 'DeepSeek',
-      description: 'DeepSeek大模型API服务，专注于代码生成和数学推理',
-      features: ['代码生成', '数学推理', '开源友好', '高性价比'],
-      models: this.getSupportedModels(),
-      pricing: {
-        'deepseek-chat': { input: 0.001, output: 0.002 },
-        'deepseek-coder': { input: 0.001, output: 0.002 }
+      name: 'DeepSeek',
+      version: 'v2.0',
+      maxTokens: 32768,
+      supportedFeatures: ['代码生成', '数学推理', '开源友好', '高性价比'],
+      features: {
+        supportsFunctions: true,
+        supportsStreaming: true,
+        supportsLongContext: true
       },
-      limits: {
-        maxTokens: 32768,
-        maxRequestsPerMinute: 300,
-        maxRequestsPerDay: 50000
+      pricing: {
+        inputTokens: 0.001,
+        outputTokens: 0.002
       }
     };
   }
@@ -316,29 +312,27 @@ export class DeepSeekProvider extends ChineseLLMProvider {
   /**
    * 获取特定模型信息
    */
-  public getSpecificModelInfo(model: string) {
-    const modelInfo: Record<string, {
-      name: string;
-      description: string;
-      maxTokens: number;
-      supportStream: boolean;
-    }> = {
+  public getSpecificModelInfo(model: string): ModelDetails {
+    const modelInfo: Record<string, ModelDetails> = {
       [DeepSeekModel.DEEPSEEK_CHAT]: {
         name: 'DeepSeek Chat',
         description: 'DeepSeek通用对话模型',
         maxTokens: 32768,
+        supportStream: true,
         supportsFunctions: true
       },
       [DeepSeekModel.DEEPSEEK_CODER]: {
         name: 'DeepSeek Coder',
         description: 'DeepSeek代码生成模型',
         maxTokens: 32768,
+        supportStream: true,
         supportsFunctions: true
       },
       [DeepSeekModel.DEEPSEEK_V2]: {
         name: 'DeepSeek V2',
         description: 'DeepSeek V2通用模型',
         maxTokens: 32768,
+        supportStream: true,
         supportsFunctions: true
       }
     };
@@ -347,6 +341,7 @@ export class DeepSeekProvider extends ChineseLLMProvider {
       name: model,
       description: 'DeepSeek模型',
       maxTokens: 32768,
+      supportStream: true,
       supportsFunctions: false
     };
   }

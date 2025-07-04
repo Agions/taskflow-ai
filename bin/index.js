@@ -1,151 +1,8550 @@
 #!/usr/bin/env node
-"use strict";var Cl=Object.create;var pr=Object.defineProperty;var Al=Object.getOwnPropertyDescriptor;var Ml=Object.getOwnPropertyNames;var Rl=Object.getPrototypeOf,Pl=Object.prototype.hasOwnProperty;var m=(t,e)=>()=>(e||t((e={exports:{}}).exports,e),e.exports),Fl=(t,e)=>{for(var r in e)pr(t,r,{get:e[r],enumerable:!0})},Qi=(t,e,r,u)=>{if(e&&typeof e=="object"||typeof e=="function")for(let n of Ml(e))!Pl.call(t,n)&&n!==r&&pr(t,n,{get:()=>e[n],enumerable:!(u=Al(e,n))||u.enumerable});return t};var B=(t,e,r)=>(r=t!=null?Cl(Rl(t)):{},Qi(e||!t||!t.__esModule?pr(r,"default",{value:t,enumerable:!0}):r,t)),Ol=t=>Qi(pr({},"__esModule",{value:!0}),t);var as=m(Mt=>{"use strict";var es={};function ql(t){let e=es[t];if(e)return e;e=es[t]=[];for(let r=0;r<128;r++){let u=String.fromCharCode(r);e.push(u)}for(let r=0;r<t.length;r++){let u=t.charCodeAt(r);e[u]="%"+("0"+u.toString(16).toUpperCase()).slice(-2)}return e}function gr(t,e){typeof e!="string"&&(e=gr.defaultChars);let r=ql(e);return t.replace(/(%[a-f0-9]{2})+/gi,function(u){let n="";for(let i=0,s=u.length;i<s;i+=3){let a=parseInt(u.slice(i+1,i+3),16);if(a<128){n+=r[a];continue}if((a&224)===192&&i+3<s){let o=parseInt(u.slice(i+4,i+6),16);if((o&192)===128){let c=a<<6&1984|o&63;c<128?n+="\uFFFD\uFFFD":n+=String.fromCharCode(c),i+=3;continue}}if((a&240)===224&&i+6<s){let o=parseInt(u.slice(i+4,i+6),16),c=parseInt(u.slice(i+7,i+9),16);if((o&192)===128&&(c&192)===128){let f=a<<12&61440|o<<6&4032|c&63;f<2048||f>=55296&&f<=57343?n+="\uFFFD\uFFFD\uFFFD":n+=String.fromCharCode(f),i+=6;continue}}if((a&248)===240&&i+9<s){let o=parseInt(u.slice(i+4,i+6),16),c=parseInt(u.slice(i+7,i+9),16),f=parseInt(u.slice(i+10,i+12),16);if((o&192)===128&&(c&192)===128&&(f&192)===128){let d=a<<18&1835008|o<<12&258048|c<<6&4032|f&63;d<65536||d>1114111?n+="\uFFFD\uFFFD\uFFFD\uFFFD":(d-=65536,n+=String.fromCharCode(55296+(d>>10),56320+(d&1023))),i+=9;continue}}n+="\uFFFD"}return n})}gr.defaultChars=";/?:@&=+$,#";gr.componentChars="";var ts={};function Ll(t){let e=ts[t];if(e)return e;e=ts[t]=[];for(let r=0;r<128;r++){let u=String.fromCharCode(r);/^[0-9a-z]$/i.test(u)?e.push(u):e.push("%"+("0"+r.toString(16).toUpperCase()).slice(-2))}for(let r=0;r<t.length;r++)e[t.charCodeAt(r)]=t[r];return e}function mr(t,e,r){typeof e!="string"&&(r=e,e=mr.defaultChars),typeof r>"u"&&(r=!0);let u=Ll(e),n="";for(let i=0,s=t.length;i<s;i++){let a=t.charCodeAt(i);if(r&&a===37&&i+2<s&&/^[0-9a-f]{2}$/i.test(t.slice(i+1,i+3))){n+=t.slice(i,i+3),i+=2;continue}if(a<128){n+=u[a];continue}if(a>=55296&&a<=57343){if(a>=55296&&a<=56319&&i+1<s){let o=t.charCodeAt(i+1);if(o>=56320&&o<=57343){n+=encodeURIComponent(t[i]+t[i+1]),i++;continue}}n+="%EF%BF%BD";continue}n+=encodeURIComponent(t[i])}return n}mr.defaultChars=";/?:@&=+$,-_.!~*'()#";mr.componentChars="-_.!~*'()";function Il(t){let e="";return e+=t.protocol||"",e+=t.slashes?"//":"",e+=t.auth?t.auth+"@":"",t.hostname&&t.hostname.indexOf(":")!==-1?e+="["+t.hostname+"]":e+=t.hostname||"",e+=t.port?":"+t.port:"",e+=t.pathname||"",e+=t.search||"",e+=t.hash||"",e}function hr(){this.protocol=null,this.slashes=null,this.auth=null,this.port=null,this.hostname=null,this.hash=null,this.search=null,this.pathname=null}var Nl=/^([a-z0-9.+-]+:)/i,jl=/:[0-9]*$/,$l=/^(\/\/?(?!\/)[^\?\s]*)(\?[^\s]*)?$/,Bl=["<",">",'"',"`"," ","\r",`
-`,"	"],zl=["{","}","|","\\","^","`"].concat(Bl),Hl=["'"].concat(zl),rs=["%","/","?",";","#"].concat(Hl),us=["/","?","#"],Ul=255,ns=/^[+a-z0-9A-Z_-]{0,63}$/,Vl=/^([+a-z0-9A-Z_-]{0,63})(.*)$/,is={javascript:!0,"javascript:":!0},ss={http:!0,https:!0,ftp:!0,gopher:!0,file:!0,"http:":!0,"https:":!0,"ftp:":!0,"gopher:":!0,"file:":!0};function Gl(t,e){if(t&&t instanceof hr)return t;let r=new hr;return r.parse(t,e),r}hr.prototype.parse=function(t,e){let r,u,n,i=t;if(i=i.trim(),!e&&t.split("#").length===1){let c=$l.exec(i);if(c)return this.pathname=c[1],c[2]&&(this.search=c[2]),this}let s=Nl.exec(i);if(s&&(s=s[0],r=s.toLowerCase(),this.protocol=s,i=i.substr(s.length)),(e||s||i.match(/^\/\/[^@\/]+@[^@\/]+/))&&(n=i.substr(0,2)==="//",n&&!(s&&is[s])&&(i=i.substr(2),this.slashes=!0)),!is[s]&&(n||s&&!ss[s])){let c=-1;for(let l=0;l<us.length;l++)u=i.indexOf(us[l]),u!==-1&&(c===-1||u<c)&&(c=u);let f,d;c===-1?d=i.lastIndexOf("@"):d=i.lastIndexOf("@",c),d!==-1&&(f=i.slice(0,d),i=i.slice(d+1),this.auth=f),c=-1;for(let l=0;l<rs.length;l++)u=i.indexOf(rs[l]),u!==-1&&(c===-1||u<c)&&(c=u);c===-1&&(c=i.length),i[c-1]===":"&&c--;let p=i.slice(0,c);i=i.slice(c),this.parseHost(p),this.hostname=this.hostname||"";let h=this.hostname[0]==="["&&this.hostname[this.hostname.length-1]==="]";if(!h){let l=this.hostname.split(/\./);for(let g=0,_=l.length;g<_;g++){let E=l[g];if(E&&!E.match(ns)){let x="";for(let y=0,v=E.length;y<v;y++)E.charCodeAt(y)>127?x+="x":x+=E[y];if(!x.match(ns)){let y=l.slice(0,g),v=l.slice(g+1),w=E.match(Vl);w&&(y.push(w[1]),v.unshift(w[2])),v.length&&(i=v.join(".")+i),this.hostname=y.join(".");break}}}}this.hostname.length>Ul&&(this.hostname=""),h&&(this.hostname=this.hostname.substr(1,this.hostname.length-2))}let a=i.indexOf("#");a!==-1&&(this.hash=i.substr(a),i=i.slice(0,a));let o=i.indexOf("?");return o!==-1&&(this.search=i.substr(o),i=i.slice(0,o)),i&&(this.pathname=i),ss[r]&&this.hostname&&!this.pathname&&(this.pathname=""),this};hr.prototype.parseHost=function(t){let e=jl.exec(t);e&&(e=e[0],e!==":"&&(this.port=e.substr(1)),t=t.substr(0,t.length-e.length)),t&&(this.hostname=t)};Mt.decode=gr;Mt.encode=mr;Mt.format=Il;Mt.parse=Gl});var Ku=m(Ke=>{"use strict";var Wl=/[\0-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/,Kl=/[\0-\x1F\x7F-\x9F]/,Yl=/[\xAD\u0600-\u0605\u061C\u06DD\u070F\u0890\u0891\u08E2\u180E\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u206F\uFEFF\uFFF9-\uFFFB]|\uD804[\uDCBD\uDCCD]|\uD80D[\uDC30-\uDC3F]|\uD82F[\uDCA0-\uDCA3]|\uD834[\uDD73-\uDD7A]|\uDB40[\uDC01\uDC20-\uDC7F]/,Zl=/[!-#%-\*,-\/:;\?@\[-\]_\{\}\xA1\xA7\xAB\xB6\xB7\xBB\xBF\u037E\u0387\u055A-\u055F\u0589\u058A\u05BE\u05C0\u05C3\u05C6\u05F3\u05F4\u0609\u060A\u060C\u060D\u061B\u061D-\u061F\u066A-\u066D\u06D4\u0700-\u070D\u07F7-\u07F9\u0830-\u083E\u085E\u0964\u0965\u0970\u09FD\u0A76\u0AF0\u0C77\u0C84\u0DF4\u0E4F\u0E5A\u0E5B\u0F04-\u0F12\u0F14\u0F3A-\u0F3D\u0F85\u0FD0-\u0FD4\u0FD9\u0FDA\u104A-\u104F\u10FB\u1360-\u1368\u1400\u166E\u169B\u169C\u16EB-\u16ED\u1735\u1736\u17D4-\u17D6\u17D8-\u17DA\u1800-\u180A\u1944\u1945\u1A1E\u1A1F\u1AA0-\u1AA6\u1AA8-\u1AAD\u1B5A-\u1B60\u1B7D\u1B7E\u1BFC-\u1BFF\u1C3B-\u1C3F\u1C7E\u1C7F\u1CC0-\u1CC7\u1CD3\u2010-\u2027\u2030-\u2043\u2045-\u2051\u2053-\u205E\u207D\u207E\u208D\u208E\u2308-\u230B\u2329\u232A\u2768-\u2775\u27C5\u27C6\u27E6-\u27EF\u2983-\u2998\u29D8-\u29DB\u29FC\u29FD\u2CF9-\u2CFC\u2CFE\u2CFF\u2D70\u2E00-\u2E2E\u2E30-\u2E4F\u2E52-\u2E5D\u3001-\u3003\u3008-\u3011\u3014-\u301F\u3030\u303D\u30A0\u30FB\uA4FE\uA4FF\uA60D-\uA60F\uA673\uA67E\uA6F2-\uA6F7\uA874-\uA877\uA8CE\uA8CF\uA8F8-\uA8FA\uA8FC\uA92E\uA92F\uA95F\uA9C1-\uA9CD\uA9DE\uA9DF\uAA5C-\uAA5F\uAADE\uAADF\uAAF0\uAAF1\uABEB\uFD3E\uFD3F\uFE10-\uFE19\uFE30-\uFE52\uFE54-\uFE61\uFE63\uFE68\uFE6A\uFE6B\uFF01-\uFF03\uFF05-\uFF0A\uFF0C-\uFF0F\uFF1A\uFF1B\uFF1F\uFF20\uFF3B-\uFF3D\uFF3F\uFF5B\uFF5D\uFF5F-\uFF65]|\uD800[\uDD00-\uDD02\uDF9F\uDFD0]|\uD801\uDD6F|\uD802[\uDC57\uDD1F\uDD3F\uDE50-\uDE58\uDE7F\uDEF0-\uDEF6\uDF39-\uDF3F\uDF99-\uDF9C]|\uD803[\uDEAD\uDF55-\uDF59\uDF86-\uDF89]|\uD804[\uDC47-\uDC4D\uDCBB\uDCBC\uDCBE-\uDCC1\uDD40-\uDD43\uDD74\uDD75\uDDC5-\uDDC8\uDDCD\uDDDB\uDDDD-\uDDDF\uDE38-\uDE3D\uDEA9]|\uD805[\uDC4B-\uDC4F\uDC5A\uDC5B\uDC5D\uDCC6\uDDC1-\uDDD7\uDE41-\uDE43\uDE60-\uDE6C\uDEB9\uDF3C-\uDF3E]|\uD806[\uDC3B\uDD44-\uDD46\uDDE2\uDE3F-\uDE46\uDE9A-\uDE9C\uDE9E-\uDEA2\uDF00-\uDF09]|\uD807[\uDC41-\uDC45\uDC70\uDC71\uDEF7\uDEF8\uDF43-\uDF4F\uDFFF]|\uD809[\uDC70-\uDC74]|\uD80B[\uDFF1\uDFF2]|\uD81A[\uDE6E\uDE6F\uDEF5\uDF37-\uDF3B\uDF44]|\uD81B[\uDE97-\uDE9A\uDFE2]|\uD82F\uDC9F|\uD836[\uDE87-\uDE8B]|\uD83A[\uDD5E\uDD5F]/,Jl=/[\$\+<->\^`\|~\xA2-\xA6\xA8\xA9\xAC\xAE-\xB1\xB4\xB8\xD7\xF7\u02C2-\u02C5\u02D2-\u02DF\u02E5-\u02EB\u02ED\u02EF-\u02FF\u0375\u0384\u0385\u03F6\u0482\u058D-\u058F\u0606-\u0608\u060B\u060E\u060F\u06DE\u06E9\u06FD\u06FE\u07F6\u07FE\u07FF\u0888\u09F2\u09F3\u09FA\u09FB\u0AF1\u0B70\u0BF3-\u0BFA\u0C7F\u0D4F\u0D79\u0E3F\u0F01-\u0F03\u0F13\u0F15-\u0F17\u0F1A-\u0F1F\u0F34\u0F36\u0F38\u0FBE-\u0FC5\u0FC7-\u0FCC\u0FCE\u0FCF\u0FD5-\u0FD8\u109E\u109F\u1390-\u1399\u166D\u17DB\u1940\u19DE-\u19FF\u1B61-\u1B6A\u1B74-\u1B7C\u1FBD\u1FBF-\u1FC1\u1FCD-\u1FCF\u1FDD-\u1FDF\u1FED-\u1FEF\u1FFD\u1FFE\u2044\u2052\u207A-\u207C\u208A-\u208C\u20A0-\u20C0\u2100\u2101\u2103-\u2106\u2108\u2109\u2114\u2116-\u2118\u211E-\u2123\u2125\u2127\u2129\u212E\u213A\u213B\u2140-\u2144\u214A-\u214D\u214F\u218A\u218B\u2190-\u2307\u230C-\u2328\u232B-\u2426\u2440-\u244A\u249C-\u24E9\u2500-\u2767\u2794-\u27C4\u27C7-\u27E5\u27F0-\u2982\u2999-\u29D7\u29DC-\u29FB\u29FE-\u2B73\u2B76-\u2B95\u2B97-\u2BFF\u2CE5-\u2CEA\u2E50\u2E51\u2E80-\u2E99\u2E9B-\u2EF3\u2F00-\u2FD5\u2FF0-\u2FFF\u3004\u3012\u3013\u3020\u3036\u3037\u303E\u303F\u309B\u309C\u3190\u3191\u3196-\u319F\u31C0-\u31E3\u31EF\u3200-\u321E\u322A-\u3247\u3250\u3260-\u327F\u328A-\u32B0\u32C0-\u33FF\u4DC0-\u4DFF\uA490-\uA4C6\uA700-\uA716\uA720\uA721\uA789\uA78A\uA828-\uA82B\uA836-\uA839\uAA77-\uAA79\uAB5B\uAB6A\uAB6B\uFB29\uFBB2-\uFBC2\uFD40-\uFD4F\uFDCF\uFDFC-\uFDFF\uFE62\uFE64-\uFE66\uFE69\uFF04\uFF0B\uFF1C-\uFF1E\uFF3E\uFF40\uFF5C\uFF5E\uFFE0-\uFFE6\uFFE8-\uFFEE\uFFFC\uFFFD]|\uD800[\uDD37-\uDD3F\uDD79-\uDD89\uDD8C-\uDD8E\uDD90-\uDD9C\uDDA0\uDDD0-\uDDFC]|\uD802[\uDC77\uDC78\uDEC8]|\uD805\uDF3F|\uD807[\uDFD5-\uDFF1]|\uD81A[\uDF3C-\uDF3F\uDF45]|\uD82F\uDC9C|\uD833[\uDF50-\uDFC3]|\uD834[\uDC00-\uDCF5\uDD00-\uDD26\uDD29-\uDD64\uDD6A-\uDD6C\uDD83\uDD84\uDD8C-\uDDA9\uDDAE-\uDDEA\uDE00-\uDE41\uDE45\uDF00-\uDF56]|\uD835[\uDEC1\uDEDB\uDEFB\uDF15\uDF35\uDF4F\uDF6F\uDF89\uDFA9\uDFC3]|\uD836[\uDC00-\uDDFF\uDE37-\uDE3A\uDE6D-\uDE74\uDE76-\uDE83\uDE85\uDE86]|\uD838[\uDD4F\uDEFF]|\uD83B[\uDCAC\uDCB0\uDD2E\uDEF0\uDEF1]|\uD83C[\uDC00-\uDC2B\uDC30-\uDC93\uDCA0-\uDCAE\uDCB1-\uDCBF\uDCC1-\uDCCF\uDCD1-\uDCF5\uDD0D-\uDDAD\uDDE6-\uDE02\uDE10-\uDE3B\uDE40-\uDE48\uDE50\uDE51\uDE60-\uDE65\uDF00-\uDFFF]|\uD83D[\uDC00-\uDED7\uDEDC-\uDEEC\uDEF0-\uDEFC\uDF00-\uDF76\uDF7B-\uDFD9\uDFE0-\uDFEB\uDFF0]|\uD83E[\uDC00-\uDC0B\uDC10-\uDC47\uDC50-\uDC59\uDC60-\uDC87\uDC90-\uDCAD\uDCB0\uDCB1\uDD00-\uDE53\uDE60-\uDE6D\uDE70-\uDE7C\uDE80-\uDE88\uDE90-\uDEBD\uDEBF-\uDEC5\uDECE-\uDEDB\uDEE0-\uDEE8\uDEF0-\uDEF8\uDF00-\uDF92\uDF94-\uDFCA]/,Xl=/[ \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]/;Ke.Any=Wl;Ke.Cc=Kl;Ke.Cf=Yl;Ke.P=Zl;Ke.S=Jl;Ke.Z=Xl});var os=m(Yu=>{"use strict";Object.defineProperty(Yu,"__esModule",{value:!0});Yu.default=new Uint16Array('\u1D41<\xD5\u0131\u028A\u049D\u057B\u05D0\u0675\u06DE\u07A2\u07D6\u080F\u0A4A\u0A91\u0DA1\u0E6D\u0F09\u0F26\u10CA\u1228\u12E1\u1415\u149D\u14C3\u14DF\u1525\0\0\0\0\0\0\u156B\u16CD\u198D\u1C12\u1DDD\u1F7E\u2060\u21B0\u228D\u23C0\u23FB\u2442\u2824\u2912\u2D08\u2E48\u2FCE\u3016\u32BA\u3639\u37AC\u38FE\u3A28\u3A71\u3AE0\u3B2E\u0800EMabcfglmnoprstu\\bfms\x7F\x84\x8B\x90\x95\x98\xA6\xB3\xB9\xC8\xCFlig\u803B\xC6\u40C6P\u803B&\u4026cute\u803B\xC1\u40C1reve;\u4102\u0100iyx}rc\u803B\xC2\u40C2;\u4410r;\uC000\u{1D504}rave\u803B\xC0\u40C0pha;\u4391acr;\u4100d;\u6A53\u0100gp\x9D\xA1on;\u4104f;\uC000\u{1D538}plyFunction;\u6061ing\u803B\xC5\u40C5\u0100cs\xBE\xC3r;\uC000\u{1D49C}ign;\u6254ilde\u803B\xC3\u40C3ml\u803B\xC4\u40C4\u0400aceforsu\xE5\xFB\xFE\u0117\u011C\u0122\u0127\u012A\u0100cr\xEA\xF2kslash;\u6216\u0176\xF6\xF8;\u6AE7ed;\u6306y;\u4411\u0180crt\u0105\u010B\u0114ause;\u6235noullis;\u612Ca;\u4392r;\uC000\u{1D505}pf;\uC000\u{1D539}eve;\u42D8c\xF2\u0113mpeq;\u624E\u0700HOacdefhilorsu\u014D\u0151\u0156\u0180\u019E\u01A2\u01B5\u01B7\u01BA\u01DC\u0215\u0273\u0278\u027Ecy;\u4427PY\u803B\xA9\u40A9\u0180cpy\u015D\u0162\u017Aute;\u4106\u0100;i\u0167\u0168\u62D2talDifferentialD;\u6145leys;\u612D\u0200aeio\u0189\u018E\u0194\u0198ron;\u410Cdil\u803B\xC7\u40C7rc;\u4108nint;\u6230ot;\u410A\u0100dn\u01A7\u01ADilla;\u40B8terDot;\u40B7\xF2\u017Fi;\u43A7rcle\u0200DMPT\u01C7\u01CB\u01D1\u01D6ot;\u6299inus;\u6296lus;\u6295imes;\u6297o\u0100cs\u01E2\u01F8kwiseContourIntegral;\u6232eCurly\u0100DQ\u0203\u020FoubleQuote;\u601Duote;\u6019\u0200lnpu\u021E\u0228\u0247\u0255on\u0100;e\u0225\u0226\u6237;\u6A74\u0180git\u022F\u0236\u023Aruent;\u6261nt;\u622FourIntegral;\u622E\u0100fr\u024C\u024E;\u6102oduct;\u6210nterClockwiseContourIntegral;\u6233oss;\u6A2Fcr;\uC000\u{1D49E}p\u0100;C\u0284\u0285\u62D3ap;\u624D\u0580DJSZacefios\u02A0\u02AC\u02B0\u02B4\u02B8\u02CB\u02D7\u02E1\u02E6\u0333\u048D\u0100;o\u0179\u02A5trahd;\u6911cy;\u4402cy;\u4405cy;\u440F\u0180grs\u02BF\u02C4\u02C7ger;\u6021r;\u61A1hv;\u6AE4\u0100ay\u02D0\u02D5ron;\u410E;\u4414l\u0100;t\u02DD\u02DE\u6207a;\u4394r;\uC000\u{1D507}\u0100af\u02EB\u0327\u0100cm\u02F0\u0322ritical\u0200ADGT\u0300\u0306\u0316\u031Ccute;\u40B4o\u0174\u030B\u030D;\u42D9bleAcute;\u42DDrave;\u4060ilde;\u42DCond;\u62C4ferentialD;\u6146\u0470\u033D\0\0\0\u0342\u0354\0\u0405f;\uC000\u{1D53B}\u0180;DE\u0348\u0349\u034D\u40A8ot;\u60DCqual;\u6250ble\u0300CDLRUV\u0363\u0372\u0382\u03CF\u03E2\u03F8ontourIntegra\xEC\u0239o\u0274\u0379\0\0\u037B\xBB\u0349nArrow;\u61D3\u0100eo\u0387\u03A4ft\u0180ART\u0390\u0396\u03A1rrow;\u61D0ightArrow;\u61D4e\xE5\u02CAng\u0100LR\u03AB\u03C4eft\u0100AR\u03B3\u03B9rrow;\u67F8ightArrow;\u67FAightArrow;\u67F9ight\u0100AT\u03D8\u03DErrow;\u61D2ee;\u62A8p\u0241\u03E9\0\0\u03EFrrow;\u61D1ownArrow;\u61D5erticalBar;\u6225n\u0300ABLRTa\u0412\u042A\u0430\u045E\u047F\u037Crrow\u0180;BU\u041D\u041E\u0422\u6193ar;\u6913pArrow;\u61F5reve;\u4311eft\u02D2\u043A\0\u0446\0\u0450ightVector;\u6950eeVector;\u695Eector\u0100;B\u0459\u045A\u61BDar;\u6956ight\u01D4\u0467\0\u0471eeVector;\u695Fector\u0100;B\u047A\u047B\u61C1ar;\u6957ee\u0100;A\u0486\u0487\u62A4rrow;\u61A7\u0100ct\u0492\u0497r;\uC000\u{1D49F}rok;\u4110\u0800NTacdfglmopqstux\u04BD\u04C0\u04C4\u04CB\u04DE\u04E2\u04E7\u04EE\u04F5\u0521\u052F\u0536\u0552\u055D\u0560\u0565G;\u414AH\u803B\xD0\u40D0cute\u803B\xC9\u40C9\u0180aiy\u04D2\u04D7\u04DCron;\u411Arc\u803B\xCA\u40CA;\u442Dot;\u4116r;\uC000\u{1D508}rave\u803B\xC8\u40C8ement;\u6208\u0100ap\u04FA\u04FEcr;\u4112ty\u0253\u0506\0\0\u0512mallSquare;\u65FBerySmallSquare;\u65AB\u0100gp\u0526\u052Aon;\u4118f;\uC000\u{1D53C}silon;\u4395u\u0100ai\u053C\u0549l\u0100;T\u0542\u0543\u6A75ilde;\u6242librium;\u61CC\u0100ci\u0557\u055Ar;\u6130m;\u6A73a;\u4397ml\u803B\xCB\u40CB\u0100ip\u056A\u056Fsts;\u6203onentialE;\u6147\u0280cfios\u0585\u0588\u058D\u05B2\u05CCy;\u4424r;\uC000\u{1D509}lled\u0253\u0597\0\0\u05A3mallSquare;\u65FCerySmallSquare;\u65AA\u0370\u05BA\0\u05BF\0\0\u05C4f;\uC000\u{1D53D}All;\u6200riertrf;\u6131c\xF2\u05CB\u0600JTabcdfgorst\u05E8\u05EC\u05EF\u05FA\u0600\u0612\u0616\u061B\u061D\u0623\u066C\u0672cy;\u4403\u803B>\u403Emma\u0100;d\u05F7\u05F8\u4393;\u43DCreve;\u411E\u0180eiy\u0607\u060C\u0610dil;\u4122rc;\u411C;\u4413ot;\u4120r;\uC000\u{1D50A};\u62D9pf;\uC000\u{1D53E}eater\u0300EFGLST\u0635\u0644\u064E\u0656\u065B\u0666qual\u0100;L\u063E\u063F\u6265ess;\u62DBullEqual;\u6267reater;\u6AA2ess;\u6277lantEqual;\u6A7Eilde;\u6273cr;\uC000\u{1D4A2};\u626B\u0400Aacfiosu\u0685\u068B\u0696\u069B\u069E\u06AA\u06BE\u06CARDcy;\u442A\u0100ct\u0690\u0694ek;\u42C7;\u405Eirc;\u4124r;\u610ClbertSpace;\u610B\u01F0\u06AF\0\u06B2f;\u610DizontalLine;\u6500\u0100ct\u06C3\u06C5\xF2\u06A9rok;\u4126mp\u0144\u06D0\u06D8ownHum\xF0\u012Fqual;\u624F\u0700EJOacdfgmnostu\u06FA\u06FE\u0703\u0707\u070E\u071A\u071E\u0721\u0728\u0744\u0778\u078B\u078F\u0795cy;\u4415lig;\u4132cy;\u4401cute\u803B\xCD\u40CD\u0100iy\u0713\u0718rc\u803B\xCE\u40CE;\u4418ot;\u4130r;\u6111rave\u803B\xCC\u40CC\u0180;ap\u0720\u072F\u073F\u0100cg\u0734\u0737r;\u412AinaryI;\u6148lie\xF3\u03DD\u01F4\u0749\0\u0762\u0100;e\u074D\u074E\u622C\u0100gr\u0753\u0758ral;\u622Bsection;\u62C2isible\u0100CT\u076C\u0772omma;\u6063imes;\u6062\u0180gpt\u077F\u0783\u0788on;\u412Ef;\uC000\u{1D540}a;\u4399cr;\u6110ilde;\u4128\u01EB\u079A\0\u079Ecy;\u4406l\u803B\xCF\u40CF\u0280cfosu\u07AC\u07B7\u07BC\u07C2\u07D0\u0100iy\u07B1\u07B5rc;\u4134;\u4419r;\uC000\u{1D50D}pf;\uC000\u{1D541}\u01E3\u07C7\0\u07CCr;\uC000\u{1D4A5}rcy;\u4408kcy;\u4404\u0380HJacfos\u07E4\u07E8\u07EC\u07F1\u07FD\u0802\u0808cy;\u4425cy;\u440Cppa;\u439A\u0100ey\u07F6\u07FBdil;\u4136;\u441Ar;\uC000\u{1D50E}pf;\uC000\u{1D542}cr;\uC000\u{1D4A6}\u0580JTaceflmost\u0825\u0829\u082C\u0850\u0863\u09B3\u09B8\u09C7\u09CD\u0A37\u0A47cy;\u4409\u803B<\u403C\u0280cmnpr\u0837\u083C\u0841\u0844\u084Dute;\u4139bda;\u439Bg;\u67EAlacetrf;\u6112r;\u619E\u0180aey\u0857\u085C\u0861ron;\u413Ddil;\u413B;\u441B\u0100fs\u0868\u0970t\u0500ACDFRTUVar\u087E\u08A9\u08B1\u08E0\u08E6\u08FC\u092F\u095B\u0390\u096A\u0100nr\u0883\u088FgleBracket;\u67E8row\u0180;BR\u0899\u089A\u089E\u6190ar;\u61E4ightArrow;\u61C6eiling;\u6308o\u01F5\u08B7\0\u08C3bleBracket;\u67E6n\u01D4\u08C8\0\u08D2eeVector;\u6961ector\u0100;B\u08DB\u08DC\u61C3ar;\u6959loor;\u630Aight\u0100AV\u08EF\u08F5rrow;\u6194ector;\u694E\u0100er\u0901\u0917e\u0180;AV\u0909\u090A\u0910\u62A3rrow;\u61A4ector;\u695Aiangle\u0180;BE\u0924\u0925\u0929\u62B2ar;\u69CFqual;\u62B4p\u0180DTV\u0937\u0942\u094CownVector;\u6951eeVector;\u6960ector\u0100;B\u0956\u0957\u61BFar;\u6958ector\u0100;B\u0965\u0966\u61BCar;\u6952ight\xE1\u039Cs\u0300EFGLST\u097E\u098B\u0995\u099D\u09A2\u09ADqualGreater;\u62DAullEqual;\u6266reater;\u6276ess;\u6AA1lantEqual;\u6A7Dilde;\u6272r;\uC000\u{1D50F}\u0100;e\u09BD\u09BE\u62D8ftarrow;\u61DAidot;\u413F\u0180npw\u09D4\u0A16\u0A1Bg\u0200LRlr\u09DE\u09F7\u0A02\u0A10eft\u0100AR\u09E6\u09ECrrow;\u67F5ightArrow;\u67F7ightArrow;\u67F6eft\u0100ar\u03B3\u0A0Aight\xE1\u03BFight\xE1\u03CAf;\uC000\u{1D543}er\u0100LR\u0A22\u0A2CeftArrow;\u6199ightArrow;\u6198\u0180cht\u0A3E\u0A40\u0A42\xF2\u084C;\u61B0rok;\u4141;\u626A\u0400acefiosu\u0A5A\u0A5D\u0A60\u0A77\u0A7C\u0A85\u0A8B\u0A8Ep;\u6905y;\u441C\u0100dl\u0A65\u0A6FiumSpace;\u605Flintrf;\u6133r;\uC000\u{1D510}nusPlus;\u6213pf;\uC000\u{1D544}c\xF2\u0A76;\u439C\u0480Jacefostu\u0AA3\u0AA7\u0AAD\u0AC0\u0B14\u0B19\u0D91\u0D97\u0D9Ecy;\u440Acute;\u4143\u0180aey\u0AB4\u0AB9\u0ABEron;\u4147dil;\u4145;\u441D\u0180gsw\u0AC7\u0AF0\u0B0Eative\u0180MTV\u0AD3\u0ADF\u0AE8ediumSpace;\u600Bhi\u0100cn\u0AE6\u0AD8\xEB\u0AD9eryThi\xEE\u0AD9ted\u0100GL\u0AF8\u0B06reaterGreate\xF2\u0673essLes\xF3\u0A48Line;\u400Ar;\uC000\u{1D511}\u0200Bnpt\u0B22\u0B28\u0B37\u0B3Areak;\u6060BreakingSpace;\u40A0f;\u6115\u0680;CDEGHLNPRSTV\u0B55\u0B56\u0B6A\u0B7C\u0BA1\u0BEB\u0C04\u0C5E\u0C84\u0CA6\u0CD8\u0D61\u0D85\u6AEC\u0100ou\u0B5B\u0B64ngruent;\u6262pCap;\u626DoubleVerticalBar;\u6226\u0180lqx\u0B83\u0B8A\u0B9Bement;\u6209ual\u0100;T\u0B92\u0B93\u6260ilde;\uC000\u2242\u0338ists;\u6204reater\u0380;EFGLST\u0BB6\u0BB7\u0BBD\u0BC9\u0BD3\u0BD8\u0BE5\u626Fqual;\u6271ullEqual;\uC000\u2267\u0338reater;\uC000\u226B\u0338ess;\u6279lantEqual;\uC000\u2A7E\u0338ilde;\u6275ump\u0144\u0BF2\u0BFDownHump;\uC000\u224E\u0338qual;\uC000\u224F\u0338e\u0100fs\u0C0A\u0C27tTriangle\u0180;BE\u0C1A\u0C1B\u0C21\u62EAar;\uC000\u29CF\u0338qual;\u62ECs\u0300;EGLST\u0C35\u0C36\u0C3C\u0C44\u0C4B\u0C58\u626Equal;\u6270reater;\u6278ess;\uC000\u226A\u0338lantEqual;\uC000\u2A7D\u0338ilde;\u6274ested\u0100GL\u0C68\u0C79reaterGreater;\uC000\u2AA2\u0338essLess;\uC000\u2AA1\u0338recedes\u0180;ES\u0C92\u0C93\u0C9B\u6280qual;\uC000\u2AAF\u0338lantEqual;\u62E0\u0100ei\u0CAB\u0CB9verseElement;\u620CghtTriangle\u0180;BE\u0CCB\u0CCC\u0CD2\u62EBar;\uC000\u29D0\u0338qual;\u62ED\u0100qu\u0CDD\u0D0CuareSu\u0100bp\u0CE8\u0CF9set\u0100;E\u0CF0\u0CF3\uC000\u228F\u0338qual;\u62E2erset\u0100;E\u0D03\u0D06\uC000\u2290\u0338qual;\u62E3\u0180bcp\u0D13\u0D24\u0D4Eset\u0100;E\u0D1B\u0D1E\uC000\u2282\u20D2qual;\u6288ceeds\u0200;EST\u0D32\u0D33\u0D3B\u0D46\u6281qual;\uC000\u2AB0\u0338lantEqual;\u62E1ilde;\uC000\u227F\u0338erset\u0100;E\u0D58\u0D5B\uC000\u2283\u20D2qual;\u6289ilde\u0200;EFT\u0D6E\u0D6F\u0D75\u0D7F\u6241qual;\u6244ullEqual;\u6247ilde;\u6249erticalBar;\u6224cr;\uC000\u{1D4A9}ilde\u803B\xD1\u40D1;\u439D\u0700Eacdfgmoprstuv\u0DBD\u0DC2\u0DC9\u0DD5\u0DDB\u0DE0\u0DE7\u0DFC\u0E02\u0E20\u0E22\u0E32\u0E3F\u0E44lig;\u4152cute\u803B\xD3\u40D3\u0100iy\u0DCE\u0DD3rc\u803B\xD4\u40D4;\u441Eblac;\u4150r;\uC000\u{1D512}rave\u803B\xD2\u40D2\u0180aei\u0DEE\u0DF2\u0DF6cr;\u414Cga;\u43A9cron;\u439Fpf;\uC000\u{1D546}enCurly\u0100DQ\u0E0E\u0E1AoubleQuote;\u601Cuote;\u6018;\u6A54\u0100cl\u0E27\u0E2Cr;\uC000\u{1D4AA}ash\u803B\xD8\u40D8i\u016C\u0E37\u0E3Cde\u803B\xD5\u40D5es;\u6A37ml\u803B\xD6\u40D6er\u0100BP\u0E4B\u0E60\u0100ar\u0E50\u0E53r;\u603Eac\u0100ek\u0E5A\u0E5C;\u63DEet;\u63B4arenthesis;\u63DC\u0480acfhilors\u0E7F\u0E87\u0E8A\u0E8F\u0E92\u0E94\u0E9D\u0EB0\u0EFCrtialD;\u6202y;\u441Fr;\uC000\u{1D513}i;\u43A6;\u43A0usMinus;\u40B1\u0100ip\u0EA2\u0EADncareplan\xE5\u069Df;\u6119\u0200;eio\u0EB9\u0EBA\u0EE0\u0EE4\u6ABBcedes\u0200;EST\u0EC8\u0EC9\u0ECF\u0EDA\u627Aqual;\u6AAFlantEqual;\u627Cilde;\u627Eme;\u6033\u0100dp\u0EE9\u0EEEuct;\u620Fortion\u0100;a\u0225\u0EF9l;\u621D\u0100ci\u0F01\u0F06r;\uC000\u{1D4AB};\u43A8\u0200Ufos\u0F11\u0F16\u0F1B\u0F1FOT\u803B"\u4022r;\uC000\u{1D514}pf;\u611Acr;\uC000\u{1D4AC}\u0600BEacefhiorsu\u0F3E\u0F43\u0F47\u0F60\u0F73\u0FA7\u0FAA\u0FAD\u1096\u10A9\u10B4\u10BEarr;\u6910G\u803B\xAE\u40AE\u0180cnr\u0F4E\u0F53\u0F56ute;\u4154g;\u67EBr\u0100;t\u0F5C\u0F5D\u61A0l;\u6916\u0180aey\u0F67\u0F6C\u0F71ron;\u4158dil;\u4156;\u4420\u0100;v\u0F78\u0F79\u611Cerse\u0100EU\u0F82\u0F99\u0100lq\u0F87\u0F8Eement;\u620Builibrium;\u61CBpEquilibrium;\u696Fr\xBB\u0F79o;\u43A1ght\u0400ACDFTUVa\u0FC1\u0FEB\u0FF3\u1022\u1028\u105B\u1087\u03D8\u0100nr\u0FC6\u0FD2gleBracket;\u67E9row\u0180;BL\u0FDC\u0FDD\u0FE1\u6192ar;\u61E5eftArrow;\u61C4eiling;\u6309o\u01F5\u0FF9\0\u1005bleBracket;\u67E7n\u01D4\u100A\0\u1014eeVector;\u695Dector\u0100;B\u101D\u101E\u61C2ar;\u6955loor;\u630B\u0100er\u102D\u1043e\u0180;AV\u1035\u1036\u103C\u62A2rrow;\u61A6ector;\u695Biangle\u0180;BE\u1050\u1051\u1055\u62B3ar;\u69D0qual;\u62B5p\u0180DTV\u1063\u106E\u1078ownVector;\u694FeeVector;\u695Cector\u0100;B\u1082\u1083\u61BEar;\u6954ector\u0100;B\u1091\u1092\u61C0ar;\u6953\u0100pu\u109B\u109Ef;\u611DndImplies;\u6970ightarrow;\u61DB\u0100ch\u10B9\u10BCr;\u611B;\u61B1leDelayed;\u69F4\u0680HOacfhimoqstu\u10E4\u10F1\u10F7\u10FD\u1119\u111E\u1151\u1156\u1161\u1167\u11B5\u11BB\u11BF\u0100Cc\u10E9\u10EEHcy;\u4429y;\u4428FTcy;\u442Ccute;\u415A\u0280;aeiy\u1108\u1109\u110E\u1113\u1117\u6ABCron;\u4160dil;\u415Erc;\u415C;\u4421r;\uC000\u{1D516}ort\u0200DLRU\u112A\u1134\u113E\u1149ownArrow\xBB\u041EeftArrow\xBB\u089AightArrow\xBB\u0FDDpArrow;\u6191gma;\u43A3allCircle;\u6218pf;\uC000\u{1D54A}\u0272\u116D\0\0\u1170t;\u621Aare\u0200;ISU\u117B\u117C\u1189\u11AF\u65A1ntersection;\u6293u\u0100bp\u118F\u119Eset\u0100;E\u1197\u1198\u628Fqual;\u6291erset\u0100;E\u11A8\u11A9\u6290qual;\u6292nion;\u6294cr;\uC000\u{1D4AE}ar;\u62C6\u0200bcmp\u11C8\u11DB\u1209\u120B\u0100;s\u11CD\u11CE\u62D0et\u0100;E\u11CD\u11D5qual;\u6286\u0100ch\u11E0\u1205eeds\u0200;EST\u11ED\u11EE\u11F4\u11FF\u627Bqual;\u6AB0lantEqual;\u627Dilde;\u627FTh\xE1\u0F8C;\u6211\u0180;es\u1212\u1213\u1223\u62D1rset\u0100;E\u121C\u121D\u6283qual;\u6287et\xBB\u1213\u0580HRSacfhiors\u123E\u1244\u1249\u1255\u125E\u1271\u1276\u129F\u12C2\u12C8\u12D1ORN\u803B\xDE\u40DEADE;\u6122\u0100Hc\u124E\u1252cy;\u440By;\u4426\u0100bu\u125A\u125C;\u4009;\u43A4\u0180aey\u1265\u126A\u126Fron;\u4164dil;\u4162;\u4422r;\uC000\u{1D517}\u0100ei\u127B\u1289\u01F2\u1280\0\u1287efore;\u6234a;\u4398\u0100cn\u128E\u1298kSpace;\uC000\u205F\u200ASpace;\u6009lde\u0200;EFT\u12AB\u12AC\u12B2\u12BC\u623Cqual;\u6243ullEqual;\u6245ilde;\u6248pf;\uC000\u{1D54B}ipleDot;\u60DB\u0100ct\u12D6\u12DBr;\uC000\u{1D4AF}rok;\u4166\u0AE1\u12F7\u130E\u131A\u1326\0\u132C\u1331\0\0\0\0\0\u1338\u133D\u1377\u1385\0\u13FF\u1404\u140A\u1410\u0100cr\u12FB\u1301ute\u803B\xDA\u40DAr\u0100;o\u1307\u1308\u619Fcir;\u6949r\u01E3\u1313\0\u1316y;\u440Eve;\u416C\u0100iy\u131E\u1323rc\u803B\xDB\u40DB;\u4423blac;\u4170r;\uC000\u{1D518}rave\u803B\xD9\u40D9acr;\u416A\u0100di\u1341\u1369er\u0100BP\u1348\u135D\u0100ar\u134D\u1350r;\u405Fac\u0100ek\u1357\u1359;\u63DFet;\u63B5arenthesis;\u63DDon\u0100;P\u1370\u1371\u62C3lus;\u628E\u0100gp\u137B\u137Fon;\u4172f;\uC000\u{1D54C}\u0400ADETadps\u1395\u13AE\u13B8\u13C4\u03E8\u13D2\u13D7\u13F3rrow\u0180;BD\u1150\u13A0\u13A4ar;\u6912ownArrow;\u61C5ownArrow;\u6195quilibrium;\u696Eee\u0100;A\u13CB\u13CC\u62A5rrow;\u61A5own\xE1\u03F3er\u0100LR\u13DE\u13E8eftArrow;\u6196ightArrow;\u6197i\u0100;l\u13F9\u13FA\u43D2on;\u43A5ing;\u416Ecr;\uC000\u{1D4B0}ilde;\u4168ml\u803B\xDC\u40DC\u0480Dbcdefosv\u1427\u142C\u1430\u1433\u143E\u1485\u148A\u1490\u1496ash;\u62ABar;\u6AEBy;\u4412ash\u0100;l\u143B\u143C\u62A9;\u6AE6\u0100er\u1443\u1445;\u62C1\u0180bty\u144C\u1450\u147Aar;\u6016\u0100;i\u144F\u1455cal\u0200BLST\u1461\u1465\u146A\u1474ar;\u6223ine;\u407Ceparator;\u6758ilde;\u6240ThinSpace;\u600Ar;\uC000\u{1D519}pf;\uC000\u{1D54D}cr;\uC000\u{1D4B1}dash;\u62AA\u0280cefos\u14A7\u14AC\u14B1\u14B6\u14BCirc;\u4174dge;\u62C0r;\uC000\u{1D51A}pf;\uC000\u{1D54E}cr;\uC000\u{1D4B2}\u0200fios\u14CB\u14D0\u14D2\u14D8r;\uC000\u{1D51B};\u439Epf;\uC000\u{1D54F}cr;\uC000\u{1D4B3}\u0480AIUacfosu\u14F1\u14F5\u14F9\u14FD\u1504\u150F\u1514\u151A\u1520cy;\u442Fcy;\u4407cy;\u442Ecute\u803B\xDD\u40DD\u0100iy\u1509\u150Drc;\u4176;\u442Br;\uC000\u{1D51C}pf;\uC000\u{1D550}cr;\uC000\u{1D4B4}ml;\u4178\u0400Hacdefos\u1535\u1539\u153F\u154B\u154F\u155D\u1560\u1564cy;\u4416cute;\u4179\u0100ay\u1544\u1549ron;\u417D;\u4417ot;\u417B\u01F2\u1554\0\u155BoWidt\xE8\u0AD9a;\u4396r;\u6128pf;\u6124cr;\uC000\u{1D4B5}\u0BE1\u1583\u158A\u1590\0\u15B0\u15B6\u15BF\0\0\0\0\u15C6\u15DB\u15EB\u165F\u166D\0\u1695\u169B\u16B2\u16B9\0\u16BEcute\u803B\xE1\u40E1reve;\u4103\u0300;Ediuy\u159C\u159D\u15A1\u15A3\u15A8\u15AD\u623E;\uC000\u223E\u0333;\u623Frc\u803B\xE2\u40E2te\u80BB\xB4\u0306;\u4430lig\u803B\xE6\u40E6\u0100;r\xB2\u15BA;\uC000\u{1D51E}rave\u803B\xE0\u40E0\u0100ep\u15CA\u15D6\u0100fp\u15CF\u15D4sym;\u6135\xE8\u15D3ha;\u43B1\u0100ap\u15DFc\u0100cl\u15E4\u15E7r;\u4101g;\u6A3F\u0264\u15F0\0\0\u160A\u0280;adsv\u15FA\u15FB\u15FF\u1601\u1607\u6227nd;\u6A55;\u6A5Clope;\u6A58;\u6A5A\u0380;elmrsz\u1618\u1619\u161B\u161E\u163F\u164F\u1659\u6220;\u69A4e\xBB\u1619sd\u0100;a\u1625\u1626\u6221\u0461\u1630\u1632\u1634\u1636\u1638\u163A\u163C\u163E;\u69A8;\u69A9;\u69AA;\u69AB;\u69AC;\u69AD;\u69AE;\u69AFt\u0100;v\u1645\u1646\u621Fb\u0100;d\u164C\u164D\u62BE;\u699D\u0100pt\u1654\u1657h;\u6222\xBB\xB9arr;\u637C\u0100gp\u1663\u1667on;\u4105f;\uC000\u{1D552}\u0380;Eaeiop\u12C1\u167B\u167D\u1682\u1684\u1687\u168A;\u6A70cir;\u6A6F;\u624Ad;\u624Bs;\u4027rox\u0100;e\u12C1\u1692\xF1\u1683ing\u803B\xE5\u40E5\u0180cty\u16A1\u16A6\u16A8r;\uC000\u{1D4B6};\u402Amp\u0100;e\u12C1\u16AF\xF1\u0288ilde\u803B\xE3\u40E3ml\u803B\xE4\u40E4\u0100ci\u16C2\u16C8onin\xF4\u0272nt;\u6A11\u0800Nabcdefiklnoprsu\u16ED\u16F1\u1730\u173C\u1743\u1748\u1778\u177D\u17E0\u17E6\u1839\u1850\u170D\u193D\u1948\u1970ot;\u6AED\u0100cr\u16F6\u171Ek\u0200ceps\u1700\u1705\u170D\u1713ong;\u624Cpsilon;\u43F6rime;\u6035im\u0100;e\u171A\u171B\u623Dq;\u62CD\u0176\u1722\u1726ee;\u62BDed\u0100;g\u172C\u172D\u6305e\xBB\u172Drk\u0100;t\u135C\u1737brk;\u63B6\u0100oy\u1701\u1741;\u4431quo;\u601E\u0280cmprt\u1753\u175B\u1761\u1764\u1768aus\u0100;e\u010A\u0109ptyv;\u69B0s\xE9\u170Cno\xF5\u0113\u0180ahw\u176F\u1771\u1773;\u43B2;\u6136een;\u626Cr;\uC000\u{1D51F}g\u0380costuvw\u178D\u179D\u17B3\u17C1\u17D5\u17DB\u17DE\u0180aiu\u1794\u1796\u179A\xF0\u0760rc;\u65EFp\xBB\u1371\u0180dpt\u17A4\u17A8\u17ADot;\u6A00lus;\u6A01imes;\u6A02\u0271\u17B9\0\0\u17BEcup;\u6A06ar;\u6605riangle\u0100du\u17CD\u17D2own;\u65BDp;\u65B3plus;\u6A04e\xE5\u1444\xE5\u14ADarow;\u690D\u0180ako\u17ED\u1826\u1835\u0100cn\u17F2\u1823k\u0180lst\u17FA\u05AB\u1802ozenge;\u69EBriangle\u0200;dlr\u1812\u1813\u1818\u181D\u65B4own;\u65BEeft;\u65C2ight;\u65B8k;\u6423\u01B1\u182B\0\u1833\u01B2\u182F\0\u1831;\u6592;\u65914;\u6593ck;\u6588\u0100eo\u183E\u184D\u0100;q\u1843\u1846\uC000=\u20E5uiv;\uC000\u2261\u20E5t;\u6310\u0200ptwx\u1859\u185E\u1867\u186Cf;\uC000\u{1D553}\u0100;t\u13CB\u1863om\xBB\u13CCtie;\u62C8\u0600DHUVbdhmptuv\u1885\u1896\u18AA\u18BB\u18D7\u18DB\u18EC\u18FF\u1905\u190A\u1910\u1921\u0200LRlr\u188E\u1890\u1892\u1894;\u6557;\u6554;\u6556;\u6553\u0280;DUdu\u18A1\u18A2\u18A4\u18A6\u18A8\u6550;\u6566;\u6569;\u6564;\u6567\u0200LRlr\u18B3\u18B5\u18B7\u18B9;\u655D;\u655A;\u655C;\u6559\u0380;HLRhlr\u18CA\u18CB\u18CD\u18CF\u18D1\u18D3\u18D5\u6551;\u656C;\u6563;\u6560;\u656B;\u6562;\u655Fox;\u69C9\u0200LRlr\u18E4\u18E6\u18E8\u18EA;\u6555;\u6552;\u6510;\u650C\u0280;DUdu\u06BD\u18F7\u18F9\u18FB\u18FD;\u6565;\u6568;\u652C;\u6534inus;\u629Flus;\u629Eimes;\u62A0\u0200LRlr\u1919\u191B\u191D\u191F;\u655B;\u6558;\u6518;\u6514\u0380;HLRhlr\u1930\u1931\u1933\u1935\u1937\u1939\u193B\u6502;\u656A;\u6561;\u655E;\u653C;\u6524;\u651C\u0100ev\u0123\u1942bar\u803B\xA6\u40A6\u0200ceio\u1951\u1956\u195A\u1960r;\uC000\u{1D4B7}mi;\u604Fm\u0100;e\u171A\u171Cl\u0180;bh\u1968\u1969\u196B\u405C;\u69C5sub;\u67C8\u016C\u1974\u197El\u0100;e\u1979\u197A\u6022t\xBB\u197Ap\u0180;Ee\u012F\u1985\u1987;\u6AAE\u0100;q\u06DC\u06DB\u0CE1\u19A7\0\u19E8\u1A11\u1A15\u1A32\0\u1A37\u1A50\0\0\u1AB4\0\0\u1AC1\0\0\u1B21\u1B2E\u1B4D\u1B52\0\u1BFD\0\u1C0C\u0180cpr\u19AD\u19B2\u19DDute;\u4107\u0300;abcds\u19BF\u19C0\u19C4\u19CA\u19D5\u19D9\u6229nd;\u6A44rcup;\u6A49\u0100au\u19CF\u19D2p;\u6A4Bp;\u6A47ot;\u6A40;\uC000\u2229\uFE00\u0100eo\u19E2\u19E5t;\u6041\xEE\u0693\u0200aeiu\u19F0\u19FB\u1A01\u1A05\u01F0\u19F5\0\u19F8s;\u6A4Don;\u410Ddil\u803B\xE7\u40E7rc;\u4109ps\u0100;s\u1A0C\u1A0D\u6A4Cm;\u6A50ot;\u410B\u0180dmn\u1A1B\u1A20\u1A26il\u80BB\xB8\u01ADptyv;\u69B2t\u8100\xA2;e\u1A2D\u1A2E\u40A2r\xE4\u01B2r;\uC000\u{1D520}\u0180cei\u1A3D\u1A40\u1A4Dy;\u4447ck\u0100;m\u1A47\u1A48\u6713ark\xBB\u1A48;\u43C7r\u0380;Ecefms\u1A5F\u1A60\u1A62\u1A6B\u1AA4\u1AAA\u1AAE\u65CB;\u69C3\u0180;el\u1A69\u1A6A\u1A6D\u42C6q;\u6257e\u0261\u1A74\0\0\u1A88rrow\u0100lr\u1A7C\u1A81eft;\u61BAight;\u61BB\u0280RSacd\u1A92\u1A94\u1A96\u1A9A\u1A9F\xBB\u0F47;\u64C8st;\u629Birc;\u629Aash;\u629Dnint;\u6A10id;\u6AEFcir;\u69C2ubs\u0100;u\u1ABB\u1ABC\u6663it\xBB\u1ABC\u02EC\u1AC7\u1AD4\u1AFA\0\u1B0Aon\u0100;e\u1ACD\u1ACE\u403A\u0100;q\xC7\xC6\u026D\u1AD9\0\0\u1AE2a\u0100;t\u1ADE\u1ADF\u402C;\u4040\u0180;fl\u1AE8\u1AE9\u1AEB\u6201\xEE\u1160e\u0100mx\u1AF1\u1AF6ent\xBB\u1AE9e\xF3\u024D\u01E7\u1AFE\0\u1B07\u0100;d\u12BB\u1B02ot;\u6A6Dn\xF4\u0246\u0180fry\u1B10\u1B14\u1B17;\uC000\u{1D554}o\xE4\u0254\u8100\xA9;s\u0155\u1B1Dr;\u6117\u0100ao\u1B25\u1B29rr;\u61B5ss;\u6717\u0100cu\u1B32\u1B37r;\uC000\u{1D4B8}\u0100bp\u1B3C\u1B44\u0100;e\u1B41\u1B42\u6ACF;\u6AD1\u0100;e\u1B49\u1B4A\u6AD0;\u6AD2dot;\u62EF\u0380delprvw\u1B60\u1B6C\u1B77\u1B82\u1BAC\u1BD4\u1BF9arr\u0100lr\u1B68\u1B6A;\u6938;\u6935\u0270\u1B72\0\0\u1B75r;\u62DEc;\u62DFarr\u0100;p\u1B7F\u1B80\u61B6;\u693D\u0300;bcdos\u1B8F\u1B90\u1B96\u1BA1\u1BA5\u1BA8\u622Arcap;\u6A48\u0100au\u1B9B\u1B9Ep;\u6A46p;\u6A4Aot;\u628Dr;\u6A45;\uC000\u222A\uFE00\u0200alrv\u1BB5\u1BBF\u1BDE\u1BE3rr\u0100;m\u1BBC\u1BBD\u61B7;\u693Cy\u0180evw\u1BC7\u1BD4\u1BD8q\u0270\u1BCE\0\0\u1BD2re\xE3\u1B73u\xE3\u1B75ee;\u62CEedge;\u62CFen\u803B\xA4\u40A4earrow\u0100lr\u1BEE\u1BF3eft\xBB\u1B80ight\xBB\u1BBDe\xE4\u1BDD\u0100ci\u1C01\u1C07onin\xF4\u01F7nt;\u6231lcty;\u632D\u0980AHabcdefhijlorstuwz\u1C38\u1C3B\u1C3F\u1C5D\u1C69\u1C75\u1C8A\u1C9E\u1CAC\u1CB7\u1CFB\u1CFF\u1D0D\u1D7B\u1D91\u1DAB\u1DBB\u1DC6\u1DCDr\xF2\u0381ar;\u6965\u0200glrs\u1C48\u1C4D\u1C52\u1C54ger;\u6020eth;\u6138\xF2\u1133h\u0100;v\u1C5A\u1C5B\u6010\xBB\u090A\u016B\u1C61\u1C67arow;\u690Fa\xE3\u0315\u0100ay\u1C6E\u1C73ron;\u410F;\u4434\u0180;ao\u0332\u1C7C\u1C84\u0100gr\u02BF\u1C81r;\u61CAtseq;\u6A77\u0180glm\u1C91\u1C94\u1C98\u803B\xB0\u40B0ta;\u43B4ptyv;\u69B1\u0100ir\u1CA3\u1CA8sht;\u697F;\uC000\u{1D521}ar\u0100lr\u1CB3\u1CB5\xBB\u08DC\xBB\u101E\u0280aegsv\u1CC2\u0378\u1CD6\u1CDC\u1CE0m\u0180;os\u0326\u1CCA\u1CD4nd\u0100;s\u0326\u1CD1uit;\u6666amma;\u43DDin;\u62F2\u0180;io\u1CE7\u1CE8\u1CF8\u40F7de\u8100\xF7;o\u1CE7\u1CF0ntimes;\u62C7n\xF8\u1CF7cy;\u4452c\u026F\u1D06\0\0\u1D0Arn;\u631Eop;\u630D\u0280lptuw\u1D18\u1D1D\u1D22\u1D49\u1D55lar;\u4024f;\uC000\u{1D555}\u0280;emps\u030B\u1D2D\u1D37\u1D3D\u1D42q\u0100;d\u0352\u1D33ot;\u6251inus;\u6238lus;\u6214quare;\u62A1blebarwedg\xE5\xFAn\u0180adh\u112E\u1D5D\u1D67ownarrow\xF3\u1C83arpoon\u0100lr\u1D72\u1D76ef\xF4\u1CB4igh\xF4\u1CB6\u0162\u1D7F\u1D85karo\xF7\u0F42\u026F\u1D8A\0\0\u1D8Ern;\u631Fop;\u630C\u0180cot\u1D98\u1DA3\u1DA6\u0100ry\u1D9D\u1DA1;\uC000\u{1D4B9};\u4455l;\u69F6rok;\u4111\u0100dr\u1DB0\u1DB4ot;\u62F1i\u0100;f\u1DBA\u1816\u65BF\u0100ah\u1DC0\u1DC3r\xF2\u0429a\xF2\u0FA6angle;\u69A6\u0100ci\u1DD2\u1DD5y;\u445Fgrarr;\u67FF\u0900Dacdefglmnopqrstux\u1E01\u1E09\u1E19\u1E38\u0578\u1E3C\u1E49\u1E61\u1E7E\u1EA5\u1EAF\u1EBD\u1EE1\u1F2A\u1F37\u1F44\u1F4E\u1F5A\u0100Do\u1E06\u1D34o\xF4\u1C89\u0100cs\u1E0E\u1E14ute\u803B\xE9\u40E9ter;\u6A6E\u0200aioy\u1E22\u1E27\u1E31\u1E36ron;\u411Br\u0100;c\u1E2D\u1E2E\u6256\u803B\xEA\u40EAlon;\u6255;\u444Dot;\u4117\u0100Dr\u1E41\u1E45ot;\u6252;\uC000\u{1D522}\u0180;rs\u1E50\u1E51\u1E57\u6A9Aave\u803B\xE8\u40E8\u0100;d\u1E5C\u1E5D\u6A96ot;\u6A98\u0200;ils\u1E6A\u1E6B\u1E72\u1E74\u6A99nters;\u63E7;\u6113\u0100;d\u1E79\u1E7A\u6A95ot;\u6A97\u0180aps\u1E85\u1E89\u1E97cr;\u4113ty\u0180;sv\u1E92\u1E93\u1E95\u6205et\xBB\u1E93p\u01001;\u1E9D\u1EA4\u0133\u1EA1\u1EA3;\u6004;\u6005\u6003\u0100gs\u1EAA\u1EAC;\u414Bp;\u6002\u0100gp\u1EB4\u1EB8on;\u4119f;\uC000\u{1D556}\u0180als\u1EC4\u1ECE\u1ED2r\u0100;s\u1ECA\u1ECB\u62D5l;\u69E3us;\u6A71i\u0180;lv\u1EDA\u1EDB\u1EDF\u43B5on\xBB\u1EDB;\u43F5\u0200csuv\u1EEA\u1EF3\u1F0B\u1F23\u0100io\u1EEF\u1E31rc\xBB\u1E2E\u0269\u1EF9\0\0\u1EFB\xED\u0548ant\u0100gl\u1F02\u1F06tr\xBB\u1E5Dess\xBB\u1E7A\u0180aei\u1F12\u1F16\u1F1Als;\u403Dst;\u625Fv\u0100;D\u0235\u1F20D;\u6A78parsl;\u69E5\u0100Da\u1F2F\u1F33ot;\u6253rr;\u6971\u0180cdi\u1F3E\u1F41\u1EF8r;\u612Fo\xF4\u0352\u0100ah\u1F49\u1F4B;\u43B7\u803B\xF0\u40F0\u0100mr\u1F53\u1F57l\u803B\xEB\u40EBo;\u60AC\u0180cip\u1F61\u1F64\u1F67l;\u4021s\xF4\u056E\u0100eo\u1F6C\u1F74ctatio\xEE\u0559nential\xE5\u0579\u09E1\u1F92\0\u1F9E\0\u1FA1\u1FA7\0\0\u1FC6\u1FCC\0\u1FD3\0\u1FE6\u1FEA\u2000\0\u2008\u205Allingdotse\xF1\u1E44y;\u4444male;\u6640\u0180ilr\u1FAD\u1FB3\u1FC1lig;\u8000\uFB03\u0269\u1FB9\0\0\u1FBDg;\u8000\uFB00ig;\u8000\uFB04;\uC000\u{1D523}lig;\u8000\uFB01lig;\uC000fj\u0180alt\u1FD9\u1FDC\u1FE1t;\u666Dig;\u8000\uFB02ns;\u65B1of;\u4192\u01F0\u1FEE\0\u1FF3f;\uC000\u{1D557}\u0100ak\u05BF\u1FF7\u0100;v\u1FFC\u1FFD\u62D4;\u6AD9artint;\u6A0D\u0100ao\u200C\u2055\u0100cs\u2011\u2052\u03B1\u201A\u2030\u2038\u2045\u2048\0\u2050\u03B2\u2022\u2025\u2027\u202A\u202C\0\u202E\u803B\xBD\u40BD;\u6153\u803B\xBC\u40BC;\u6155;\u6159;\u615B\u01B3\u2034\0\u2036;\u6154;\u6156\u02B4\u203E\u2041\0\0\u2043\u803B\xBE\u40BE;\u6157;\u615C5;\u6158\u01B6\u204C\0\u204E;\u615A;\u615D8;\u615El;\u6044wn;\u6322cr;\uC000\u{1D4BB}\u0880Eabcdefgijlnorstv\u2082\u2089\u209F\u20A5\u20B0\u20B4\u20F0\u20F5\u20FA\u20FF\u2103\u2112\u2138\u0317\u213E\u2152\u219E\u0100;l\u064D\u2087;\u6A8C\u0180cmp\u2090\u2095\u209Dute;\u41F5ma\u0100;d\u209C\u1CDA\u43B3;\u6A86reve;\u411F\u0100iy\u20AA\u20AErc;\u411D;\u4433ot;\u4121\u0200;lqs\u063E\u0642\u20BD\u20C9\u0180;qs\u063E\u064C\u20C4lan\xF4\u0665\u0200;cdl\u0665\u20D2\u20D5\u20E5c;\u6AA9ot\u0100;o\u20DC\u20DD\u6A80\u0100;l\u20E2\u20E3\u6A82;\u6A84\u0100;e\u20EA\u20ED\uC000\u22DB\uFE00s;\u6A94r;\uC000\u{1D524}\u0100;g\u0673\u061Bmel;\u6137cy;\u4453\u0200;Eaj\u065A\u210C\u210E\u2110;\u6A92;\u6AA5;\u6AA4\u0200Eaes\u211B\u211D\u2129\u2134;\u6269p\u0100;p\u2123\u2124\u6A8Arox\xBB\u2124\u0100;q\u212E\u212F\u6A88\u0100;q\u212E\u211Bim;\u62E7pf;\uC000\u{1D558}\u0100ci\u2143\u2146r;\u610Am\u0180;el\u066B\u214E\u2150;\u6A8E;\u6A90\u8300>;cdlqr\u05EE\u2160\u216A\u216E\u2173\u2179\u0100ci\u2165\u2167;\u6AA7r;\u6A7Aot;\u62D7Par;\u6995uest;\u6A7C\u0280adels\u2184\u216A\u2190\u0656\u219B\u01F0\u2189\0\u218Epro\xF8\u209Er;\u6978q\u0100lq\u063F\u2196les\xF3\u2088i\xED\u066B\u0100en\u21A3\u21ADrtneqq;\uC000\u2269\uFE00\xC5\u21AA\u0500Aabcefkosy\u21C4\u21C7\u21F1\u21F5\u21FA\u2218\u221D\u222F\u2268\u227Dr\xF2\u03A0\u0200ilmr\u21D0\u21D4\u21D7\u21DBrs\xF0\u1484f\xBB\u2024il\xF4\u06A9\u0100dr\u21E0\u21E4cy;\u444A\u0180;cw\u08F4\u21EB\u21EFir;\u6948;\u61ADar;\u610Firc;\u4125\u0180alr\u2201\u220E\u2213rts\u0100;u\u2209\u220A\u6665it\xBB\u220Alip;\u6026con;\u62B9r;\uC000\u{1D525}s\u0100ew\u2223\u2229arow;\u6925arow;\u6926\u0280amopr\u223A\u223E\u2243\u225E\u2263rr;\u61FFtht;\u623Bk\u0100lr\u2249\u2253eftarrow;\u61A9ightarrow;\u61AAf;\uC000\u{1D559}bar;\u6015\u0180clt\u226F\u2274\u2278r;\uC000\u{1D4BD}as\xE8\u21F4rok;\u4127\u0100bp\u2282\u2287ull;\u6043hen\xBB\u1C5B\u0AE1\u22A3\0\u22AA\0\u22B8\u22C5\u22CE\0\u22D5\u22F3\0\0\u22F8\u2322\u2367\u2362\u237F\0\u2386\u23AA\u23B4cute\u803B\xED\u40ED\u0180;iy\u0771\u22B0\u22B5rc\u803B\xEE\u40EE;\u4438\u0100cx\u22BC\u22BFy;\u4435cl\u803B\xA1\u40A1\u0100fr\u039F\u22C9;\uC000\u{1D526}rave\u803B\xEC\u40EC\u0200;ino\u073E\u22DD\u22E9\u22EE\u0100in\u22E2\u22E6nt;\u6A0Ct;\u622Dfin;\u69DCta;\u6129lig;\u4133\u0180aop\u22FE\u231A\u231D\u0180cgt\u2305\u2308\u2317r;\u412B\u0180elp\u071F\u230F\u2313in\xE5\u078Ear\xF4\u0720h;\u4131f;\u62B7ed;\u41B5\u0280;cfot\u04F4\u232C\u2331\u233D\u2341are;\u6105in\u0100;t\u2338\u2339\u621Eie;\u69DDdo\xF4\u2319\u0280;celp\u0757\u234C\u2350\u235B\u2361al;\u62BA\u0100gr\u2355\u2359er\xF3\u1563\xE3\u234Darhk;\u6A17rod;\u6A3C\u0200cgpt\u236F\u2372\u2376\u237By;\u4451on;\u412Ff;\uC000\u{1D55A}a;\u43B9uest\u803B\xBF\u40BF\u0100ci\u238A\u238Fr;\uC000\u{1D4BE}n\u0280;Edsv\u04F4\u239B\u239D\u23A1\u04F3;\u62F9ot;\u62F5\u0100;v\u23A6\u23A7\u62F4;\u62F3\u0100;i\u0777\u23AElde;\u4129\u01EB\u23B8\0\u23BCcy;\u4456l\u803B\xEF\u40EF\u0300cfmosu\u23CC\u23D7\u23DC\u23E1\u23E7\u23F5\u0100iy\u23D1\u23D5rc;\u4135;\u4439r;\uC000\u{1D527}ath;\u4237pf;\uC000\u{1D55B}\u01E3\u23EC\0\u23F1r;\uC000\u{1D4BF}rcy;\u4458kcy;\u4454\u0400acfghjos\u240B\u2416\u2422\u2427\u242D\u2431\u2435\u243Bppa\u0100;v\u2413\u2414\u43BA;\u43F0\u0100ey\u241B\u2420dil;\u4137;\u443Ar;\uC000\u{1D528}reen;\u4138cy;\u4445cy;\u445Cpf;\uC000\u{1D55C}cr;\uC000\u{1D4C0}\u0B80ABEHabcdefghjlmnoprstuv\u2470\u2481\u2486\u248D\u2491\u250E\u253D\u255A\u2580\u264E\u265E\u2665\u2679\u267D\u269A\u26B2\u26D8\u275D\u2768\u278B\u27C0\u2801\u2812\u0180art\u2477\u247A\u247Cr\xF2\u09C6\xF2\u0395ail;\u691Barr;\u690E\u0100;g\u0994\u248B;\u6A8Bar;\u6962\u0963\u24A5\0\u24AA\0\u24B1\0\0\0\0\0\u24B5\u24BA\0\u24C6\u24C8\u24CD\0\u24F9ute;\u413Amptyv;\u69B4ra\xEE\u084Cbda;\u43BBg\u0180;dl\u088E\u24C1\u24C3;\u6991\xE5\u088E;\u6A85uo\u803B\xAB\u40ABr\u0400;bfhlpst\u0899\u24DE\u24E6\u24E9\u24EB\u24EE\u24F1\u24F5\u0100;f\u089D\u24E3s;\u691Fs;\u691D\xEB\u2252p;\u61ABl;\u6939im;\u6973l;\u61A2\u0180;ae\u24FF\u2500\u2504\u6AABil;\u6919\u0100;s\u2509\u250A\u6AAD;\uC000\u2AAD\uFE00\u0180abr\u2515\u2519\u251Drr;\u690Crk;\u6772\u0100ak\u2522\u252Cc\u0100ek\u2528\u252A;\u407B;\u405B\u0100es\u2531\u2533;\u698Bl\u0100du\u2539\u253B;\u698F;\u698D\u0200aeuy\u2546\u254B\u2556\u2558ron;\u413E\u0100di\u2550\u2554il;\u413C\xEC\u08B0\xE2\u2529;\u443B\u0200cqrs\u2563\u2566\u256D\u257Da;\u6936uo\u0100;r\u0E19\u1746\u0100du\u2572\u2577har;\u6967shar;\u694Bh;\u61B2\u0280;fgqs\u258B\u258C\u0989\u25F3\u25FF\u6264t\u0280ahlrt\u2598\u25A4\u25B7\u25C2\u25E8rrow\u0100;t\u0899\u25A1a\xE9\u24F6arpoon\u0100du\u25AF\u25B4own\xBB\u045Ap\xBB\u0966eftarrows;\u61C7ight\u0180ahs\u25CD\u25D6\u25DErrow\u0100;s\u08F4\u08A7arpoon\xF3\u0F98quigarro\xF7\u21F0hreetimes;\u62CB\u0180;qs\u258B\u0993\u25FAlan\xF4\u09AC\u0280;cdgs\u09AC\u260A\u260D\u261D\u2628c;\u6AA8ot\u0100;o\u2614\u2615\u6A7F\u0100;r\u261A\u261B\u6A81;\u6A83\u0100;e\u2622\u2625\uC000\u22DA\uFE00s;\u6A93\u0280adegs\u2633\u2639\u263D\u2649\u264Bppro\xF8\u24C6ot;\u62D6q\u0100gq\u2643\u2645\xF4\u0989gt\xF2\u248C\xF4\u099Bi\xED\u09B2\u0180ilr\u2655\u08E1\u265Asht;\u697C;\uC000\u{1D529}\u0100;E\u099C\u2663;\u6A91\u0161\u2669\u2676r\u0100du\u25B2\u266E\u0100;l\u0965\u2673;\u696Alk;\u6584cy;\u4459\u0280;acht\u0A48\u2688\u268B\u2691\u2696r\xF2\u25C1orne\xF2\u1D08ard;\u696Bri;\u65FA\u0100io\u269F\u26A4dot;\u4140ust\u0100;a\u26AC\u26AD\u63B0che\xBB\u26AD\u0200Eaes\u26BB\u26BD\u26C9\u26D4;\u6268p\u0100;p\u26C3\u26C4\u6A89rox\xBB\u26C4\u0100;q\u26CE\u26CF\u6A87\u0100;q\u26CE\u26BBim;\u62E6\u0400abnoptwz\u26E9\u26F4\u26F7\u271A\u272F\u2741\u2747\u2750\u0100nr\u26EE\u26F1g;\u67ECr;\u61FDr\xEB\u08C1g\u0180lmr\u26FF\u270D\u2714eft\u0100ar\u09E6\u2707ight\xE1\u09F2apsto;\u67FCight\xE1\u09FDparrow\u0100lr\u2725\u2729ef\xF4\u24EDight;\u61AC\u0180afl\u2736\u2739\u273Dr;\u6985;\uC000\u{1D55D}us;\u6A2Dimes;\u6A34\u0161\u274B\u274Fst;\u6217\xE1\u134E\u0180;ef\u2757\u2758\u1800\u65CAnge\xBB\u2758ar\u0100;l\u2764\u2765\u4028t;\u6993\u0280achmt\u2773\u2776\u277C\u2785\u2787r\xF2\u08A8orne\xF2\u1D8Car\u0100;d\u0F98\u2783;\u696D;\u600Eri;\u62BF\u0300achiqt\u2798\u279D\u0A40\u27A2\u27AE\u27BBquo;\u6039r;\uC000\u{1D4C1}m\u0180;eg\u09B2\u27AA\u27AC;\u6A8D;\u6A8F\u0100bu\u252A\u27B3o\u0100;r\u0E1F\u27B9;\u601Arok;\u4142\u8400<;cdhilqr\u082B\u27D2\u2639\u27DC\u27E0\u27E5\u27EA\u27F0\u0100ci\u27D7\u27D9;\u6AA6r;\u6A79re\xE5\u25F2mes;\u62C9arr;\u6976uest;\u6A7B\u0100Pi\u27F5\u27F9ar;\u6996\u0180;ef\u2800\u092D\u181B\u65C3r\u0100du\u2807\u280Dshar;\u694Ahar;\u6966\u0100en\u2817\u2821rtneqq;\uC000\u2268\uFE00\xC5\u281E\u0700Dacdefhilnopsu\u2840\u2845\u2882\u288E\u2893\u28A0\u28A5\u28A8\u28DA\u28E2\u28E4\u0A83\u28F3\u2902Dot;\u623A\u0200clpr\u284E\u2852\u2863\u287Dr\u803B\xAF\u40AF\u0100et\u2857\u2859;\u6642\u0100;e\u285E\u285F\u6720se\xBB\u285F\u0100;s\u103B\u2868to\u0200;dlu\u103B\u2873\u2877\u287Bow\xEE\u048Cef\xF4\u090F\xF0\u13D1ker;\u65AE\u0100oy\u2887\u288Cmma;\u6A29;\u443Cash;\u6014asuredangle\xBB\u1626r;\uC000\u{1D52A}o;\u6127\u0180cdn\u28AF\u28B4\u28C9ro\u803B\xB5\u40B5\u0200;acd\u1464\u28BD\u28C0\u28C4s\xF4\u16A7ir;\u6AF0ot\u80BB\xB7\u01B5us\u0180;bd\u28D2\u1903\u28D3\u6212\u0100;u\u1D3C\u28D8;\u6A2A\u0163\u28DE\u28E1p;\u6ADB\xF2\u2212\xF0\u0A81\u0100dp\u28E9\u28EEels;\u62A7f;\uC000\u{1D55E}\u0100ct\u28F8\u28FDr;\uC000\u{1D4C2}pos\xBB\u159D\u0180;lm\u2909\u290A\u290D\u43BCtimap;\u62B8\u0C00GLRVabcdefghijlmoprstuvw\u2942\u2953\u297E\u2989\u2998\u29DA\u29E9\u2A15\u2A1A\u2A58\u2A5D\u2A83\u2A95\u2AA4\u2AA8\u2B04\u2B07\u2B44\u2B7F\u2BAE\u2C34\u2C67\u2C7C\u2CE9\u0100gt\u2947\u294B;\uC000\u22D9\u0338\u0100;v\u2950\u0BCF\uC000\u226B\u20D2\u0180elt\u295A\u2972\u2976ft\u0100ar\u2961\u2967rrow;\u61CDightarrow;\u61CE;\uC000\u22D8\u0338\u0100;v\u297B\u0C47\uC000\u226A\u20D2ightarrow;\u61CF\u0100Dd\u298E\u2993ash;\u62AFash;\u62AE\u0280bcnpt\u29A3\u29A7\u29AC\u29B1\u29CCla\xBB\u02DEute;\u4144g;\uC000\u2220\u20D2\u0280;Eiop\u0D84\u29BC\u29C0\u29C5\u29C8;\uC000\u2A70\u0338d;\uC000\u224B\u0338s;\u4149ro\xF8\u0D84ur\u0100;a\u29D3\u29D4\u666El\u0100;s\u29D3\u0B38\u01F3\u29DF\0\u29E3p\u80BB\xA0\u0B37mp\u0100;e\u0BF9\u0C00\u0280aeouy\u29F4\u29FE\u2A03\u2A10\u2A13\u01F0\u29F9\0\u29FB;\u6A43on;\u4148dil;\u4146ng\u0100;d\u0D7E\u2A0Aot;\uC000\u2A6D\u0338p;\u6A42;\u443Dash;\u6013\u0380;Aadqsx\u0B92\u2A29\u2A2D\u2A3B\u2A41\u2A45\u2A50rr;\u61D7r\u0100hr\u2A33\u2A36k;\u6924\u0100;o\u13F2\u13F0ot;\uC000\u2250\u0338ui\xF6\u0B63\u0100ei\u2A4A\u2A4Ear;\u6928\xED\u0B98ist\u0100;s\u0BA0\u0B9Fr;\uC000\u{1D52B}\u0200Eest\u0BC5\u2A66\u2A79\u2A7C\u0180;qs\u0BBC\u2A6D\u0BE1\u0180;qs\u0BBC\u0BC5\u2A74lan\xF4\u0BE2i\xED\u0BEA\u0100;r\u0BB6\u2A81\xBB\u0BB7\u0180Aap\u2A8A\u2A8D\u2A91r\xF2\u2971rr;\u61AEar;\u6AF2\u0180;sv\u0F8D\u2A9C\u0F8C\u0100;d\u2AA1\u2AA2\u62FC;\u62FAcy;\u445A\u0380AEadest\u2AB7\u2ABA\u2ABE\u2AC2\u2AC5\u2AF6\u2AF9r\xF2\u2966;\uC000\u2266\u0338rr;\u619Ar;\u6025\u0200;fqs\u0C3B\u2ACE\u2AE3\u2AEFt\u0100ar\u2AD4\u2AD9rro\xF7\u2AC1ightarro\xF7\u2A90\u0180;qs\u0C3B\u2ABA\u2AEAlan\xF4\u0C55\u0100;s\u0C55\u2AF4\xBB\u0C36i\xED\u0C5D\u0100;r\u0C35\u2AFEi\u0100;e\u0C1A\u0C25i\xE4\u0D90\u0100pt\u2B0C\u2B11f;\uC000\u{1D55F}\u8180\xAC;in\u2B19\u2B1A\u2B36\u40ACn\u0200;Edv\u0B89\u2B24\u2B28\u2B2E;\uC000\u22F9\u0338ot;\uC000\u22F5\u0338\u01E1\u0B89\u2B33\u2B35;\u62F7;\u62F6i\u0100;v\u0CB8\u2B3C\u01E1\u0CB8\u2B41\u2B43;\u62FE;\u62FD\u0180aor\u2B4B\u2B63\u2B69r\u0200;ast\u0B7B\u2B55\u2B5A\u2B5Flle\xEC\u0B7Bl;\uC000\u2AFD\u20E5;\uC000\u2202\u0338lint;\u6A14\u0180;ce\u0C92\u2B70\u2B73u\xE5\u0CA5\u0100;c\u0C98\u2B78\u0100;e\u0C92\u2B7D\xF1\u0C98\u0200Aait\u2B88\u2B8B\u2B9D\u2BA7r\xF2\u2988rr\u0180;cw\u2B94\u2B95\u2B99\u619B;\uC000\u2933\u0338;\uC000\u219D\u0338ghtarrow\xBB\u2B95ri\u0100;e\u0CCB\u0CD6\u0380chimpqu\u2BBD\u2BCD\u2BD9\u2B04\u0B78\u2BE4\u2BEF\u0200;cer\u0D32\u2BC6\u0D37\u2BC9u\xE5\u0D45;\uC000\u{1D4C3}ort\u026D\u2B05\0\0\u2BD6ar\xE1\u2B56m\u0100;e\u0D6E\u2BDF\u0100;q\u0D74\u0D73su\u0100bp\u2BEB\u2BED\xE5\u0CF8\xE5\u0D0B\u0180bcp\u2BF6\u2C11\u2C19\u0200;Ees\u2BFF\u2C00\u0D22\u2C04\u6284;\uC000\u2AC5\u0338et\u0100;e\u0D1B\u2C0Bq\u0100;q\u0D23\u2C00c\u0100;e\u0D32\u2C17\xF1\u0D38\u0200;Ees\u2C22\u2C23\u0D5F\u2C27\u6285;\uC000\u2AC6\u0338et\u0100;e\u0D58\u2C2Eq\u0100;q\u0D60\u2C23\u0200gilr\u2C3D\u2C3F\u2C45\u2C47\xEC\u0BD7lde\u803B\xF1\u40F1\xE7\u0C43iangle\u0100lr\u2C52\u2C5Ceft\u0100;e\u0C1A\u2C5A\xF1\u0C26ight\u0100;e\u0CCB\u2C65\xF1\u0CD7\u0100;m\u2C6C\u2C6D\u43BD\u0180;es\u2C74\u2C75\u2C79\u4023ro;\u6116p;\u6007\u0480DHadgilrs\u2C8F\u2C94\u2C99\u2C9E\u2CA3\u2CB0\u2CB6\u2CD3\u2CE3ash;\u62ADarr;\u6904p;\uC000\u224D\u20D2ash;\u62AC\u0100et\u2CA8\u2CAC;\uC000\u2265\u20D2;\uC000>\u20D2nfin;\u69DE\u0180Aet\u2CBD\u2CC1\u2CC5rr;\u6902;\uC000\u2264\u20D2\u0100;r\u2CCA\u2CCD\uC000<\u20D2ie;\uC000\u22B4\u20D2\u0100At\u2CD8\u2CDCrr;\u6903rie;\uC000\u22B5\u20D2im;\uC000\u223C\u20D2\u0180Aan\u2CF0\u2CF4\u2D02rr;\u61D6r\u0100hr\u2CFA\u2CFDk;\u6923\u0100;o\u13E7\u13E5ear;\u6927\u1253\u1A95\0\0\0\0\0\0\0\0\0\0\0\0\0\u2D2D\0\u2D38\u2D48\u2D60\u2D65\u2D72\u2D84\u1B07\0\0\u2D8D\u2DAB\0\u2DC8\u2DCE\0\u2DDC\u2E19\u2E2B\u2E3E\u2E43\u0100cs\u2D31\u1A97ute\u803B\xF3\u40F3\u0100iy\u2D3C\u2D45r\u0100;c\u1A9E\u2D42\u803B\xF4\u40F4;\u443E\u0280abios\u1AA0\u2D52\u2D57\u01C8\u2D5Alac;\u4151v;\u6A38old;\u69BClig;\u4153\u0100cr\u2D69\u2D6Dir;\u69BF;\uC000\u{1D52C}\u036F\u2D79\0\0\u2D7C\0\u2D82n;\u42DBave\u803B\xF2\u40F2;\u69C1\u0100bm\u2D88\u0DF4ar;\u69B5\u0200acit\u2D95\u2D98\u2DA5\u2DA8r\xF2\u1A80\u0100ir\u2D9D\u2DA0r;\u69BEoss;\u69BBn\xE5\u0E52;\u69C0\u0180aei\u2DB1\u2DB5\u2DB9cr;\u414Dga;\u43C9\u0180cdn\u2DC0\u2DC5\u01CDron;\u43BF;\u69B6pf;\uC000\u{1D560}\u0180ael\u2DD4\u2DD7\u01D2r;\u69B7rp;\u69B9\u0380;adiosv\u2DEA\u2DEB\u2DEE\u2E08\u2E0D\u2E10\u2E16\u6228r\xF2\u1A86\u0200;efm\u2DF7\u2DF8\u2E02\u2E05\u6A5Dr\u0100;o\u2DFE\u2DFF\u6134f\xBB\u2DFF\u803B\xAA\u40AA\u803B\xBA\u40BAgof;\u62B6r;\u6A56lope;\u6A57;\u6A5B\u0180clo\u2E1F\u2E21\u2E27\xF2\u2E01ash\u803B\xF8\u40F8l;\u6298i\u016C\u2E2F\u2E34de\u803B\xF5\u40F5es\u0100;a\u01DB\u2E3As;\u6A36ml\u803B\xF6\u40F6bar;\u633D\u0AE1\u2E5E\0\u2E7D\0\u2E80\u2E9D\0\u2EA2\u2EB9\0\0\u2ECB\u0E9C\0\u2F13\0\0\u2F2B\u2FBC\0\u2FC8r\u0200;ast\u0403\u2E67\u2E72\u0E85\u8100\xB6;l\u2E6D\u2E6E\u40B6le\xEC\u0403\u0269\u2E78\0\0\u2E7Bm;\u6AF3;\u6AFDy;\u443Fr\u0280cimpt\u2E8B\u2E8F\u2E93\u1865\u2E97nt;\u4025od;\u402Eil;\u6030enk;\u6031r;\uC000\u{1D52D}\u0180imo\u2EA8\u2EB0\u2EB4\u0100;v\u2EAD\u2EAE\u43C6;\u43D5ma\xF4\u0A76ne;\u660E\u0180;tv\u2EBF\u2EC0\u2EC8\u43C0chfork\xBB\u1FFD;\u43D6\u0100au\u2ECF\u2EDFn\u0100ck\u2ED5\u2EDDk\u0100;h\u21F4\u2EDB;\u610E\xF6\u21F4s\u0480;abcdemst\u2EF3\u2EF4\u1908\u2EF9\u2EFD\u2F04\u2F06\u2F0A\u2F0E\u402Bcir;\u6A23ir;\u6A22\u0100ou\u1D40\u2F02;\u6A25;\u6A72n\u80BB\xB1\u0E9Dim;\u6A26wo;\u6A27\u0180ipu\u2F19\u2F20\u2F25ntint;\u6A15f;\uC000\u{1D561}nd\u803B\xA3\u40A3\u0500;Eaceinosu\u0EC8\u2F3F\u2F41\u2F44\u2F47\u2F81\u2F89\u2F92\u2F7E\u2FB6;\u6AB3p;\u6AB7u\xE5\u0ED9\u0100;c\u0ECE\u2F4C\u0300;acens\u0EC8\u2F59\u2F5F\u2F66\u2F68\u2F7Eppro\xF8\u2F43urlye\xF1\u0ED9\xF1\u0ECE\u0180aes\u2F6F\u2F76\u2F7Approx;\u6AB9qq;\u6AB5im;\u62E8i\xED\u0EDFme\u0100;s\u2F88\u0EAE\u6032\u0180Eas\u2F78\u2F90\u2F7A\xF0\u2F75\u0180dfp\u0EEC\u2F99\u2FAF\u0180als\u2FA0\u2FA5\u2FAAlar;\u632Eine;\u6312urf;\u6313\u0100;t\u0EFB\u2FB4\xEF\u0EFBrel;\u62B0\u0100ci\u2FC0\u2FC5r;\uC000\u{1D4C5};\u43C8ncsp;\u6008\u0300fiopsu\u2FDA\u22E2\u2FDF\u2FE5\u2FEB\u2FF1r;\uC000\u{1D52E}pf;\uC000\u{1D562}rime;\u6057cr;\uC000\u{1D4C6}\u0180aeo\u2FF8\u3009\u3013t\u0100ei\u2FFE\u3005rnion\xF3\u06B0nt;\u6A16st\u0100;e\u3010\u3011\u403F\xF1\u1F19\xF4\u0F14\u0A80ABHabcdefhilmnoprstux\u3040\u3051\u3055\u3059\u30E0\u310E\u312B\u3147\u3162\u3172\u318E\u3206\u3215\u3224\u3229\u3258\u326E\u3272\u3290\u32B0\u32B7\u0180art\u3047\u304A\u304Cr\xF2\u10B3\xF2\u03DDail;\u691Car\xF2\u1C65ar;\u6964\u0380cdenqrt\u3068\u3075\u3078\u307F\u308F\u3094\u30CC\u0100eu\u306D\u3071;\uC000\u223D\u0331te;\u4155i\xE3\u116Emptyv;\u69B3g\u0200;del\u0FD1\u3089\u308B\u308D;\u6992;\u69A5\xE5\u0FD1uo\u803B\xBB\u40BBr\u0580;abcfhlpstw\u0FDC\u30AC\u30AF\u30B7\u30B9\u30BC\u30BE\u30C0\u30C3\u30C7\u30CAp;\u6975\u0100;f\u0FE0\u30B4s;\u6920;\u6933s;\u691E\xEB\u225D\xF0\u272El;\u6945im;\u6974l;\u61A3;\u619D\u0100ai\u30D1\u30D5il;\u691Ao\u0100;n\u30DB\u30DC\u6236al\xF3\u0F1E\u0180abr\u30E7\u30EA\u30EEr\xF2\u17E5rk;\u6773\u0100ak\u30F3\u30FDc\u0100ek\u30F9\u30FB;\u407D;\u405D\u0100es\u3102\u3104;\u698Cl\u0100du\u310A\u310C;\u698E;\u6990\u0200aeuy\u3117\u311C\u3127\u3129ron;\u4159\u0100di\u3121\u3125il;\u4157\xEC\u0FF2\xE2\u30FA;\u4440\u0200clqs\u3134\u3137\u313D\u3144a;\u6937dhar;\u6969uo\u0100;r\u020E\u020Dh;\u61B3\u0180acg\u314E\u315F\u0F44l\u0200;ips\u0F78\u3158\u315B\u109Cn\xE5\u10BBar\xF4\u0FA9t;\u65AD\u0180ilr\u3169\u1023\u316Esht;\u697D;\uC000\u{1D52F}\u0100ao\u3177\u3186r\u0100du\u317D\u317F\xBB\u047B\u0100;l\u1091\u3184;\u696C\u0100;v\u318B\u318C\u43C1;\u43F1\u0180gns\u3195\u31F9\u31FCht\u0300ahlrst\u31A4\u31B0\u31C2\u31D8\u31E4\u31EErrow\u0100;t\u0FDC\u31ADa\xE9\u30C8arpoon\u0100du\u31BB\u31BFow\xEE\u317Ep\xBB\u1092eft\u0100ah\u31CA\u31D0rrow\xF3\u0FEAarpoon\xF3\u0551ightarrows;\u61C9quigarro\xF7\u30CBhreetimes;\u62CCg;\u42DAingdotse\xF1\u1F32\u0180ahm\u320D\u3210\u3213r\xF2\u0FEAa\xF2\u0551;\u600Foust\u0100;a\u321E\u321F\u63B1che\xBB\u321Fmid;\u6AEE\u0200abpt\u3232\u323D\u3240\u3252\u0100nr\u3237\u323Ag;\u67EDr;\u61FEr\xEB\u1003\u0180afl\u3247\u324A\u324Er;\u6986;\uC000\u{1D563}us;\u6A2Eimes;\u6A35\u0100ap\u325D\u3267r\u0100;g\u3263\u3264\u4029t;\u6994olint;\u6A12ar\xF2\u31E3\u0200achq\u327B\u3280\u10BC\u3285quo;\u603Ar;\uC000\u{1D4C7}\u0100bu\u30FB\u328Ao\u0100;r\u0214\u0213\u0180hir\u3297\u329B\u32A0re\xE5\u31F8mes;\u62CAi\u0200;efl\u32AA\u1059\u1821\u32AB\u65B9tri;\u69CEluhar;\u6968;\u611E\u0D61\u32D5\u32DB\u32DF\u332C\u3338\u3371\0\u337A\u33A4\0\0\u33EC\u33F0\0\u3428\u3448\u345A\u34AD\u34B1\u34CA\u34F1\0\u3616\0\0\u3633cute;\u415Bqu\xEF\u27BA\u0500;Eaceinpsy\u11ED\u32F3\u32F5\u32FF\u3302\u330B\u330F\u331F\u3326\u3329;\u6AB4\u01F0\u32FA\0\u32FC;\u6AB8on;\u4161u\xE5\u11FE\u0100;d\u11F3\u3307il;\u415Frc;\u415D\u0180Eas\u3316\u3318\u331B;\u6AB6p;\u6ABAim;\u62E9olint;\u6A13i\xED\u1204;\u4441ot\u0180;be\u3334\u1D47\u3335\u62C5;\u6A66\u0380Aacmstx\u3346\u334A\u3357\u335B\u335E\u3363\u336Drr;\u61D8r\u0100hr\u3350\u3352\xEB\u2228\u0100;o\u0A36\u0A34t\u803B\xA7\u40A7i;\u403Bwar;\u6929m\u0100in\u3369\xF0nu\xF3\xF1t;\u6736r\u0100;o\u3376\u2055\uC000\u{1D530}\u0200acoy\u3382\u3386\u3391\u33A0rp;\u666F\u0100hy\u338B\u338Fcy;\u4449;\u4448rt\u026D\u3399\0\0\u339Ci\xE4\u1464ara\xEC\u2E6F\u803B\xAD\u40AD\u0100gm\u33A8\u33B4ma\u0180;fv\u33B1\u33B2\u33B2\u43C3;\u43C2\u0400;deglnpr\u12AB\u33C5\u33C9\u33CE\u33D6\u33DE\u33E1\u33E6ot;\u6A6A\u0100;q\u12B1\u12B0\u0100;E\u33D3\u33D4\u6A9E;\u6AA0\u0100;E\u33DB\u33DC\u6A9D;\u6A9Fe;\u6246lus;\u6A24arr;\u6972ar\xF2\u113D\u0200aeit\u33F8\u3408\u340F\u3417\u0100ls\u33FD\u3404lsetm\xE9\u336Ahp;\u6A33parsl;\u69E4\u0100dl\u1463\u3414e;\u6323\u0100;e\u341C\u341D\u6AAA\u0100;s\u3422\u3423\u6AAC;\uC000\u2AAC\uFE00\u0180flp\u342E\u3433\u3442tcy;\u444C\u0100;b\u3438\u3439\u402F\u0100;a\u343E\u343F\u69C4r;\u633Ff;\uC000\u{1D564}a\u0100dr\u344D\u0402es\u0100;u\u3454\u3455\u6660it\xBB\u3455\u0180csu\u3460\u3479\u349F\u0100au\u3465\u346Fp\u0100;s\u1188\u346B;\uC000\u2293\uFE00p\u0100;s\u11B4\u3475;\uC000\u2294\uFE00u\u0100bp\u347F\u348F\u0180;es\u1197\u119C\u3486et\u0100;e\u1197\u348D\xF1\u119D\u0180;es\u11A8\u11AD\u3496et\u0100;e\u11A8\u349D\xF1\u11AE\u0180;af\u117B\u34A6\u05B0r\u0165\u34AB\u05B1\xBB\u117Car\xF2\u1148\u0200cemt\u34B9\u34BE\u34C2\u34C5r;\uC000\u{1D4C8}tm\xEE\xF1i\xEC\u3415ar\xE6\u11BE\u0100ar\u34CE\u34D5r\u0100;f\u34D4\u17BF\u6606\u0100an\u34DA\u34EDight\u0100ep\u34E3\u34EApsilo\xEE\u1EE0h\xE9\u2EAFs\xBB\u2852\u0280bcmnp\u34FB\u355E\u1209\u358B\u358E\u0480;Edemnprs\u350E\u350F\u3511\u3515\u351E\u3523\u352C\u3531\u3536\u6282;\u6AC5ot;\u6ABD\u0100;d\u11DA\u351Aot;\u6AC3ult;\u6AC1\u0100Ee\u3528\u352A;\u6ACB;\u628Alus;\u6ABFarr;\u6979\u0180eiu\u353D\u3552\u3555t\u0180;en\u350E\u3545\u354Bq\u0100;q\u11DA\u350Feq\u0100;q\u352B\u3528m;\u6AC7\u0100bp\u355A\u355C;\u6AD5;\u6AD3c\u0300;acens\u11ED\u356C\u3572\u3579\u357B\u3326ppro\xF8\u32FAurlye\xF1\u11FE\xF1\u11F3\u0180aes\u3582\u3588\u331Bppro\xF8\u331Aq\xF1\u3317g;\u666A\u0680123;Edehlmnps\u35A9\u35AC\u35AF\u121C\u35B2\u35B4\u35C0\u35C9\u35D5\u35DA\u35DF\u35E8\u35ED\u803B\xB9\u40B9\u803B\xB2\u40B2\u803B\xB3\u40B3;\u6AC6\u0100os\u35B9\u35BCt;\u6ABEub;\u6AD8\u0100;d\u1222\u35C5ot;\u6AC4s\u0100ou\u35CF\u35D2l;\u67C9b;\u6AD7arr;\u697Bult;\u6AC2\u0100Ee\u35E4\u35E6;\u6ACC;\u628Blus;\u6AC0\u0180eiu\u35F4\u3609\u360Ct\u0180;en\u121C\u35FC\u3602q\u0100;q\u1222\u35B2eq\u0100;q\u35E7\u35E4m;\u6AC8\u0100bp\u3611\u3613;\u6AD4;\u6AD6\u0180Aan\u361C\u3620\u362Drr;\u61D9r\u0100hr\u3626\u3628\xEB\u222E\u0100;o\u0A2B\u0A29war;\u692Alig\u803B\xDF\u40DF\u0BE1\u3651\u365D\u3660\u12CE\u3673\u3679\0\u367E\u36C2\0\0\0\0\0\u36DB\u3703\0\u3709\u376C\0\0\0\u3787\u0272\u3656\0\0\u365Bget;\u6316;\u43C4r\xEB\u0E5F\u0180aey\u3666\u366B\u3670ron;\u4165dil;\u4163;\u4442lrec;\u6315r;\uC000\u{1D531}\u0200eiko\u3686\u369D\u36B5\u36BC\u01F2\u368B\0\u3691e\u01004f\u1284\u1281a\u0180;sv\u3698\u3699\u369B\u43B8ym;\u43D1\u0100cn\u36A2\u36B2k\u0100as\u36A8\u36AEppro\xF8\u12C1im\xBB\u12ACs\xF0\u129E\u0100as\u36BA\u36AE\xF0\u12C1rn\u803B\xFE\u40FE\u01EC\u031F\u36C6\u22E7es\u8180\xD7;bd\u36CF\u36D0\u36D8\u40D7\u0100;a\u190F\u36D5r;\u6A31;\u6A30\u0180eps\u36E1\u36E3\u3700\xE1\u2A4D\u0200;bcf\u0486\u36EC\u36F0\u36F4ot;\u6336ir;\u6AF1\u0100;o\u36F9\u36FC\uC000\u{1D565}rk;\u6ADA\xE1\u3362rime;\u6034\u0180aip\u370F\u3712\u3764d\xE5\u1248\u0380adempst\u3721\u374D\u3740\u3751\u3757\u375C\u375Fngle\u0280;dlqr\u3730\u3731\u3736\u3740\u3742\u65B5own\xBB\u1DBBeft\u0100;e\u2800\u373E\xF1\u092E;\u625Cight\u0100;e\u32AA\u374B\xF1\u105Aot;\u65ECinus;\u6A3Alus;\u6A39b;\u69CDime;\u6A3Bezium;\u63E2\u0180cht\u3772\u377D\u3781\u0100ry\u3777\u377B;\uC000\u{1D4C9};\u4446cy;\u445Brok;\u4167\u0100io\u378B\u378Ex\xF4\u1777head\u0100lr\u3797\u37A0eftarro\xF7\u084Fightarrow\xBB\u0F5D\u0900AHabcdfghlmoprstuw\u37D0\u37D3\u37D7\u37E4\u37F0\u37FC\u380E\u381C\u3823\u3834\u3851\u385D\u386B\u38A9\u38CC\u38D2\u38EA\u38F6r\xF2\u03EDar;\u6963\u0100cr\u37DC\u37E2ute\u803B\xFA\u40FA\xF2\u1150r\u01E3\u37EA\0\u37EDy;\u445Eve;\u416D\u0100iy\u37F5\u37FArc\u803B\xFB\u40FB;\u4443\u0180abh\u3803\u3806\u380Br\xF2\u13ADlac;\u4171a\xF2\u13C3\u0100ir\u3813\u3818sht;\u697E;\uC000\u{1D532}rave\u803B\xF9\u40F9\u0161\u3827\u3831r\u0100lr\u382C\u382E\xBB\u0957\xBB\u1083lk;\u6580\u0100ct\u3839\u384D\u026F\u383F\0\0\u384Arn\u0100;e\u3845\u3846\u631Cr\xBB\u3846op;\u630Fri;\u65F8\u0100al\u3856\u385Acr;\u416B\u80BB\xA8\u0349\u0100gp\u3862\u3866on;\u4173f;\uC000\u{1D566}\u0300adhlsu\u114B\u3878\u387D\u1372\u3891\u38A0own\xE1\u13B3arpoon\u0100lr\u3888\u388Cef\xF4\u382Digh\xF4\u382Fi\u0180;hl\u3899\u389A\u389C\u43C5\xBB\u13FAon\xBB\u389Aparrows;\u61C8\u0180cit\u38B0\u38C4\u38C8\u026F\u38B6\0\0\u38C1rn\u0100;e\u38BC\u38BD\u631Dr\xBB\u38BDop;\u630Eng;\u416Fri;\u65F9cr;\uC000\u{1D4CA}\u0180dir\u38D9\u38DD\u38E2ot;\u62F0lde;\u4169i\u0100;f\u3730\u38E8\xBB\u1813\u0100am\u38EF\u38F2r\xF2\u38A8l\u803B\xFC\u40FCangle;\u69A7\u0780ABDacdeflnoprsz\u391C\u391F\u3929\u392D\u39B5\u39B8\u39BD\u39DF\u39E4\u39E8\u39F3\u39F9\u39FD\u3A01\u3A20r\xF2\u03F7ar\u0100;v\u3926\u3927\u6AE8;\u6AE9as\xE8\u03E1\u0100nr\u3932\u3937grt;\u699C\u0380eknprst\u34E3\u3946\u394B\u3952\u395D\u3964\u3996app\xE1\u2415othin\xE7\u1E96\u0180hir\u34EB\u2EC8\u3959op\xF4\u2FB5\u0100;h\u13B7\u3962\xEF\u318D\u0100iu\u3969\u396Dgm\xE1\u33B3\u0100bp\u3972\u3984setneq\u0100;q\u397D\u3980\uC000\u228A\uFE00;\uC000\u2ACB\uFE00setneq\u0100;q\u398F\u3992\uC000\u228B\uFE00;\uC000\u2ACC\uFE00\u0100hr\u399B\u399Fet\xE1\u369Ciangle\u0100lr\u39AA\u39AFeft\xBB\u0925ight\xBB\u1051y;\u4432ash\xBB\u1036\u0180elr\u39C4\u39D2\u39D7\u0180;be\u2DEA\u39CB\u39CFar;\u62BBq;\u625Alip;\u62EE\u0100bt\u39DC\u1468a\xF2\u1469r;\uC000\u{1D533}tr\xE9\u39AEsu\u0100bp\u39EF\u39F1\xBB\u0D1C\xBB\u0D59pf;\uC000\u{1D567}ro\xF0\u0EFBtr\xE9\u39B4\u0100cu\u3A06\u3A0Br;\uC000\u{1D4CB}\u0100bp\u3A10\u3A18n\u0100Ee\u3980\u3A16\xBB\u397En\u0100Ee\u3992\u3A1E\xBB\u3990igzag;\u699A\u0380cefoprs\u3A36\u3A3B\u3A56\u3A5B\u3A54\u3A61\u3A6Airc;\u4175\u0100di\u3A40\u3A51\u0100bg\u3A45\u3A49ar;\u6A5Fe\u0100;q\u15FA\u3A4F;\u6259erp;\u6118r;\uC000\u{1D534}pf;\uC000\u{1D568}\u0100;e\u1479\u3A66at\xE8\u1479cr;\uC000\u{1D4CC}\u0AE3\u178E\u3A87\0\u3A8B\0\u3A90\u3A9B\0\0\u3A9D\u3AA8\u3AAB\u3AAF\0\0\u3AC3\u3ACE\0\u3AD8\u17DC\u17DFtr\xE9\u17D1r;\uC000\u{1D535}\u0100Aa\u3A94\u3A97r\xF2\u03C3r\xF2\u09F6;\u43BE\u0100Aa\u3AA1\u3AA4r\xF2\u03B8r\xF2\u09EBa\xF0\u2713is;\u62FB\u0180dpt\u17A4\u3AB5\u3ABE\u0100fl\u3ABA\u17A9;\uC000\u{1D569}im\xE5\u17B2\u0100Aa\u3AC7\u3ACAr\xF2\u03CEr\xF2\u0A01\u0100cq\u3AD2\u17B8r;\uC000\u{1D4CD}\u0100pt\u17D6\u3ADCr\xE9\u17D4\u0400acefiosu\u3AF0\u3AFD\u3B08\u3B0C\u3B11\u3B15\u3B1B\u3B21c\u0100uy\u3AF6\u3AFBte\u803B\xFD\u40FD;\u444F\u0100iy\u3B02\u3B06rc;\u4177;\u444Bn\u803B\xA5\u40A5r;\uC000\u{1D536}cy;\u4457pf;\uC000\u{1D56A}cr;\uC000\u{1D4CE}\u0100cm\u3B26\u3B29y;\u444El\u803B\xFF\u40FF\u0500acdefhiosw\u3B42\u3B48\u3B54\u3B58\u3B64\u3B69\u3B6D\u3B74\u3B7A\u3B80cute;\u417A\u0100ay\u3B4D\u3B52ron;\u417E;\u4437ot;\u417C\u0100et\u3B5D\u3B61tr\xE6\u155Fa;\u43B6r;\uC000\u{1D537}cy;\u4436grarr;\u61DDpf;\uC000\u{1D56B}cr;\uC000\u{1D4CF}\u0100jn\u3B85\u3B87;\u600Dj;\u600C'.split("").map(function(t){return t.charCodeAt(0)}))});var cs=m(Zu=>{"use strict";Object.defineProperty(Zu,"__esModule",{value:!0});Zu.default=new Uint16Array("\u0200aglq	\x1B\u026D\0\0p;\u4026os;\u4027t;\u403Et;\u403Cuot;\u4022".split("").map(function(t){return t.charCodeAt(0)}))});var Xu=m(Re=>{"use strict";var Ju;Object.defineProperty(Re,"__esModule",{value:!0});Re.replaceCodePoint=Re.fromCodePoint=void 0;var Ql=new Map([[0,65533],[128,8364],[130,8218],[131,402],[132,8222],[133,8230],[134,8224],[135,8225],[136,710],[137,8240],[138,352],[139,8249],[140,338],[142,381],[145,8216],[146,8217],[147,8220],[148,8221],[149,8226],[150,8211],[151,8212],[152,732],[153,8482],[154,353],[155,8250],[156,339],[158,382],[159,376]]);Re.fromCodePoint=(Ju=String.fromCodePoint)!==null&&Ju!==void 0?Ju:function(t){var e="";return t>65535&&(t-=65536,e+=String.fromCharCode(t>>>10&1023|55296),t=56320|t&1023),e+=String.fromCharCode(t),e};function ls(t){var e;return t>=55296&&t<=57343||t>1114111?65533:(e=Ql.get(t))!==null&&e!==void 0?e:t}Re.replaceCodePoint=ls;function ef(t){return(0,Re.fromCodePoint)(ls(t))}Re.default=ef});var rn=m(M=>{"use strict";var tf=M&&M.__createBinding||(Object.create?function(t,e,r,u){u===void 0&&(u=r);var n=Object.getOwnPropertyDescriptor(e,r);(!n||("get"in n?!e.__esModule:n.writable||n.configurable))&&(n={enumerable:!0,get:function(){return e[r]}}),Object.defineProperty(t,u,n)}:function(t,e,r,u){u===void 0&&(u=r),t[u]=e[r]}),rf=M&&M.__setModuleDefault||(Object.create?function(t,e){Object.defineProperty(t,"default",{enumerable:!0,value:e})}:function(t,e){t.default=e}),uf=M&&M.__importStar||function(t){if(t&&t.__esModule)return t;var e={};if(t!=null)for(var r in t)r!=="default"&&Object.prototype.hasOwnProperty.call(t,r)&&tf(e,t,r);return rf(e,t),e},fs=M&&M.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(M,"__esModule",{value:!0});M.decodeXML=M.decodeHTMLStrict=M.decodeHTMLAttribute=M.decodeHTML=M.determineBranch=M.EntityDecoder=M.DecodingMode=M.BinTrieFlags=M.fromCodePoint=M.replaceCodePoint=M.decodeCodePoint=M.xmlDecodeTree=M.htmlDecodeTree=void 0;var ds=fs(os());M.htmlDecodeTree=ds.default;var ps=fs(cs());M.xmlDecodeTree=ps.default;var en=uf(Xu());M.decodeCodePoint=en.default;var hs=Xu();Object.defineProperty(M,"replaceCodePoint",{enumerable:!0,get:function(){return hs.replaceCodePoint}});Object.defineProperty(M,"fromCodePoint",{enumerable:!0,get:function(){return hs.fromCodePoint}});var G;(function(t){t[t.NUM=35]="NUM",t[t.SEMI=59]="SEMI",t[t.EQUALS=61]="EQUALS",t[t.ZERO=48]="ZERO",t[t.NINE=57]="NINE",t[t.LOWER_A=97]="LOWER_A",t[t.LOWER_F=102]="LOWER_F",t[t.LOWER_X=120]="LOWER_X",t[t.LOWER_Z=122]="LOWER_Z",t[t.UPPER_A=65]="UPPER_A",t[t.UPPER_F=70]="UPPER_F",t[t.UPPER_Z=90]="UPPER_Z"})(G||(G={}));var nf=32,Ye;(function(t){t[t.VALUE_LENGTH=49152]="VALUE_LENGTH",t[t.BRANCH_LENGTH=16256]="BRANCH_LENGTH",t[t.JUMP_TABLE=127]="JUMP_TABLE"})(Ye=M.BinTrieFlags||(M.BinTrieFlags={}));function Qu(t){return t>=G.ZERO&&t<=G.NINE}function sf(t){return t>=G.UPPER_A&&t<=G.UPPER_F||t>=G.LOWER_A&&t<=G.LOWER_F}function af(t){return t>=G.UPPER_A&&t<=G.UPPER_Z||t>=G.LOWER_A&&t<=G.LOWER_Z||Qu(t)}function of(t){return t===G.EQUALS||af(t)}var V;(function(t){t[t.EntityStart=0]="EntityStart",t[t.NumericStart=1]="NumericStart",t[t.NumericDecimal=2]="NumericDecimal",t[t.NumericHex=3]="NumericHex",t[t.NamedEntity=4]="NamedEntity"})(V||(V={}));var me;(function(t){t[t.Legacy=0]="Legacy",t[t.Strict=1]="Strict",t[t.Attribute=2]="Attribute"})(me=M.DecodingMode||(M.DecodingMode={}));var gs=function(){function t(e,r,u){this.decodeTree=e,this.emitCodePoint=r,this.errors=u,this.state=V.EntityStart,this.consumed=1,this.result=0,this.treeIndex=0,this.excess=1,this.decodeMode=me.Strict}return t.prototype.startEntity=function(e){this.decodeMode=e,this.state=V.EntityStart,this.result=0,this.treeIndex=0,this.excess=1,this.consumed=1},t.prototype.write=function(e,r){switch(this.state){case V.EntityStart:return e.charCodeAt(r)===G.NUM?(this.state=V.NumericStart,this.consumed+=1,this.stateNumericStart(e,r+1)):(this.state=V.NamedEntity,this.stateNamedEntity(e,r));case V.NumericStart:return this.stateNumericStart(e,r);case V.NumericDecimal:return this.stateNumericDecimal(e,r);case V.NumericHex:return this.stateNumericHex(e,r);case V.NamedEntity:return this.stateNamedEntity(e,r)}},t.prototype.stateNumericStart=function(e,r){return r>=e.length?-1:(e.charCodeAt(r)|nf)===G.LOWER_X?(this.state=V.NumericHex,this.consumed+=1,this.stateNumericHex(e,r+1)):(this.state=V.NumericDecimal,this.stateNumericDecimal(e,r))},t.prototype.addToNumericResult=function(e,r,u,n){if(r!==u){var i=u-r;this.result=this.result*Math.pow(n,i)+parseInt(e.substr(r,i),n),this.consumed+=i}},t.prototype.stateNumericHex=function(e,r){for(var u=r;r<e.length;){var n=e.charCodeAt(r);if(Qu(n)||sf(n))r+=1;else return this.addToNumericResult(e,u,r,16),this.emitNumericEntity(n,3)}return this.addToNumericResult(e,u,r,16),-1},t.prototype.stateNumericDecimal=function(e,r){for(var u=r;r<e.length;){var n=e.charCodeAt(r);if(Qu(n))r+=1;else return this.addToNumericResult(e,u,r,10),this.emitNumericEntity(n,2)}return this.addToNumericResult(e,u,r,10),-1},t.prototype.emitNumericEntity=function(e,r){var u;if(this.consumed<=r)return(u=this.errors)===null||u===void 0||u.absenceOfDigitsInNumericCharacterReference(this.consumed),0;if(e===G.SEMI)this.consumed+=1;else if(this.decodeMode===me.Strict)return 0;return this.emitCodePoint((0,en.replaceCodePoint)(this.result),this.consumed),this.errors&&(e!==G.SEMI&&this.errors.missingSemicolonAfterCharacterReference(),this.errors.validateNumericCharacterReference(this.result)),this.consumed},t.prototype.stateNamedEntity=function(e,r){for(var u=this.decodeTree,n=u[this.treeIndex],i=(n&Ye.VALUE_LENGTH)>>14;r<e.length;r++,this.excess++){var s=e.charCodeAt(r);if(this.treeIndex=bs(u,n,this.treeIndex+Math.max(1,i),s),this.treeIndex<0)return this.result===0||this.decodeMode===me.Attribute&&(i===0||of(s))?0:this.emitNotTerminatedNamedEntity();if(n=u[this.treeIndex],i=(n&Ye.VALUE_LENGTH)>>14,i!==0){if(s===G.SEMI)return this.emitNamedEntityData(this.treeIndex,i,this.consumed+this.excess);this.decodeMode!==me.Strict&&(this.result=this.treeIndex,this.consumed+=this.excess,this.excess=0)}}return-1},t.prototype.emitNotTerminatedNamedEntity=function(){var e,r=this,u=r.result,n=r.decodeTree,i=(n[u]&Ye.VALUE_LENGTH)>>14;return this.emitNamedEntityData(u,i,this.consumed),(e=this.errors)===null||e===void 0||e.missingSemicolonAfterCharacterReference(),this.consumed},t.prototype.emitNamedEntityData=function(e,r,u){var n=this.decodeTree;return this.emitCodePoint(r===1?n[e]&~Ye.VALUE_LENGTH:n[e+1],u),r===3&&this.emitCodePoint(n[e+2],u),u},t.prototype.end=function(){var e;switch(this.state){case V.NamedEntity:return this.result!==0&&(this.decodeMode!==me.Attribute||this.result===this.treeIndex)?this.emitNotTerminatedNamedEntity():0;case V.NumericDecimal:return this.emitNumericEntity(0,2);case V.NumericHex:return this.emitNumericEntity(0,3);case V.NumericStart:return(e=this.errors)===null||e===void 0||e.absenceOfDigitsInNumericCharacterReference(this.consumed),0;case V.EntityStart:return 0}},t}();M.EntityDecoder=gs;function ms(t){var e="",r=new gs(t,function(u){return e+=(0,en.fromCodePoint)(u)});return function(n,i){for(var s=0,a=0;(a=n.indexOf("&",a))>=0;){e+=n.slice(s,a),r.startEntity(i);var o=r.write(n,a+1);if(o<0){s=a+r.end();break}s=a+o,a=o===0?s+1:s}var c=e+n.slice(s);return e="",c}}function bs(t,e,r,u){var n=(e&Ye.BRANCH_LENGTH)>>7,i=e&Ye.JUMP_TABLE;if(n===0)return i!==0&&u===i?r:-1;if(i){var s=u-i;return s<0||s>=n?-1:t[r+s]-1}for(var a=r,o=a+n-1;a<=o;){var c=a+o>>>1,f=t[c];if(f<u)a=c+1;else if(f>u)o=c-1;else return t[c+n]}return-1}M.determineBranch=bs;var tn=ms(ds.default),cf=ms(ps.default);function lf(t,e){return e===void 0&&(e=me.Legacy),tn(t,e)}M.decodeHTML=lf;function ff(t){return tn(t,me.Attribute)}M.decodeHTMLAttribute=ff;function df(t){return tn(t,me.Strict)}M.decodeHTMLStrict=df;function pf(t){return cf(t,me.Strict)}M.decodeXML=pf});var ys=m(un=>{"use strict";Object.defineProperty(un,"__esModule",{value:!0});function br(t){for(var e=1;e<t.length;e++)t[e][0]+=t[e-1][0]+1;return t}un.default=new Map(br([[9,"&Tab;"],[0,"&NewLine;"],[22,"&excl;"],[0,"&quot;"],[0,"&num;"],[0,"&dollar;"],[0,"&percnt;"],[0,"&amp;"],[0,"&apos;"],[0,"&lpar;"],[0,"&rpar;"],[0,"&ast;"],[0,"&plus;"],[0,"&comma;"],[1,"&period;"],[0,"&sol;"],[10,"&colon;"],[0,"&semi;"],[0,{v:"&lt;",n:8402,o:"&nvlt;"}],[0,{v:"&equals;",n:8421,o:"&bne;"}],[0,{v:"&gt;",n:8402,o:"&nvgt;"}],[0,"&quest;"],[0,"&commat;"],[26,"&lbrack;"],[0,"&bsol;"],[0,"&rbrack;"],[0,"&Hat;"],[0,"&lowbar;"],[0,"&DiacriticalGrave;"],[5,{n:106,o:"&fjlig;"}],[20,"&lbrace;"],[0,"&verbar;"],[0,"&rbrace;"],[34,"&nbsp;"],[0,"&iexcl;"],[0,"&cent;"],[0,"&pound;"],[0,"&curren;"],[0,"&yen;"],[0,"&brvbar;"],[0,"&sect;"],[0,"&die;"],[0,"&copy;"],[0,"&ordf;"],[0,"&laquo;"],[0,"&not;"],[0,"&shy;"],[0,"&circledR;"],[0,"&macr;"],[0,"&deg;"],[0,"&PlusMinus;"],[0,"&sup2;"],[0,"&sup3;"],[0,"&acute;"],[0,"&micro;"],[0,"&para;"],[0,"&centerdot;"],[0,"&cedil;"],[0,"&sup1;"],[0,"&ordm;"],[0,"&raquo;"],[0,"&frac14;"],[0,"&frac12;"],[0,"&frac34;"],[0,"&iquest;"],[0,"&Agrave;"],[0,"&Aacute;"],[0,"&Acirc;"],[0,"&Atilde;"],[0,"&Auml;"],[0,"&angst;"],[0,"&AElig;"],[0,"&Ccedil;"],[0,"&Egrave;"],[0,"&Eacute;"],[0,"&Ecirc;"],[0,"&Euml;"],[0,"&Igrave;"],[0,"&Iacute;"],[0,"&Icirc;"],[0,"&Iuml;"],[0,"&ETH;"],[0,"&Ntilde;"],[0,"&Ograve;"],[0,"&Oacute;"],[0,"&Ocirc;"],[0,"&Otilde;"],[0,"&Ouml;"],[0,"&times;"],[0,"&Oslash;"],[0,"&Ugrave;"],[0,"&Uacute;"],[0,"&Ucirc;"],[0,"&Uuml;"],[0,"&Yacute;"],[0,"&THORN;"],[0,"&szlig;"],[0,"&agrave;"],[0,"&aacute;"],[0,"&acirc;"],[0,"&atilde;"],[0,"&auml;"],[0,"&aring;"],[0,"&aelig;"],[0,"&ccedil;"],[0,"&egrave;"],[0,"&eacute;"],[0,"&ecirc;"],[0,"&euml;"],[0,"&igrave;"],[0,"&iacute;"],[0,"&icirc;"],[0,"&iuml;"],[0,"&eth;"],[0,"&ntilde;"],[0,"&ograve;"],[0,"&oacute;"],[0,"&ocirc;"],[0,"&otilde;"],[0,"&ouml;"],[0,"&div;"],[0,"&oslash;"],[0,"&ugrave;"],[0,"&uacute;"],[0,"&ucirc;"],[0,"&uuml;"],[0,"&yacute;"],[0,"&thorn;"],[0,"&yuml;"],[0,"&Amacr;"],[0,"&amacr;"],[0,"&Abreve;"],[0,"&abreve;"],[0,"&Aogon;"],[0,"&aogon;"],[0,"&Cacute;"],[0,"&cacute;"],[0,"&Ccirc;"],[0,"&ccirc;"],[0,"&Cdot;"],[0,"&cdot;"],[0,"&Ccaron;"],[0,"&ccaron;"],[0,"&Dcaron;"],[0,"&dcaron;"],[0,"&Dstrok;"],[0,"&dstrok;"],[0,"&Emacr;"],[0,"&emacr;"],[2,"&Edot;"],[0,"&edot;"],[0,"&Eogon;"],[0,"&eogon;"],[0,"&Ecaron;"],[0,"&ecaron;"],[0,"&Gcirc;"],[0,"&gcirc;"],[0,"&Gbreve;"],[0,"&gbreve;"],[0,"&Gdot;"],[0,"&gdot;"],[0,"&Gcedil;"],[1,"&Hcirc;"],[0,"&hcirc;"],[0,"&Hstrok;"],[0,"&hstrok;"],[0,"&Itilde;"],[0,"&itilde;"],[0,"&Imacr;"],[0,"&imacr;"],[2,"&Iogon;"],[0,"&iogon;"],[0,"&Idot;"],[0,"&imath;"],[0,"&IJlig;"],[0,"&ijlig;"],[0,"&Jcirc;"],[0,"&jcirc;"],[0,"&Kcedil;"],[0,"&kcedil;"],[0,"&kgreen;"],[0,"&Lacute;"],[0,"&lacute;"],[0,"&Lcedil;"],[0,"&lcedil;"],[0,"&Lcaron;"],[0,"&lcaron;"],[0,"&Lmidot;"],[0,"&lmidot;"],[0,"&Lstrok;"],[0,"&lstrok;"],[0,"&Nacute;"],[0,"&nacute;"],[0,"&Ncedil;"],[0,"&ncedil;"],[0,"&Ncaron;"],[0,"&ncaron;"],[0,"&napos;"],[0,"&ENG;"],[0,"&eng;"],[0,"&Omacr;"],[0,"&omacr;"],[2,"&Odblac;"],[0,"&odblac;"],[0,"&OElig;"],[0,"&oelig;"],[0,"&Racute;"],[0,"&racute;"],[0,"&Rcedil;"],[0,"&rcedil;"],[0,"&Rcaron;"],[0,"&rcaron;"],[0,"&Sacute;"],[0,"&sacute;"],[0,"&Scirc;"],[0,"&scirc;"],[0,"&Scedil;"],[0,"&scedil;"],[0,"&Scaron;"],[0,"&scaron;"],[0,"&Tcedil;"],[0,"&tcedil;"],[0,"&Tcaron;"],[0,"&tcaron;"],[0,"&Tstrok;"],[0,"&tstrok;"],[0,"&Utilde;"],[0,"&utilde;"],[0,"&Umacr;"],[0,"&umacr;"],[0,"&Ubreve;"],[0,"&ubreve;"],[0,"&Uring;"],[0,"&uring;"],[0,"&Udblac;"],[0,"&udblac;"],[0,"&Uogon;"],[0,"&uogon;"],[0,"&Wcirc;"],[0,"&wcirc;"],[0,"&Ycirc;"],[0,"&ycirc;"],[0,"&Yuml;"],[0,"&Zacute;"],[0,"&zacute;"],[0,"&Zdot;"],[0,"&zdot;"],[0,"&Zcaron;"],[0,"&zcaron;"],[19,"&fnof;"],[34,"&imped;"],[63,"&gacute;"],[65,"&jmath;"],[142,"&circ;"],[0,"&caron;"],[16,"&breve;"],[0,"&DiacriticalDot;"],[0,"&ring;"],[0,"&ogon;"],[0,"&DiacriticalTilde;"],[0,"&dblac;"],[51,"&DownBreve;"],[127,"&Alpha;"],[0,"&Beta;"],[0,"&Gamma;"],[0,"&Delta;"],[0,"&Epsilon;"],[0,"&Zeta;"],[0,"&Eta;"],[0,"&Theta;"],[0,"&Iota;"],[0,"&Kappa;"],[0,"&Lambda;"],[0,"&Mu;"],[0,"&Nu;"],[0,"&Xi;"],[0,"&Omicron;"],[0,"&Pi;"],[0,"&Rho;"],[1,"&Sigma;"],[0,"&Tau;"],[0,"&Upsilon;"],[0,"&Phi;"],[0,"&Chi;"],[0,"&Psi;"],[0,"&ohm;"],[7,"&alpha;"],[0,"&beta;"],[0,"&gamma;"],[0,"&delta;"],[0,"&epsi;"],[0,"&zeta;"],[0,"&eta;"],[0,"&theta;"],[0,"&iota;"],[0,"&kappa;"],[0,"&lambda;"],[0,"&mu;"],[0,"&nu;"],[0,"&xi;"],[0,"&omicron;"],[0,"&pi;"],[0,"&rho;"],[0,"&sigmaf;"],[0,"&sigma;"],[0,"&tau;"],[0,"&upsi;"],[0,"&phi;"],[0,"&chi;"],[0,"&psi;"],[0,"&omega;"],[7,"&thetasym;"],[0,"&Upsi;"],[2,"&phiv;"],[0,"&piv;"],[5,"&Gammad;"],[0,"&digamma;"],[18,"&kappav;"],[0,"&rhov;"],[3,"&epsiv;"],[0,"&backepsilon;"],[10,"&IOcy;"],[0,"&DJcy;"],[0,"&GJcy;"],[0,"&Jukcy;"],[0,"&DScy;"],[0,"&Iukcy;"],[0,"&YIcy;"],[0,"&Jsercy;"],[0,"&LJcy;"],[0,"&NJcy;"],[0,"&TSHcy;"],[0,"&KJcy;"],[1,"&Ubrcy;"],[0,"&DZcy;"],[0,"&Acy;"],[0,"&Bcy;"],[0,"&Vcy;"],[0,"&Gcy;"],[0,"&Dcy;"],[0,"&IEcy;"],[0,"&ZHcy;"],[0,"&Zcy;"],[0,"&Icy;"],[0,"&Jcy;"],[0,"&Kcy;"],[0,"&Lcy;"],[0,"&Mcy;"],[0,"&Ncy;"],[0,"&Ocy;"],[0,"&Pcy;"],[0,"&Rcy;"],[0,"&Scy;"],[0,"&Tcy;"],[0,"&Ucy;"],[0,"&Fcy;"],[0,"&KHcy;"],[0,"&TScy;"],[0,"&CHcy;"],[0,"&SHcy;"],[0,"&SHCHcy;"],[0,"&HARDcy;"],[0,"&Ycy;"],[0,"&SOFTcy;"],[0,"&Ecy;"],[0,"&YUcy;"],[0,"&YAcy;"],[0,"&acy;"],[0,"&bcy;"],[0,"&vcy;"],[0,"&gcy;"],[0,"&dcy;"],[0,"&iecy;"],[0,"&zhcy;"],[0,"&zcy;"],[0,"&icy;"],[0,"&jcy;"],[0,"&kcy;"],[0,"&lcy;"],[0,"&mcy;"],[0,"&ncy;"],[0,"&ocy;"],[0,"&pcy;"],[0,"&rcy;"],[0,"&scy;"],[0,"&tcy;"],[0,"&ucy;"],[0,"&fcy;"],[0,"&khcy;"],[0,"&tscy;"],[0,"&chcy;"],[0,"&shcy;"],[0,"&shchcy;"],[0,"&hardcy;"],[0,"&ycy;"],[0,"&softcy;"],[0,"&ecy;"],[0,"&yucy;"],[0,"&yacy;"],[1,"&iocy;"],[0,"&djcy;"],[0,"&gjcy;"],[0,"&jukcy;"],[0,"&dscy;"],[0,"&iukcy;"],[0,"&yicy;"],[0,"&jsercy;"],[0,"&ljcy;"],[0,"&njcy;"],[0,"&tshcy;"],[0,"&kjcy;"],[1,"&ubrcy;"],[0,"&dzcy;"],[7074,"&ensp;"],[0,"&emsp;"],[0,"&emsp13;"],[0,"&emsp14;"],[1,"&numsp;"],[0,"&puncsp;"],[0,"&ThinSpace;"],[0,"&hairsp;"],[0,"&NegativeMediumSpace;"],[0,"&zwnj;"],[0,"&zwj;"],[0,"&lrm;"],[0,"&rlm;"],[0,"&dash;"],[2,"&ndash;"],[0,"&mdash;"],[0,"&horbar;"],[0,"&Verbar;"],[1,"&lsquo;"],[0,"&CloseCurlyQuote;"],[0,"&lsquor;"],[1,"&ldquo;"],[0,"&CloseCurlyDoubleQuote;"],[0,"&bdquo;"],[1,"&dagger;"],[0,"&Dagger;"],[0,"&bull;"],[2,"&nldr;"],[0,"&hellip;"],[9,"&permil;"],[0,"&pertenk;"],[0,"&prime;"],[0,"&Prime;"],[0,"&tprime;"],[0,"&backprime;"],[3,"&lsaquo;"],[0,"&rsaquo;"],[3,"&oline;"],[2,"&caret;"],[1,"&hybull;"],[0,"&frasl;"],[10,"&bsemi;"],[7,"&qprime;"],[7,{v:"&MediumSpace;",n:8202,o:"&ThickSpace;"}],[0,"&NoBreak;"],[0,"&af;"],[0,"&InvisibleTimes;"],[0,"&ic;"],[72,"&euro;"],[46,"&tdot;"],[0,"&DotDot;"],[37,"&complexes;"],[2,"&incare;"],[4,"&gscr;"],[0,"&hamilt;"],[0,"&Hfr;"],[0,"&Hopf;"],[0,"&planckh;"],[0,"&hbar;"],[0,"&imagline;"],[0,"&Ifr;"],[0,"&lagran;"],[0,"&ell;"],[1,"&naturals;"],[0,"&numero;"],[0,"&copysr;"],[0,"&weierp;"],[0,"&Popf;"],[0,"&Qopf;"],[0,"&realine;"],[0,"&real;"],[0,"&reals;"],[0,"&rx;"],[3,"&trade;"],[1,"&integers;"],[2,"&mho;"],[0,"&zeetrf;"],[0,"&iiota;"],[2,"&bernou;"],[0,"&Cayleys;"],[1,"&escr;"],[0,"&Escr;"],[0,"&Fouriertrf;"],[1,"&Mellintrf;"],[0,"&order;"],[0,"&alefsym;"],[0,"&beth;"],[0,"&gimel;"],[0,"&daleth;"],[12,"&CapitalDifferentialD;"],[0,"&dd;"],[0,"&ee;"],[0,"&ii;"],[10,"&frac13;"],[0,"&frac23;"],[0,"&frac15;"],[0,"&frac25;"],[0,"&frac35;"],[0,"&frac45;"],[0,"&frac16;"],[0,"&frac56;"],[0,"&frac18;"],[0,"&frac38;"],[0,"&frac58;"],[0,"&frac78;"],[49,"&larr;"],[0,"&ShortUpArrow;"],[0,"&rarr;"],[0,"&darr;"],[0,"&harr;"],[0,"&updownarrow;"],[0,"&nwarr;"],[0,"&nearr;"],[0,"&LowerRightArrow;"],[0,"&LowerLeftArrow;"],[0,"&nlarr;"],[0,"&nrarr;"],[1,{v:"&rarrw;",n:824,o:"&nrarrw;"}],[0,"&Larr;"],[0,"&Uarr;"],[0,"&Rarr;"],[0,"&Darr;"],[0,"&larrtl;"],[0,"&rarrtl;"],[0,"&LeftTeeArrow;"],[0,"&mapstoup;"],[0,"&map;"],[0,"&DownTeeArrow;"],[1,"&hookleftarrow;"],[0,"&hookrightarrow;"],[0,"&larrlp;"],[0,"&looparrowright;"],[0,"&harrw;"],[0,"&nharr;"],[1,"&lsh;"],[0,"&rsh;"],[0,"&ldsh;"],[0,"&rdsh;"],[1,"&crarr;"],[0,"&cularr;"],[0,"&curarr;"],[2,"&circlearrowleft;"],[0,"&circlearrowright;"],[0,"&leftharpoonup;"],[0,"&DownLeftVector;"],[0,"&RightUpVector;"],[0,"&LeftUpVector;"],[0,"&rharu;"],[0,"&DownRightVector;"],[0,"&dharr;"],[0,"&dharl;"],[0,"&RightArrowLeftArrow;"],[0,"&udarr;"],[0,"&LeftArrowRightArrow;"],[0,"&leftleftarrows;"],[0,"&upuparrows;"],[0,"&rightrightarrows;"],[0,"&ddarr;"],[0,"&leftrightharpoons;"],[0,"&Equilibrium;"],[0,"&nlArr;"],[0,"&nhArr;"],[0,"&nrArr;"],[0,"&DoubleLeftArrow;"],[0,"&DoubleUpArrow;"],[0,"&DoubleRightArrow;"],[0,"&dArr;"],[0,"&DoubleLeftRightArrow;"],[0,"&DoubleUpDownArrow;"],[0,"&nwArr;"],[0,"&neArr;"],[0,"&seArr;"],[0,"&swArr;"],[0,"&lAarr;"],[0,"&rAarr;"],[1,"&zigrarr;"],[6,"&larrb;"],[0,"&rarrb;"],[15,"&DownArrowUpArrow;"],[7,"&loarr;"],[0,"&roarr;"],[0,"&hoarr;"],[0,"&forall;"],[0,"&comp;"],[0,{v:"&part;",n:824,o:"&npart;"}],[0,"&exist;"],[0,"&nexist;"],[0,"&empty;"],[1,"&Del;"],[0,"&Element;"],[0,"&NotElement;"],[1,"&ni;"],[0,"&notni;"],[2,"&prod;"],[0,"&coprod;"],[0,"&sum;"],[0,"&minus;"],[0,"&MinusPlus;"],[0,"&dotplus;"],[1,"&Backslash;"],[0,"&lowast;"],[0,"&compfn;"],[1,"&radic;"],[2,"&prop;"],[0,"&infin;"],[0,"&angrt;"],[0,{v:"&ang;",n:8402,o:"&nang;"}],[0,"&angmsd;"],[0,"&angsph;"],[0,"&mid;"],[0,"&nmid;"],[0,"&DoubleVerticalBar;"],[0,"&NotDoubleVerticalBar;"],[0,"&and;"],[0,"&or;"],[0,{v:"&cap;",n:65024,o:"&caps;"}],[0,{v:"&cup;",n:65024,o:"&cups;"}],[0,"&int;"],[0,"&Int;"],[0,"&iiint;"],[0,"&conint;"],[0,"&Conint;"],[0,"&Cconint;"],[0,"&cwint;"],[0,"&ClockwiseContourIntegral;"],[0,"&awconint;"],[0,"&there4;"],[0,"&becaus;"],[0,"&ratio;"],[0,"&Colon;"],[0,"&dotminus;"],[1,"&mDDot;"],[0,"&homtht;"],[0,{v:"&sim;",n:8402,o:"&nvsim;"}],[0,{v:"&backsim;",n:817,o:"&race;"}],[0,{v:"&ac;",n:819,o:"&acE;"}],[0,"&acd;"],[0,"&VerticalTilde;"],[0,"&NotTilde;"],[0,{v:"&eqsim;",n:824,o:"&nesim;"}],[0,"&sime;"],[0,"&NotTildeEqual;"],[0,"&cong;"],[0,"&simne;"],[0,"&ncong;"],[0,"&ap;"],[0,"&nap;"],[0,"&ape;"],[0,{v:"&apid;",n:824,o:"&napid;"}],[0,"&backcong;"],[0,{v:"&asympeq;",n:8402,o:"&nvap;"}],[0,{v:"&bump;",n:824,o:"&nbump;"}],[0,{v:"&bumpe;",n:824,o:"&nbumpe;"}],[0,{v:"&doteq;",n:824,o:"&nedot;"}],[0,"&doteqdot;"],[0,"&efDot;"],[0,"&erDot;"],[0,"&Assign;"],[0,"&ecolon;"],[0,"&ecir;"],[0,"&circeq;"],[1,"&wedgeq;"],[0,"&veeeq;"],[1,"&triangleq;"],[2,"&equest;"],[0,"&ne;"],[0,{v:"&Congruent;",n:8421,o:"&bnequiv;"}],[0,"&nequiv;"],[1,{v:"&le;",n:8402,o:"&nvle;"}],[0,{v:"&ge;",n:8402,o:"&nvge;"}],[0,{v:"&lE;",n:824,o:"&nlE;"}],[0,{v:"&gE;",n:824,o:"&ngE;"}],[0,{v:"&lnE;",n:65024,o:"&lvertneqq;"}],[0,{v:"&gnE;",n:65024,o:"&gvertneqq;"}],[0,{v:"&ll;",n:new Map(br([[824,"&nLtv;"],[7577,"&nLt;"]]))}],[0,{v:"&gg;",n:new Map(br([[824,"&nGtv;"],[7577,"&nGt;"]]))}],[0,"&between;"],[0,"&NotCupCap;"],[0,"&nless;"],[0,"&ngt;"],[0,"&nle;"],[0,"&nge;"],[0,"&lesssim;"],[0,"&GreaterTilde;"],[0,"&nlsim;"],[0,"&ngsim;"],[0,"&LessGreater;"],[0,"&gl;"],[0,"&NotLessGreater;"],[0,"&NotGreaterLess;"],[0,"&pr;"],[0,"&sc;"],[0,"&prcue;"],[0,"&sccue;"],[0,"&PrecedesTilde;"],[0,{v:"&scsim;",n:824,o:"&NotSucceedsTilde;"}],[0,"&NotPrecedes;"],[0,"&NotSucceeds;"],[0,{v:"&sub;",n:8402,o:"&NotSubset;"}],[0,{v:"&sup;",n:8402,o:"&NotSuperset;"}],[0,"&nsub;"],[0,"&nsup;"],[0,"&sube;"],[0,"&supe;"],[0,"&NotSubsetEqual;"],[0,"&NotSupersetEqual;"],[0,{v:"&subne;",n:65024,o:"&varsubsetneq;"}],[0,{v:"&supne;",n:65024,o:"&varsupsetneq;"}],[1,"&cupdot;"],[0,"&UnionPlus;"],[0,{v:"&sqsub;",n:824,o:"&NotSquareSubset;"}],[0,{v:"&sqsup;",n:824,o:"&NotSquareSuperset;"}],[0,"&sqsube;"],[0,"&sqsupe;"],[0,{v:"&sqcap;",n:65024,o:"&sqcaps;"}],[0,{v:"&sqcup;",n:65024,o:"&sqcups;"}],[0,"&CirclePlus;"],[0,"&CircleMinus;"],[0,"&CircleTimes;"],[0,"&osol;"],[0,"&CircleDot;"],[0,"&circledcirc;"],[0,"&circledast;"],[1,"&circleddash;"],[0,"&boxplus;"],[0,"&boxminus;"],[0,"&boxtimes;"],[0,"&dotsquare;"],[0,"&RightTee;"],[0,"&dashv;"],[0,"&DownTee;"],[0,"&bot;"],[1,"&models;"],[0,"&DoubleRightTee;"],[0,"&Vdash;"],[0,"&Vvdash;"],[0,"&VDash;"],[0,"&nvdash;"],[0,"&nvDash;"],[0,"&nVdash;"],[0,"&nVDash;"],[0,"&prurel;"],[1,"&LeftTriangle;"],[0,"&RightTriangle;"],[0,{v:"&LeftTriangleEqual;",n:8402,o:"&nvltrie;"}],[0,{v:"&RightTriangleEqual;",n:8402,o:"&nvrtrie;"}],[0,"&origof;"],[0,"&imof;"],[0,"&multimap;"],[0,"&hercon;"],[0,"&intcal;"],[0,"&veebar;"],[1,"&barvee;"],[0,"&angrtvb;"],[0,"&lrtri;"],[0,"&bigwedge;"],[0,"&bigvee;"],[0,"&bigcap;"],[0,"&bigcup;"],[0,"&diam;"],[0,"&sdot;"],[0,"&sstarf;"],[0,"&divideontimes;"],[0,"&bowtie;"],[0,"&ltimes;"],[0,"&rtimes;"],[0,"&leftthreetimes;"],[0,"&rightthreetimes;"],[0,"&backsimeq;"],[0,"&curlyvee;"],[0,"&curlywedge;"],[0,"&Sub;"],[0,"&Sup;"],[0,"&Cap;"],[0,"&Cup;"],[0,"&fork;"],[0,"&epar;"],[0,"&lessdot;"],[0,"&gtdot;"],[0,{v:"&Ll;",n:824,o:"&nLl;"}],[0,{v:"&Gg;",n:824,o:"&nGg;"}],[0,{v:"&leg;",n:65024,o:"&lesg;"}],[0,{v:"&gel;",n:65024,o:"&gesl;"}],[2,"&cuepr;"],[0,"&cuesc;"],[0,"&NotPrecedesSlantEqual;"],[0,"&NotSucceedsSlantEqual;"],[0,"&NotSquareSubsetEqual;"],[0,"&NotSquareSupersetEqual;"],[2,"&lnsim;"],[0,"&gnsim;"],[0,"&precnsim;"],[0,"&scnsim;"],[0,"&nltri;"],[0,"&NotRightTriangle;"],[0,"&nltrie;"],[0,"&NotRightTriangleEqual;"],[0,"&vellip;"],[0,"&ctdot;"],[0,"&utdot;"],[0,"&dtdot;"],[0,"&disin;"],[0,"&isinsv;"],[0,"&isins;"],[0,{v:"&isindot;",n:824,o:"&notindot;"}],[0,"&notinvc;"],[0,"&notinvb;"],[1,{v:"&isinE;",n:824,o:"&notinE;"}],[0,"&nisd;"],[0,"&xnis;"],[0,"&nis;"],[0,"&notnivc;"],[0,"&notnivb;"],[6,"&barwed;"],[0,"&Barwed;"],[1,"&lceil;"],[0,"&rceil;"],[0,"&LeftFloor;"],[0,"&rfloor;"],[0,"&drcrop;"],[0,"&dlcrop;"],[0,"&urcrop;"],[0,"&ulcrop;"],[0,"&bnot;"],[1,"&profline;"],[0,"&profsurf;"],[1,"&telrec;"],[0,"&target;"],[5,"&ulcorn;"],[0,"&urcorn;"],[0,"&dlcorn;"],[0,"&drcorn;"],[2,"&frown;"],[0,"&smile;"],[9,"&cylcty;"],[0,"&profalar;"],[7,"&topbot;"],[6,"&ovbar;"],[1,"&solbar;"],[60,"&angzarr;"],[51,"&lmoustache;"],[0,"&rmoustache;"],[2,"&OverBracket;"],[0,"&bbrk;"],[0,"&bbrktbrk;"],[37,"&OverParenthesis;"],[0,"&UnderParenthesis;"],[0,"&OverBrace;"],[0,"&UnderBrace;"],[2,"&trpezium;"],[4,"&elinters;"],[59,"&blank;"],[164,"&circledS;"],[55,"&boxh;"],[1,"&boxv;"],[9,"&boxdr;"],[3,"&boxdl;"],[3,"&boxur;"],[3,"&boxul;"],[3,"&boxvr;"],[7,"&boxvl;"],[7,"&boxhd;"],[7,"&boxhu;"],[7,"&boxvh;"],[19,"&boxH;"],[0,"&boxV;"],[0,"&boxdR;"],[0,"&boxDr;"],[0,"&boxDR;"],[0,"&boxdL;"],[0,"&boxDl;"],[0,"&boxDL;"],[0,"&boxuR;"],[0,"&boxUr;"],[0,"&boxUR;"],[0,"&boxuL;"],[0,"&boxUl;"],[0,"&boxUL;"],[0,"&boxvR;"],[0,"&boxVr;"],[0,"&boxVR;"],[0,"&boxvL;"],[0,"&boxVl;"],[0,"&boxVL;"],[0,"&boxHd;"],[0,"&boxhD;"],[0,"&boxHD;"],[0,"&boxHu;"],[0,"&boxhU;"],[0,"&boxHU;"],[0,"&boxvH;"],[0,"&boxVh;"],[0,"&boxVH;"],[19,"&uhblk;"],[3,"&lhblk;"],[3,"&block;"],[8,"&blk14;"],[0,"&blk12;"],[0,"&blk34;"],[13,"&square;"],[8,"&blacksquare;"],[0,"&EmptyVerySmallSquare;"],[1,"&rect;"],[0,"&marker;"],[2,"&fltns;"],[1,"&bigtriangleup;"],[0,"&blacktriangle;"],[0,"&triangle;"],[2,"&blacktriangleright;"],[0,"&rtri;"],[3,"&bigtriangledown;"],[0,"&blacktriangledown;"],[0,"&dtri;"],[2,"&blacktriangleleft;"],[0,"&ltri;"],[6,"&loz;"],[0,"&cir;"],[32,"&tridot;"],[2,"&bigcirc;"],[8,"&ultri;"],[0,"&urtri;"],[0,"&lltri;"],[0,"&EmptySmallSquare;"],[0,"&FilledSmallSquare;"],[8,"&bigstar;"],[0,"&star;"],[7,"&phone;"],[49,"&female;"],[1,"&male;"],[29,"&spades;"],[2,"&clubs;"],[1,"&hearts;"],[0,"&diamondsuit;"],[3,"&sung;"],[2,"&flat;"],[0,"&natural;"],[0,"&sharp;"],[163,"&check;"],[3,"&cross;"],[8,"&malt;"],[21,"&sext;"],[33,"&VerticalSeparator;"],[25,"&lbbrk;"],[0,"&rbbrk;"],[84,"&bsolhsub;"],[0,"&suphsol;"],[28,"&LeftDoubleBracket;"],[0,"&RightDoubleBracket;"],[0,"&lang;"],[0,"&rang;"],[0,"&Lang;"],[0,"&Rang;"],[0,"&loang;"],[0,"&roang;"],[7,"&longleftarrow;"],[0,"&longrightarrow;"],[0,"&longleftrightarrow;"],[0,"&DoubleLongLeftArrow;"],[0,"&DoubleLongRightArrow;"],[0,"&DoubleLongLeftRightArrow;"],[1,"&longmapsto;"],[2,"&dzigrarr;"],[258,"&nvlArr;"],[0,"&nvrArr;"],[0,"&nvHarr;"],[0,"&Map;"],[6,"&lbarr;"],[0,"&bkarow;"],[0,"&lBarr;"],[0,"&dbkarow;"],[0,"&drbkarow;"],[0,"&DDotrahd;"],[0,"&UpArrowBar;"],[0,"&DownArrowBar;"],[2,"&Rarrtl;"],[2,"&latail;"],[0,"&ratail;"],[0,"&lAtail;"],[0,"&rAtail;"],[0,"&larrfs;"],[0,"&rarrfs;"],[0,"&larrbfs;"],[0,"&rarrbfs;"],[2,"&nwarhk;"],[0,"&nearhk;"],[0,"&hksearow;"],[0,"&hkswarow;"],[0,"&nwnear;"],[0,"&nesear;"],[0,"&seswar;"],[0,"&swnwar;"],[8,{v:"&rarrc;",n:824,o:"&nrarrc;"}],[1,"&cudarrr;"],[0,"&ldca;"],[0,"&rdca;"],[0,"&cudarrl;"],[0,"&larrpl;"],[2,"&curarrm;"],[0,"&cularrp;"],[7,"&rarrpl;"],[2,"&harrcir;"],[0,"&Uarrocir;"],[0,"&lurdshar;"],[0,"&ldrushar;"],[2,"&LeftRightVector;"],[0,"&RightUpDownVector;"],[0,"&DownLeftRightVector;"],[0,"&LeftUpDownVector;"],[0,"&LeftVectorBar;"],[0,"&RightVectorBar;"],[0,"&RightUpVectorBar;"],[0,"&RightDownVectorBar;"],[0,"&DownLeftVectorBar;"],[0,"&DownRightVectorBar;"],[0,"&LeftUpVectorBar;"],[0,"&LeftDownVectorBar;"],[0,"&LeftTeeVector;"],[0,"&RightTeeVector;"],[0,"&RightUpTeeVector;"],[0,"&RightDownTeeVector;"],[0,"&DownLeftTeeVector;"],[0,"&DownRightTeeVector;"],[0,"&LeftUpTeeVector;"],[0,"&LeftDownTeeVector;"],[0,"&lHar;"],[0,"&uHar;"],[0,"&rHar;"],[0,"&dHar;"],[0,"&luruhar;"],[0,"&ldrdhar;"],[0,"&ruluhar;"],[0,"&rdldhar;"],[0,"&lharul;"],[0,"&llhard;"],[0,"&rharul;"],[0,"&lrhard;"],[0,"&udhar;"],[0,"&duhar;"],[0,"&RoundImplies;"],[0,"&erarr;"],[0,"&simrarr;"],[0,"&larrsim;"],[0,"&rarrsim;"],[0,"&rarrap;"],[0,"&ltlarr;"],[1,"&gtrarr;"],[0,"&subrarr;"],[1,"&suplarr;"],[0,"&lfisht;"],[0,"&rfisht;"],[0,"&ufisht;"],[0,"&dfisht;"],[5,"&lopar;"],[0,"&ropar;"],[4,"&lbrke;"],[0,"&rbrke;"],[0,"&lbrkslu;"],[0,"&rbrksld;"],[0,"&lbrksld;"],[0,"&rbrkslu;"],[0,"&langd;"],[0,"&rangd;"],[0,"&lparlt;"],[0,"&rpargt;"],[0,"&gtlPar;"],[0,"&ltrPar;"],[3,"&vzigzag;"],[1,"&vangrt;"],[0,"&angrtvbd;"],[6,"&ange;"],[0,"&range;"],[0,"&dwangle;"],[0,"&uwangle;"],[0,"&angmsdaa;"],[0,"&angmsdab;"],[0,"&angmsdac;"],[0,"&angmsdad;"],[0,"&angmsdae;"],[0,"&angmsdaf;"],[0,"&angmsdag;"],[0,"&angmsdah;"],[0,"&bemptyv;"],[0,"&demptyv;"],[0,"&cemptyv;"],[0,"&raemptyv;"],[0,"&laemptyv;"],[0,"&ohbar;"],[0,"&omid;"],[0,"&opar;"],[1,"&operp;"],[1,"&olcross;"],[0,"&odsold;"],[1,"&olcir;"],[0,"&ofcir;"],[0,"&olt;"],[0,"&ogt;"],[0,"&cirscir;"],[0,"&cirE;"],[0,"&solb;"],[0,"&bsolb;"],[3,"&boxbox;"],[3,"&trisb;"],[0,"&rtriltri;"],[0,{v:"&LeftTriangleBar;",n:824,o:"&NotLeftTriangleBar;"}],[0,{v:"&RightTriangleBar;",n:824,o:"&NotRightTriangleBar;"}],[11,"&iinfin;"],[0,"&infintie;"],[0,"&nvinfin;"],[4,"&eparsl;"],[0,"&smeparsl;"],[0,"&eqvparsl;"],[5,"&blacklozenge;"],[8,"&RuleDelayed;"],[1,"&dsol;"],[9,"&bigodot;"],[0,"&bigoplus;"],[0,"&bigotimes;"],[1,"&biguplus;"],[1,"&bigsqcup;"],[5,"&iiiint;"],[0,"&fpartint;"],[2,"&cirfnint;"],[0,"&awint;"],[0,"&rppolint;"],[0,"&scpolint;"],[0,"&npolint;"],[0,"&pointint;"],[0,"&quatint;"],[0,"&intlarhk;"],[10,"&pluscir;"],[0,"&plusacir;"],[0,"&simplus;"],[0,"&plusdu;"],[0,"&plussim;"],[0,"&plustwo;"],[1,"&mcomma;"],[0,"&minusdu;"],[2,"&loplus;"],[0,"&roplus;"],[0,"&Cross;"],[0,"&timesd;"],[0,"&timesbar;"],[1,"&smashp;"],[0,"&lotimes;"],[0,"&rotimes;"],[0,"&otimesas;"],[0,"&Otimes;"],[0,"&odiv;"],[0,"&triplus;"],[0,"&triminus;"],[0,"&tritime;"],[0,"&intprod;"],[2,"&amalg;"],[0,"&capdot;"],[1,"&ncup;"],[0,"&ncap;"],[0,"&capand;"],[0,"&cupor;"],[0,"&cupcap;"],[0,"&capcup;"],[0,"&cupbrcap;"],[0,"&capbrcup;"],[0,"&cupcup;"],[0,"&capcap;"],[0,"&ccups;"],[0,"&ccaps;"],[2,"&ccupssm;"],[2,"&And;"],[0,"&Or;"],[0,"&andand;"],[0,"&oror;"],[0,"&orslope;"],[0,"&andslope;"],[1,"&andv;"],[0,"&orv;"],[0,"&andd;"],[0,"&ord;"],[1,"&wedbar;"],[6,"&sdote;"],[3,"&simdot;"],[2,{v:"&congdot;",n:824,o:"&ncongdot;"}],[0,"&easter;"],[0,"&apacir;"],[0,{v:"&apE;",n:824,o:"&napE;"}],[0,"&eplus;"],[0,"&pluse;"],[0,"&Esim;"],[0,"&Colone;"],[0,"&Equal;"],[1,"&ddotseq;"],[0,"&equivDD;"],[0,"&ltcir;"],[0,"&gtcir;"],[0,"&ltquest;"],[0,"&gtquest;"],[0,{v:"&leqslant;",n:824,o:"&nleqslant;"}],[0,{v:"&geqslant;",n:824,o:"&ngeqslant;"}],[0,"&lesdot;"],[0,"&gesdot;"],[0,"&lesdoto;"],[0,"&gesdoto;"],[0,"&lesdotor;"],[0,"&gesdotol;"],[0,"&lap;"],[0,"&gap;"],[0,"&lne;"],[0,"&gne;"],[0,"&lnap;"],[0,"&gnap;"],[0,"&lEg;"],[0,"&gEl;"],[0,"&lsime;"],[0,"&gsime;"],[0,"&lsimg;"],[0,"&gsiml;"],[0,"&lgE;"],[0,"&glE;"],[0,"&lesges;"],[0,"&gesles;"],[0,"&els;"],[0,"&egs;"],[0,"&elsdot;"],[0,"&egsdot;"],[0,"&el;"],[0,"&eg;"],[2,"&siml;"],[0,"&simg;"],[0,"&simlE;"],[0,"&simgE;"],[0,{v:"&LessLess;",n:824,o:"&NotNestedLessLess;"}],[0,{v:"&GreaterGreater;",n:824,o:"&NotNestedGreaterGreater;"}],[1,"&glj;"],[0,"&gla;"],[0,"&ltcc;"],[0,"&gtcc;"],[0,"&lescc;"],[0,"&gescc;"],[0,"&smt;"],[0,"&lat;"],[0,{v:"&smte;",n:65024,o:"&smtes;"}],[0,{v:"&late;",n:65024,o:"&lates;"}],[0,"&bumpE;"],[0,{v:"&PrecedesEqual;",n:824,o:"&NotPrecedesEqual;"}],[0,{v:"&sce;",n:824,o:"&NotSucceedsEqual;"}],[2,"&prE;"],[0,"&scE;"],[0,"&precneqq;"],[0,"&scnE;"],[0,"&prap;"],[0,"&scap;"],[0,"&precnapprox;"],[0,"&scnap;"],[0,"&Pr;"],[0,"&Sc;"],[0,"&subdot;"],[0,"&supdot;"],[0,"&subplus;"],[0,"&supplus;"],[0,"&submult;"],[0,"&supmult;"],[0,"&subedot;"],[0,"&supedot;"],[0,{v:"&subE;",n:824,o:"&nsubE;"}],[0,{v:"&supE;",n:824,o:"&nsupE;"}],[0,"&subsim;"],[0,"&supsim;"],[2,{v:"&subnE;",n:65024,o:"&varsubsetneqq;"}],[0,{v:"&supnE;",n:65024,o:"&varsupsetneqq;"}],[2,"&csub;"],[0,"&csup;"],[0,"&csube;"],[0,"&csupe;"],[0,"&subsup;"],[0,"&supsub;"],[0,"&subsub;"],[0,"&supsup;"],[0,"&suphsub;"],[0,"&supdsub;"],[0,"&forkv;"],[0,"&topfork;"],[0,"&mlcp;"],[8,"&Dashv;"],[1,"&Vdashl;"],[0,"&Barv;"],[0,"&vBar;"],[0,"&vBarv;"],[1,"&Vbar;"],[0,"&Not;"],[0,"&bNot;"],[0,"&rnmid;"],[0,"&cirmid;"],[0,"&midcir;"],[0,"&topcir;"],[0,"&nhpar;"],[0,"&parsim;"],[9,{v:"&parsl;",n:8421,o:"&nparsl;"}],[44343,{n:new Map(br([[56476,"&Ascr;"],[1,"&Cscr;"],[0,"&Dscr;"],[2,"&Gscr;"],[2,"&Jscr;"],[0,"&Kscr;"],[2,"&Nscr;"],[0,"&Oscr;"],[0,"&Pscr;"],[0,"&Qscr;"],[1,"&Sscr;"],[0,"&Tscr;"],[0,"&Uscr;"],[0,"&Vscr;"],[0,"&Wscr;"],[0,"&Xscr;"],[0,"&Yscr;"],[0,"&Zscr;"],[0,"&ascr;"],[0,"&bscr;"],[0,"&cscr;"],[0,"&dscr;"],[1,"&fscr;"],[1,"&hscr;"],[0,"&iscr;"],[0,"&jscr;"],[0,"&kscr;"],[0,"&lscr;"],[0,"&mscr;"],[0,"&nscr;"],[1,"&pscr;"],[0,"&qscr;"],[0,"&rscr;"],[0,"&sscr;"],[0,"&tscr;"],[0,"&uscr;"],[0,"&vscr;"],[0,"&wscr;"],[0,"&xscr;"],[0,"&yscr;"],[0,"&zscr;"],[52,"&Afr;"],[0,"&Bfr;"],[1,"&Dfr;"],[0,"&Efr;"],[0,"&Ffr;"],[0,"&Gfr;"],[2,"&Jfr;"],[0,"&Kfr;"],[0,"&Lfr;"],[0,"&Mfr;"],[0,"&Nfr;"],[0,"&Ofr;"],[0,"&Pfr;"],[0,"&Qfr;"],[1,"&Sfr;"],[0,"&Tfr;"],[0,"&Ufr;"],[0,"&Vfr;"],[0,"&Wfr;"],[0,"&Xfr;"],[0,"&Yfr;"],[1,"&afr;"],[0,"&bfr;"],[0,"&cfr;"],[0,"&dfr;"],[0,"&efr;"],[0,"&ffr;"],[0,"&gfr;"],[0,"&hfr;"],[0,"&ifr;"],[0,"&jfr;"],[0,"&kfr;"],[0,"&lfr;"],[0,"&mfr;"],[0,"&nfr;"],[0,"&ofr;"],[0,"&pfr;"],[0,"&qfr;"],[0,"&rfr;"],[0,"&sfr;"],[0,"&tfr;"],[0,"&ufr;"],[0,"&vfr;"],[0,"&wfr;"],[0,"&xfr;"],[0,"&yfr;"],[0,"&zfr;"],[0,"&Aopf;"],[0,"&Bopf;"],[1,"&Dopf;"],[0,"&Eopf;"],[0,"&Fopf;"],[0,"&Gopf;"],[1,"&Iopf;"],[0,"&Jopf;"],[0,"&Kopf;"],[0,"&Lopf;"],[0,"&Mopf;"],[1,"&Oopf;"],[3,"&Sopf;"],[0,"&Topf;"],[0,"&Uopf;"],[0,"&Vopf;"],[0,"&Wopf;"],[0,"&Xopf;"],[0,"&Yopf;"],[1,"&aopf;"],[0,"&bopf;"],[0,"&copf;"],[0,"&dopf;"],[0,"&eopf;"],[0,"&fopf;"],[0,"&gopf;"],[0,"&hopf;"],[0,"&iopf;"],[0,"&jopf;"],[0,"&kopf;"],[0,"&lopf;"],[0,"&mopf;"],[0,"&nopf;"],[0,"&oopf;"],[0,"&popf;"],[0,"&qopf;"],[0,"&ropf;"],[0,"&sopf;"],[0,"&topf;"],[0,"&uopf;"],[0,"&vopf;"],[0,"&wopf;"],[0,"&xopf;"],[0,"&yopf;"],[0,"&zopf;"]]))}],[8906,"&fflig;"],[0,"&filig;"],[0,"&fllig;"],[0,"&ffilig;"],[0,"&ffllig;"]]))});var yr=m(U=>{"use strict";Object.defineProperty(U,"__esModule",{value:!0});U.escapeText=U.escapeAttribute=U.escapeUTF8=U.escape=U.encodeXML=U.getCodePoint=U.xmlReplacer=void 0;U.xmlReplacer=/["&'<>$\x80-\uFFFF]/g;var _s=new Map([[34,"&quot;"],[38,"&amp;"],[39,"&apos;"],[60,"&lt;"],[62,"&gt;"]]);U.getCodePoint=String.prototype.codePointAt!=null?function(t,e){return t.codePointAt(e)}:function(t,e){return(t.charCodeAt(e)&64512)===55296?(t.charCodeAt(e)-55296)*1024+t.charCodeAt(e+1)-56320+65536:t.charCodeAt(e)};function xs(t){for(var e="",r=0,u;(u=U.xmlReplacer.exec(t))!==null;){var n=u.index,i=t.charCodeAt(n),s=_s.get(i);s!==void 0?(e+=t.substring(r,n)+s,r=n+1):(e+="".concat(t.substring(r,n),"&#x").concat((0,U.getCodePoint)(t,n).toString(16),";"),r=U.xmlReplacer.lastIndex+=+((i&64512)===55296))}return e+t.substr(r)}U.encodeXML=xs;U.escape=xs;function nn(t,e){return function(u){for(var n,i=0,s="";n=t.exec(u);)i!==n.index&&(s+=u.substring(i,n.index)),s+=e.get(n[0].charCodeAt(0)),i=n.index+1;return s+u.substring(i)}}U.escapeUTF8=nn(/[&<>'"]/g,_s);U.escapeAttribute=nn(/["&\u00A0]/g,new Map([[34,"&quot;"],[38,"&amp;"],[160,"&nbsp;"]]));U.escapeText=nn(/[&<>\u00A0]/g,new Map([[38,"&amp;"],[60,"&lt;"],[62,"&gt;"],[160,"&nbsp;"]]))});var sn=m(Pe=>{"use strict";var hf=Pe&&Pe.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(Pe,"__esModule",{value:!0});Pe.encodeNonAsciiHTML=Pe.encodeHTML=void 0;var gf=hf(ys()),vs=yr(),mf=/[\t\n!-,./:-@[-`\f{-}$\x80-\uFFFF]/g;function bf(t){return Es(mf,t)}Pe.encodeHTML=bf;function yf(t){return Es(vs.xmlReplacer,t)}Pe.encodeNonAsciiHTML=yf;function Es(t,e){for(var r="",u=0,n;(n=t.exec(e))!==null;){var i=n.index;r+=e.substring(u,i);var s=e.charCodeAt(i),a=gf.default.get(s);if(typeof a=="object"){if(i+1<e.length){var o=e.charCodeAt(i+1),c=typeof a.n=="number"?a.n===o?a.o:void 0:a.n.get(o);if(c!==void 0){r+=c,u=t.lastIndex+=1;continue}}a=a.v}if(a!==void 0)r+=a,u=i+1;else{var f=(0,vs.getCodePoint)(e,i);r+="&#x".concat(f.toString(16),";"),u=t.lastIndex+=+(f!==s)}}return r+e.substr(u)}});var Ds=m(T=>{"use strict";Object.defineProperty(T,"__esModule",{value:!0});T.decodeXMLStrict=T.decodeHTML5Strict=T.decodeHTML4Strict=T.decodeHTML5=T.decodeHTML4=T.decodeHTMLAttribute=T.decodeHTMLStrict=T.decodeHTML=T.decodeXML=T.DecodingMode=T.EntityDecoder=T.encodeHTML5=T.encodeHTML4=T.encodeNonAsciiHTML=T.encodeHTML=T.escapeText=T.escapeAttribute=T.escapeUTF8=T.escape=T.encodeXML=T.encode=T.decodeStrict=T.decode=T.EncodingMode=T.EntityLevel=void 0;var an=rn(),ws=sn(),_r=yr(),ct;(function(t){t[t.XML=0]="XML",t[t.HTML=1]="HTML"})(ct=T.EntityLevel||(T.EntityLevel={}));var Rt;(function(t){t[t.UTF8=0]="UTF8",t[t.ASCII=1]="ASCII",t[t.Extensive=2]="Extensive",t[t.Attribute=3]="Attribute",t[t.Text=4]="Text"})(Rt=T.EncodingMode||(T.EncodingMode={}));function ks(t,e){e===void 0&&(e=ct.XML);var r=typeof e=="number"?e:e.level;if(r===ct.HTML){var u=typeof e=="object"?e.mode:void 0;return(0,an.decodeHTML)(t,u)}return(0,an.decodeXML)(t)}T.decode=ks;function _f(t,e){var r;e===void 0&&(e=ct.XML);var u=typeof e=="number"?{level:e}:e;return(r=u.mode)!==null&&r!==void 0||(u.mode=an.DecodingMode.Strict),ks(t,u)}T.decodeStrict=_f;function xf(t,e){e===void 0&&(e=ct.XML);var r=typeof e=="number"?{level:e}:e;return r.mode===Rt.UTF8?(0,_r.escapeUTF8)(t):r.mode===Rt.Attribute?(0,_r.escapeAttribute)(t):r.mode===Rt.Text?(0,_r.escapeText)(t):r.level===ct.HTML?r.mode===Rt.ASCII?(0,ws.encodeNonAsciiHTML)(t):(0,ws.encodeHTML)(t):(0,_r.encodeXML)(t)}T.encode=xf;var Pt=yr();Object.defineProperty(T,"encodeXML",{enumerable:!0,get:function(){return Pt.encodeXML}});Object.defineProperty(T,"escape",{enumerable:!0,get:function(){return Pt.escape}});Object.defineProperty(T,"escapeUTF8",{enumerable:!0,get:function(){return Pt.escapeUTF8}});Object.defineProperty(T,"escapeAttribute",{enumerable:!0,get:function(){return Pt.escapeAttribute}});Object.defineProperty(T,"escapeText",{enumerable:!0,get:function(){return Pt.escapeText}});var xr=sn();Object.defineProperty(T,"encodeHTML",{enumerable:!0,get:function(){return xr.encodeHTML}});Object.defineProperty(T,"encodeNonAsciiHTML",{enumerable:!0,get:function(){return xr.encodeNonAsciiHTML}});Object.defineProperty(T,"encodeHTML4",{enumerable:!0,get:function(){return xr.encodeHTML}});Object.defineProperty(T,"encodeHTML5",{enumerable:!0,get:function(){return xr.encodeHTML}});var fe=rn();Object.defineProperty(T,"EntityDecoder",{enumerable:!0,get:function(){return fe.EntityDecoder}});Object.defineProperty(T,"DecodingMode",{enumerable:!0,get:function(){return fe.DecodingMode}});Object.defineProperty(T,"decodeXML",{enumerable:!0,get:function(){return fe.decodeXML}});Object.defineProperty(T,"decodeHTML",{enumerable:!0,get:function(){return fe.decodeHTML}});Object.defineProperty(T,"decodeHTMLStrict",{enumerable:!0,get:function(){return fe.decodeHTMLStrict}});Object.defineProperty(T,"decodeHTMLAttribute",{enumerable:!0,get:function(){return fe.decodeHTMLAttribute}});Object.defineProperty(T,"decodeHTML4",{enumerable:!0,get:function(){return fe.decodeHTML}});Object.defineProperty(T,"decodeHTML5",{enumerable:!0,get:function(){return fe.decodeHTML}});Object.defineProperty(T,"decodeHTML4Strict",{enumerable:!0,get:function(){return fe.decodeHTMLStrict}});Object.defineProperty(T,"decodeHTML5Strict",{enumerable:!0,get:function(){return fe.decodeHTMLStrict}});Object.defineProperty(T,"decodeXMLStrict",{enumerable:!0,get:function(){return fe.decodeXML}})});var Ms=m((J2,As)=>{"use strict";var vr=Ku();function vf(t){let e={};t=t||{},e.src_Any=vr.Any.source,e.src_Cc=vr.Cc.source,e.src_Z=vr.Z.source,e.src_P=vr.P.source,e.src_ZPCc=[e.src_Z,e.src_P,e.src_Cc].join("|"),e.src_ZCc=[e.src_Z,e.src_Cc].join("|");let r="[><\uFF5C]";return e.src_pseudo_letter="(?:(?!"+r+"|"+e.src_ZPCc+")"+e.src_Any+")",e.src_ip4="(?:(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)",e.src_auth="(?:(?:(?!"+e.src_ZCc+"|[@/\\[\\]()]).)+@)?",e.src_port="(?::(?:6(?:[0-4]\\d{3}|5(?:[0-4]\\d{2}|5(?:[0-2]\\d|3[0-5])))|[1-5]?\\d{1,4}))?",e.src_host_terminator="(?=$|"+r+"|"+e.src_ZPCc+")(?!"+(t["---"]?"-(?!--)|":"-|")+"_|:\\d|\\.-|\\.(?!$|"+e.src_ZPCc+"))",e.src_path="(?:[/?#](?:(?!"+e.src_ZCc+"|"+r+`|[()[\\]{}.,"'?!\\-;]).|\\[(?:(?!`+e.src_ZCc+"|\\]).)*\\]|\\((?:(?!"+e.src_ZCc+"|[)]).)*\\)|\\{(?:(?!"+e.src_ZCc+'|[}]).)*\\}|\\"(?:(?!'+e.src_ZCc+`|["]).)+\\"|\\'(?:(?!`+e.src_ZCc+"|[']).)+\\'|\\'(?="+e.src_pseudo_letter+"|[-])|\\.{2,}[a-zA-Z0-9%/&]|\\.(?!"+e.src_ZCc+"|[.]|$)|"+(t["---"]?"\\-(?!--(?:[^-]|$))(?:-*)|":"\\-+|")+",(?!"+e.src_ZCc+"|$)|;(?!"+e.src_ZCc+"|$)|\\!+(?!"+e.src_ZCc+"|[!]|$)|\\?(?!"+e.src_ZCc+"|[?]|$))+|\\/)?",e.src_email_name='[\\-;:&=\\+\\$,\\.a-zA-Z0-9_][\\-;:&=\\+\\$,\\"\\.a-zA-Z0-9_]*',e.src_xn="xn--[a-z0-9\\-]{1,59}",e.src_domain_root="(?:"+e.src_xn+"|"+e.src_pseudo_letter+"{1,63})",e.src_domain="(?:"+e.src_xn+"|(?:"+e.src_pseudo_letter+")|(?:"+e.src_pseudo_letter+"(?:-|"+e.src_pseudo_letter+"){0,61}"+e.src_pseudo_letter+"))",e.src_host="(?:(?:(?:(?:"+e.src_domain+")\\.)*"+e.src_domain+"))",e.tpl_host_fuzzy="(?:"+e.src_ip4+"|(?:(?:(?:"+e.src_domain+")\\.)+(?:%TLDS%)))",e.tpl_host_no_ip_fuzzy="(?:(?:(?:"+e.src_domain+")\\.)+(?:%TLDS%))",e.src_host_strict=e.src_host+e.src_host_terminator,e.tpl_host_fuzzy_strict=e.tpl_host_fuzzy+e.src_host_terminator,e.src_host_port_strict=e.src_host+e.src_port+e.src_host_terminator,e.tpl_host_port_fuzzy_strict=e.tpl_host_fuzzy+e.src_port+e.src_host_terminator,e.tpl_host_port_no_ip_fuzzy_strict=e.tpl_host_no_ip_fuzzy+e.src_port+e.src_host_terminator,e.tpl_host_fuzzy_test="localhost|www\\.|\\.\\d{1,3}\\.|(?:\\.(?:%TLDS%)(?:"+e.src_ZPCc+"|>|$))",e.tpl_email_fuzzy="(^|"+r+'|"|\\(|'+e.src_ZCc+")("+e.src_email_name+"@"+e.tpl_host_fuzzy_strict+")",e.tpl_link_fuzzy="(^|(?![.:/\\-_@])(?:[$+<=>^`|\uFF5C]|"+e.src_ZPCc+"))((?![$+<=>^`|\uFF5C])"+e.tpl_host_port_fuzzy_strict+e.src_path+")",e.tpl_link_no_ip_fuzzy="(^|(?![.:/\\-_@])(?:[$+<=>^`|\uFF5C]|"+e.src_ZPCc+"))((?![$+<=>^`|\uFF5C])"+e.tpl_host_port_no_ip_fuzzy_strict+e.src_path+")",e}function on(t){return Array.prototype.slice.call(arguments,1).forEach(function(r){r&&Object.keys(r).forEach(function(u){t[u]=r[u]})}),t}function wr(t){return Object.prototype.toString.call(t)}function Ef(t){return wr(t)==="[object String]"}function wf(t){return wr(t)==="[object Object]"}function kf(t){return wr(t)==="[object RegExp]"}function Ts(t){return wr(t)==="[object Function]"}function Df(t){return t.replace(/[.?*+^$[\]\\(){}|-]/g,"\\$&")}var Cs={fuzzyLink:!0,fuzzyEmail:!0,fuzzyIP:!1};function Tf(t){return Object.keys(t||{}).reduce(function(e,r){return e||Cs.hasOwnProperty(r)},!1)}var Sf={"http:":{validate:function(t,e,r){let u=t.slice(e);return r.re.http||(r.re.http=new RegExp("^\\/\\/"+r.re.src_auth+r.re.src_host_port_strict+r.re.src_path,"i")),r.re.http.test(u)?u.match(r.re.http)[0].length:0}},"https:":"http:","ftp:":"http:","//":{validate:function(t,e,r){let u=t.slice(e);return r.re.no_http||(r.re.no_http=new RegExp("^"+r.re.src_auth+"(?:localhost|(?:(?:"+r.re.src_domain+")\\.)+"+r.re.src_domain_root+")"+r.re.src_port+r.re.src_host_terminator+r.re.src_path,"i")),r.re.no_http.test(u)?e>=3&&t[e-3]===":"||e>=3&&t[e-3]==="/"?0:u.match(r.re.no_http)[0].length:0}},"mailto:":{validate:function(t,e,r){let u=t.slice(e);return r.re.mailto||(r.re.mailto=new RegExp("^"+r.re.src_email_name+"@"+r.re.src_host_strict,"i")),r.re.mailto.test(u)?u.match(r.re.mailto)[0].length:0}}},Cf="a[cdefgilmnoqrstuwxz]|b[abdefghijmnorstvwyz]|c[acdfghiklmnoruvwxyz]|d[ejkmoz]|e[cegrstu]|f[ijkmor]|g[abdefghilmnpqrstuwy]|h[kmnrtu]|i[delmnoqrst]|j[emop]|k[eghimnprwyz]|l[abcikrstuvy]|m[acdeghklmnopqrstuvwxyz]|n[acefgilopruz]|om|p[aefghklmnrstwy]|qa|r[eosuw]|s[abcdeghijklmnortuvxyz]|t[cdfghjklmnortvwz]|u[agksyz]|v[aceginu]|w[fs]|y[et]|z[amw]",Af="biz|com|edu|gov|net|org|pro|web|xxx|aero|asia|coop|info|museum|name|shop|\u0440\u0444".split("|");function Mf(t){t.__index__=-1,t.__text_cache__=""}function Rf(t){return function(e,r){let u=e.slice(r);return t.test(u)?u.match(t)[0].length:0}}function Ss(){return function(t,e){e.normalize(t)}}function Er(t){let e=t.re=vf(t.__opts__),r=t.__tlds__.slice();t.onCompile(),t.__tlds_replaced__||r.push(Cf),r.push(e.src_xn),e.src_tlds=r.join("|");function u(a){return a.replace("%TLDS%",e.src_tlds)}e.email_fuzzy=RegExp(u(e.tpl_email_fuzzy),"i"),e.link_fuzzy=RegExp(u(e.tpl_link_fuzzy),"i"),e.link_no_ip_fuzzy=RegExp(u(e.tpl_link_no_ip_fuzzy),"i"),e.host_fuzzy_test=RegExp(u(e.tpl_host_fuzzy_test),"i");let n=[];t.__compiled__={};function i(a,o){throw new Error('(LinkifyIt) Invalid schema "'+a+'": '+o)}Object.keys(t.__schemas__).forEach(function(a){let o=t.__schemas__[a];if(o===null)return;let c={validate:null,link:null};if(t.__compiled__[a]=c,wf(o)){kf(o.validate)?c.validate=Rf(o.validate):Ts(o.validate)?c.validate=o.validate:i(a,o),Ts(o.normalize)?c.normalize=o.normalize:o.normalize?i(a,o):c.normalize=Ss();return}if(Ef(o)){n.push(a);return}i(a,o)}),n.forEach(function(a){t.__compiled__[t.__schemas__[a]]&&(t.__compiled__[a].validate=t.__compiled__[t.__schemas__[a]].validate,t.__compiled__[a].normalize=t.__compiled__[t.__schemas__[a]].normalize)}),t.__compiled__[""]={validate:null,normalize:Ss()};let s=Object.keys(t.__compiled__).filter(function(a){return a.length>0&&t.__compiled__[a]}).map(Df).join("|");t.re.schema_test=RegExp("(^|(?!_)(?:[><\uFF5C]|"+e.src_ZPCc+"))("+s+")","i"),t.re.schema_search=RegExp("(^|(?!_)(?:[><\uFF5C]|"+e.src_ZPCc+"))("+s+")","ig"),t.re.schema_at_start=RegExp("^"+t.re.schema_search.source,"i"),t.re.pretest=RegExp("("+t.re.schema_test.source+")|("+t.re.host_fuzzy_test.source+")|@","i"),Mf(t)}function Pf(t,e){let r=t.__index__,u=t.__last_index__,n=t.__text_cache__.slice(r,u);this.schema=t.__schema__.toLowerCase(),this.index=r+e,this.lastIndex=u+e,this.raw=n,this.text=n,this.url=n}function cn(t,e){let r=new Pf(t,e);return t.__compiled__[r.schema].normalize(r,t),r}function ie(t,e){if(!(this instanceof ie))return new ie(t,e);e||Tf(t)&&(e=t,t={}),this.__opts__=on({},Cs,e),this.__index__=-1,this.__last_index__=-1,this.__schema__="",this.__text_cache__="",this.__schemas__=on({},Sf,t),this.__compiled__={},this.__tlds__=Af,this.__tlds_replaced__=!1,this.re={},Er(this)}ie.prototype.add=function(e,r){return this.__schemas__[e]=r,Er(this),this};ie.prototype.set=function(e){return this.__opts__=on(this.__opts__,e),this};ie.prototype.test=function(e){if(this.__text_cache__=e,this.__index__=-1,!e.length)return!1;let r,u,n,i,s,a,o,c,f;if(this.re.schema_test.test(e)){for(o=this.re.schema_search,o.lastIndex=0;(r=o.exec(e))!==null;)if(i=this.testSchemaAt(e,r[2],o.lastIndex),i){this.__schema__=r[2],this.__index__=r.index+r[1].length,this.__last_index__=r.index+r[0].length+i;break}}return this.__opts__.fuzzyLink&&this.__compiled__["http:"]&&(c=e.search(this.re.host_fuzzy_test),c>=0&&(this.__index__<0||c<this.__index__)&&(u=e.match(this.__opts__.fuzzyIP?this.re.link_fuzzy:this.re.link_no_ip_fuzzy))!==null&&(s=u.index+u[1].length,(this.__index__<0||s<this.__index__)&&(this.__schema__="",this.__index__=s,this.__last_index__=u.index+u[0].length))),this.__opts__.fuzzyEmail&&this.__compiled__["mailto:"]&&(f=e.indexOf("@"),f>=0&&(n=e.match(this.re.email_fuzzy))!==null&&(s=n.index+n[1].length,a=n.index+n[0].length,(this.__index__<0||s<this.__index__||s===this.__index__&&a>this.__last_index__)&&(this.__schema__="mailto:",this.__index__=s,this.__last_index__=a))),this.__index__>=0};ie.prototype.pretest=function(e){return this.re.pretest.test(e)};ie.prototype.testSchemaAt=function(e,r,u){return this.__compiled__[r.toLowerCase()]?this.__compiled__[r.toLowerCase()].validate(e,u,this):0};ie.prototype.match=function(e){let r=[],u=0;this.__index__>=0&&this.__text_cache__===e&&(r.push(cn(this,u)),u=this.__last_index__);let n=u?e.slice(u):e;for(;this.test(n);)r.push(cn(this,u)),n=n.slice(this.__last_index__),u+=this.__last_index__;return r.length?r:null};ie.prototype.matchAtStart=function(e){if(this.__text_cache__=e,this.__index__=-1,!e.length)return null;let r=this.re.schema_at_start.exec(e);if(!r)return null;let u=this.testSchemaAt(e,r[2],r[0].length);return u?(this.__schema__=r[2],this.__index__=r.index+r[1].length,this.__last_index__=r.index+r[0].length+u,cn(this,0)):null};ie.prototype.tlds=function(e,r){return e=Array.isArray(e)?e:[e],r?(this.__tlds__=this.__tlds__.concat(e).sort().filter(function(u,n,i){return u!==i[n-1]}).reverse(),Er(this),this):(this.__tlds__=e.slice(),this.__tlds_replaced__=!0,Er(this),this)};ie.prototype.normalize=function(e){e.schema||(e.url="http://"+e.url),e.schema==="mailto:"&&!/^mailto:/i.test(e.url)&&(e.url="mailto:"+e.url)};ie.prototype.onCompile=function(){};As.exports=ie});var js=m((X2,Ns)=>{"use strict";var Ps="-",Ff=/^xn--/,Of=/[^\0-\x7F]/,qf=/[\x2E\u3002\uFF0E\uFF61]/g,Lf={overflow:"Overflow: input needs wider integers to process","not-basic":"Illegal input >= 0x80 (not a basic code point)","invalid-input":"Invalid input"},ln=35,be=Math.floor,fn=String.fromCharCode;function Fe(t){throw new RangeError(Lf[t])}function If(t,e){let r=[],u=t.length;for(;u--;)r[u]=e(t[u]);return r}function Fs(t,e){let r=t.split("@"),u="";r.length>1&&(u=r[0]+"@",t=r[1]),t=t.replace(qf,".");let n=t.split("."),i=If(n,e).join(".");return u+i}function Os(t){let e=[],r=0,u=t.length;for(;r<u;){let n=t.charCodeAt(r++);if(n>=55296&&n<=56319&&r<u){let i=t.charCodeAt(r++);(i&64512)==56320?e.push(((n&1023)<<10)+(i&1023)+65536):(e.push(n),r--)}else e.push(n)}return e}var Nf=t=>String.fromCodePoint(...t),jf=function(t){return t>=48&&t<58?26+(t-48):t>=65&&t<91?t-65:t>=97&&t<123?t-97:36},Rs=function(t,e){return t+22+75*(t<26)-((e!=0)<<5)},qs=function(t,e,r){let u=0;for(t=r?be(t/700):t>>1,t+=be(t/e);t>ln*26>>1;u+=36)t=be(t/ln);return be(u+(ln+1)*t/(t+38))},Ls=function(t){let e=[],r=t.length,u=0,n=128,i=72,s=t.lastIndexOf(Ps);s<0&&(s=0);for(let a=0;a<s;++a)t.charCodeAt(a)>=128&&Fe("not-basic"),e.push(t.charCodeAt(a));for(let a=s>0?s+1:0;a<r;){let o=u;for(let f=1,d=36;;d+=36){a>=r&&Fe("invalid-input");let p=jf(t.charCodeAt(a++));p>=36&&Fe("invalid-input"),p>be((2147483647-u)/f)&&Fe("overflow"),u+=p*f;let h=d<=i?1:d>=i+26?26:d-i;if(p<h)break;let l=36-h;f>be(2147483647/l)&&Fe("overflow"),f*=l}let c=e.length+1;i=qs(u-o,c,o==0),be(u/c)>2147483647-n&&Fe("overflow"),n+=be(u/c),u%=c,e.splice(u++,0,n)}return String.fromCodePoint(...e)},Is=function(t){let e=[];t=Os(t);let r=t.length,u=128,n=0,i=72;for(let o of t)o<128&&e.push(fn(o));let s=e.length,a=s;for(s&&e.push(Ps);a<r;){let o=2147483647;for(let f of t)f>=u&&f<o&&(o=f);let c=a+1;o-u>be((2147483647-n)/c)&&Fe("overflow"),n+=(o-u)*c,u=o;for(let f of t)if(f<u&&++n>2147483647&&Fe("overflow"),f===u){let d=n;for(let p=36;;p+=36){let h=p<=i?1:p>=i+26?26:p-i;if(d<h)break;let l=d-h,g=36-h;e.push(fn(Rs(h+l%g,0))),d=be(l/g)}e.push(fn(Rs(d,0))),i=qs(n,c,a===s),n=0,++a}++n,++u}return e.join("")},$f=function(t){return Fs(t,function(e){return Ff.test(e)?Ls(e.slice(4).toLowerCase()):e})},Bf=function(t){return Fs(t,function(e){return Of.test(e)?"xn--"+Is(e):e})},zf={version:"2.3.1",ucs2:{decode:Os,encode:Nf},decode:Ls,encode:Is,toASCII:Bf,toUnicode:$f};Ns.exports=zf});var aa=m((Q2,sa)=>{"use strict";var Hf=as(),Uf=Ku(),Ks=Ds(),Vf=Ms(),Ys=js();function Zs(t){var e=Object.create(null);return t&&Object.keys(t).forEach(function(r){if(r!=="default"){var u=Object.getOwnPropertyDescriptor(t,r);Object.defineProperty(e,r,u.get?u:{enumerable:!0,get:function(){return t[r]}})}}),e.default=t,Object.freeze(e)}var Oe=Zs(Hf),mn=Zs(Uf);function Gf(t){return Object.prototype.toString.call(t)}function bn(t){return Gf(t)==="[object String]"}var Wf=Object.prototype.hasOwnProperty;function Kf(t,e){return Wf.call(t,e)}function Sr(t){return Array.prototype.slice.call(arguments,1).forEach(function(r){if(r){if(typeof r!="object")throw new TypeError(r+"must be object");Object.keys(r).forEach(function(u){t[u]=r[u]})}}),t}function Js(t,e,r){return[].concat(t.slice(0,e),r,t.slice(e+1))}function yn(t){return!(t>=55296&&t<=57343||t>=64976&&t<=65007||(t&65535)===65535||(t&65535)===65534||t>=0&&t<=8||t===11||t>=14&&t<=31||t>=127&&t<=159||t>1114111)}function Tr(t){if(t>65535){t-=65536;let e=55296+(t>>10),r=56320+(t&1023);return String.fromCharCode(e,r)}return String.fromCharCode(t)}var Xs=/\\([!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~])/g,Yf=/&([a-z#][a-z0-9]{1,31});/gi,Zf=new RegExp(Xs.source+"|"+Yf.source,"gi"),Jf=/^#((?:x[a-f0-9]{1,8}|[0-9]{1,8}))$/i;function Xf(t,e){if(e.charCodeAt(0)===35&&Jf.test(e)){let u=e[1].toLowerCase()==="x"?parseInt(e.slice(2),16):parseInt(e.slice(1),10);return yn(u)?Tr(u):t}let r=Ks.decodeHTML(t);return r!==t?r:t}function Qf(t){return t.indexOf("\\")<0?t:t.replace(Xs,"$1")}function ft(t){return t.indexOf("\\")<0&&t.indexOf("&")<0?t:t.replace(Zf,function(e,r,u){return r||Xf(e,u)})}var ed=/[&<>"]/,td=/[&<>"]/g,rd={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"};function ud(t){return rd[t]}function qe(t){return ed.test(t)?t.replace(td,ud):t}var nd=/[.?*+^$[\]\\(){}|-]/g;function id(t){return t.replace(nd,"\\$&")}function I(t){switch(t){case 9:case 32:return!0}return!1}function Ft(t){if(t>=8192&&t<=8202)return!0;switch(t){case 9:case 10:case 11:case 12:case 13:case 32:case 160:case 5760:case 8239:case 8287:case 12288:return!0}return!1}function Ot(t){return mn.P.test(t)||mn.S.test(t)}function qt(t){switch(t){case 33:case 34:case 35:case 36:case 37:case 38:case 39:case 40:case 41:case 42:case 43:case 44:case 45:case 46:case 47:case 58:case 59:case 60:case 61:case 62:case 63:case 64:case 91:case 92:case 93:case 94:case 95:case 96:case 123:case 124:case 125:case 126:return!0;default:return!1}}function Cr(t){return t=t.trim().replace(/\s+/g," "),"\u1E9E".toLowerCase()==="\u1E7E"&&(t=t.replace(/ẞ/g,"\xDF")),t.toLowerCase().toUpperCase()}var sd={mdurl:Oe,ucmicro:mn},ad=Object.freeze({__proto__:null,arrayReplaceAt:Js,assign:Sr,escapeHtml:qe,escapeRE:id,fromCodePoint:Tr,has:Kf,isMdAsciiPunct:qt,isPunctChar:Ot,isSpace:I,isString:bn,isValidEntityCode:yn,isWhiteSpace:Ft,lib:sd,normalizeReference:Cr,unescapeAll:ft,unescapeMd:Qf});function od(t,e,r){let u,n,i,s,a=t.posMax,o=t.pos;for(t.pos=e+1,u=1;t.pos<a;){if(i=t.src.charCodeAt(t.pos),i===93&&(u--,u===0)){n=!0;break}if(s=t.pos,t.md.inline.skipToken(t),i===91){if(s===t.pos-1)u++;else if(r)return t.pos=o,-1}}let c=-1;return n&&(c=t.pos),t.pos=o,c}function cd(t,e,r){let u,n=e,i={ok:!1,pos:0,str:""};if(t.charCodeAt(n)===60){for(n++;n<r;){if(u=t.charCodeAt(n),u===10||u===60)return i;if(u===62)return i.pos=n+1,i.str=ft(t.slice(e+1,n)),i.ok=!0,i;if(u===92&&n+1<r){n+=2;continue}n++}return i}let s=0;for(;n<r&&(u=t.charCodeAt(n),!(u===32||u<32||u===127));){if(u===92&&n+1<r){if(t.charCodeAt(n+1)===32)break;n+=2;continue}if(u===40&&(s++,s>32))return i;if(u===41){if(s===0)break;s--}n++}return e===n||s!==0||(i.str=ft(t.slice(e,n)),i.pos=n,i.ok=!0),i}function ld(t,e,r,u){let n,i=e,s={ok:!1,can_continue:!1,pos:0,str:"",marker:0};if(u)s.str=u.str,s.marker=u.marker;else{if(i>=r)return s;let a=t.charCodeAt(i);if(a!==34&&a!==39&&a!==40)return s;e++,i++,a===40&&(a=41),s.marker=a}for(;i<r;){if(n=t.charCodeAt(i),n===s.marker)return s.pos=i+1,s.str+=ft(t.slice(e,i)),s.ok=!0,s;if(n===40&&s.marker===41)return s;n===92&&i+1<r&&i++,i++}return s.can_continue=!0,s.str+=ft(t.slice(e,i)),s}var fd=Object.freeze({__proto__:null,parseLinkDestination:cd,parseLinkLabel:od,parseLinkTitle:ld}),ye={};ye.code_inline=function(t,e,r,u,n){let i=t[e];return"<code"+n.renderAttrs(i)+">"+qe(i.content)+"</code>"};ye.code_block=function(t,e,r,u,n){let i=t[e];return"<pre"+n.renderAttrs(i)+"><code>"+qe(t[e].content)+`</code></pre>
-`};ye.fence=function(t,e,r,u,n){let i=t[e],s=i.info?ft(i.info).trim():"",a="",o="";if(s){let f=s.split(/(\s+)/g);a=f[0],o=f.slice(2).join("")}let c;if(r.highlight?c=r.highlight(i.content,a,o)||qe(i.content):c=qe(i.content),c.indexOf("<pre")===0)return c+`
-`;if(s){let f=i.attrIndex("class"),d=i.attrs?i.attrs.slice():[];f<0?d.push(["class",r.langPrefix+a]):(d[f]=d[f].slice(),d[f][1]+=" "+r.langPrefix+a);let p={attrs:d};return`<pre><code${n.renderAttrs(p)}>${c}</code></pre>
-`}return`<pre><code${n.renderAttrs(i)}>${c}</code></pre>
-`};ye.image=function(t,e,r,u,n){let i=t[e];return i.attrs[i.attrIndex("alt")][1]=n.renderInlineAsText(i.children,r,u),n.renderToken(t,e,r)};ye.hardbreak=function(t,e,r){return r.xhtmlOut?`<br />
-`:`<br>
-`};ye.softbreak=function(t,e,r){return r.breaks?r.xhtmlOut?`<br />
-`:`<br>
-`:`
-`};ye.text=function(t,e){return qe(t[e].content)};ye.html_block=function(t,e){return t[e].content};ye.html_inline=function(t,e){return t[e].content};function dt(){this.rules=Sr({},ye)}dt.prototype.renderAttrs=function(e){let r,u,n;if(!e.attrs)return"";for(n="",r=0,u=e.attrs.length;r<u;r++)n+=" "+qe(e.attrs[r][0])+'="'+qe(e.attrs[r][1])+'"';return n};dt.prototype.renderToken=function(e,r,u){let n=e[r],i="";if(n.hidden)return"";n.block&&n.nesting!==-1&&r&&e[r-1].hidden&&(i+=`
-`),i+=(n.nesting===-1?"</":"<")+n.tag,i+=this.renderAttrs(n),n.nesting===0&&u.xhtmlOut&&(i+=" /");let s=!1;if(n.block&&(s=!0,n.nesting===1&&r+1<e.length)){let a=e[r+1];(a.type==="inline"||a.hidden||a.nesting===-1&&a.tag===n.tag)&&(s=!1)}return i+=s?`>
-`:">",i};dt.prototype.renderInline=function(t,e,r){let u="",n=this.rules;for(let i=0,s=t.length;i<s;i++){let a=t[i].type;typeof n[a]<"u"?u+=n[a](t,i,e,r,this):u+=this.renderToken(t,i,e)}return u};dt.prototype.renderInlineAsText=function(t,e,r){let u="";for(let n=0,i=t.length;n<i;n++)switch(t[n].type){case"text":u+=t[n].content;break;case"image":u+=this.renderInlineAsText(t[n].children,e,r);break;case"html_inline":case"html_block":u+=t[n].content;break;case"softbreak":case"hardbreak":u+=`
-`;break}return u};dt.prototype.render=function(t,e,r){let u="",n=this.rules;for(let i=0,s=t.length;i<s;i++){let a=t[i].type;a==="inline"?u+=this.renderInline(t[i].children,e,r):typeof n[a]<"u"?u+=n[a](t,i,e,r,this):u+=this.renderToken(t,i,e,r)}return u};function te(){this.__rules__=[],this.__cache__=null}te.prototype.__find__=function(t){for(let e=0;e<this.__rules__.length;e++)if(this.__rules__[e].name===t)return e;return-1};te.prototype.__compile__=function(){let t=this,e=[""];t.__rules__.forEach(function(r){r.enabled&&r.alt.forEach(function(u){e.indexOf(u)<0&&e.push(u)})}),t.__cache__={},e.forEach(function(r){t.__cache__[r]=[],t.__rules__.forEach(function(u){u.enabled&&(r&&u.alt.indexOf(r)<0||t.__cache__[r].push(u.fn))})})};te.prototype.at=function(t,e,r){let u=this.__find__(t),n=r||{};if(u===-1)throw new Error("Parser rule not found: "+t);this.__rules__[u].fn=e,this.__rules__[u].alt=n.alt||[],this.__cache__=null};te.prototype.before=function(t,e,r,u){let n=this.__find__(t),i=u||{};if(n===-1)throw new Error("Parser rule not found: "+t);this.__rules__.splice(n,0,{name:e,enabled:!0,fn:r,alt:i.alt||[]}),this.__cache__=null};te.prototype.after=function(t,e,r,u){let n=this.__find__(t),i=u||{};if(n===-1)throw new Error("Parser rule not found: "+t);this.__rules__.splice(n+1,0,{name:e,enabled:!0,fn:r,alt:i.alt||[]}),this.__cache__=null};te.prototype.push=function(t,e,r){let u=r||{};this.__rules__.push({name:t,enabled:!0,fn:e,alt:u.alt||[]}),this.__cache__=null};te.prototype.enable=function(t,e){Array.isArray(t)||(t=[t]);let r=[];return t.forEach(function(u){let n=this.__find__(u);if(n<0){if(e)return;throw new Error("Rules manager: invalid rule name "+u)}this.__rules__[n].enabled=!0,r.push(u)},this),this.__cache__=null,r};te.prototype.enableOnly=function(t,e){Array.isArray(t)||(t=[t]),this.__rules__.forEach(function(r){r.enabled=!1}),this.enable(t,e)};te.prototype.disable=function(t,e){Array.isArray(t)||(t=[t]);let r=[];return t.forEach(function(u){let n=this.__find__(u);if(n<0){if(e)return;throw new Error("Rules manager: invalid rule name "+u)}this.__rules__[n].enabled=!1,r.push(u)},this),this.__cache__=null,r};te.prototype.getRules=function(t){return this.__cache__===null&&this.__compile__(),this.__cache__[t]||[]};function de(t,e,r){this.type=t,this.tag=e,this.attrs=null,this.map=null,this.nesting=r,this.level=0,this.children=null,this.content="",this.markup="",this.info="",this.meta=null,this.block=!1,this.hidden=!1}de.prototype.attrIndex=function(e){if(!this.attrs)return-1;let r=this.attrs;for(let u=0,n=r.length;u<n;u++)if(r[u][0]===e)return u;return-1};de.prototype.attrPush=function(e){this.attrs?this.attrs.push(e):this.attrs=[e]};de.prototype.attrSet=function(e,r){let u=this.attrIndex(e),n=[e,r];u<0?this.attrPush(n):this.attrs[u]=n};de.prototype.attrGet=function(e){let r=this.attrIndex(e),u=null;return r>=0&&(u=this.attrs[r][1]),u};de.prototype.attrJoin=function(e,r){let u=this.attrIndex(e);u<0?this.attrPush([e,r]):this.attrs[u][1]=this.attrs[u][1]+" "+r};function Qs(t,e,r){this.src=t,this.env=r,this.tokens=[],this.inlineMode=!1,this.md=e}Qs.prototype.Token=de;var dd=/\r\n?|\n/g,pd=/\0/g;function hd(t){let e;e=t.src.replace(dd,`
-`),e=e.replace(pd,"\uFFFD"),t.src=e}function gd(t){let e;t.inlineMode?(e=new t.Token("inline","",0),e.content=t.src,e.map=[0,1],e.children=[],t.tokens.push(e)):t.md.block.parse(t.src,t.md,t.env,t.tokens)}function md(t){let e=t.tokens;for(let r=0,u=e.length;r<u;r++){let n=e[r];n.type==="inline"&&t.md.inline.parse(n.content,t.md,t.env,n.children)}}function bd(t){return/^<a[>\s]/i.test(t)}function yd(t){return/^<\/a\s*>/i.test(t)}function _d(t){let e=t.tokens;if(t.md.options.linkify)for(let r=0,u=e.length;r<u;r++){if(e[r].type!=="inline"||!t.md.linkify.pretest(e[r].content))continue;let n=e[r].children,i=0;for(let s=n.length-1;s>=0;s--){let a=n[s];if(a.type==="link_close"){for(s--;n[s].level!==a.level&&n[s].type!=="link_open";)s--;continue}if(a.type==="html_inline"&&(bd(a.content)&&i>0&&i--,yd(a.content)&&i++),!(i>0)&&a.type==="text"&&t.md.linkify.test(a.content)){let o=a.content,c=t.md.linkify.match(o),f=[],d=a.level,p=0;c.length>0&&c[0].index===0&&s>0&&n[s-1].type==="text_special"&&(c=c.slice(1));for(let h=0;h<c.length;h++){let l=c[h].url,g=t.md.normalizeLink(l);if(!t.md.validateLink(g))continue;let _=c[h].text;c[h].schema?c[h].schema==="mailto:"&&!/^mailto:/i.test(_)?_=t.md.normalizeLinkText("mailto:"+_).replace(/^mailto:/,""):_=t.md.normalizeLinkText(_):_=t.md.normalizeLinkText("http://"+_).replace(/^http:\/\//,"");let E=c[h].index;if(E>p){let w=new t.Token("text","",0);w.content=o.slice(p,E),w.level=d,f.push(w)}let x=new t.Token("link_open","a",1);x.attrs=[["href",g]],x.level=d++,x.markup="linkify",x.info="auto",f.push(x);let y=new t.Token("text","",0);y.content=_,y.level=d,f.push(y);let v=new t.Token("link_close","a",-1);v.level=--d,v.markup="linkify",v.info="auto",f.push(v),p=c[h].lastIndex}if(p<o.length){let h=new t.Token("text","",0);h.content=o.slice(p),h.level=d,f.push(h)}e[r].children=n=Js(n,s,f)}}}}var ea=/\+-|\.\.|\?\?\?\?|!!!!|,,|--/,xd=/\((c|tm|r)\)/i,vd=/\((c|tm|r)\)/ig,Ed={c:"\xA9",r:"\xAE",tm:"\u2122"};function wd(t,e){return Ed[e.toLowerCase()]}function kd(t){let e=0;for(let r=t.length-1;r>=0;r--){let u=t[r];u.type==="text"&&!e&&(u.content=u.content.replace(vd,wd)),u.type==="link_open"&&u.info==="auto"&&e--,u.type==="link_close"&&u.info==="auto"&&e++}}function Dd(t){let e=0;for(let r=t.length-1;r>=0;r--){let u=t[r];u.type==="text"&&!e&&ea.test(u.content)&&(u.content=u.content.replace(/\+-/g,"\xB1").replace(/\.{2,}/g,"\u2026").replace(/([?!])…/g,"$1..").replace(/([?!]){4,}/g,"$1$1$1").replace(/,{2,}/g,",").replace(/(^|[^-])---(?=[^-]|$)/mg,"$1\u2014").replace(/(^|\s)--(?=\s|$)/mg,"$1\u2013").replace(/(^|[^-\s])--(?=[^-\s]|$)/mg,"$1\u2013")),u.type==="link_open"&&u.info==="auto"&&e--,u.type==="link_close"&&u.info==="auto"&&e++}}function Td(t){let e;if(t.md.options.typographer)for(e=t.tokens.length-1;e>=0;e--)t.tokens[e].type==="inline"&&(xd.test(t.tokens[e].content)&&kd(t.tokens[e].children),ea.test(t.tokens[e].content)&&Dd(t.tokens[e].children))}var Sd=/['"]/,$s=/['"]/g,Bs="\u2019";function kr(t,e,r){return t.slice(0,e)+r+t.slice(e+1)}function Cd(t,e){let r,u=[];for(let n=0;n<t.length;n++){let i=t[n],s=t[n].level;for(r=u.length-1;r>=0&&!(u[r].level<=s);r--);if(u.length=r+1,i.type!=="text")continue;let a=i.content,o=0,c=a.length;e:for(;o<c;){$s.lastIndex=o;let f=$s.exec(a);if(!f)break;let d=!0,p=!0;o=f.index+1;let h=f[0]==="'",l=32;if(f.index-1>=0)l=a.charCodeAt(f.index-1);else for(r=n-1;r>=0&&!(t[r].type==="softbreak"||t[r].type==="hardbreak");r--)if(t[r].content){l=t[r].content.charCodeAt(t[r].content.length-1);break}let g=32;if(o<c)g=a.charCodeAt(o);else for(r=n+1;r<t.length&&!(t[r].type==="softbreak"||t[r].type==="hardbreak");r++)if(t[r].content){g=t[r].content.charCodeAt(0);break}let _=qt(l)||Ot(String.fromCharCode(l)),E=qt(g)||Ot(String.fromCharCode(g)),x=Ft(l),y=Ft(g);if(y?d=!1:E&&(x||_||(d=!1)),x?p=!1:_&&(y||E||(p=!1)),g===34&&f[0]==='"'&&l>=48&&l<=57&&(p=d=!1),d&&p&&(d=_,p=E),!d&&!p){h&&(i.content=kr(i.content,f.index,Bs));continue}if(p)for(r=u.length-1;r>=0;r--){let v=u[r];if(u[r].level<s)break;if(v.single===h&&u[r].level===s){v=u[r];let w,D;h?(w=e.md.options.quotes[2],D=e.md.options.quotes[3]):(w=e.md.options.quotes[0],D=e.md.options.quotes[1]),i.content=kr(i.content,f.index,D),t[v.token].content=kr(t[v.token].content,v.pos,w),o+=D.length-1,v.token===n&&(o+=w.length-1),a=i.content,c=a.length,u.length=r;continue e}}d?u.push({token:n,pos:f.index,single:h,level:s}):p&&h&&(i.content=kr(i.content,f.index,Bs))}}}function Ad(t){if(t.md.options.typographer)for(let e=t.tokens.length-1;e>=0;e--)t.tokens[e].type!=="inline"||!Sd.test(t.tokens[e].content)||Cd(t.tokens[e].children,t)}function Md(t){let e,r,u=t.tokens,n=u.length;for(let i=0;i<n;i++){if(u[i].type!=="inline")continue;let s=u[i].children,a=s.length;for(e=0;e<a;e++)s[e].type==="text_special"&&(s[e].type="text");for(e=r=0;e<a;e++)s[e].type==="text"&&e+1<a&&s[e+1].type==="text"?s[e+1].content=s[e].content+s[e+1].content:(e!==r&&(s[r]=s[e]),r++);e!==r&&(s.length=r)}}var dn=[["normalize",hd],["block",gd],["inline",md],["linkify",_d],["replacements",Td],["smartquotes",Ad],["text_join",Md]];function _n(){this.ruler=new te;for(let t=0;t<dn.length;t++)this.ruler.push(dn[t][0],dn[t][1])}_n.prototype.process=function(t){let e=this.ruler.getRules("");for(let r=0,u=e.length;r<u;r++)e[r](t)};_n.prototype.State=Qs;function _e(t,e,r,u){this.src=t,this.md=e,this.env=r,this.tokens=u,this.bMarks=[],this.eMarks=[],this.tShift=[],this.sCount=[],this.bsCount=[],this.blkIndent=0,this.line=0,this.lineMax=0,this.tight=!1,this.ddIndent=-1,this.listIndent=-1,this.parentType="root",this.level=0;let n=this.src;for(let i=0,s=0,a=0,o=0,c=n.length,f=!1;s<c;s++){let d=n.charCodeAt(s);if(!f)if(I(d)){a++,d===9?o+=4-o%4:o++;continue}else f=!0;(d===10||s===c-1)&&(d!==10&&s++,this.bMarks.push(i),this.eMarks.push(s),this.tShift.push(a),this.sCount.push(o),this.bsCount.push(0),f=!1,a=0,o=0,i=s+1)}this.bMarks.push(n.length),this.eMarks.push(n.length),this.tShift.push(0),this.sCount.push(0),this.bsCount.push(0),this.lineMax=this.bMarks.length-1}_e.prototype.push=function(t,e,r){let u=new de(t,e,r);return u.block=!0,r<0&&this.level--,u.level=this.level,r>0&&this.level++,this.tokens.push(u),u};_e.prototype.isEmpty=function(e){return this.bMarks[e]+this.tShift[e]>=this.eMarks[e]};_e.prototype.skipEmptyLines=function(e){for(let r=this.lineMax;e<r&&!(this.bMarks[e]+this.tShift[e]<this.eMarks[e]);e++);return e};_e.prototype.skipSpaces=function(e){for(let r=this.src.length;e<r;e++){let u=this.src.charCodeAt(e);if(!I(u))break}return e};_e.prototype.skipSpacesBack=function(e,r){if(e<=r)return e;for(;e>r;)if(!I(this.src.charCodeAt(--e)))return e+1;return e};_e.prototype.skipChars=function(e,r){for(let u=this.src.length;e<u&&this.src.charCodeAt(e)===r;e++);return e};_e.prototype.skipCharsBack=function(e,r,u){if(e<=u)return e;for(;e>u;)if(r!==this.src.charCodeAt(--e))return e+1;return e};_e.prototype.getLines=function(e,r,u,n){if(e>=r)return"";let i=new Array(r-e);for(let s=0,a=e;a<r;a++,s++){let o=0,c=this.bMarks[a],f=c,d;for(a+1<r||n?d=this.eMarks[a]+1:d=this.eMarks[a];f<d&&o<u;){let p=this.src.charCodeAt(f);if(I(p))p===9?o+=4-(o+this.bsCount[a])%4:o++;else if(f-c<this.tShift[a])o++;else break;f++}o>u?i[s]=new Array(o-u+1).join(" ")+this.src.slice(f,d):i[s]=this.src.slice(f,d)}return i.join("")};_e.prototype.Token=de;var Rd=65536;function pn(t,e){let r=t.bMarks[e]+t.tShift[e],u=t.eMarks[e];return t.src.slice(r,u)}function zs(t){let e=[],r=t.length,u=0,n=t.charCodeAt(u),i=!1,s=0,a="";for(;u<r;)n===124&&(i?(a+=t.substring(s,u-1),s=u):(e.push(a+t.substring(s,u)),a="",s=u+1)),i=n===92,u++,n=t.charCodeAt(u);return e.push(a+t.substring(s)),e}function Pd(t,e,r,u){if(e+2>r)return!1;let n=e+1;if(t.sCount[n]<t.blkIndent||t.sCount[n]-t.blkIndent>=4)return!1;let i=t.bMarks[n]+t.tShift[n];if(i>=t.eMarks[n])return!1;let s=t.src.charCodeAt(i++);if(s!==124&&s!==45&&s!==58||i>=t.eMarks[n])return!1;let a=t.src.charCodeAt(i++);if(a!==124&&a!==45&&a!==58&&!I(a)||s===45&&I(a))return!1;for(;i<t.eMarks[n];){let v=t.src.charCodeAt(i);if(v!==124&&v!==45&&v!==58&&!I(v))return!1;i++}let o=pn(t,e+1),c=o.split("|"),f=[];for(let v=0;v<c.length;v++){let w=c[v].trim();if(!w){if(v===0||v===c.length-1)continue;return!1}if(!/^:?-+:?$/.test(w))return!1;w.charCodeAt(w.length-1)===58?f.push(w.charCodeAt(0)===58?"center":"right"):w.charCodeAt(0)===58?f.push("left"):f.push("")}if(o=pn(t,e).trim(),o.indexOf("|")===-1||t.sCount[e]-t.blkIndent>=4)return!1;c=zs(o),c.length&&c[0]===""&&c.shift(),c.length&&c[c.length-1]===""&&c.pop();let d=c.length;if(d===0||d!==f.length)return!1;if(u)return!0;let p=t.parentType;t.parentType="table";let h=t.md.block.ruler.getRules("blockquote"),l=t.push("table_open","table",1),g=[e,0];l.map=g;let _=t.push("thead_open","thead",1);_.map=[e,e+1];let E=t.push("tr_open","tr",1);E.map=[e,e+1];for(let v=0;v<c.length;v++){let w=t.push("th_open","th",1);f[v]&&(w.attrs=[["style","text-align:"+f[v]]]);let D=t.push("inline","",0);D.content=c[v].trim(),D.children=[],t.push("th_close","th",-1)}t.push("tr_close","tr",-1),t.push("thead_close","thead",-1);let x,y=0;for(n=e+2;n<r&&!(t.sCount[n]<t.blkIndent);n++){let v=!1;for(let D=0,S=h.length;D<S;D++)if(h[D](t,n,r,!0)){v=!0;break}if(v||(o=pn(t,n).trim(),!o)||t.sCount[n]-t.blkIndent>=4||(c=zs(o),c.length&&c[0]===""&&c.shift(),c.length&&c[c.length-1]===""&&c.pop(),y+=d-c.length,y>Rd))break;if(n===e+2){let D=t.push("tbody_open","tbody",1);D.map=x=[e+2,0]}let w=t.push("tr_open","tr",1);w.map=[n,n+1];for(let D=0;D<d;D++){let S=t.push("td_open","td",1);f[D]&&(S.attrs=[["style","text-align:"+f[D]]]);let F=t.push("inline","",0);F.content=c[D]?c[D].trim():"",F.children=[],t.push("td_close","td",-1)}t.push("tr_close","tr",-1)}return x&&(t.push("tbody_close","tbody",-1),x[1]=n),t.push("table_close","table",-1),g[1]=n,t.parentType=p,t.line=n,!0}function Fd(t,e,r){if(t.sCount[e]-t.blkIndent<4)return!1;let u=e+1,n=u;for(;u<r;){if(t.isEmpty(u)){u++;continue}if(t.sCount[u]-t.blkIndent>=4){u++,n=u;continue}break}t.line=n;let i=t.push("code_block","code",0);return i.content=t.getLines(e,n,4+t.blkIndent,!1)+`
-`,i.map=[e,t.line],!0}function Od(t,e,r,u){let n=t.bMarks[e]+t.tShift[e],i=t.eMarks[e];if(t.sCount[e]-t.blkIndent>=4||n+3>i)return!1;let s=t.src.charCodeAt(n);if(s!==126&&s!==96)return!1;let a=n;n=t.skipChars(n,s);let o=n-a;if(o<3)return!1;let c=t.src.slice(a,n),f=t.src.slice(n,i);if(s===96&&f.indexOf(String.fromCharCode(s))>=0)return!1;if(u)return!0;let d=e,p=!1;for(;d++,!(d>=r||(n=a=t.bMarks[d]+t.tShift[d],i=t.eMarks[d],n<i&&t.sCount[d]<t.blkIndent));)if(t.src.charCodeAt(n)===s&&!(t.sCount[d]-t.blkIndent>=4)&&(n=t.skipChars(n,s),!(n-a<o)&&(n=t.skipSpaces(n),!(n<i)))){p=!0;break}o=t.sCount[e],t.line=d+(p?1:0);let h=t.push("fence","code",0);return h.info=f,h.content=t.getLines(e+1,d,o,!0),h.markup=c,h.map=[e,t.line],!0}function qd(t,e,r,u){let n=t.bMarks[e]+t.tShift[e],i=t.eMarks[e],s=t.lineMax;if(t.sCount[e]-t.blkIndent>=4||t.src.charCodeAt(n)!==62)return!1;if(u)return!0;let a=[],o=[],c=[],f=[],d=t.md.block.ruler.getRules("blockquote"),p=t.parentType;t.parentType="blockquote";let h=!1,l;for(l=e;l<r;l++){let y=t.sCount[l]<t.blkIndent;if(n=t.bMarks[l]+t.tShift[l],i=t.eMarks[l],n>=i)break;if(t.src.charCodeAt(n++)===62&&!y){let w=t.sCount[l]+1,D,S;t.src.charCodeAt(n)===32?(n++,w++,S=!1,D=!0):t.src.charCodeAt(n)===9?(D=!0,(t.bsCount[l]+w)%4===3?(n++,w++,S=!1):S=!0):D=!1;let F=w;for(a.push(t.bMarks[l]),t.bMarks[l]=n;n<i;){let A=t.src.charCodeAt(n);if(I(A))A===9?F+=4-(F+t.bsCount[l]+(S?1:0))%4:F++;else break;n++}h=n>=i,o.push(t.bsCount[l]),t.bsCount[l]=t.sCount[l]+1+(D?1:0),c.push(t.sCount[l]),t.sCount[l]=F-w,f.push(t.tShift[l]),t.tShift[l]=n-t.bMarks[l];continue}if(h)break;let v=!1;for(let w=0,D=d.length;w<D;w++)if(d[w](t,l,r,!0)){v=!0;break}if(v){t.lineMax=l,t.blkIndent!==0&&(a.push(t.bMarks[l]),o.push(t.bsCount[l]),f.push(t.tShift[l]),c.push(t.sCount[l]),t.sCount[l]-=t.blkIndent);break}a.push(t.bMarks[l]),o.push(t.bsCount[l]),f.push(t.tShift[l]),c.push(t.sCount[l]),t.sCount[l]=-1}let g=t.blkIndent;t.blkIndent=0;let _=t.push("blockquote_open","blockquote",1);_.markup=">";let E=[e,0];_.map=E,t.md.block.tokenize(t,e,l);let x=t.push("blockquote_close","blockquote",-1);x.markup=">",t.lineMax=s,t.parentType=p,E[1]=t.line;for(let y=0;y<f.length;y++)t.bMarks[y+e]=a[y],t.tShift[y+e]=f[y],t.sCount[y+e]=c[y],t.bsCount[y+e]=o[y];return t.blkIndent=g,!0}function Ld(t,e,r,u){let n=t.eMarks[e];if(t.sCount[e]-t.blkIndent>=4)return!1;let i=t.bMarks[e]+t.tShift[e],s=t.src.charCodeAt(i++);if(s!==42&&s!==45&&s!==95)return!1;let a=1;for(;i<n;){let c=t.src.charCodeAt(i++);if(c!==s&&!I(c))return!1;c===s&&a++}if(a<3)return!1;if(u)return!0;t.line=e+1;let o=t.push("hr","hr",0);return o.map=[e,t.line],o.markup=Array(a+1).join(String.fromCharCode(s)),!0}function Hs(t,e){let r=t.eMarks[e],u=t.bMarks[e]+t.tShift[e],n=t.src.charCodeAt(u++);if(n!==42&&n!==45&&n!==43)return-1;if(u<r){let i=t.src.charCodeAt(u);if(!I(i))return-1}return u}function Us(t,e){let r=t.bMarks[e]+t.tShift[e],u=t.eMarks[e],n=r;if(n+1>=u)return-1;let i=t.src.charCodeAt(n++);if(i<48||i>57)return-1;for(;;){if(n>=u)return-1;if(i=t.src.charCodeAt(n++),i>=48&&i<=57){if(n-r>=10)return-1;continue}if(i===41||i===46)break;return-1}return n<u&&(i=t.src.charCodeAt(n),!I(i))?-1:n}function Id(t,e){let r=t.level+2;for(let u=e+2,n=t.tokens.length-2;u<n;u++)t.tokens[u].level===r&&t.tokens[u].type==="paragraph_open"&&(t.tokens[u+2].hidden=!0,t.tokens[u].hidden=!0,u+=2)}function Nd(t,e,r,u){let n,i,s,a,o=e,c=!0;if(t.sCount[o]-t.blkIndent>=4||t.listIndent>=0&&t.sCount[o]-t.listIndent>=4&&t.sCount[o]<t.blkIndent)return!1;let f=!1;u&&t.parentType==="paragraph"&&t.sCount[o]>=t.blkIndent&&(f=!0);let d,p,h;if((h=Us(t,o))>=0){if(d=!0,s=t.bMarks[o]+t.tShift[o],p=Number(t.src.slice(s,h-1)),f&&p!==1)return!1}else if((h=Hs(t,o))>=0)d=!1;else return!1;if(f&&t.skipSpaces(h)>=t.eMarks[o])return!1;if(u)return!0;let l=t.src.charCodeAt(h-1),g=t.tokens.length;d?(a=t.push("ordered_list_open","ol",1),p!==1&&(a.attrs=[["start",p]])):a=t.push("bullet_list_open","ul",1);let _=[o,0];a.map=_,a.markup=String.fromCharCode(l);let E=!1,x=t.md.block.ruler.getRules("list"),y=t.parentType;for(t.parentType="list";o<r;){i=h,n=t.eMarks[o];let v=t.sCount[o]+h-(t.bMarks[o]+t.tShift[o]),w=v;for(;i<n;){let ne=t.src.charCodeAt(i);if(ne===9)w+=4-(w+t.bsCount[o])%4;else if(ne===32)w++;else break;i++}let D=i,S;D>=n?S=1:S=w-v,S>4&&(S=1);let F=v+S;a=t.push("list_item_open","li",1),a.markup=String.fromCharCode(l);let A=[o,0];a.map=A,d&&(a.info=t.src.slice(s,h-1));let N=t.tight,$=t.tShift[o],H=t.sCount[o],J=t.listIndent;if(t.listIndent=t.blkIndent,t.blkIndent=F,t.tight=!0,t.tShift[o]=D-t.bMarks[o],t.sCount[o]=w,D>=n&&t.isEmpty(o+1)?t.line=Math.min(t.line+2,r):t.md.block.tokenize(t,o,r,!0),(!t.tight||E)&&(c=!1),E=t.line-o>1&&t.isEmpty(t.line-1),t.blkIndent=t.listIndent,t.listIndent=J,t.tShift[o]=$,t.sCount[o]=H,t.tight=N,a=t.push("list_item_close","li",-1),a.markup=String.fromCharCode(l),o=t.line,A[1]=o,o>=r||t.sCount[o]<t.blkIndent||t.sCount[o]-t.blkIndent>=4)break;let Z=!1;for(let ne=0,b=x.length;ne<b;ne++)if(x[ne](t,o,r,!0)){Z=!0;break}if(Z)break;if(d){if(h=Us(t,o),h<0)break;s=t.bMarks[o]+t.tShift[o]}else if(h=Hs(t,o),h<0)break;if(l!==t.src.charCodeAt(h-1))break}return d?a=t.push("ordered_list_close","ol",-1):a=t.push("bullet_list_close","ul",-1),a.markup=String.fromCharCode(l),_[1]=o,t.line=o,t.parentType=y,c&&Id(t,g),!0}function jd(t,e,r,u){let n=t.bMarks[e]+t.tShift[e],i=t.eMarks[e],s=e+1;if(t.sCount[e]-t.blkIndent>=4||t.src.charCodeAt(n)!==91)return!1;function a(x){let y=t.lineMax;if(x>=y||t.isEmpty(x))return null;let v=!1;if(t.sCount[x]-t.blkIndent>3&&(v=!0),t.sCount[x]<0&&(v=!0),!v){let S=t.md.block.ruler.getRules("reference"),F=t.parentType;t.parentType="reference";let A=!1;for(let N=0,$=S.length;N<$;N++)if(S[N](t,x,y,!0)){A=!0;break}if(t.parentType=F,A)return null}let w=t.bMarks[x]+t.tShift[x],D=t.eMarks[x];return t.src.slice(w,D+1)}let o=t.src.slice(n,i+1);i=o.length;let c=-1;for(n=1;n<i;n++){let x=o.charCodeAt(n);if(x===91)return!1;if(x===93){c=n;break}else if(x===10){let y=a(s);y!==null&&(o+=y,i=o.length,s++)}else if(x===92&&(n++,n<i&&o.charCodeAt(n)===10)){let y=a(s);y!==null&&(o+=y,i=o.length,s++)}}if(c<0||o.charCodeAt(c+1)!==58)return!1;for(n=c+2;n<i;n++){let x=o.charCodeAt(n);if(x===10){let y=a(s);y!==null&&(o+=y,i=o.length,s++)}else if(!I(x))break}let f=t.md.helpers.parseLinkDestination(o,n,i);if(!f.ok)return!1;let d=t.md.normalizeLink(f.str);if(!t.md.validateLink(d))return!1;n=f.pos;let p=n,h=s,l=n;for(;n<i;n++){let x=o.charCodeAt(n);if(x===10){let y=a(s);y!==null&&(o+=y,i=o.length,s++)}else if(!I(x))break}let g=t.md.helpers.parseLinkTitle(o,n,i);for(;g.can_continue;){let x=a(s);if(x===null)break;o+=x,n=i,i=o.length,s++,g=t.md.helpers.parseLinkTitle(o,n,i,g)}let _;for(n<i&&l!==n&&g.ok?(_=g.str,n=g.pos):(_="",n=p,s=h);n<i;){let x=o.charCodeAt(n);if(!I(x))break;n++}if(n<i&&o.charCodeAt(n)!==10&&_)for(_="",n=p,s=h;n<i;){let x=o.charCodeAt(n);if(!I(x))break;n++}if(n<i&&o.charCodeAt(n)!==10)return!1;let E=Cr(o.slice(1,c));return E?(u||(typeof t.env.references>"u"&&(t.env.references={}),typeof t.env.references[E]>"u"&&(t.env.references[E]={title:_,href:d}),t.line=s),!0):!1}var $d=["address","article","aside","base","basefont","blockquote","body","caption","center","col","colgroup","dd","details","dialog","dir","div","dl","dt","fieldset","figcaption","figure","footer","form","frame","frameset","h1","h2","h3","h4","h5","h6","head","header","hr","html","iframe","legend","li","link","main","menu","menuitem","nav","noframes","ol","optgroup","option","p","param","search","section","summary","table","tbody","td","tfoot","th","thead","title","tr","track","ul"],Bd="[a-zA-Z_:][a-zA-Z0-9:._-]*",zd="[^\"'=<>`\\x00-\\x20]+",Hd="'[^']*'",Ud='"[^"]*"',Vd="(?:"+zd+"|"+Hd+"|"+Ud+")",Gd="(?:\\s+"+Bd+"(?:\\s*=\\s*"+Vd+")?)",ta="<[A-Za-z][A-Za-z0-9\\-]*"+Gd+"*\\s*\\/?>",ra="<\\/[A-Za-z][A-Za-z0-9\\-]*\\s*>",Wd="<!---?>|<!--(?:[^-]|-[^-]|--[^>])*-->",Kd="<[?][\\s\\S]*?[?]>",Yd="<![A-Za-z][^>]*>",Zd="<!\\[CDATA\\[[\\s\\S]*?\\]\\]>",Jd=new RegExp("^(?:"+ta+"|"+ra+"|"+Wd+"|"+Kd+"|"+Yd+"|"+Zd+")"),Xd=new RegExp("^(?:"+ta+"|"+ra+")"),lt=[[/^<(script|pre|style|textarea)(?=(\s|>|$))/i,/<\/(script|pre|style|textarea)>/i,!0],[/^<!--/,/-->/,!0],[/^<\?/,/\?>/,!0],[/^<![A-Z]/,/>/,!0],[/^<!\[CDATA\[/,/\]\]>/,!0],[new RegExp("^</?("+$d.join("|")+")(?=(\\s|/?>|$))","i"),/^$/,!0],[new RegExp(Xd.source+"\\s*$"),/^$/,!1]];function Qd(t,e,r,u){let n=t.bMarks[e]+t.tShift[e],i=t.eMarks[e];if(t.sCount[e]-t.blkIndent>=4||!t.md.options.html||t.src.charCodeAt(n)!==60)return!1;let s=t.src.slice(n,i),a=0;for(;a<lt.length&&!lt[a][0].test(s);a++);if(a===lt.length)return!1;if(u)return lt[a][2];let o=e+1;if(!lt[a][1].test(s)){for(;o<r&&!(t.sCount[o]<t.blkIndent);o++)if(n=t.bMarks[o]+t.tShift[o],i=t.eMarks[o],s=t.src.slice(n,i),lt[a][1].test(s)){s.length!==0&&o++;break}}t.line=o;let c=t.push("html_block","",0);return c.map=[e,o],c.content=t.getLines(e,o,t.blkIndent,!0),!0}function ep(t,e,r,u){let n=t.bMarks[e]+t.tShift[e],i=t.eMarks[e];if(t.sCount[e]-t.blkIndent>=4)return!1;let s=t.src.charCodeAt(n);if(s!==35||n>=i)return!1;let a=1;for(s=t.src.charCodeAt(++n);s===35&&n<i&&a<=6;)a++,s=t.src.charCodeAt(++n);if(a>6||n<i&&!I(s))return!1;if(u)return!0;i=t.skipSpacesBack(i,n);let o=t.skipCharsBack(i,35,n);o>n&&I(t.src.charCodeAt(o-1))&&(i=o),t.line=e+1;let c=t.push("heading_open","h"+String(a),1);c.markup="########".slice(0,a),c.map=[e,t.line];let f=t.push("inline","",0);f.content=t.src.slice(n,i).trim(),f.map=[e,t.line],f.children=[];let d=t.push("heading_close","h"+String(a),-1);return d.markup="########".slice(0,a),!0}function tp(t,e,r){let u=t.md.block.ruler.getRules("paragraph");if(t.sCount[e]-t.blkIndent>=4)return!1;let n=t.parentType;t.parentType="paragraph";let i=0,s,a=e+1;for(;a<r&&!t.isEmpty(a);a++){if(t.sCount[a]-t.blkIndent>3)continue;if(t.sCount[a]>=t.blkIndent){let h=t.bMarks[a]+t.tShift[a],l=t.eMarks[a];if(h<l&&(s=t.src.charCodeAt(h),(s===45||s===61)&&(h=t.skipChars(h,s),h=t.skipSpaces(h),h>=l))){i=s===61?1:2;break}}if(t.sCount[a]<0)continue;let p=!1;for(let h=0,l=u.length;h<l;h++)if(u[h](t,a,r,!0)){p=!0;break}if(p)break}if(!i)return!1;let o=t.getLines(e,a,t.blkIndent,!1).trim();t.line=a+1;let c=t.push("heading_open","h"+String(i),1);c.markup=String.fromCharCode(s),c.map=[e,t.line];let f=t.push("inline","",0);f.content=o,f.map=[e,t.line-1],f.children=[];let d=t.push("heading_close","h"+String(i),-1);return d.markup=String.fromCharCode(s),t.parentType=n,!0}function rp(t,e,r){let u=t.md.block.ruler.getRules("paragraph"),n=t.parentType,i=e+1;for(t.parentType="paragraph";i<r&&!t.isEmpty(i);i++){if(t.sCount[i]-t.blkIndent>3||t.sCount[i]<0)continue;let c=!1;for(let f=0,d=u.length;f<d;f++)if(u[f](t,i,r,!0)){c=!0;break}if(c)break}let s=t.getLines(e,i,t.blkIndent,!1).trim();t.line=i;let a=t.push("paragraph_open","p",1);a.map=[e,t.line];let o=t.push("inline","",0);return o.content=s,o.map=[e,t.line],o.children=[],t.push("paragraph_close","p",-1),t.parentType=n,!0}var Dr=[["table",Pd,["paragraph","reference"]],["code",Fd],["fence",Od,["paragraph","reference","blockquote","list"]],["blockquote",qd,["paragraph","reference","blockquote","list"]],["hr",Ld,["paragraph","reference","blockquote","list"]],["list",Nd,["paragraph","reference","blockquote"]],["reference",jd],["html_block",Qd,["paragraph","reference","blockquote"]],["heading",ep,["paragraph","reference","blockquote"]],["lheading",tp],["paragraph",rp]];function Ar(){this.ruler=new te;for(let t=0;t<Dr.length;t++)this.ruler.push(Dr[t][0],Dr[t][1],{alt:(Dr[t][2]||[]).slice()})}Ar.prototype.tokenize=function(t,e,r){let u=this.ruler.getRules(""),n=u.length,i=t.md.options.maxNesting,s=e,a=!1;for(;s<r&&(t.line=s=t.skipEmptyLines(s),!(s>=r||t.sCount[s]<t.blkIndent));){if(t.level>=i){t.line=r;break}let o=t.line,c=!1;for(let f=0;f<n;f++)if(c=u[f](t,s,r,!1),c){if(o>=t.line)throw new Error("block rule didn't increment state.line");break}if(!c)throw new Error("none of the block rules matched");t.tight=!a,t.isEmpty(t.line-1)&&(a=!0),s=t.line,s<r&&t.isEmpty(s)&&(a=!0,s++,t.line=s)}};Ar.prototype.parse=function(t,e,r,u){if(!t)return;let n=new this.State(t,e,r,u);this.tokenize(n,n.line,n.lineMax)};Ar.prototype.State=_e;function Lt(t,e,r,u){this.src=t,this.env=r,this.md=e,this.tokens=u,this.tokens_meta=Array(u.length),this.pos=0,this.posMax=this.src.length,this.level=0,this.pending="",this.pendingLevel=0,this.cache={},this.delimiters=[],this._prev_delimiters=[],this.backticks={},this.backticksScanned=!1,this.linkLevel=0}Lt.prototype.pushPending=function(){let t=new de("text","",0);return t.content=this.pending,t.level=this.pendingLevel,this.tokens.push(t),this.pending="",t};Lt.prototype.push=function(t,e,r){this.pending&&this.pushPending();let u=new de(t,e,r),n=null;return r<0&&(this.level--,this.delimiters=this._prev_delimiters.pop()),u.level=this.level,r>0&&(this.level++,this._prev_delimiters.push(this.delimiters),this.delimiters=[],n={delimiters:this.delimiters}),this.pendingLevel=this.level,this.tokens.push(u),this.tokens_meta.push(n),u};Lt.prototype.scanDelims=function(t,e){let r=this.posMax,u=this.src.charCodeAt(t),n=t>0?this.src.charCodeAt(t-1):32,i=t;for(;i<r&&this.src.charCodeAt(i)===u;)i++;let s=i-t,a=i<r?this.src.charCodeAt(i):32,o=qt(n)||Ot(String.fromCharCode(n)),c=qt(a)||Ot(String.fromCharCode(a)),f=Ft(n),d=Ft(a),p=!d&&(!c||f||o),h=!f&&(!o||d||c);return{can_open:p&&(e||!h||o),can_close:h&&(e||!p||c),length:s}};Lt.prototype.Token=de;function up(t){switch(t){case 10:case 33:case 35:case 36:case 37:case 38:case 42:case 43:case 45:case 58:case 60:case 61:case 62:case 64:case 91:case 92:case 93:case 94:case 95:case 96:case 123:case 125:case 126:return!0;default:return!1}}function np(t,e){let r=t.pos;for(;r<t.posMax&&!up(t.src.charCodeAt(r));)r++;return r===t.pos?!1:(e||(t.pending+=t.src.slice(t.pos,r)),t.pos=r,!0)}var ip=/(?:^|[^a-z0-9.+-])([a-z][a-z0-9.+-]*)$/i;function sp(t,e){if(!t.md.options.linkify||t.linkLevel>0)return!1;let r=t.pos,u=t.posMax;if(r+3>u||t.src.charCodeAt(r)!==58||t.src.charCodeAt(r+1)!==47||t.src.charCodeAt(r+2)!==47)return!1;let n=t.pending.match(ip);if(!n)return!1;let i=n[1],s=t.md.linkify.matchAtStart(t.src.slice(r-i.length));if(!s)return!1;let a=s.url;if(a.length<=i.length)return!1;a=a.replace(/\*+$/,"");let o=t.md.normalizeLink(a);if(!t.md.validateLink(o))return!1;if(!e){t.pending=t.pending.slice(0,-i.length);let c=t.push("link_open","a",1);c.attrs=[["href",o]],c.markup="linkify",c.info="auto";let f=t.push("text","",0);f.content=t.md.normalizeLinkText(a);let d=t.push("link_close","a",-1);d.markup="linkify",d.info="auto"}return t.pos+=a.length-i.length,!0}function ap(t,e){let r=t.pos;if(t.src.charCodeAt(r)!==10)return!1;let u=t.pending.length-1,n=t.posMax;if(!e)if(u>=0&&t.pending.charCodeAt(u)===32)if(u>=1&&t.pending.charCodeAt(u-1)===32){let i=u-1;for(;i>=1&&t.pending.charCodeAt(i-1)===32;)i--;t.pending=t.pending.slice(0,i),t.push("hardbreak","br",0)}else t.pending=t.pending.slice(0,-1),t.push("softbreak","br",0);else t.push("softbreak","br",0);for(r++;r<n&&I(t.src.charCodeAt(r));)r++;return t.pos=r,!0}var xn=[];for(let t=0;t<256;t++)xn.push(0);"\\!\"#$%&'()*+,./:;<=>?@[]^_`{|}~-".split("").forEach(function(t){xn[t.charCodeAt(0)]=1});function op(t,e){let r=t.pos,u=t.posMax;if(t.src.charCodeAt(r)!==92||(r++,r>=u))return!1;let n=t.src.charCodeAt(r);if(n===10){for(e||t.push("hardbreak","br",0),r++;r<u&&(n=t.src.charCodeAt(r),!!I(n));)r++;return t.pos=r,!0}let i=t.src[r];if(n>=55296&&n<=56319&&r+1<u){let a=t.src.charCodeAt(r+1);a>=56320&&a<=57343&&(i+=t.src[r+1],r++)}let s="\\"+i;if(!e){let a=t.push("text_special","",0);n<256&&xn[n]!==0?a.content=i:a.content=s,a.markup=s,a.info="escape"}return t.pos=r+1,!0}function cp(t,e){let r=t.pos;if(t.src.charCodeAt(r)!==96)return!1;let n=r;r++;let i=t.posMax;for(;r<i&&t.src.charCodeAt(r)===96;)r++;let s=t.src.slice(n,r),a=s.length;if(t.backticksScanned&&(t.backticks[a]||0)<=n)return e||(t.pending+=s),t.pos+=a,!0;let o=r,c;for(;(c=t.src.indexOf("`",o))!==-1;){for(o=c+1;o<i&&t.src.charCodeAt(o)===96;)o++;let f=o-c;if(f===a){if(!e){let d=t.push("code_inline","code",0);d.markup=s,d.content=t.src.slice(r,c).replace(/\n/g," ").replace(/^ (.+) $/,"$1")}return t.pos=o,!0}t.backticks[f]=c}return t.backticksScanned=!0,e||(t.pending+=s),t.pos+=a,!0}function lp(t,e){let r=t.pos,u=t.src.charCodeAt(r);if(e||u!==126)return!1;let n=t.scanDelims(t.pos,!0),i=n.length,s=String.fromCharCode(u);if(i<2)return!1;let a;i%2&&(a=t.push("text","",0),a.content=s,i--);for(let o=0;o<i;o+=2)a=t.push("text","",0),a.content=s+s,t.delimiters.push({marker:u,length:0,token:t.tokens.length-1,end:-1,open:n.can_open,close:n.can_close});return t.pos+=n.length,!0}function Vs(t,e){let r,u=[],n=e.length;for(let i=0;i<n;i++){let s=e[i];if(s.marker!==126||s.end===-1)continue;let a=e[s.end];r=t.tokens[s.token],r.type="s_open",r.tag="s",r.nesting=1,r.markup="~~",r.content="",r=t.tokens[a.token],r.type="s_close",r.tag="s",r.nesting=-1,r.markup="~~",r.content="",t.tokens[a.token-1].type==="text"&&t.tokens[a.token-1].content==="~"&&u.push(a.token-1)}for(;u.length;){let i=u.pop(),s=i+1;for(;s<t.tokens.length&&t.tokens[s].type==="s_close";)s++;s--,i!==s&&(r=t.tokens[s],t.tokens[s]=t.tokens[i],t.tokens[i]=r)}}function fp(t){let e=t.tokens_meta,r=t.tokens_meta.length;Vs(t,t.delimiters);for(let u=0;u<r;u++)e[u]&&e[u].delimiters&&Vs(t,e[u].delimiters)}var ua={tokenize:lp,postProcess:fp};function dp(t,e){let r=t.pos,u=t.src.charCodeAt(r);if(e||u!==95&&u!==42)return!1;let n=t.scanDelims(t.pos,u===42);for(let i=0;i<n.length;i++){let s=t.push("text","",0);s.content=String.fromCharCode(u),t.delimiters.push({marker:u,length:n.length,token:t.tokens.length-1,end:-1,open:n.can_open,close:n.can_close})}return t.pos+=n.length,!0}function Gs(t,e){let r=e.length;for(let u=r-1;u>=0;u--){let n=e[u];if(n.marker!==95&&n.marker!==42||n.end===-1)continue;let i=e[n.end],s=u>0&&e[u-1].end===n.end+1&&e[u-1].marker===n.marker&&e[u-1].token===n.token-1&&e[n.end+1].token===i.token+1,a=String.fromCharCode(n.marker),o=t.tokens[n.token];o.type=s?"strong_open":"em_open",o.tag=s?"strong":"em",o.nesting=1,o.markup=s?a+a:a,o.content="";let c=t.tokens[i.token];c.type=s?"strong_close":"em_close",c.tag=s?"strong":"em",c.nesting=-1,c.markup=s?a+a:a,c.content="",s&&(t.tokens[e[u-1].token].content="",t.tokens[e[n.end+1].token].content="",u--)}}function pp(t){let e=t.tokens_meta,r=t.tokens_meta.length;Gs(t,t.delimiters);for(let u=0;u<r;u++)e[u]&&e[u].delimiters&&Gs(t,e[u].delimiters)}var na={tokenize:dp,postProcess:pp};function hp(t,e){let r,u,n,i,s="",a="",o=t.pos,c=!0;if(t.src.charCodeAt(t.pos)!==91)return!1;let f=t.pos,d=t.posMax,p=t.pos+1,h=t.md.helpers.parseLinkLabel(t,t.pos,!0);if(h<0)return!1;let l=h+1;if(l<d&&t.src.charCodeAt(l)===40){for(c=!1,l++;l<d&&(r=t.src.charCodeAt(l),!(!I(r)&&r!==10));l++);if(l>=d)return!1;if(o=l,n=t.md.helpers.parseLinkDestination(t.src,l,t.posMax),n.ok){for(s=t.md.normalizeLink(n.str),t.md.validateLink(s)?l=n.pos:s="",o=l;l<d&&(r=t.src.charCodeAt(l),!(!I(r)&&r!==10));l++);if(n=t.md.helpers.parseLinkTitle(t.src,l,t.posMax),l<d&&o!==l&&n.ok)for(a=n.str,l=n.pos;l<d&&(r=t.src.charCodeAt(l),!(!I(r)&&r!==10));l++);}(l>=d||t.src.charCodeAt(l)!==41)&&(c=!0),l++}if(c){if(typeof t.env.references>"u")return!1;if(l<d&&t.src.charCodeAt(l)===91?(o=l+1,l=t.md.helpers.parseLinkLabel(t,l),l>=0?u=t.src.slice(o,l++):l=h+1):l=h+1,u||(u=t.src.slice(p,h)),i=t.env.references[Cr(u)],!i)return t.pos=f,!1;s=i.href,a=i.title}if(!e){t.pos=p,t.posMax=h;let g=t.push("link_open","a",1),_=[["href",s]];g.attrs=_,a&&_.push(["title",a]),t.linkLevel++,t.md.inline.tokenize(t),t.linkLevel--,t.push("link_close","a",-1)}return t.pos=l,t.posMax=d,!0}function gp(t,e){let r,u,n,i,s,a,o,c,f="",d=t.pos,p=t.posMax;if(t.src.charCodeAt(t.pos)!==33||t.src.charCodeAt(t.pos+1)!==91)return!1;let h=t.pos+2,l=t.md.helpers.parseLinkLabel(t,t.pos+1,!1);if(l<0)return!1;if(i=l+1,i<p&&t.src.charCodeAt(i)===40){for(i++;i<p&&(r=t.src.charCodeAt(i),!(!I(r)&&r!==10));i++);if(i>=p)return!1;for(c=i,a=t.md.helpers.parseLinkDestination(t.src,i,t.posMax),a.ok&&(f=t.md.normalizeLink(a.str),t.md.validateLink(f)?i=a.pos:f=""),c=i;i<p&&(r=t.src.charCodeAt(i),!(!I(r)&&r!==10));i++);if(a=t.md.helpers.parseLinkTitle(t.src,i,t.posMax),i<p&&c!==i&&a.ok)for(o=a.str,i=a.pos;i<p&&(r=t.src.charCodeAt(i),!(!I(r)&&r!==10));i++);else o="";if(i>=p||t.src.charCodeAt(i)!==41)return t.pos=d,!1;i++}else{if(typeof t.env.references>"u")return!1;if(i<p&&t.src.charCodeAt(i)===91?(c=i+1,i=t.md.helpers.parseLinkLabel(t,i),i>=0?n=t.src.slice(c,i++):i=l+1):i=l+1,n||(n=t.src.slice(h,l)),s=t.env.references[Cr(n)],!s)return t.pos=d,!1;f=s.href,o=s.title}if(!e){u=t.src.slice(h,l);let g=[];t.md.inline.parse(u,t.md,t.env,g);let _=t.push("image","img",0),E=[["src",f],["alt",""]];_.attrs=E,_.children=g,_.content=u,o&&E.push(["title",o])}return t.pos=i,t.posMax=p,!0}var mp=/^([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)$/,bp=/^([a-zA-Z][a-zA-Z0-9+.-]{1,31}):([^<>\x00-\x20]*)$/;function yp(t,e){let r=t.pos;if(t.src.charCodeAt(r)!==60)return!1;let u=t.pos,n=t.posMax;for(;;){if(++r>=n)return!1;let s=t.src.charCodeAt(r);if(s===60)return!1;if(s===62)break}let i=t.src.slice(u+1,r);if(bp.test(i)){let s=t.md.normalizeLink(i);if(!t.md.validateLink(s))return!1;if(!e){let a=t.push("link_open","a",1);a.attrs=[["href",s]],a.markup="autolink",a.info="auto";let o=t.push("text","",0);o.content=t.md.normalizeLinkText(i);let c=t.push("link_close","a",-1);c.markup="autolink",c.info="auto"}return t.pos+=i.length+2,!0}if(mp.test(i)){let s=t.md.normalizeLink("mailto:"+i);if(!t.md.validateLink(s))return!1;if(!e){let a=t.push("link_open","a",1);a.attrs=[["href",s]],a.markup="autolink",a.info="auto";let o=t.push("text","",0);o.content=t.md.normalizeLinkText(i);let c=t.push("link_close","a",-1);c.markup="autolink",c.info="auto"}return t.pos+=i.length+2,!0}return!1}function _p(t){return/^<a[>\s]/i.test(t)}function xp(t){return/^<\/a\s*>/i.test(t)}function vp(t){let e=t|32;return e>=97&&e<=122}function Ep(t,e){if(!t.md.options.html)return!1;let r=t.posMax,u=t.pos;if(t.src.charCodeAt(u)!==60||u+2>=r)return!1;let n=t.src.charCodeAt(u+1);if(n!==33&&n!==63&&n!==47&&!vp(n))return!1;let i=t.src.slice(u).match(Jd);if(!i)return!1;if(!e){let s=t.push("html_inline","",0);s.content=i[0],_p(s.content)&&t.linkLevel++,xp(s.content)&&t.linkLevel--}return t.pos+=i[0].length,!0}var wp=/^&#((?:x[a-f0-9]{1,6}|[0-9]{1,7}));/i,kp=/^&([a-z][a-z0-9]{1,31});/i;function Dp(t,e){let r=t.pos,u=t.posMax;if(t.src.charCodeAt(r)!==38||r+1>=u)return!1;if(t.src.charCodeAt(r+1)===35){let i=t.src.slice(r).match(wp);if(i){if(!e){let s=i[1][0].toLowerCase()==="x"?parseInt(i[1].slice(1),16):parseInt(i[1],10),a=t.push("text_special","",0);a.content=yn(s)?Tr(s):Tr(65533),a.markup=i[0],a.info="entity"}return t.pos+=i[0].length,!0}}else{let i=t.src.slice(r).match(kp);if(i){let s=Ks.decodeHTML(i[0]);if(s!==i[0]){if(!e){let a=t.push("text_special","",0);a.content=s,a.markup=i[0],a.info="entity"}return t.pos+=i[0].length,!0}}}return!1}function Ws(t){let e={},r=t.length;if(!r)return;let u=0,n=-2,i=[];for(let s=0;s<r;s++){let a=t[s];if(i.push(0),(t[u].marker!==a.marker||n!==a.token-1)&&(u=s),n=a.token,a.length=a.length||0,!a.close)continue;e.hasOwnProperty(a.marker)||(e[a.marker]=[-1,-1,-1,-1,-1,-1]);let o=e[a.marker][(a.open?3:0)+a.length%3],c=u-i[u]-1,f=c;for(;c>o;c-=i[c]+1){let d=t[c];if(d.marker===a.marker&&d.open&&d.end<0){let p=!1;if((d.close||a.open)&&(d.length+a.length)%3===0&&(d.length%3!==0||a.length%3!==0)&&(p=!0),!p){let h=c>0&&!t[c-1].open?i[c-1]+1:0;i[s]=s-c+h,i[c]=h,a.open=!1,d.end=s,d.close=!1,f=-1,n=-2;break}}}f!==-1&&(e[a.marker][(a.open?3:0)+(a.length||0)%3]=f)}}function Tp(t){let e=t.tokens_meta,r=t.tokens_meta.length;Ws(t.delimiters);for(let u=0;u<r;u++)e[u]&&e[u].delimiters&&Ws(e[u].delimiters)}function Sp(t){let e,r,u=0,n=t.tokens,i=t.tokens.length;for(e=r=0;e<i;e++)n[e].nesting<0&&u--,n[e].level=u,n[e].nesting>0&&u++,n[e].type==="text"&&e+1<i&&n[e+1].type==="text"?n[e+1].content=n[e].content+n[e+1].content:(e!==r&&(n[r]=n[e]),r++);e!==r&&(n.length=r)}var hn=[["text",np],["linkify",sp],["newline",ap],["escape",op],["backticks",cp],["strikethrough",ua.tokenize],["emphasis",na.tokenize],["link",hp],["image",gp],["autolink",yp],["html_inline",Ep],["entity",Dp]],gn=[["balance_pairs",Tp],["strikethrough",ua.postProcess],["emphasis",na.postProcess],["fragments_join",Sp]];function It(){this.ruler=new te;for(let t=0;t<hn.length;t++)this.ruler.push(hn[t][0],hn[t][1]);this.ruler2=new te;for(let t=0;t<gn.length;t++)this.ruler2.push(gn[t][0],gn[t][1])}It.prototype.skipToken=function(t){let e=t.pos,r=this.ruler.getRules(""),u=r.length,n=t.md.options.maxNesting,i=t.cache;if(typeof i[e]<"u"){t.pos=i[e];return}let s=!1;if(t.level<n){for(let a=0;a<u;a++)if(t.level++,s=r[a](t,!0),t.level--,s){if(e>=t.pos)throw new Error("inline rule didn't increment state.pos");break}}else t.pos=t.posMax;s||t.pos++,i[e]=t.pos};It.prototype.tokenize=function(t){let e=this.ruler.getRules(""),r=e.length,u=t.posMax,n=t.md.options.maxNesting;for(;t.pos<u;){let i=t.pos,s=!1;if(t.level<n){for(let a=0;a<r;a++)if(s=e[a](t,!1),s){if(i>=t.pos)throw new Error("inline rule didn't increment state.pos");break}}if(s){if(t.pos>=u)break;continue}t.pending+=t.src[t.pos++]}t.pending&&t.pushPending()};It.prototype.parse=function(t,e,r,u){let n=new this.State(t,e,r,u);this.tokenize(n);let i=this.ruler2.getRules(""),s=i.length;for(let a=0;a<s;a++)i[a](n)};It.prototype.State=Lt;var Cp={options:{html:!1,xhtmlOut:!1,breaks:!1,langPrefix:"language-",linkify:!1,typographer:!1,quotes:"\u201C\u201D\u2018\u2019",highlight:null,maxNesting:100},components:{core:{},block:{},inline:{}}},Ap={options:{html:!1,xhtmlOut:!1,breaks:!1,langPrefix:"language-",linkify:!1,typographer:!1,quotes:"\u201C\u201D\u2018\u2019",highlight:null,maxNesting:20},components:{core:{rules:["normalize","block","inline","text_join"]},block:{rules:["paragraph"]},inline:{rules:["text"],rules2:["balance_pairs","fragments_join"]}}},Mp={options:{html:!0,xhtmlOut:!0,breaks:!1,langPrefix:"language-",linkify:!1,typographer:!1,quotes:"\u201C\u201D\u2018\u2019",highlight:null,maxNesting:20},components:{core:{rules:["normalize","block","inline","text_join"]},block:{rules:["blockquote","code","fence","heading","hr","html_block","lheading","list","reference","paragraph"]},inline:{rules:["autolink","backticks","emphasis","entity","escape","html_inline","image","link","newline","text"],rules2:["balance_pairs","emphasis","fragments_join"]}}},Rp={default:Cp,zero:Ap,commonmark:Mp},Pp=/^(vbscript|javascript|file|data):/,Fp=/^data:image\/(gif|png|jpeg|webp);/;function Op(t){let e=t.trim().toLowerCase();return Pp.test(e)?Fp.test(e):!0}var ia=["http:","https:","mailto:"];function qp(t){let e=Oe.parse(t,!0);if(e.hostname&&(!e.protocol||ia.indexOf(e.protocol)>=0))try{e.hostname=Ys.toASCII(e.hostname)}catch{}return Oe.encode(Oe.format(e))}function Lp(t){let e=Oe.parse(t,!0);if(e.hostname&&(!e.protocol||ia.indexOf(e.protocol)>=0))try{e.hostname=Ys.toUnicode(e.hostname)}catch{}return Oe.decode(Oe.format(e),Oe.decode.defaultChars+"%")}function se(t,e){if(!(this instanceof se))return new se(t,e);e||bn(t)||(e=t||{},t="default"),this.inline=new It,this.block=new Ar,this.core=new _n,this.renderer=new dt,this.linkify=new Vf,this.validateLink=Op,this.normalizeLink=qp,this.normalizeLinkText=Lp,this.utils=ad,this.helpers=Sr({},fd),this.options={},this.configure(t),e&&this.set(e)}se.prototype.set=function(t){return Sr(this.options,t),this};se.prototype.configure=function(t){let e=this;if(bn(t)){let r=t;if(t=Rp[r],!t)throw new Error('Wrong `markdown-it` preset "'+r+'", check name')}if(!t)throw new Error("Wrong `markdown-it` preset, can't be empty");return t.options&&e.set(t.options),t.components&&Object.keys(t.components).forEach(function(r){t.components[r].rules&&e[r].ruler.enableOnly(t.components[r].rules),t.components[r].rules2&&e[r].ruler2.enableOnly(t.components[r].rules2)}),this};se.prototype.enable=function(t,e){let r=[];Array.isArray(t)||(t=[t]),["core","block","inline"].forEach(function(n){r=r.concat(this[n].ruler.enable(t,!0))},this),r=r.concat(this.inline.ruler2.enable(t,!0));let u=t.filter(function(n){return r.indexOf(n)<0});if(u.length&&!e)throw new Error("MarkdownIt. Failed to enable unknown rule(s): "+u);return this};se.prototype.disable=function(t,e){let r=[];Array.isArray(t)||(t=[t]),["core","block","inline"].forEach(function(n){r=r.concat(this[n].ruler.disable(t,!0))},this),r=r.concat(this.inline.ruler2.disable(t,!0));let u=t.filter(function(n){return r.indexOf(n)<0});if(u.length&&!e)throw new Error("MarkdownIt. Failed to disable unknown rule(s): "+u);return this};se.prototype.use=function(t){let e=[this].concat(Array.prototype.slice.call(arguments,1));return t.apply(t,e),this};se.prototype.parse=function(t,e){if(typeof t!="string")throw new Error("Input data should be a String");let r=new this.core.State(t,this,e);return this.core.process(r),r.tokens};se.prototype.render=function(t,e){return e=e||{},this.renderer.render(this.parse(t,e),this.options,e)};se.prototype.parseInline=function(t,e){let r=new this.core.State(t,this,e);return r.inlineMode=!0,this.core.process(r),r.tokens};se.prototype.renderInline=function(t,e){return e=e||{},this.renderer.render(this.parseInline(t,e),this.options,e)};sa.exports=se});var re=m((Iy,pa)=>{"use strict";var En=class t extends Error{constructor(e){super(`Format functions must be synchronous taking a two arguments: (info, opts)
-Found: ${e.toString().split(`
-`)[0]}
-`),Error.captureStackTrace(this,t)}};pa.exports=t=>{if(t.length>2)throw new En(t);function e(u={}){this.options=u}e.prototype.transform=t;function r(u){return new e(u)}return r.Format=e,r}});var ba=m((Ny,ma)=>{var ga={};ma.exports=ga;var ha={reset:[0,0],bold:[1,22],dim:[2,22],italic:[3,23],underline:[4,24],inverse:[7,27],hidden:[8,28],strikethrough:[9,29],black:[30,39],red:[31,39],green:[32,39],yellow:[33,39],blue:[34,39],magenta:[35,39],cyan:[36,39],white:[37,39],gray:[90,39],grey:[90,39],brightRed:[91,39],brightGreen:[92,39],brightYellow:[93,39],brightBlue:[94,39],brightMagenta:[95,39],brightCyan:[96,39],brightWhite:[97,39],bgBlack:[40,49],bgRed:[41,49],bgGreen:[42,49],bgYellow:[43,49],bgBlue:[44,49],bgMagenta:[45,49],bgCyan:[46,49],bgWhite:[47,49],bgGray:[100,49],bgGrey:[100,49],bgBrightRed:[101,49],bgBrightGreen:[102,49],bgBrightYellow:[103,49],bgBrightBlue:[104,49],bgBrightMagenta:[105,49],bgBrightCyan:[106,49],bgBrightWhite:[107,49],blackBG:[40,49],redBG:[41,49],greenBG:[42,49],yellowBG:[43,49],blueBG:[44,49],magentaBG:[45,49],cyanBG:[46,49],whiteBG:[47,49]};Object.keys(ha).forEach(function(t){var e=ha[t],r=ga[t]=[];r.open="\x1B["+e[0]+"m",r.close="\x1B["+e[1]+"m"})});var _a=m((jy,ya)=>{"use strict";ya.exports=function(t,e){e=e||process.argv||[];var r=e.indexOf("--"),u=/^-{1,2}/.test(t)?"":"--",n=e.indexOf(u+t);return n!==-1&&(r===-1?!0:n<r)}});var va=m(($y,xa)=>{"use strict";var Ip=require("os"),pe=_a(),X=process.env,gt=void 0;pe("no-color")||pe("no-colors")||pe("color=false")?gt=!1:(pe("color")||pe("colors")||pe("color=true")||pe("color=always"))&&(gt=!0);"FORCE_COLOR"in X&&(gt=X.FORCE_COLOR.length===0||parseInt(X.FORCE_COLOR,10)!==0);function Np(t){return t===0?!1:{level:t,hasBasic:!0,has256:t>=2,has16m:t>=3}}function jp(t){if(gt===!1)return 0;if(pe("color=16m")||pe("color=full")||pe("color=truecolor"))return 3;if(pe("color=256"))return 2;if(t&&!t.isTTY&&gt!==!0)return 0;var e=gt?1:0;if(process.platform==="win32"){var r=Ip.release().split(".");return Number(process.versions.node.split(".")[0])>=8&&Number(r[0])>=10&&Number(r[2])>=10586?Number(r[2])>=14931?3:2:1}if("CI"in X)return["TRAVIS","CIRCLECI","APPVEYOR","GITLAB_CI"].some(function(n){return n in X})||X.CI_NAME==="codeship"?1:e;if("TEAMCITY_VERSION"in X)return/^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(X.TEAMCITY_VERSION)?1:0;if("TERM_PROGRAM"in X){var u=parseInt((X.TERM_PROGRAM_VERSION||"").split(".")[0],10);switch(X.TERM_PROGRAM){case"iTerm.app":return u>=3?3:2;case"Hyper":return 3;case"Apple_Terminal":return 2}}return/-256(color)?$/i.test(X.TERM)?2:/^screen|^xterm|^vt100|^rxvt|color|ansi|cygwin|linux/i.test(X.TERM)||"COLORTERM"in X?1:(X.TERM==="dumb",e)}function wn(t){var e=jp(t);return Np(e)}xa.exports={supportsColor:wn,stdout:wn(process.stdout),stderr:wn(process.stderr)}});var wa=m((By,Ea)=>{Ea.exports=function(e,r){var u="";e=e||"Run the trap, drop the bass",e=e.split("");var n={a:["@","\u0104","\u023A","\u0245","\u0394","\u039B","\u0414"],b:["\xDF","\u0181","\u0243","\u026E","\u03B2","\u0E3F"],c:["\xA9","\u023B","\u03FE"],d:["\xD0","\u018A","\u0500","\u0501","\u0502","\u0503"],e:["\xCB","\u0115","\u018E","\u0258","\u03A3","\u03BE","\u04BC","\u0A6C"],f:["\u04FA"],g:["\u0262"],h:["\u0126","\u0195","\u04A2","\u04BA","\u04C7","\u050A"],i:["\u0F0F"],j:["\u0134"],k:["\u0138","\u04A0","\u04C3","\u051E"],l:["\u0139"],m:["\u028D","\u04CD","\u04CE","\u0520","\u0521","\u0D69"],n:["\xD1","\u014B","\u019D","\u0376","\u03A0","\u048A"],o:["\xD8","\xF5","\xF8","\u01FE","\u0298","\u047A","\u05DD","\u06DD","\u0E4F"],p:["\u01F7","\u048E"],q:["\u09CD"],r:["\xAE","\u01A6","\u0210","\u024C","\u0280","\u042F"],s:["\xA7","\u03DE","\u03DF","\u03E8"],t:["\u0141","\u0166","\u0373"],u:["\u01B1","\u054D"],v:["\u05D8"],w:["\u0428","\u0460","\u047C","\u0D70"],x:["\u04B2","\u04FE","\u04FC","\u04FD"],y:["\xA5","\u04B0","\u04CB"],z:["\u01B5","\u0240"]};return e.forEach(function(i){i=i.toLowerCase();var s=n[i]||[" "],a=Math.floor(Math.random()*s.length);typeof n[i]<"u"?u+=n[i][a]:u+=i}),u}});var Da=m((zy,ka)=>{ka.exports=function(e,r){e=e||"   he is here   ";var u={up:["\u030D","\u030E","\u0304","\u0305","\u033F","\u0311","\u0306","\u0310","\u0352","\u0357","\u0351","\u0307","\u0308","\u030A","\u0342","\u0313","\u0308","\u034A","\u034B","\u034C","\u0303","\u0302","\u030C","\u0350","\u0300","\u0301","\u030B","\u030F","\u0312","\u0313","\u0314","\u033D","\u0309","\u0363","\u0364","\u0365","\u0366","\u0367","\u0368","\u0369","\u036A","\u036B","\u036C","\u036D","\u036E","\u036F","\u033E","\u035B","\u0346","\u031A"],down:["\u0316","\u0317","\u0318","\u0319","\u031C","\u031D","\u031E","\u031F","\u0320","\u0324","\u0325","\u0326","\u0329","\u032A","\u032B","\u032C","\u032D","\u032E","\u032F","\u0330","\u0331","\u0332","\u0333","\u0339","\u033A","\u033B","\u033C","\u0345","\u0347","\u0348","\u0349","\u034D","\u034E","\u0353","\u0354","\u0355","\u0356","\u0359","\u035A","\u0323"],mid:["\u0315","\u031B","\u0300","\u0301","\u0358","\u0321","\u0322","\u0327","\u0328","\u0334","\u0335","\u0336","\u035C","\u035D","\u035E","\u035F","\u0360","\u0362","\u0338","\u0337","\u0361"," \u0489"]},n=[].concat(u.up,u.down,u.mid);function i(o){var c=Math.floor(Math.random()*o);return c}function s(o){var c=!1;return n.filter(function(f){c=f===o}),c}function a(o,c){var f="",d,p;c=c||{},c.up=typeof c.up<"u"?c.up:!0,c.mid=typeof c.mid<"u"?c.mid:!0,c.down=typeof c.down<"u"?c.down:!0,c.size=typeof c.size<"u"?c.size:"maxi",o=o.split("");for(p in o)if(!s(p)){switch(f=f+o[p],d={up:0,down:0,mid:0},c.size){case"mini":d.up=i(8),d.mid=i(2),d.down=i(8);break;case"maxi":d.up=i(16)+3,d.mid=i(4)+1,d.down=i(64)+3;break;default:d.up=i(8)+1,d.mid=i(6)/2,d.down=i(8)+1;break}var h=["up","mid","down"];for(var l in h)for(var g=h[l],_=0;_<=d[g];_++)c[g]&&(f=f+u[g][i(u[g].length)])}return f}return a(e,r)}});var Sa=m((Hy,Ta)=>{Ta.exports=function(t){return function(e,r,u){if(e===" ")return e;switch(r%3){case 0:return t.red(e);case 1:return t.white(e);case 2:return t.blue(e)}}}});var Aa=m((Uy,Ca)=>{Ca.exports=function(t){return function(e,r,u){return r%2===0?e:t.inverse(e)}}});var Ra=m((Vy,Ma)=>{Ma.exports=function(t){var e=["red","yellow","green","blue","magenta"];return function(r,u,n){return r===" "?r:t[e[u++%e.length]](r)}}});var Fa=m((Gy,Pa)=>{Pa.exports=function(t){var e=["underline","inverse","grey","yellow","red","green","blue","white","cyan","magenta","brightYellow","brightRed","brightGreen","brightBlue","brightWhite","brightCyan","brightMagenta"];return function(r,u,n){return r===" "?r:t[e[Math.round(Math.random()*(e.length-2))]](r)}}});var ja=m((Ky,Na)=>{var P={};Na.exports=P;P.themes={};var $p=require("util"),Ze=P.styles=ba(),qa=Object.defineProperties,Bp=new RegExp(/[\r\n]+/g);P.supportsColor=va().supportsColor;typeof P.enabled>"u"&&(P.enabled=P.supportsColor()!==!1);P.enable=function(){P.enabled=!0};P.disable=function(){P.enabled=!1};P.stripColors=P.strip=function(t){return(""+t).replace(/\x1B\[\d+m/g,"")};var Wy=P.stylize=function(e,r){if(!P.enabled)return e+"";var u=Ze[r];return!u&&r in P?P[r](e):u.open+e+u.close},zp=/[|\\{}()[\]^$+*?.]/g,Hp=function(t){if(typeof t!="string")throw new TypeError("Expected a string");return t.replace(zp,"\\$&")};function La(t){var e=function r(){return Vp.apply(r,arguments)};return e._styles=t,e.__proto__=Up,e}var Ia=function(){var t={};return Ze.grey=Ze.gray,Object.keys(Ze).forEach(function(e){Ze[e].closeRe=new RegExp(Hp(Ze[e].close),"g"),t[e]={get:function(){return La(this._styles.concat(e))}}}),t}(),Up=qa(function(){},Ia);function Vp(){var t=Array.prototype.slice.call(arguments),e=t.map(function(s){return s!=null&&s.constructor===String?s:$p.inspect(s)}).join(" ");if(!P.enabled||!e)return e;for(var r=e.indexOf(`
-`)!=-1,u=this._styles,n=u.length;n--;){var i=Ze[u[n]];e=i.open+e.replace(i.closeRe,i.open)+i.close,r&&(e=e.replace(Bp,function(s){return i.close+s+i.open}))}return e}P.setTheme=function(t){if(typeof t=="string"){console.log("colors.setTheme now only accepts an object, not a string.  If you are trying to set a theme from a file, it is now your (the caller's) responsibility to require the file.  The old syntax looked like colors.setTheme(__dirname + '/../themes/generic-logging.js'); The new syntax looks like colors.setTheme(require(__dirname + '/../themes/generic-logging.js'));");return}for(var e in t)(function(r){P[r]=function(u){if(typeof t[r]=="object"){var n=u;for(var i in t[r])n=P[t[r][i]](n);return n}return P[t[r]](u)}})(e)};function Gp(){var t={};return Object.keys(Ia).forEach(function(e){t[e]={get:function(){return La([e])}}}),t}var Wp=function(e,r){var u=r.split("");return u=u.map(e),u.join("")};P.trap=wa();P.zalgo=Da();P.maps={};P.maps.america=Sa()(P);P.maps.zebra=Aa()(P);P.maps.rainbow=Ra()(P);P.maps.random=Fa()(P);for(Oa in P.maps)(function(t){P[t]=function(e){return Wp(P.maps[t],e)}})(Oa);var Oa;qa(P,Gp())});var kn=m((Yy,$a)=>{var Kp=ja();$a.exports=Kp});var Ba=m(Dn=>{"use strict";Dn.levels={error:0,warn:1,help:2,data:3,info:4,debug:5,prompt:6,verbose:7,input:8,silly:9};Dn.colors={error:"red",warn:"yellow",help:"cyan",data:"grey",info:"green",debug:"blue",prompt:"grey",verbose:"cyan",input:"grey",silly:"magenta"}});var za=m(Tn=>{"use strict";Tn.levels={error:0,warn:1,info:2,http:3,verbose:4,debug:5,silly:6};Tn.colors={error:"red",warn:"yellow",info:"green",http:"green",verbose:"cyan",debug:"blue",silly:"magenta"}});var Ha=m(Sn=>{"use strict";Sn.levels={emerg:0,alert:1,crit:2,error:3,warning:4,notice:5,info:6,debug:7};Sn.colors={emerg:"red",alert:"yellow",crit:"red",error:"red",warning:"red",notice:"yellow",info:"green",debug:"blue"}});var Ua=m($r=>{"use strict";Object.defineProperty($r,"cli",{value:Ba()});Object.defineProperty($r,"npm",{value:za()});Object.defineProperty($r,"syslog",{value:Ha()})});var z=m(jt=>{"use strict";Object.defineProperty(jt,"LEVEL",{value:Symbol.for("level")});Object.defineProperty(jt,"MESSAGE",{value:Symbol.for("message")});Object.defineProperty(jt,"SPLAT",{value:Symbol.for("splat")});Object.defineProperty(jt,"configs",{value:Ua()})});var Hr=m((t3,zr)=>{"use strict";var Mn=kn(),{LEVEL:Cn,MESSAGE:An}=z();Mn.enabled=!0;var Va=/\s+/,Br=class t{constructor(e={}){e.colors&&this.addColors(e.colors),this.options=e}static addColors(e){let r=Object.keys(e).reduce((u,n)=>(u[n]=Va.test(e[n])?e[n].split(Va):e[n],u),{});return t.allColors=Object.assign({},t.allColors||{},r),t.allColors}addColors(e){return t.addColors(e)}colorize(e,r,u){if(typeof u>"u"&&(u=r),!Array.isArray(t.allColors[e]))return Mn[t.allColors[e]](u);for(let n=0,i=t.allColors[e].length;n<i;n++)u=Mn[t.allColors[e][n]](u);return u}transform(e,r){return r.all&&typeof e[An]=="string"&&(e[An]=this.colorize(e[Cn],e.level,e[An])),(r.level||r.all||!r.message)&&(e.level=this.colorize(e[Cn],e.level)),(r.all||r.message)&&(e.message=this.colorize(e[Cn],e.level,e.message)),e}};zr.exports=t=>new Br(t);zr.exports.Colorizer=zr.exports.Format=Br});var Wa=m((r3,Ga)=>{"use strict";var{Colorizer:Yp}=Hr();Ga.exports=t=>(Yp.addColors(t.colors||t),t)});var Ya=m((u3,Ka)=>{"use strict";var Zp=re();Ka.exports=Zp(t=>(t.message=`	${t.message}`,t))});var Xa=m((n3,Ja)=>{"use strict";var Jp=re(),{LEVEL:Za,MESSAGE:Rn}=z();Ja.exports=Jp((t,{stack:e,cause:r})=>{if(t instanceof Error){let n=Object.assign({},t,{level:t.level,[Za]:t[Za]||t.level,message:t.message,[Rn]:t[Rn]||t.message});return e&&(n.stack=t.stack),r&&(n.cause=t.cause),n}if(!(t.message instanceof Error))return t;let u=t.message;return Object.assign(t,u),t.message=u.message,t[Rn]=u.message,e&&(t.stack=u.stack),r&&(t.cause=u.cause),t})});var Fn=m((i3,Vr)=>{"use strict";var{configs:Xp,LEVEL:Qa,MESSAGE:Pn}=z(),Ur=class t{constructor(e={levels:Xp.npm.levels}){this.paddings=t.paddingForLevels(e.levels,e.filler),this.options=e}static getLongestLevel(e){let r=Object.keys(e).map(u=>u.length);return Math.max(...r)}static paddingForLevel(e,r,u){let n=u+1-e.length,i=Math.floor(n/r.length);return`${r}${r.repeat(i)}`.slice(0,n)}static paddingForLevels(e,r=" "){let u=t.getLongestLevel(e);return Object.keys(e).reduce((n,i)=>(n[i]=t.paddingForLevel(i,r,u),n),{})}transform(e,r){return e.message=`${this.paddings[e[Qa]]}${e.message}`,e[Pn]&&(e[Pn]=`${this.paddings[e[Qa]]}${e[Pn]}`),e}};Vr.exports=t=>new Ur(t);Vr.exports.Padder=Vr.exports.Format=Ur});var eo=m((s3,On)=>{"use strict";var{Colorizer:Qp}=Hr(),{Padder:eh}=Fn(),{configs:th,MESSAGE:rh}=z(),Gr=class{constructor(e={}){e.levels||(e.levels=th.cli.levels),this.colorizer=new Qp(e),this.padder=new eh(e),this.options=e}transform(e,r){return this.colorizer.transform(this.padder.transform(e,r),r),e[rh]=`${e.level}:${e.message}`,e}};On.exports=t=>new Gr(t);On.exports.Format=Gr});var ro=m((a3,qn)=>{"use strict";var uh=re();function to(t){if(t.every(nh))return e=>{let r=e;for(let u=0;u<t.length;u++)if(r=t[u].transform(r,t[u].options),!r)return!1;return r}}function nh(t){if(typeof t.transform!="function")throw new Error(["No transform function found on format. Did you create a format instance?","const myFormat = format(formatFn);","const instance = myFormat();"].join(`
-`));return!0}qn.exports=(...t)=>{let e=uh(to(t)),r=e();return r.Format=e.Format,r};qn.exports.cascade=to});var Bt=m((jn,io)=>{"use strict";var{hasOwnProperty:$t}=Object.prototype,Xe=Nn();Xe.configure=Nn;Xe.stringify=Xe;Xe.default=Xe;jn.stringify=Xe;jn.configure=Nn;io.exports=Xe;var ih=/[\u0000-\u001f\u0022\u005c\ud800-\udfff]/;function $e(t){return t.length<5e3&&!ih.test(t)?`"${t}"`:JSON.stringify(t)}function Ln(t,e){if(t.length>200||e)return t.sort(e);for(let r=1;r<t.length;r++){let u=t[r],n=r;for(;n!==0&&t[n-1]>u;)t[n]=t[n-1],n--;t[n]=u}return t}var sh=Object.getOwnPropertyDescriptor(Object.getPrototypeOf(Object.getPrototypeOf(new Int8Array)),Symbol.toStringTag).get;function In(t){return sh.call(t)!==void 0&&t.length!==0}function uo(t,e,r){t.length<r&&(r=t.length);let u=e===","?"":" ",n=`"0":${u}${t[0]}`;for(let i=1;i<r;i++)n+=`${e}"${i}":${u}${t[i]}`;return n}function ah(t){if($t.call(t,"circularValue")){let e=t.circularValue;if(typeof e=="string")return`"${e}"`;if(e==null)return e;if(e===Error||e===TypeError)return{toString(){throw new TypeError("Converting circular structure to JSON")}};throw new TypeError('The "circularValue" argument must be of type string or the value null or undefined')}return'"[Circular]"'}function oh(t){let e;if($t.call(t,"deterministic")&&(e=t.deterministic,typeof e!="boolean"&&typeof e!="function"))throw new TypeError('The "deterministic" argument must be of type boolean or comparator function');return e===void 0?!0:e}function ch(t,e){let r;if($t.call(t,e)&&(r=t[e],typeof r!="boolean"))throw new TypeError(`The "${e}" argument must be of type boolean`);return r===void 0?!0:r}function no(t,e){let r;if($t.call(t,e)){if(r=t[e],typeof r!="number")throw new TypeError(`The "${e}" argument must be of type number`);if(!Number.isInteger(r))throw new TypeError(`The "${e}" argument must be an integer`);if(r<1)throw new RangeError(`The "${e}" argument must be >= 1`)}return r===void 0?1/0:r}function Je(t){return t===1?"1 item":`${t} items`}function lh(t){let e=new Set;for(let r of t)(typeof r=="string"||typeof r=="number")&&e.add(String(r));return e}function fh(t){if($t.call(t,"strict")){let e=t.strict;if(typeof e!="boolean")throw new TypeError('The "strict" argument must be of type boolean');if(e)return r=>{let u=`Object can not safely be stringified. Received type ${typeof r}`;throw typeof r!="function"&&(u+=` (${r.toString()})`),new Error(u)}}}function Nn(t){t={...t};let e=fh(t);e&&(t.bigint===void 0&&(t.bigint=!1),"circularValue"in t||(t.circularValue=Error));let r=ah(t),u=ch(t,"bigint"),n=oh(t),i=typeof n=="function"?n:void 0,s=no(t,"maximumDepth"),a=no(t,"maximumBreadth");function o(h,l,g,_,E,x){let y=l[h];switch(typeof y=="object"&&y!==null&&typeof y.toJSON=="function"&&(y=y.toJSON(h)),y=_.call(l,h,y),typeof y){case"string":return $e(y);case"object":{if(y===null)return"null";if(g.indexOf(y)!==-1)return r;let v="",w=",",D=x;if(Array.isArray(y)){if(y.length===0)return"[]";if(s<g.length+1)return'"[Array]"';g.push(y),E!==""&&(x+=E,v+=`
-${x}`,w=`,
-${x}`);let H=Math.min(y.length,a),J=0;for(;J<H-1;J++){let ne=o(String(J),y,g,_,E,x);v+=ne!==void 0?ne:"null",v+=w}let Z=o(String(J),y,g,_,E,x);if(v+=Z!==void 0?Z:"null",y.length-1>a){let ne=y.length-a-1;v+=`${w}"... ${Je(ne)} not stringified"`}return E!==""&&(v+=`
-${D}`),g.pop(),`[${v}]`}let S=Object.keys(y),F=S.length;if(F===0)return"{}";if(s<g.length+1)return'"[Object]"';let A="",N="";E!==""&&(x+=E,w=`,
-${x}`,A=" ");let $=Math.min(F,a);n&&!In(y)&&(S=Ln(S,i)),g.push(y);for(let H=0;H<$;H++){let J=S[H],Z=o(J,y,g,_,E,x);Z!==void 0&&(v+=`${N}${$e(J)}:${A}${Z}`,N=w)}if(F>a){let H=F-a;v+=`${N}"...":${A}"${Je(H)} not stringified"`,N=w}return E!==""&&N.length>1&&(v=`
-${x}${v}
-${D}`),g.pop(),`{${v}}`}case"number":return isFinite(y)?String(y):e?e(y):"null";case"boolean":return y===!0?"true":"false";case"undefined":return;case"bigint":if(u)return String(y);default:return e?e(y):void 0}}function c(h,l,g,_,E,x){switch(typeof l=="object"&&l!==null&&typeof l.toJSON=="function"&&(l=l.toJSON(h)),typeof l){case"string":return $e(l);case"object":{if(l===null)return"null";if(g.indexOf(l)!==-1)return r;let y=x,v="",w=",";if(Array.isArray(l)){if(l.length===0)return"[]";if(s<g.length+1)return'"[Array]"';g.push(l),E!==""&&(x+=E,v+=`
-${x}`,w=`,
-${x}`);let F=Math.min(l.length,a),A=0;for(;A<F-1;A++){let $=c(String(A),l[A],g,_,E,x);v+=$!==void 0?$:"null",v+=w}let N=c(String(A),l[A],g,_,E,x);if(v+=N!==void 0?N:"null",l.length-1>a){let $=l.length-a-1;v+=`${w}"... ${Je($)} not stringified"`}return E!==""&&(v+=`
-${y}`),g.pop(),`[${v}]`}g.push(l);let D="";E!==""&&(x+=E,w=`,
-${x}`,D=" ");let S="";for(let F of _){let A=c(F,l[F],g,_,E,x);A!==void 0&&(v+=`${S}${$e(F)}:${D}${A}`,S=w)}return E!==""&&S.length>1&&(v=`
-${x}${v}
-${y}`),g.pop(),`{${v}}`}case"number":return isFinite(l)?String(l):e?e(l):"null";case"boolean":return l===!0?"true":"false";case"undefined":return;case"bigint":if(u)return String(l);default:return e?e(l):void 0}}function f(h,l,g,_,E){switch(typeof l){case"string":return $e(l);case"object":{if(l===null)return"null";if(typeof l.toJSON=="function"){if(l=l.toJSON(h),typeof l!="object")return f(h,l,g,_,E);if(l===null)return"null"}if(g.indexOf(l)!==-1)return r;let x=E;if(Array.isArray(l)){if(l.length===0)return"[]";if(s<g.length+1)return'"[Array]"';g.push(l),E+=_;let A=`
-${E}`,N=`,
-${E}`,$=Math.min(l.length,a),H=0;for(;H<$-1;H++){let Z=f(String(H),l[H],g,_,E);A+=Z!==void 0?Z:"null",A+=N}let J=f(String(H),l[H],g,_,E);if(A+=J!==void 0?J:"null",l.length-1>a){let Z=l.length-a-1;A+=`${N}"... ${Je(Z)} not stringified"`}return A+=`
-${x}`,g.pop(),`[${A}]`}let y=Object.keys(l),v=y.length;if(v===0)return"{}";if(s<g.length+1)return'"[Object]"';E+=_;let w=`,
-${E}`,D="",S="",F=Math.min(v,a);In(l)&&(D+=uo(l,w,a),y=y.slice(l.length),F-=l.length,S=w),n&&(y=Ln(y,i)),g.push(l);for(let A=0;A<F;A++){let N=y[A],$=f(N,l[N],g,_,E);$!==void 0&&(D+=`${S}${$e(N)}: ${$}`,S=w)}if(v>a){let A=v-a;D+=`${S}"...": "${Je(A)} not stringified"`,S=w}return S!==""&&(D=`
-${E}${D}
-${x}`),g.pop(),`{${D}}`}case"number":return isFinite(l)?String(l):e?e(l):"null";case"boolean":return l===!0?"true":"false";case"undefined":return;case"bigint":if(u)return String(l);default:return e?e(l):void 0}}function d(h,l,g){switch(typeof l){case"string":return $e(l);case"object":{if(l===null)return"null";if(typeof l.toJSON=="function"){if(l=l.toJSON(h),typeof l!="object")return d(h,l,g);if(l===null)return"null"}if(g.indexOf(l)!==-1)return r;let _="",E=l.length!==void 0;if(E&&Array.isArray(l)){if(l.length===0)return"[]";if(s<g.length+1)return'"[Array]"';g.push(l);let D=Math.min(l.length,a),S=0;for(;S<D-1;S++){let A=d(String(S),l[S],g);_+=A!==void 0?A:"null",_+=","}let F=d(String(S),l[S],g);if(_+=F!==void 0?F:"null",l.length-1>a){let A=l.length-a-1;_+=`,"... ${Je(A)} not stringified"`}return g.pop(),`[${_}]`}let x=Object.keys(l),y=x.length;if(y===0)return"{}";if(s<g.length+1)return'"[Object]"';let v="",w=Math.min(y,a);E&&In(l)&&(_+=uo(l,",",a),x=x.slice(l.length),w-=l.length,v=","),n&&(x=Ln(x,i)),g.push(l);for(let D=0;D<w;D++){let S=x[D],F=d(S,l[S],g);F!==void 0&&(_+=`${v}${$e(S)}:${F}`,v=",")}if(y>a){let D=y-a;_+=`${v}"...":"${Je(D)} not stringified"`}return g.pop(),`{${_}}`}case"number":return isFinite(l)?String(l):e?e(l):"null";case"boolean":return l===!0?"true":"false";case"undefined":return;case"bigint":if(u)return String(l);default:return e?e(l):void 0}}function p(h,l,g){if(arguments.length>1){let _="";if(typeof g=="number"?_=" ".repeat(Math.min(g,10)):typeof g=="string"&&(_=g.slice(0,10)),l!=null){if(typeof l=="function")return o("",{"":h},[],l,_,"");if(Array.isArray(l))return c("",h,[],lh(l),_,"")}if(_.length!==0)return f("",h,[],_,"")}return d("",h,[])}return p}});var $n=m((o3,so)=>{"use strict";var dh=re(),{MESSAGE:ph}=z(),hh=Bt();function gh(t,e){return typeof e=="bigint"?e.toString():e}so.exports=dh((t,e)=>{let r=hh.configure(e);return t[ph]=r(t,e.replacer||gh,e.space),t})});var oo=m((c3,ao)=>{"use strict";var mh=re();ao.exports=mh((t,e)=>e.message?(t.message=`[${e.label}] ${t.message}`,t):(t.label=e.label,t))});var lo=m((l3,co)=>{"use strict";var bh=re(),{MESSAGE:yh}=z(),_h=Bt();co.exports=bh(t=>{let e={};return t.message&&(e["@message"]=t.message,delete t.message),t.timestamp&&(e["@timestamp"]=t.timestamp,delete t.timestamp),e["@fields"]=t,t[yh]=_h(e),t})});var po=m((f3,fo)=>{"use strict";var xh=re();function vh(t,e,r){let u=e.reduce((i,s)=>(i[s]=t[s],delete t[s],i),{}),n=Object.keys(t).reduce((i,s)=>(i[s]=t[s],delete t[s],i),{});return Object.assign(t,u,{[r]:n}),t}function Eh(t,e,r){return t[r]=e.reduce((u,n)=>(u[n]=t[n],delete t[n],u),{}),t}fo.exports=xh((t,e={})=>{let r="metadata";e.key&&(r=e.key);let u=[];return!e.fillExcept&&!e.fillWith&&(u.push("level"),u.push("message")),e.fillExcept&&(u=e.fillExcept),u.length>0?vh(t,u,r):e.fillWith?Eh(t,e.fillWith,r):t})});var go=m((d3,ho)=>{var mt=1e3,bt=mt*60,yt=bt*60,Qe=yt*24,wh=Qe*7,kh=Qe*365.25;ho.exports=function(t,e){e=e||{};var r=typeof t;if(r==="string"&&t.length>0)return Dh(t);if(r==="number"&&isFinite(t))return e.long?Sh(t):Th(t);throw new Error("val is not a non-empty string or a valid number. val="+JSON.stringify(t))};function Dh(t){if(t=String(t),!(t.length>100)){var e=/^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(t);if(e){var r=parseFloat(e[1]),u=(e[2]||"ms").toLowerCase();switch(u){case"years":case"year":case"yrs":case"yr":case"y":return r*kh;case"weeks":case"week":case"w":return r*wh;case"days":case"day":case"d":return r*Qe;case"hours":case"hour":case"hrs":case"hr":case"h":return r*yt;case"minutes":case"minute":case"mins":case"min":case"m":return r*bt;case"seconds":case"second":case"secs":case"sec":case"s":return r*mt;case"milliseconds":case"millisecond":case"msecs":case"msec":case"ms":return r;default:return}}}}function Th(t){var e=Math.abs(t);return e>=Qe?Math.round(t/Qe)+"d":e>=yt?Math.round(t/yt)+"h":e>=bt?Math.round(t/bt)+"m":e>=mt?Math.round(t/mt)+"s":t+"ms"}function Sh(t){var e=Math.abs(t);return e>=Qe?Wr(t,e,Qe,"day"):e>=yt?Wr(t,e,yt,"hour"):e>=bt?Wr(t,e,bt,"minute"):e>=mt?Wr(t,e,mt,"second"):t+" ms"}function Wr(t,e,r,u){var n=e>=r*1.5;return Math.round(t/r)+" "+u+(n?"s":"")}});var bo=m((zt,mo)=>{"use strict";var Ch=re(),Ah=go();mo.exports=Ch(t=>{let e=+new Date;return zt.diff=e-(zt.prevTime||e),zt.prevTime=e,t.ms=`+${Ah(zt.diff)}`,t})});var xo=m((p3,_o)=>{"use strict";var Mh=require("util").inspect,Rh=re(),{LEVEL:Ph,MESSAGE:yo,SPLAT:Fh}=z();_o.exports=Rh((t,e={})=>{let r=Object.assign({},t);return delete r[Ph],delete r[yo],delete r[Fh],t[yo]=Mh(r,!1,e.depth||null,e.colorize),t})});var vo=m((h3,Yr)=>{"use strict";var{MESSAGE:Oh}=z(),Kr=class{constructor(e){this.template=e}transform(e){return e[Oh]=this.template(e),e}};Yr.exports=t=>new Kr(t);Yr.exports.Printf=Yr.exports.Format=Kr});var ko=m((g3,wo)=>{"use strict";var qh=re(),{MESSAGE:Eo}=z(),Lh=Bt();wo.exports=qh(t=>{let e=Lh(Object.assign({},t,{level:void 0,message:void 0,splat:void 0})),r=t.padding&&t.padding[t.level]||"";return e!=="{}"?t[Eo]=`${t.level}:${r} ${t.message} ${e}`:t[Eo]=`${t.level}:${r} ${t.message}`,t})});var So=m((m3,To)=>{"use strict";var Ih=require("util"),{SPLAT:Do}=z(),Nh=/%[scdjifoO%]/g,jh=/%%/g,Bn=class{constructor(e){this.options=e}_splat(e,r){let u=e.message,n=e[Do]||e.splat||[],i=u.match(jh),s=i&&i.length||0,o=r.length-s-n.length,c=o<0?n.splice(o,-1*o):[],f=c.length;if(f)for(let d=0;d<f;d++)Object.assign(e,c[d]);return e.message=Ih.format(u,...n),e}transform(e){let r=e.message,u=e[Do]||e.splat;if(!u||!u.length)return e;let n=r&&r.match&&r.match(Nh);if(!n&&(u||u.length)){let i=u.length>1?u.splice(0):u,s=i.length;if(s)for(let a=0;a<s;a++)Object.assign(e,i[a]);return e}return n?this._splat(e,n):e}};To.exports=t=>new Bn(t)});var Ao=m((Zr,Co)=>{(function(t,e){typeof Zr=="object"&&typeof Co<"u"?e(Zr):typeof define=="function"&&define.amd?define(["exports"],e):e(t.fecha={})})(Zr,function(t){"use strict";var e=/d{1,4}|M{1,4}|YY(?:YY)?|S{1,3}|Do|ZZ|Z|([HhMsDm])\1?|[aA]|"[^"]*"|'[^']*'/g,r="\\d\\d?",u="\\d\\d",n="\\d{3}",i="\\d{4}",s="[^\\s]+",a=/\[([^]*?)\]/gm;function o(b,k){for(var L=[],ee=0,C=b.length;ee<C;ee++)L.push(b[ee].substr(0,k));return L}var c=function(b){return function(k,L){var ee=L[b].map(function(ge){return ge.toLowerCase()}),C=ee.indexOf(k.toLowerCase());return C>-1?C:null}};function f(b){for(var k=[],L=1;L<arguments.length;L++)k[L-1]=arguments[L];for(var ee=0,C=k;ee<C.length;ee++){var ge=C[ee];for(var We in ge)b[We]=ge[We]}return b}var d=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],p=["January","February","March","April","May","June","July","August","September","October","November","December"],h=o(p,3),l=o(d,3),g={dayNamesShort:l,dayNames:d,monthNamesShort:h,monthNames:p,amPm:["am","pm"],DoFn:function(b){return b+["th","st","nd","rd"][b%10>3?0:(b-b%10!==10?1:0)*b%10]}},_=f({},g),E=function(b){return _=f(_,b)},x=function(b){return b.replace(/[|\\{()[^$+*?.-]/g,"\\$&")},y=function(b,k){for(k===void 0&&(k=2),b=String(b);b.length<k;)b="0"+b;return b},v={D:function(b){return String(b.getDate())},DD:function(b){return y(b.getDate())},Do:function(b,k){return k.DoFn(b.getDate())},d:function(b){return String(b.getDay())},dd:function(b){return y(b.getDay())},ddd:function(b,k){return k.dayNamesShort[b.getDay()]},dddd:function(b,k){return k.dayNames[b.getDay()]},M:function(b){return String(b.getMonth()+1)},MM:function(b){return y(b.getMonth()+1)},MMM:function(b,k){return k.monthNamesShort[b.getMonth()]},MMMM:function(b,k){return k.monthNames[b.getMonth()]},YY:function(b){return y(String(b.getFullYear()),4).substr(2)},YYYY:function(b){return y(b.getFullYear(),4)},h:function(b){return String(b.getHours()%12||12)},hh:function(b){return y(b.getHours()%12||12)},H:function(b){return String(b.getHours())},HH:function(b){return y(b.getHours())},m:function(b){return String(b.getMinutes())},mm:function(b){return y(b.getMinutes())},s:function(b){return String(b.getSeconds())},ss:function(b){return y(b.getSeconds())},S:function(b){return String(Math.round(b.getMilliseconds()/100))},SS:function(b){return y(Math.round(b.getMilliseconds()/10),2)},SSS:function(b){return y(b.getMilliseconds(),3)},a:function(b,k){return b.getHours()<12?k.amPm[0]:k.amPm[1]},A:function(b,k){return b.getHours()<12?k.amPm[0].toUpperCase():k.amPm[1].toUpperCase()},ZZ:function(b){var k=b.getTimezoneOffset();return(k>0?"-":"+")+y(Math.floor(Math.abs(k)/60)*100+Math.abs(k)%60,4)},Z:function(b){var k=b.getTimezoneOffset();return(k>0?"-":"+")+y(Math.floor(Math.abs(k)/60),2)+":"+y(Math.abs(k)%60,2)}},w=function(b){return+b-1},D=[null,r],S=[null,s],F=["isPm",s,function(b,k){var L=b.toLowerCase();return L===k.amPm[0]?0:L===k.amPm[1]?1:null}],A=["timezoneOffset","[^\\s]*?[\\+\\-]\\d\\d:?\\d\\d|[^\\s]*?Z?",function(b){var k=(b+"").match(/([+-]|\d\d)/gi);if(k){var L=+k[1]*60+parseInt(k[2],10);return k[0]==="+"?L:-L}return 0}],N={D:["day",r],DD:["day",u],Do:["day",r+s,function(b){return parseInt(b,10)}],M:["month",r,w],MM:["month",u,w],YY:["year",u,function(b){var k=new Date,L=+(""+k.getFullYear()).substr(0,2);return+(""+(+b>68?L-1:L)+b)}],h:["hour",r,void 0,"isPm"],hh:["hour",u,void 0,"isPm"],H:["hour",r],HH:["hour",u],m:["minute",r],mm:["minute",u],s:["second",r],ss:["second",u],YYYY:["year",i],S:["millisecond","\\d",function(b){return+b*100}],SS:["millisecond",u,function(b){return+b*10}],SSS:["millisecond",n],d:D,dd:D,ddd:S,dddd:S,MMM:["month",s,c("monthNamesShort")],MMMM:["month",s,c("monthNames")],a:F,A:F,ZZ:A,Z:A},$={default:"ddd MMM DD YYYY HH:mm:ss",shortDate:"M/D/YY",mediumDate:"MMM D, YYYY",longDate:"MMMM D, YYYY",fullDate:"dddd, MMMM D, YYYY",isoDate:"YYYY-MM-DD",isoDateTime:"YYYY-MM-DDTHH:mm:ssZ",shortTime:"HH:mm",mediumTime:"HH:mm:ss",longTime:"HH:mm:ss.SSS"},H=function(b){return f($,b)},J=function(b,k,L){if(k===void 0&&(k=$.default),L===void 0&&(L={}),typeof b=="number"&&(b=new Date(b)),Object.prototype.toString.call(b)!=="[object Date]"||isNaN(b.getTime()))throw new Error("Invalid Date pass to format");k=$[k]||k;var ee=[];k=k.replace(a,function(ge,We){return ee.push(We),"@@@"});var C=f(f({},_),L);return k=k.replace(e,function(ge){return v[ge](b,C)}),k.replace(/@@@/g,function(){return ee.shift()})};function Z(b,k,L){if(L===void 0&&(L={}),typeof k!="string")throw new Error("Invalid format in fecha parse");if(k=$[k]||k,b.length>1e3)return null;var ee=new Date,C={year:ee.getFullYear(),month:0,day:1,hour:0,minute:0,second:0,millisecond:0,isPm:null,timezoneOffset:null},ge=[],We=[],Ct=k.replace(a,function(At,at){return We.push(x(at)),"@@@"}),cr={},Ki={};Ct=x(Ct).replace(e,function(At){var at=N[At],Wu=at[0],Sl=at[1],Xi=at[3];if(cr[Wu])throw new Error("Invalid format. "+Wu+" specified twice in format");return cr[Wu]=!0,Xi&&(Ki[Xi]=!0),ge.push(at),"("+Sl+")"}),Object.keys(Ki).forEach(function(At){if(!cr[At])throw new Error("Invalid format. "+At+" is required in specified format")}),Ct=Ct.replace(/@@@/g,function(){return We.shift()});var lr=b.match(new RegExp(Ct,"i"));if(!lr)return null;for(var kl=f(f({},_),L),le=1;le<lr.length;le++){var Yi=ge[le-1],Dl=Yi[0],Zi=Yi[2],Ji=Zi?Zi(lr[le],kl):+lr[le];if(Ji==null)return null;C[Dl]=Ji}C.isPm===1&&C.hour!=null&&+C.hour!=12?C.hour=+C.hour+12:C.isPm===0&&+C.hour==12&&(C.hour=0);var fr;if(C.timezoneOffset==null){fr=new Date(C.year,C.month,C.day,C.hour,C.minute,C.second,C.millisecond);for(var dr=[["month","getMonth"],["day","getDate"],["hour","getHours"],["minute","getMinutes"],["second","getSeconds"]],le=0,Tl=dr.length;le<Tl;le++)if(cr[dr[le][0]]&&C[dr[le][0]]!==fr[dr[le][1]]())return null}else if(fr=new Date(Date.UTC(C.year,C.month,C.day,C.hour,C.minute-C.timezoneOffset,C.second,C.millisecond)),C.month>11||C.month<0||C.day>31||C.day<1||C.hour>23||C.hour<0||C.minute>59||C.minute<0||C.second>59||C.second<0)return null;return fr}var ne={format:J,parse:Z,defaultI18n:g,setGlobalDateI18n:E,setGlobalDateMasks:H};t.assign=f,t.default=ne,t.format=J,t.parse=Z,t.defaultI18n=g,t.setGlobalDateI18n=E,t.setGlobalDateMasks=H,Object.defineProperty(t,"__esModule",{value:!0})})});var Ro=m((b3,Mo)=>{"use strict";var $h=Ao(),Bh=re();Mo.exports=Bh((t,e={})=>(e.format&&(t.timestamp=typeof e.format=="function"?e.format():$h.format(new Date,e.format)),t.timestamp||(t.timestamp=new Date().toISOString()),e.alias&&(t[e.alias]=t.timestamp),t))});var Fo=m((y3,Po)=>{"use strict";var zn=kn(),zh=re(),{MESSAGE:Hn}=z();Po.exports=zh((t,e)=>(e.level!==!1&&(t.level=zn.strip(t.level)),e.message!==!1&&(t.message=zn.strip(String(t.message))),e.raw!==!1&&t[Hn]&&(t[Hn]=zn.strip(String(t[Hn]))),t))});var Vn=m(Un=>{"use strict";var Hh=Un.format=re();Un.levels=Wa();function Y(t,e){Object.defineProperty(Hh,t,{get(){return e()},configurable:!0})}Y("align",function(){return Ya()});Y("errors",function(){return Xa()});Y("cli",function(){return eo()});Y("combine",function(){return ro()});Y("colorize",function(){return Hr()});Y("json",function(){return $n()});Y("label",function(){return oo()});Y("logstash",function(){return lo()});Y("metadata",function(){return po()});Y("ms",function(){return bo()});Y("padLevels",function(){return Fn()});Y("prettyPrint",function(){return xo()});Y("printf",function(){return vo()});Y("simple",function(){return ko()});Y("splat",function(){return So()});Y("timestamp",function(){return Ro()});Y("uncolorize",function(){return Fo()})});var Gn=m(Jr=>{"use strict";var{format:Oo}=require("util");Jr.warn={deprecated(t){return()=>{throw new Error(Oo("{ %s } was removed in winston@3.0.0.",t))}},useFormat(t){return()=>{throw new Error([Oo("{ %s } was removed in winston@3.0.0.",t),"Use a custom winston.format = winston.format(function) instead."].join(`
-`))}},forFunctions(t,e,r){r.forEach(u=>{t[u]=Jr.warn[e](u)})},forProperties(t,e,r){r.forEach(u=>{let n=Jr.warn[e](u);Object.defineProperty(t,u,{get:n,set:n})})}}});var qo=m((v3,Uh)=>{Uh.exports={name:"winston",description:"A logger for just about everything.",version:"3.17.0",author:"Charlie Robbins <charlie.robbins@gmail.com>",maintainers:["David Hyde <dabh@alumni.stanford.edu>"],repository:{type:"git",url:"https://github.com/winstonjs/winston.git"},keywords:["winston","logger","logging","logs","sysadmin","bunyan","pino","loglevel","tools","json","stream"],dependencies:{"@dabh/diagnostics":"^2.0.2","@colors/colors":"^1.6.0",async:"^3.2.3","is-stream":"^2.0.0",logform:"^2.7.0","one-time":"^1.0.0","readable-stream":"^3.4.0","safe-stable-stringify":"^2.3.1","stack-trace":"0.0.x","triple-beam":"^1.3.0","winston-transport":"^4.9.0"},devDependencies:{"@babel/cli":"^7.23.9","@babel/core":"^7.24.0","@babel/preset-env":"^7.24.0","@dabh/eslint-config-populist":"^4.4.0","@types/node":"^20.11.24","abstract-winston-transport":"^0.5.1",assume:"^2.2.0","cross-spawn-async":"^2.2.5",eslint:"^8.57.0",hock:"^1.4.1",mocha:"^10.3.0",nyc:"^17.1.0",rimraf:"5.0.1",split2:"^4.1.0","std-mocks":"^2.0.0",through2:"^4.0.2","winston-compat":"^0.1.5"},main:"./lib/winston.js",browser:"./dist/winston",types:"./index.d.ts",scripts:{lint:"eslint lib/*.js lib/winston/*.js lib/winston/**/*.js --resolve-plugins-relative-to ./node_modules/@dabh/eslint-config-populist",test:"rimraf test/fixtures/logs/* && mocha","test:coverage":"nyc npm run test:unit","test:unit":"mocha test/unit","test:integration":"mocha test/integration",build:"rimraf dist && babel lib -d dist",prepublishOnly:"npm run build"},engines:{node:">= 12.0.0"},license:"MIT"}});var Io=m((E3,Lo)=>{Lo.exports=require("util").deprecate});var Wn=m((w3,No)=>{No.exports=require("stream")});var Yn=m((k3,$o)=>{"use strict";function Vh(t,e){var r=this,u=this._readableState&&this._readableState.destroyed,n=this._writableState&&this._writableState.destroyed;return u||n?(e?e(t):t&&(this._writableState?this._writableState.errorEmitted||(this._writableState.errorEmitted=!0,process.nextTick(Kn,this,t)):process.nextTick(Kn,this,t)),this):(this._readableState&&(this._readableState.destroyed=!0),this._writableState&&(this._writableState.destroyed=!0),this._destroy(t||null,function(i){!e&&i?r._writableState?r._writableState.errorEmitted?process.nextTick(Xr,r):(r._writableState.errorEmitted=!0,process.nextTick(jo,r,i)):process.nextTick(jo,r,i):e?(process.nextTick(Xr,r),e(i)):process.nextTick(Xr,r)}),this)}function jo(t,e){Kn(t,e),Xr(t)}function Xr(t){t._writableState&&!t._writableState.emitClose||t._readableState&&!t._readableState.emitClose||t.emit("close")}function Gh(){this._readableState&&(this._readableState.destroyed=!1,this._readableState.reading=!1,this._readableState.ended=!1,this._readableState.endEmitted=!1),this._writableState&&(this._writableState.destroyed=!1,this._writableState.ended=!1,this._writableState.ending=!1,this._writableState.finalCalled=!1,this._writableState.prefinished=!1,this._writableState.finished=!1,this._writableState.errorEmitted=!1)}function Kn(t,e){t.emit("error",e)}function Wh(t,e){var r=t._readableState,u=t._writableState;r&&r.autoDestroy||u&&u.autoDestroy?t.destroy(e):t.emit("error",e)}$o.exports={destroy:Vh,undestroy:Gh,errorOrDestroy:Wh}});var Be=m((D3,Ho)=>{"use strict";var zo={};function ae(t,e,r){r||(r=Error);function u(i,s,a){return typeof e=="string"?e:e(i,s,a)}class n extends r{constructor(s,a,o){super(u(s,a,o))}}n.prototype.name=r.name,n.prototype.code=t,zo[t]=n}function Bo(t,e){if(Array.isArray(t)){let r=t.length;return t=t.map(u=>String(u)),r>2?`one of ${e} ${t.slice(0,r-1).join(", ")}, or `+t[r-1]:r===2?`one of ${e} ${t[0]} or ${t[1]}`:`of ${e} ${t[0]}`}else return`of ${e} ${String(t)}`}function Kh(t,e,r){return t.substr(!r||r<0?0:+r,e.length)===e}function Yh(t,e,r){return(r===void 0||r>t.length)&&(r=t.length),t.substring(r-e.length,r)===e}function Zh(t,e,r){return typeof r!="number"&&(r=0),r+e.length>t.length?!1:t.indexOf(e,r)!==-1}ae("ERR_INVALID_OPT_VALUE",function(t,e){return'The value "'+e+'" is invalid for option "'+t+'"'},TypeError);ae("ERR_INVALID_ARG_TYPE",function(t,e,r){let u;typeof e=="string"&&Kh(e,"not ")?(u="must not be",e=e.replace(/^not /,"")):u="must be";let n;if(Yh(t," argument"))n=`The ${t} ${u} ${Bo(e,"type")}`;else{let i=Zh(t,".")?"property":"argument";n=`The "${t}" ${i} ${u} ${Bo(e,"type")}`}return n+=`. Received type ${typeof r}`,n},TypeError);ae("ERR_STREAM_PUSH_AFTER_EOF","stream.push() after EOF");ae("ERR_METHOD_NOT_IMPLEMENTED",function(t){return"The "+t+" method is not implemented"});ae("ERR_STREAM_PREMATURE_CLOSE","Premature close");ae("ERR_STREAM_DESTROYED",function(t){return"Cannot call "+t+" after a stream was destroyed"});ae("ERR_MULTIPLE_CALLBACK","Callback called multiple times");ae("ERR_STREAM_CANNOT_PIPE","Cannot pipe, not readable");ae("ERR_STREAM_WRITE_AFTER_END","write after end");ae("ERR_STREAM_NULL_VALUES","May not write null values to stream",TypeError);ae("ERR_UNKNOWN_ENCODING",function(t){return"Unknown encoding: "+t},TypeError);ae("ERR_STREAM_UNSHIFT_AFTER_END_EVENT","stream.unshift() after end event");Ho.exports.codes=zo});var Zn=m((T3,Uo)=>{"use strict";var Jh=Be().codes.ERR_INVALID_OPT_VALUE;function Xh(t,e,r){return t.highWaterMark!=null?t.highWaterMark:e?t[r]:null}function Qh(t,e,r,u){var n=Xh(e,u,r);if(n!=null){if(!(isFinite(n)&&Math.floor(n)===n)||n<0){var i=u?r:"highWaterMark";throw new Jh(i,n)}return Math.floor(n)}return t.objectMode?16:16*1024}Uo.exports={getHighWaterMark:Qh}});var Vo=m((S3,Jn)=>{typeof Object.create=="function"?Jn.exports=function(e,r){r&&(e.super_=r,e.prototype=Object.create(r.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}))}:Jn.exports=function(e,r){if(r){e.super_=r;var u=function(){};u.prototype=r.prototype,e.prototype=new u,e.prototype.constructor=e}}});var _t=m((C3,Qn)=>{try{if(Xn=require("util"),typeof Xn.inherits!="function")throw"";Qn.exports=Xn.inherits}catch{Qn.exports=Vo()}var Xn});var Jo=m((A3,Zo)=>{"use strict";function Go(t,e){var r=Object.keys(t);if(Object.getOwnPropertySymbols){var u=Object.getOwnPropertySymbols(t);e&&(u=u.filter(function(n){return Object.getOwnPropertyDescriptor(t,n).enumerable})),r.push.apply(r,u)}return r}function Wo(t){for(var e=1;e<arguments.length;e++){var r=arguments[e]!=null?arguments[e]:{};e%2?Go(Object(r),!0).forEach(function(u){eg(t,u,r[u])}):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(r)):Go(Object(r)).forEach(function(u){Object.defineProperty(t,u,Object.getOwnPropertyDescriptor(r,u))})}return t}function eg(t,e,r){return e=Yo(e),e in t?Object.defineProperty(t,e,{value:r,enumerable:!0,configurable:!0,writable:!0}):t[e]=r,t}function tg(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}function Ko(t,e){for(var r=0;r<e.length;r++){var u=e[r];u.enumerable=u.enumerable||!1,u.configurable=!0,"value"in u&&(u.writable=!0),Object.defineProperty(t,Yo(u.key),u)}}function rg(t,e,r){return e&&Ko(t.prototype,e),r&&Ko(t,r),Object.defineProperty(t,"prototype",{writable:!1}),t}function Yo(t){var e=ug(t,"string");return typeof e=="symbol"?e:String(e)}function ug(t,e){if(typeof t!="object"||t===null)return t;var r=t[Symbol.toPrimitive];if(r!==void 0){var u=r.call(t,e||"default");if(typeof u!="object")return u;throw new TypeError("@@toPrimitive must return a primitive value.")}return(e==="string"?String:Number)(t)}var ng=require("buffer"),Qr=ng.Buffer,ig=require("util"),ei=ig.inspect,sg=ei&&ei.custom||"inspect";function ag(t,e,r){Qr.prototype.copy.call(t,e,r)}Zo.exports=function(){function t(){tg(this,t),this.head=null,this.tail=null,this.length=0}return rg(t,[{key:"push",value:function(r){var u={data:r,next:null};this.length>0?this.tail.next=u:this.head=u,this.tail=u,++this.length}},{key:"unshift",value:function(r){var u={data:r,next:this.head};this.length===0&&(this.tail=u),this.head=u,++this.length}},{key:"shift",value:function(){if(this.length!==0){var r=this.head.data;return this.length===1?this.head=this.tail=null:this.head=this.head.next,--this.length,r}}},{key:"clear",value:function(){this.head=this.tail=null,this.length=0}},{key:"join",value:function(r){if(this.length===0)return"";for(var u=this.head,n=""+u.data;u=u.next;)n+=r+u.data;return n}},{key:"concat",value:function(r){if(this.length===0)return Qr.alloc(0);for(var u=Qr.allocUnsafe(r>>>0),n=this.head,i=0;n;)ag(n.data,u,i),i+=n.data.length,n=n.next;return u}},{key:"consume",value:function(r,u){var n;return r<this.head.data.length?(n=this.head.data.slice(0,r),this.head.data=this.head.data.slice(r)):r===this.head.data.length?n=this.shift():n=u?this._getString(r):this._getBuffer(r),n}},{key:"first",value:function(){return this.head.data}},{key:"_getString",value:function(r){var u=this.head,n=1,i=u.data;for(r-=i.length;u=u.next;){var s=u.data,a=r>s.length?s.length:r;if(a===s.length?i+=s:i+=s.slice(0,r),r-=a,r===0){a===s.length?(++n,u.next?this.head=u.next:this.head=this.tail=null):(this.head=u,u.data=s.slice(a));break}++n}return this.length-=n,i}},{key:"_getBuffer",value:function(r){var u=Qr.allocUnsafe(r),n=this.head,i=1;for(n.data.copy(u),r-=n.data.length;n=n.next;){var s=n.data,a=r>s.length?s.length:r;if(s.copy(u,u.length-r,0,a),r-=a,r===0){a===s.length?(++i,n.next?this.head=n.next:this.head=this.tail=null):(this.head=n,n.data=s.slice(a));break}++i}return this.length-=i,u}},{key:sg,value:function(r,u){return ei(this,Wo(Wo({},u),{},{depth:0,customInspect:!1}))}}]),t}()});var eu=m((M3,ec)=>{"use strict";var Xo=Be().codes.ERR_STREAM_PREMATURE_CLOSE;function og(t){var e=!1;return function(){if(!e){e=!0;for(var r=arguments.length,u=new Array(r),n=0;n<r;n++)u[n]=arguments[n];t.apply(this,u)}}}function cg(){}function lg(t){return t.setHeader&&typeof t.abort=="function"}function Qo(t,e,r){if(typeof e=="function")return Qo(t,null,e);e||(e={}),r=og(r||cg);var u=e.readable||e.readable!==!1&&t.readable,n=e.writable||e.writable!==!1&&t.writable,i=function(){t.writable||a()},s=t._writableState&&t._writableState.finished,a=function(){n=!1,s=!0,u||r.call(t)},o=t._readableState&&t._readableState.endEmitted,c=function(){u=!1,o=!0,n||r.call(t)},f=function(l){r.call(t,l)},d=function(){var l;if(u&&!o)return(!t._readableState||!t._readableState.ended)&&(l=new Xo),r.call(t,l);if(n&&!s)return(!t._writableState||!t._writableState.ended)&&(l=new Xo),r.call(t,l)},p=function(){t.req.on("finish",a)};return lg(t)?(t.on("complete",a),t.on("abort",d),t.req?p():t.on("request",p)):n&&!t._writableState&&(t.on("end",i),t.on("close",i)),t.on("end",c),t.on("finish",a),e.error!==!1&&t.on("error",f),t.on("close",d),function(){t.removeListener("complete",a),t.removeListener("abort",d),t.removeListener("request",p),t.req&&t.req.removeListener("finish",a),t.removeListener("end",i),t.removeListener("close",i),t.removeListener("finish",a),t.removeListener("end",c),t.removeListener("error",f),t.removeListener("close",d)}}ec.exports=Qo});var rc=m((R3,tc)=>{"use strict";var tu;function ze(t,e,r){return e=fg(e),e in t?Object.defineProperty(t,e,{value:r,enumerable:!0,configurable:!0,writable:!0}):t[e]=r,t}function fg(t){var e=dg(t,"string");return typeof e=="symbol"?e:String(e)}function dg(t,e){if(typeof t!="object"||t===null)return t;var r=t[Symbol.toPrimitive];if(r!==void 0){var u=r.call(t,e||"default");if(typeof u!="object")return u;throw new TypeError("@@toPrimitive must return a primitive value.")}return(e==="string"?String:Number)(t)}var pg=eu(),He=Symbol("lastResolve"),et=Symbol("lastReject"),Ht=Symbol("error"),ru=Symbol("ended"),tt=Symbol("lastPromise"),ti=Symbol("handlePromise"),rt=Symbol("stream");function Ue(t,e){return{value:t,done:e}}function hg(t){var e=t[He];if(e!==null){var r=t[rt].read();r!==null&&(t[tt]=null,t[He]=null,t[et]=null,e(Ue(r,!1)))}}function gg(t){process.nextTick(hg,t)}function mg(t,e){return function(r,u){t.then(function(){if(e[ru]){r(Ue(void 0,!0));return}e[ti](r,u)},u)}}var bg=Object.getPrototypeOf(function(){}),yg=Object.setPrototypeOf((tu={get stream(){return this[rt]},next:function(){var e=this,r=this[Ht];if(r!==null)return Promise.reject(r);if(this[ru])return Promise.resolve(Ue(void 0,!0));if(this[rt].destroyed)return new Promise(function(s,a){process.nextTick(function(){e[Ht]?a(e[Ht]):s(Ue(void 0,!0))})});var u=this[tt],n;if(u)n=new Promise(mg(u,this));else{var i=this[rt].read();if(i!==null)return Promise.resolve(Ue(i,!1));n=new Promise(this[ti])}return this[tt]=n,n}},ze(tu,Symbol.asyncIterator,function(){return this}),ze(tu,"return",function(){var e=this;return new Promise(function(r,u){e[rt].destroy(null,function(n){if(n){u(n);return}r(Ue(void 0,!0))})})}),tu),bg),_g=function(e){var r,u=Object.create(yg,(r={},ze(r,rt,{value:e,writable:!0}),ze(r,He,{value:null,writable:!0}),ze(r,et,{value:null,writable:!0}),ze(r,Ht,{value:null,writable:!0}),ze(r,ru,{value:e._readableState.endEmitted,writable:!0}),ze(r,ti,{value:function(i,s){var a=u[rt].read();a?(u[tt]=null,u[He]=null,u[et]=null,i(Ue(a,!1))):(u[He]=i,u[et]=s)},writable:!0}),r));return u[tt]=null,pg(e,function(n){if(n&&n.code!=="ERR_STREAM_PREMATURE_CLOSE"){var i=u[et];i!==null&&(u[tt]=null,u[He]=null,u[et]=null,i(n)),u[Ht]=n;return}var s=u[He];s!==null&&(u[tt]=null,u[He]=null,u[et]=null,s(Ue(void 0,!0))),u[ru]=!0}),e.on("readable",gg.bind(null,u)),u};tc.exports=_g});var sc=m((P3,ic)=>{"use strict";function uc(t,e,r,u,n,i,s){try{var a=t[i](s),o=a.value}catch(c){r(c);return}a.done?e(o):Promise.resolve(o).then(u,n)}function xg(t){return function(){var e=this,r=arguments;return new Promise(function(u,n){var i=t.apply(e,r);function s(o){uc(i,u,n,s,a,"next",o)}function a(o){uc(i,u,n,s,a,"throw",o)}s(void 0)})}}function nc(t,e){var r=Object.keys(t);if(Object.getOwnPropertySymbols){var u=Object.getOwnPropertySymbols(t);e&&(u=u.filter(function(n){return Object.getOwnPropertyDescriptor(t,n).enumerable})),r.push.apply(r,u)}return r}function vg(t){for(var e=1;e<arguments.length;e++){var r=arguments[e]!=null?arguments[e]:{};e%2?nc(Object(r),!0).forEach(function(u){Eg(t,u,r[u])}):Object.getOwnPropertyDescriptors?Object.defineProperties(t,Object.getOwnPropertyDescriptors(r)):nc(Object(r)).forEach(function(u){Object.defineProperty(t,u,Object.getOwnPropertyDescriptor(r,u))})}return t}function Eg(t,e,r){return e=wg(e),e in t?Object.defineProperty(t,e,{value:r,enumerable:!0,configurable:!0,writable:!0}):t[e]=r,t}function wg(t){var e=kg(t,"string");return typeof e=="symbol"?e:String(e)}function kg(t,e){if(typeof t!="object"||t===null)return t;var r=t[Symbol.toPrimitive];if(r!==void 0){var u=r.call(t,e||"default");if(typeof u!="object")return u;throw new TypeError("@@toPrimitive must return a primitive value.")}return(e==="string"?String:Number)(t)}var Dg=Be().codes.ERR_INVALID_ARG_TYPE;function Tg(t,e,r){var u;if(e&&typeof e.next=="function")u=e;else if(e&&e[Symbol.asyncIterator])u=e[Symbol.asyncIterator]();else if(e&&e[Symbol.iterator])u=e[Symbol.iterator]();else throw new Dg("iterable",["Iterable"],e);var n=new t(vg({objectMode:!0},r)),i=!1;n._read=function(){i||(i=!0,s())};function s(){return a.apply(this,arguments)}function a(){return a=xg(function*(){try{var o=yield u.next(),c=o.value,f=o.done;f?n.push(null):n.push(yield c)?s():i=!1}catch(d){n.destroy(d)}}),a.apply(this,arguments)}return n}ic.exports=Tg});var fi=m((O3,mc)=>{"use strict";mc.exports=O;var xt;O.ReadableState=lc;var F3=require("events").EventEmitter,cc=function(e,r){return e.listeners(r).length},Vt=Wn(),uu=require("buffer").Buffer,Sg=(typeof global<"u"?global:typeof window<"u"?window:typeof self<"u"?self:{}).Uint8Array||function(){};function Cg(t){return uu.from(t)}function Ag(t){return uu.isBuffer(t)||t instanceof Sg}var ri=require("util"),R;ri&&ri.debuglog?R=ri.debuglog("stream"):R=function(){};var Mg=Jo(),ci=Yn(),Rg=Zn(),Pg=Rg.getHighWaterMark,nu=Be().codes,Fg=nu.ERR_INVALID_ARG_TYPE,Og=nu.ERR_STREAM_PUSH_AFTER_EOF,qg=nu.ERR_METHOD_NOT_IMPLEMENTED,Lg=nu.ERR_STREAM_UNSHIFT_AFTER_END_EVENT,vt,ui,ni;_t()(O,Vt);var Ut=ci.errorOrDestroy,ii=["error","close","destroy","pause","resume"];function Ig(t,e,r){if(typeof t.prependListener=="function")return t.prependListener(e,r);!t._events||!t._events[e]?t.on(e,r):Array.isArray(t._events[e])?t._events[e].unshift(r):t._events[e]=[r,t._events[e]]}function lc(t,e,r){xt=xt||ut(),t=t||{},typeof r!="boolean"&&(r=e instanceof xt),this.objectMode=!!t.objectMode,r&&(this.objectMode=this.objectMode||!!t.readableObjectMode),this.highWaterMark=Pg(this,t,"readableHighWaterMark",r),this.buffer=new Mg,this.length=0,this.pipes=null,this.pipesCount=0,this.flowing=null,this.ended=!1,this.endEmitted=!1,this.reading=!1,this.sync=!0,this.needReadable=!1,this.emittedReadable=!1,this.readableListening=!1,this.resumeScheduled=!1,this.paused=!0,this.emitClose=t.emitClose!==!1,this.autoDestroy=!!t.autoDestroy,this.destroyed=!1,this.defaultEncoding=t.defaultEncoding||"utf8",this.awaitDrain=0,this.readingMore=!1,this.decoder=null,this.encoding=null,t.encoding&&(vt||(vt=require("string_decoder/").StringDecoder),this.decoder=new vt(t.encoding),this.encoding=t.encoding)}function O(t){if(xt=xt||ut(),!(this instanceof O))return new O(t);var e=this instanceof xt;this._readableState=new lc(t,this,e),this.readable=!0,t&&(typeof t.read=="function"&&(this._read=t.read),typeof t.destroy=="function"&&(this._destroy=t.destroy)),Vt.call(this)}Object.defineProperty(O.prototype,"destroyed",{enumerable:!1,get:function(){return this._readableState===void 0?!1:this._readableState.destroyed},set:function(e){this._readableState&&(this._readableState.destroyed=e)}});O.prototype.destroy=ci.destroy;O.prototype._undestroy=ci.undestroy;O.prototype._destroy=function(t,e){e(t)};O.prototype.push=function(t,e){var r=this._readableState,u;return r.objectMode?u=!0:typeof t=="string"&&(e=e||r.defaultEncoding,e!==r.encoding&&(t=uu.from(t,e),e=""),u=!0),fc(this,t,e,!1,u)};O.prototype.unshift=function(t){return fc(this,t,null,!0,!1)};function fc(t,e,r,u,n){R("readableAddChunk",e);var i=t._readableState;if(e===null)i.reading=!1,$g(t,i);else{var s;if(n||(s=Ng(i,e)),s)Ut(t,s);else if(i.objectMode||e&&e.length>0)if(typeof e!="string"&&!i.objectMode&&Object.getPrototypeOf(e)!==uu.prototype&&(e=Cg(e)),u)i.endEmitted?Ut(t,new Lg):si(t,i,e,!0);else if(i.ended)Ut(t,new Og);else{if(i.destroyed)return!1;i.reading=!1,i.decoder&&!r?(e=i.decoder.write(e),i.objectMode||e.length!==0?si(t,i,e,!1):oi(t,i)):si(t,i,e,!1)}else u||(i.reading=!1,oi(t,i))}return!i.ended&&(i.length<i.highWaterMark||i.length===0)}function si(t,e,r,u){e.flowing&&e.length===0&&!e.sync?(e.awaitDrain=0,t.emit("data",r)):(e.length+=e.objectMode?1:r.length,u?e.buffer.unshift(r):e.buffer.push(r),e.needReadable&&iu(t)),oi(t,e)}function Ng(t,e){var r;return!Ag(e)&&typeof e!="string"&&e!==void 0&&!t.objectMode&&(r=new Fg("chunk",["string","Buffer","Uint8Array"],e)),r}O.prototype.isPaused=function(){return this._readableState.flowing===!1};O.prototype.setEncoding=function(t){vt||(vt=require("string_decoder/").StringDecoder);var e=new vt(t);this._readableState.decoder=e,this._readableState.encoding=this._readableState.decoder.encoding;for(var r=this._readableState.buffer.head,u="";r!==null;)u+=e.write(r.data),r=r.next;return this._readableState.buffer.clear(),u!==""&&this._readableState.buffer.push(u),this._readableState.length=u.length,this};var ac=1073741824;function jg(t){return t>=ac?t=ac:(t--,t|=t>>>1,t|=t>>>2,t|=t>>>4,t|=t>>>8,t|=t>>>16,t++),t}function oc(t,e){return t<=0||e.length===0&&e.ended?0:e.objectMode?1:t!==t?e.flowing&&e.length?e.buffer.head.data.length:e.length:(t>e.highWaterMark&&(e.highWaterMark=jg(t)),t<=e.length?t:e.ended?e.length:(e.needReadable=!0,0))}O.prototype.read=function(t){R("read",t),t=parseInt(t,10);var e=this._readableState,r=t;if(t!==0&&(e.emittedReadable=!1),t===0&&e.needReadable&&((e.highWaterMark!==0?e.length>=e.highWaterMark:e.length>0)||e.ended))return R("read: emitReadable",e.length,e.ended),e.length===0&&e.ended?ai(this):iu(this),null;if(t=oc(t,e),t===0&&e.ended)return e.length===0&&ai(this),null;var u=e.needReadable;R("need readable",u),(e.length===0||e.length-t<e.highWaterMark)&&(u=!0,R("length less than watermark",u)),e.ended||e.reading?(u=!1,R("reading or ended",u)):u&&(R("do read"),e.reading=!0,e.sync=!0,e.length===0&&(e.needReadable=!0),this._read(e.highWaterMark),e.sync=!1,e.reading||(t=oc(r,e)));var n;return t>0?n=hc(t,e):n=null,n===null?(e.needReadable=e.length<=e.highWaterMark,t=0):(e.length-=t,e.awaitDrain=0),e.length===0&&(e.ended||(e.needReadable=!0),r!==t&&e.ended&&ai(this)),n!==null&&this.emit("data",n),n};function $g(t,e){if(R("onEofChunk"),!e.ended){if(e.decoder){var r=e.decoder.end();r&&r.length&&(e.buffer.push(r),e.length+=e.objectMode?1:r.length)}e.ended=!0,e.sync?iu(t):(e.needReadable=!1,e.emittedReadable||(e.emittedReadable=!0,dc(t)))}}function iu(t){var e=t._readableState;R("emitReadable",e.needReadable,e.emittedReadable),e.needReadable=!1,e.emittedReadable||(R("emitReadable",e.flowing),e.emittedReadable=!0,process.nextTick(dc,t))}function dc(t){var e=t._readableState;R("emitReadable_",e.destroyed,e.length,e.ended),!e.destroyed&&(e.length||e.ended)&&(t.emit("readable"),e.emittedReadable=!1),e.needReadable=!e.flowing&&!e.ended&&e.length<=e.highWaterMark,li(t)}function oi(t,e){e.readingMore||(e.readingMore=!0,process.nextTick(Bg,t,e))}function Bg(t,e){for(;!e.reading&&!e.ended&&(e.length<e.highWaterMark||e.flowing&&e.length===0);){var r=e.length;if(R("maybeReadMore read 0"),t.read(0),r===e.length)break}e.readingMore=!1}O.prototype._read=function(t){Ut(this,new qg("_read()"))};O.prototype.pipe=function(t,e){var r=this,u=this._readableState;switch(u.pipesCount){case 0:u.pipes=t;break;case 1:u.pipes=[u.pipes,t];break;default:u.pipes.push(t);break}u.pipesCount+=1,R("pipe count=%d opts=%j",u.pipesCount,e);var n=(!e||e.end!==!1)&&t!==process.stdout&&t!==process.stderr,i=n?a:g;u.endEmitted?process.nextTick(i):r.once("end",i),t.on("unpipe",s);function s(_,E){R("onunpipe"),_===r&&E&&E.hasUnpiped===!1&&(E.hasUnpiped=!0,f())}function a(){R("onend"),t.end()}var o=zg(r);t.on("drain",o);var c=!1;function f(){R("cleanup"),t.removeListener("close",h),t.removeListener("finish",l),t.removeListener("drain",o),t.removeListener("error",p),t.removeListener("unpipe",s),r.removeListener("end",a),r.removeListener("end",g),r.removeListener("data",d),c=!0,u.awaitDrain&&(!t._writableState||t._writableState.needDrain)&&o()}r.on("data",d);function d(_){R("ondata");var E=t.write(_);R("dest.write",E),E===!1&&((u.pipesCount===1&&u.pipes===t||u.pipesCount>1&&gc(u.pipes,t)!==-1)&&!c&&(R("false write response, pause",u.awaitDrain),u.awaitDrain++),r.pause())}function p(_){R("onerror",_),g(),t.removeListener("error",p),cc(t,"error")===0&&Ut(t,_)}Ig(t,"error",p);function h(){t.removeListener("finish",l),g()}t.once("close",h);function l(){R("onfinish"),t.removeListener("close",h),g()}t.once("finish",l);function g(){R("unpipe"),r.unpipe(t)}return t.emit("pipe",r),u.flowing||(R("pipe resume"),r.resume()),t};function zg(t){return function(){var r=t._readableState;R("pipeOnDrain",r.awaitDrain),r.awaitDrain&&r.awaitDrain--,r.awaitDrain===0&&cc(t,"data")&&(r.flowing=!0,li(t))}}O.prototype.unpipe=function(t){var e=this._readableState,r={hasUnpiped:!1};if(e.pipesCount===0)return this;if(e.pipesCount===1)return t&&t!==e.pipes?this:(t||(t=e.pipes),e.pipes=null,e.pipesCount=0,e.flowing=!1,t&&t.emit("unpipe",this,r),this);if(!t){var u=e.pipes,n=e.pipesCount;e.pipes=null,e.pipesCount=0,e.flowing=!1;for(var i=0;i<n;i++)u[i].emit("unpipe",this,{hasUnpiped:!1});return this}var s=gc(e.pipes,t);return s===-1?this:(e.pipes.splice(s,1),e.pipesCount-=1,e.pipesCount===1&&(e.pipes=e.pipes[0]),t.emit("unpipe",this,r),this)};O.prototype.on=function(t,e){var r=Vt.prototype.on.call(this,t,e),u=this._readableState;return t==="data"?(u.readableListening=this.listenerCount("readable")>0,u.flowing!==!1&&this.resume()):t==="readable"&&!u.endEmitted&&!u.readableListening&&(u.readableListening=u.needReadable=!0,u.flowing=!1,u.emittedReadable=!1,R("on readable",u.length,u.reading),u.length?iu(this):u.reading||process.nextTick(Hg,this)),r};O.prototype.addListener=O.prototype.on;O.prototype.removeListener=function(t,e){var r=Vt.prototype.removeListener.call(this,t,e);return t==="readable"&&process.nextTick(pc,this),r};O.prototype.removeAllListeners=function(t){var e=Vt.prototype.removeAllListeners.apply(this,arguments);return(t==="readable"||t===void 0)&&process.nextTick(pc,this),e};function pc(t){var e=t._readableState;e.readableListening=t.listenerCount("readable")>0,e.resumeScheduled&&!e.paused?e.flowing=!0:t.listenerCount("data")>0&&t.resume()}function Hg(t){R("readable nexttick read 0"),t.read(0)}O.prototype.resume=function(){var t=this._readableState;return t.flowing||(R("resume"),t.flowing=!t.readableListening,Ug(this,t)),t.paused=!1,this};function Ug(t,e){e.resumeScheduled||(e.resumeScheduled=!0,process.nextTick(Vg,t,e))}function Vg(t,e){R("resume",e.reading),e.reading||t.read(0),e.resumeScheduled=!1,t.emit("resume"),li(t),e.flowing&&!e.reading&&t.read(0)}O.prototype.pause=function(){return R("call pause flowing=%j",this._readableState.flowing),this._readableState.flowing!==!1&&(R("pause"),this._readableState.flowing=!1,this.emit("pause")),this._readableState.paused=!0,this};function li(t){var e=t._readableState;for(R("flow",e.flowing);e.flowing&&t.read()!==null;);}O.prototype.wrap=function(t){var e=this,r=this._readableState,u=!1;t.on("end",function(){if(R("wrapped end"),r.decoder&&!r.ended){var s=r.decoder.end();s&&s.length&&e.push(s)}e.push(null)}),t.on("data",function(s){if(R("wrapped data"),r.decoder&&(s=r.decoder.write(s)),!(r.objectMode&&s==null)&&!(!r.objectMode&&(!s||!s.length))){var a=e.push(s);a||(u=!0,t.pause())}});for(var n in t)this[n]===void 0&&typeof t[n]=="function"&&(this[n]=function(a){return function(){return t[a].apply(t,arguments)}}(n));for(var i=0;i<ii.length;i++)t.on(ii[i],this.emit.bind(this,ii[i]));return this._read=function(s){R("wrapped _read",s),u&&(u=!1,t.resume())},this};typeof Symbol=="function"&&(O.prototype[Symbol.asyncIterator]=function(){return ui===void 0&&(ui=rc()),ui(this)});Object.defineProperty(O.prototype,"readableHighWaterMark",{enumerable:!1,get:function(){return this._readableState.highWaterMark}});Object.defineProperty(O.prototype,"readableBuffer",{enumerable:!1,get:function(){return this._readableState&&this._readableState.buffer}});Object.defineProperty(O.prototype,"readableFlowing",{enumerable:!1,get:function(){return this._readableState.flowing},set:function(e){this._readableState&&(this._readableState.flowing=e)}});O._fromList=hc;Object.defineProperty(O.prototype,"readableLength",{enumerable:!1,get:function(){return this._readableState.length}});function hc(t,e){if(e.length===0)return null;var r;return e.objectMode?r=e.buffer.shift():!t||t>=e.length?(e.decoder?r=e.buffer.join(""):e.buffer.length===1?r=e.buffer.first():r=e.buffer.concat(e.length),e.buffer.clear()):r=e.buffer.consume(t,e.decoder),r}function ai(t){var e=t._readableState;R("endReadable",e.endEmitted),e.endEmitted||(e.ended=!0,process.nextTick(Gg,e,t))}function Gg(t,e){if(R("endReadableNT",t.endEmitted,t.length),!t.endEmitted&&t.length===0&&(t.endEmitted=!0,e.readable=!1,e.emit("end"),t.autoDestroy)){var r=e._writableState;(!r||r.autoDestroy&&r.finished)&&e.destroy()}}typeof Symbol=="function"&&(O.from=function(t,e){return ni===void 0&&(ni=sc()),ni(O,t,e)});function gc(t,e){for(var r=0,u=t.length;r<u;r++)if(t[r]===e)return r;return-1}});var ut=m((q3,yc)=>{"use strict";var Wg=Object.keys||function(t){var e=[];for(var r in t)e.push(r);return e};yc.exports=xe;var bc=fi(),pi=ou();_t()(xe,bc);for(di=Wg(pi.prototype),su=0;su<di.length;su++)au=di[su],xe.prototype[au]||(xe.prototype[au]=pi.prototype[au]);var di,au,su;function xe(t){if(!(this instanceof xe))return new xe(t);bc.call(this,t),pi.call(this,t),this.allowHalfOpen=!0,t&&(t.readable===!1&&(this.readable=!1),t.writable===!1&&(this.writable=!1),t.allowHalfOpen===!1&&(this.allowHalfOpen=!1,this.once("end",Kg)))}Object.defineProperty(xe.prototype,"writableHighWaterMark",{enumerable:!1,get:function(){return this._writableState.highWaterMark}});Object.defineProperty(xe.prototype,"writableBuffer",{enumerable:!1,get:function(){return this._writableState&&this._writableState.getBuffer()}});Object.defineProperty(xe.prototype,"writableLength",{enumerable:!1,get:function(){return this._writableState.length}});function Kg(){this._writableState.ended||process.nextTick(Yg,this)}function Yg(t){t.end()}Object.defineProperty(xe.prototype,"destroyed",{enumerable:!1,get:function(){return this._readableState===void 0||this._writableState===void 0?!1:this._readableState.destroyed&&this._writableState.destroyed},set:function(e){this._readableState===void 0||this._writableState===void 0||(this._readableState.destroyed=e,this._writableState.destroyed=e)}})});var ou=m((L3,kc)=>{"use strict";kc.exports=j;function xc(t){var e=this;this.next=null,this.entry=null,this.finish=function(){E1(e,t)}}var Et;j.WritableState=Wt;var Zg={deprecate:Io()},vc=Wn(),lu=require("buffer").Buffer,Jg=(typeof global<"u"?global:typeof window<"u"?window:typeof self<"u"?self:{}).Uint8Array||function(){};function Xg(t){return lu.from(t)}function Qg(t){return lu.isBuffer(t)||t instanceof Jg}var gi=Yn(),e1=Zn(),t1=e1.getHighWaterMark,Ve=Be().codes,r1=Ve.ERR_INVALID_ARG_TYPE,u1=Ve.ERR_METHOD_NOT_IMPLEMENTED,n1=Ve.ERR_MULTIPLE_CALLBACK,i1=Ve.ERR_STREAM_CANNOT_PIPE,s1=Ve.ERR_STREAM_DESTROYED,a1=Ve.ERR_STREAM_NULL_VALUES,o1=Ve.ERR_STREAM_WRITE_AFTER_END,c1=Ve.ERR_UNKNOWN_ENCODING,wt=gi.errorOrDestroy;_t()(j,vc);function l1(){}function Wt(t,e,r){Et=Et||ut(),t=t||{},typeof r!="boolean"&&(r=e instanceof Et),this.objectMode=!!t.objectMode,r&&(this.objectMode=this.objectMode||!!t.writableObjectMode),this.highWaterMark=t1(this,t,"writableHighWaterMark",r),this.finalCalled=!1,this.needDrain=!1,this.ending=!1,this.ended=!1,this.finished=!1,this.destroyed=!1;var u=t.decodeStrings===!1;this.decodeStrings=!u,this.defaultEncoding=t.defaultEncoding||"utf8",this.length=0,this.writing=!1,this.corked=0,this.sync=!0,this.bufferProcessing=!1,this.onwrite=function(n){b1(e,n)},this.writecb=null,this.writelen=0,this.bufferedRequest=null,this.lastBufferedRequest=null,this.pendingcb=0,this.prefinished=!1,this.errorEmitted=!1,this.emitClose=t.emitClose!==!1,this.autoDestroy=!!t.autoDestroy,this.bufferedRequestCount=0,this.corkedRequestsFree=new xc(this)}Wt.prototype.getBuffer=function(){for(var e=this.bufferedRequest,r=[];e;)r.push(e),e=e.next;return r};(function(){try{Object.defineProperty(Wt.prototype,"buffer",{get:Zg.deprecate(function(){return this.getBuffer()},"_writableState.buffer is deprecated. Use _writableState.getBuffer instead.","DEP0003")})}catch{}})();var cu;typeof Symbol=="function"&&Symbol.hasInstance&&typeof Function.prototype[Symbol.hasInstance]=="function"?(cu=Function.prototype[Symbol.hasInstance],Object.defineProperty(j,Symbol.hasInstance,{value:function(e){return cu.call(this,e)?!0:this!==j?!1:e&&e._writableState instanceof Wt}})):cu=function(e){return e instanceof this};function j(t){Et=Et||ut();var e=this instanceof Et;if(!e&&!cu.call(j,this))return new j(t);this._writableState=new Wt(t,this,e),this.writable=!0,t&&(typeof t.write=="function"&&(this._write=t.write),typeof t.writev=="function"&&(this._writev=t.writev),typeof t.destroy=="function"&&(this._destroy=t.destroy),typeof t.final=="function"&&(this._final=t.final)),vc.call(this)}j.prototype.pipe=function(){wt(this,new i1)};function f1(t,e){var r=new o1;wt(t,r),process.nextTick(e,r)}function d1(t,e,r,u){var n;return r===null?n=new a1:typeof r!="string"&&!e.objectMode&&(n=new r1("chunk",["string","Buffer"],r)),n?(wt(t,n),process.nextTick(u,n),!1):!0}j.prototype.write=function(t,e,r){var u=this._writableState,n=!1,i=!u.objectMode&&Qg(t);return i&&!lu.isBuffer(t)&&(t=Xg(t)),typeof e=="function"&&(r=e,e=null),i?e="buffer":e||(e=u.defaultEncoding),typeof r!="function"&&(r=l1),u.ending?f1(this,r):(i||d1(this,u,t,r))&&(u.pendingcb++,n=h1(this,u,i,t,e,r)),n};j.prototype.cork=function(){this._writableState.corked++};j.prototype.uncork=function(){var t=this._writableState;t.corked&&(t.corked--,!t.writing&&!t.corked&&!t.bufferProcessing&&t.bufferedRequest&&Ec(this,t))};j.prototype.setDefaultEncoding=function(e){if(typeof e=="string"&&(e=e.toLowerCase()),!(["hex","utf8","utf-8","ascii","binary","base64","ucs2","ucs-2","utf16le","utf-16le","raw"].indexOf((e+"").toLowerCase())>-1))throw new c1(e);return this._writableState.defaultEncoding=e,this};Object.defineProperty(j.prototype,"writableBuffer",{enumerable:!1,get:function(){return this._writableState&&this._writableState.getBuffer()}});function p1(t,e,r){return!t.objectMode&&t.decodeStrings!==!1&&typeof e=="string"&&(e=lu.from(e,r)),e}Object.defineProperty(j.prototype,"writableHighWaterMark",{enumerable:!1,get:function(){return this._writableState.highWaterMark}});function h1(t,e,r,u,n,i){if(!r){var s=p1(e,u,n);u!==s&&(r=!0,n="buffer",u=s)}var a=e.objectMode?1:u.length;e.length+=a;var o=e.length<e.highWaterMark;if(o||(e.needDrain=!0),e.writing||e.corked){var c=e.lastBufferedRequest;e.lastBufferedRequest={chunk:u,encoding:n,isBuf:r,callback:i,next:null},c?c.next=e.lastBufferedRequest:e.bufferedRequest=e.lastBufferedRequest,e.bufferedRequestCount+=1}else hi(t,e,!1,a,u,n,i);return o}function hi(t,e,r,u,n,i,s){e.writelen=u,e.writecb=s,e.writing=!0,e.sync=!0,e.destroyed?e.onwrite(new s1("write")):r?t._writev(n,e.onwrite):t._write(n,i,e.onwrite),e.sync=!1}function g1(t,e,r,u,n){--e.pendingcb,r?(process.nextTick(n,u),process.nextTick(Gt,t,e),t._writableState.errorEmitted=!0,wt(t,u)):(n(u),t._writableState.errorEmitted=!0,wt(t,u),Gt(t,e))}function m1(t){t.writing=!1,t.writecb=null,t.length-=t.writelen,t.writelen=0}function b1(t,e){var r=t._writableState,u=r.sync,n=r.writecb;if(typeof n!="function")throw new n1;if(m1(r),e)g1(t,r,u,e,n);else{var i=wc(r)||t.destroyed;!i&&!r.corked&&!r.bufferProcessing&&r.bufferedRequest&&Ec(t,r),u?process.nextTick(_c,t,r,i,n):_c(t,r,i,n)}}function _c(t,e,r,u){r||y1(t,e),e.pendingcb--,u(),Gt(t,e)}function y1(t,e){e.length===0&&e.needDrain&&(e.needDrain=!1,t.emit("drain"))}function Ec(t,e){e.bufferProcessing=!0;var r=e.bufferedRequest;if(t._writev&&r&&r.next){var u=e.bufferedRequestCount,n=new Array(u),i=e.corkedRequestsFree;i.entry=r;for(var s=0,a=!0;r;)n[s]=r,r.isBuf||(a=!1),r=r.next,s+=1;n.allBuffers=a,hi(t,e,!0,e.length,n,"",i.finish),e.pendingcb++,e.lastBufferedRequest=null,i.next?(e.corkedRequestsFree=i.next,i.next=null):e.corkedRequestsFree=new xc(e),e.bufferedRequestCount=0}else{for(;r;){var o=r.chunk,c=r.encoding,f=r.callback,d=e.objectMode?1:o.length;if(hi(t,e,!1,d,o,c,f),r=r.next,e.bufferedRequestCount--,e.writing)break}r===null&&(e.lastBufferedRequest=null)}e.bufferedRequest=r,e.bufferProcessing=!1}j.prototype._write=function(t,e,r){r(new u1("_write()"))};j.prototype._writev=null;j.prototype.end=function(t,e,r){var u=this._writableState;return typeof t=="function"?(r=t,t=null,e=null):typeof e=="function"&&(r=e,e=null),t!=null&&this.write(t,e),u.corked&&(u.corked=1,this.uncork()),u.ending||v1(this,u,r),this};Object.defineProperty(j.prototype,"writableLength",{enumerable:!1,get:function(){return this._writableState.length}});function wc(t){return t.ending&&t.length===0&&t.bufferedRequest===null&&!t.finished&&!t.writing}function _1(t,e){t._final(function(r){e.pendingcb--,r&&wt(t,r),e.prefinished=!0,t.emit("prefinish"),Gt(t,e)})}function x1(t,e){!e.prefinished&&!e.finalCalled&&(typeof t._final=="function"&&!e.destroyed?(e.pendingcb++,e.finalCalled=!0,process.nextTick(_1,t,e)):(e.prefinished=!0,t.emit("prefinish")))}function Gt(t,e){var r=wc(e);if(r&&(x1(t,e),e.pendingcb===0&&(e.finished=!0,t.emit("finish"),e.autoDestroy))){var u=t._readableState;(!u||u.autoDestroy&&u.endEmitted)&&t.destroy()}return r}function v1(t,e,r){e.ending=!0,Gt(t,e),r&&(e.finished?process.nextTick(r):t.once("finish",r)),e.ended=!0,t.writable=!1}function E1(t,e,r){var u=t.entry;for(t.entry=null;u;){var n=u.callback;e.pendingcb--,n(r),u=u.next}e.corkedRequestsFree.next=t}Object.defineProperty(j.prototype,"destroyed",{enumerable:!1,get:function(){return this._writableState===void 0?!1:this._writableState.destroyed},set:function(e){this._writableState&&(this._writableState.destroyed=e)}});j.prototype.destroy=gi.destroy;j.prototype._undestroy=gi.undestroy;j.prototype._destroy=function(t,e){e(t)}});var mi=m((I3,Sc)=>{"use strict";var w1=require("util"),Dc=ou(),{LEVEL:Tc}=z(),Kt=Sc.exports=function(e={}){Dc.call(this,{objectMode:!0,highWaterMark:e.highWaterMark}),this.format=e.format,this.level=e.level,this.handleExceptions=e.handleExceptions,this.handleRejections=e.handleRejections,this.silent=e.silent,e.log&&(this.log=e.log),e.logv&&(this.logv=e.logv),e.close&&(this.close=e.close),this.once("pipe",r=>{this.levels=r.levels,this.parent=r}),this.once("unpipe",r=>{r===this.parent&&(this.parent=null,this.close&&this.close())})};w1.inherits(Kt,Dc);Kt.prototype._write=function(e,r,u){if(this.silent||e.exception===!0&&!this.handleExceptions)return u(null);let n=this.level||this.parent&&this.parent.level;if(!n||this.levels[n]>=this.levels[e[Tc]]){if(e&&!this.format)return this.log(e,u);let i,s;try{s=this.format.transform(Object.assign({},e),this.format.options)}catch(a){i=a}if(i||!s){if(u(),i)throw i;return}return this.log(s,u)}return this._writableState.sync=!1,u(null)};Kt.prototype._writev=function(e,r){if(this.logv){let u=e.filter(this._accept,this);return u.length?this.logv(u,r):r(null)}for(let u=0;u<e.length;u++){if(!this._accept(e[u]))continue;if(e[u].chunk&&!this.format){this.log(e[u].chunk,e[u].callback);continue}let n,i;try{i=this.format.transform(Object.assign({},e[u].chunk),this.format.options)}catch(s){n=s}if(n||!i){if(e[u].callback(),n)throw r(null),n}else this.log(i,e[u].callback)}return r(null)};Kt.prototype._accept=function(e){let r=e.chunk;if(this.silent)return!1;let u=this.level||this.parent&&this.parent.level;return!!((r.exception===!0||!u||this.levels[u]>=this.levels[r[Tc]])&&(this.handleExceptions||r.exception!==!0))};Kt.prototype._nop=function(){}});var yi=m((N3,Ac)=>{"use strict";var k1=require("util"),{LEVEL:bi}=z(),Cc=mi(),Yt=Ac.exports=function(e={}){if(Cc.call(this,e),!e.transport||typeof e.transport.log!="function")throw new Error("Invalid transport, must be an object with a log method.");this.transport=e.transport,this.level=this.level||e.transport.level,this.handleExceptions=this.handleExceptions||e.transport.handleExceptions,this._deprecated();function r(u){this.emit("error",u,this.transport)}this.transport.__winstonError||(this.transport.__winstonError=r.bind(this),this.transport.on("error",this.transport.__winstonError))};k1.inherits(Yt,Cc);Yt.prototype._write=function(e,r,u){if(this.silent||e.exception===!0&&!this.handleExceptions)return u(null);(!this.level||this.levels[this.level]>=this.levels[e[bi]])&&this.transport.log(e[bi],e.message,e,this._nop),u(null)};Yt.prototype._writev=function(e,r){for(let u=0;u<e.length;u++)this._accept(e[u])&&(this.transport.log(e[u].chunk[bi],e[u].chunk.message,e[u].chunk,this._nop),e[u].callback());return r(null)};Yt.prototype._deprecated=function(){console.error([`${this.transport.name} is a legacy winston transport. Consider upgrading: `,"- Upgrade docs: https://github.com/winstonjs/winston/blob/master/UPGRADE-3.0.md"].join(`
-`))};Yt.prototype.close=function(){this.transport.close&&this.transport.close(),this.transport.__winstonError&&(this.transport.removeListener("error",this.transport.__winstonError),this.transport.__winstonError=null)}});var kt=m((j3,_i)=>{"use strict";_i.exports=mi();_i.exports.LegacyTransportStream=yi()});var Pc=m((B3,Rc)=>{"use strict";var D1=require("os"),{LEVEL:Mc,MESSAGE:Dt}=z(),T1=kt();Rc.exports=class extends T1{constructor(e={}){super(e),this.name=e.name||"console",this.stderrLevels=this._stringArrayToSet(e.stderrLevels),this.consoleWarnLevels=this._stringArrayToSet(e.consoleWarnLevels),this.eol=typeof e.eol=="string"?e.eol:D1.EOL,this.forceConsole=e.forceConsole||!1,this._consoleLog=console.log.bind(console),this._consoleWarn=console.warn.bind(console),this._consoleError=console.error.bind(console),this.setMaxListeners(30)}log(e,r){if(setImmediate(()=>this.emit("logged",e)),this.stderrLevels[e[Mc]]){console._stderr&&!this.forceConsole?console._stderr.write(`${e[Dt]}${this.eol}`):this._consoleError(e[Dt]),r&&r();return}else if(this.consoleWarnLevels[e[Mc]]){console._stderr&&!this.forceConsole?console._stderr.write(`${e[Dt]}${this.eol}`):this._consoleWarn(e[Dt]),r&&r();return}console._stdout&&!this.forceConsole?console._stdout.write(`${e[Dt]}${this.eol}`):this._consoleLog(e[Dt]),r&&r()}_stringArrayToSet(e,r){if(!e)return{};if(r=r||"Cannot make set from type other than Array of string elements",!Array.isArray(e))throw new Error(r);return e.reduce((u,n)=>{if(typeof n!="string")throw new Error(r);return u[n]=!0,u},{})}}});var du=m((fu,Fc)=>{"use strict";Object.defineProperty(fu,"__esModule",{value:!0});fu.default=S1;function S1(t){return t&&typeof t.length=="number"&&t.length>=0&&t.length%1===0}Fc.exports=fu.default});var qc=m((pu,Oc)=>{"use strict";Object.defineProperty(pu,"__esModule",{value:!0});pu.default=function(t){return function(...e){var r=e.pop();return t.call(this,e,r)}};Oc.exports=pu.default});var Nc=m(Ge=>{"use strict";Object.defineProperty(Ge,"__esModule",{value:!0});Ge.fallback=Lc;Ge.wrap=Ic;var C1=Ge.hasQueueMicrotask=typeof queueMicrotask=="function"&&queueMicrotask,A1=Ge.hasSetImmediate=typeof setImmediate=="function"&&setImmediate,M1=Ge.hasNextTick=typeof process=="object"&&typeof process.nextTick=="function";function Lc(t){setTimeout(t,0)}function Ic(t){return(e,...r)=>t(()=>e(...r))}var Zt;C1?Zt=queueMicrotask:A1?Zt=setImmediate:M1?Zt=process.nextTick:Zt=Lc;Ge.default=Ic(Zt)});var Hc=m((hu,zc)=>{"use strict";Object.defineProperty(hu,"__esModule",{value:!0});hu.default=L1;var R1=qc(),P1=Bc(R1),F1=Nc(),O1=Bc(F1),q1=nt();function Bc(t){return t&&t.__esModule?t:{default:t}}function L1(t){return(0,q1.isAsync)(t)?function(...e){let r=e.pop(),u=t.apply(this,e);return jc(u,r)}:(0,P1.default)(function(e,r){var u;try{u=t.apply(this,e)}catch(n){return r(n)}if(u&&typeof u.then=="function")return jc(u,r);r(null,u)})}function jc(t,e){return t.then(r=>{$c(e,null,r)},r=>{$c(e,r&&(r instanceof Error||r.message)?r:new Error(r))})}function $c(t,e,r){try{t(e,r)}catch(u){(0,O1.default)(n=>{throw n},u)}}zc.exports=hu.default});var nt=m(Ce=>{"use strict";Object.defineProperty(Ce,"__esModule",{value:!0});Ce.isAsyncIterable=Ce.isAsyncGenerator=Ce.isAsync=void 0;var I1=Hc(),N1=j1(I1);function j1(t){return t&&t.__esModule?t:{default:t}}function Uc(t){return t[Symbol.toStringTag]==="AsyncFunction"}function $1(t){return t[Symbol.toStringTag]==="AsyncGenerator"}function B1(t){return typeof t[Symbol.asyncIterator]=="function"}function z1(t){if(typeof t!="function")throw new Error("expected a function");return Uc(t)?(0,N1.default)(t):t}Ce.default=z1;Ce.isAsync=Uc;Ce.isAsyncGenerator=$1;Ce.isAsyncIterable=B1});var Tt=m((gu,Vc)=>{"use strict";Object.defineProperty(gu,"__esModule",{value:!0});gu.default=H1;function H1(t,e){if(e||(e=t.length),!e)throw new Error("arity is undefined");function r(...u){return typeof u[e-1]=="function"?t.apply(this,u):new Promise((n,i)=>{u[e-1]=(s,...a)=>{if(s)return i(s);n(a.length>1?a:a[0])},t.apply(this,u)})}return r}Vc.exports=gu.default});var Wc=m((mu,Gc)=>{"use strict";Object.defineProperty(mu,"__esModule",{value:!0});var U1=du(),V1=xi(U1),G1=nt(),W1=xi(G1),K1=Tt(),Y1=xi(K1);function xi(t){return t&&t.__esModule?t:{default:t}}mu.default=(0,Y1.default)((t,e,r)=>{var u=(0,V1.default)(e)?[]:{};t(e,(n,i,s)=>{(0,W1.default)(n)((a,...o)=>{o.length<2&&([o]=o),u[i]=o,s(a)})},n=>r(n,u))},3);Gc.exports=mu.default});var vi=m((bu,Kc)=>{"use strict";Object.defineProperty(bu,"__esModule",{value:!0});bu.default=Z1;function Z1(t){function e(...r){if(t!==null){var u=t;t=null,u.apply(this,r)}}return Object.assign(e,t),e}Kc.exports=bu.default});var Zc=m((yu,Yc)=>{"use strict";Object.defineProperty(yu,"__esModule",{value:!0});yu.default=function(t){return t[Symbol.iterator]&&t[Symbol.iterator]()};Yc.exports=yu.default});var Qc=m((_u,Xc)=>{"use strict";Object.defineProperty(_u,"__esModule",{value:!0});_u.default=nm;var J1=du(),X1=Jc(J1),Q1=Zc(),em=Jc(Q1);function Jc(t){return t&&t.__esModule?t:{default:t}}function tm(t){var e=-1,r=t.length;return function(){return++e<r?{value:t[e],key:e}:null}}function rm(t){var e=-1;return function(){var u=t.next();return u.done?null:(e++,{value:u.value,key:e})}}function um(t){var e=t?Object.keys(t):[],r=-1,u=e.length;return function n(){var i=e[++r];return i==="__proto__"?n():r<u?{value:t[i],key:i}:null}}function nm(t){if((0,X1.default)(t))return tm(t);var e=(0,em.default)(t);return e?rm(e):um(t)}Xc.exports=_u.default});var Ei=m((xu,e0)=>{"use strict";Object.defineProperty(xu,"__esModule",{value:!0});xu.default=im;function im(t){return function(...e){if(t===null)throw new Error("Callback was already called.");var r=t;t=null,r.apply(this,e)}}e0.exports=xu.default});var Eu=m((vu,t0)=>{"use strict";Object.defineProperty(vu,"__esModule",{value:!0});var sm={};vu.default=sm;t0.exports=vu.default});var u0=m((wu,r0)=>{"use strict";Object.defineProperty(wu,"__esModule",{value:!0});wu.default=lm;var am=Eu(),om=cm(am);function cm(t){return t&&t.__esModule?t:{default:t}}function lm(t,e,r,u){let n=!1,i=!1,s=!1,a=0,o=0;function c(){a>=e||s||n||(s=!0,t.next().then(({value:p,done:h})=>{if(!(i||n)){if(s=!1,h){n=!0,a<=0&&u(null);return}a++,r(p,o,f),o++,c()}}).catch(d))}function f(p,h){if(a-=1,!i){if(p)return d(p);if(p===!1){n=!0,i=!0;return}if(h===om.default||n&&a<=0)return n=!0,u(null);c()}}function d(p){i||(s=!1,n=!0,u(p))}c()}r0.exports=wu.default});var a0=m((ku,s0)=>{"use strict";Object.defineProperty(ku,"__esModule",{value:!0});var fm=vi(),dm=Jt(fm),pm=Qc(),hm=Jt(pm),gm=Ei(),mm=Jt(gm),n0=nt(),bm=u0(),i0=Jt(bm),ym=Eu(),_m=Jt(ym);function Jt(t){return t&&t.__esModule?t:{default:t}}ku.default=t=>(e,r,u)=>{if(u=(0,dm.default)(u),t<=0)throw new RangeError("concurrency limit cannot be less than 1");if(!e)return u(null);if((0,n0.isAsyncGenerator)(e))return(0,i0.default)(e,t,r,u);if((0,n0.isAsyncIterable)(e))return(0,i0.default)(e[Symbol.asyncIterator](),t,r,u);var n=(0,hm.default)(e),i=!1,s=!1,a=0,o=!1;function c(d,p){if(!s)if(a-=1,d)i=!0,u(d);else if(d===!1)i=!0,s=!0;else{if(p===_m.default||i&&a<=0)return i=!0,u(null);o||f()}}function f(){for(o=!0;a<t&&!i;){var d=n();if(d===null){i=!0,a<=0&&u(null);return}a+=1,r(d.value,d.key,(0,mm.default)(c))}o=!1}f()};s0.exports=ku.default});var ki=m((Du,o0)=>{"use strict";Object.defineProperty(Du,"__esModule",{value:!0});var xm=a0(),vm=wi(xm),Em=nt(),wm=wi(Em),km=Tt(),Dm=wi(km);function wi(t){return t&&t.__esModule?t:{default:t}}function Tm(t,e,r,u){return(0,vm.default)(e)(t,(0,wm.default)(r),u)}Du.default=(0,Dm.default)(Tm,4);o0.exports=Du.default});var f0=m((Tu,l0)=>{"use strict";Object.defineProperty(Tu,"__esModule",{value:!0});var Sm=ki(),Cm=c0(Sm),Am=Tt(),Mm=c0(Am);function c0(t){return t&&t.__esModule?t:{default:t}}function Rm(t,e,r){return(0,Cm.default)(t,1,e,r)}Tu.default=(0,Mm.default)(Rm,3);l0.exports=Tu.default});var h0=m((Su,p0)=>{"use strict";Object.defineProperty(Su,"__esModule",{value:!0});Su.default=Lm;var Pm=Wc(),Fm=d0(Pm),Om=f0(),qm=d0(Om);function d0(t){return t&&t.__esModule?t:{default:t}}function Lm(t,e){return(0,Fm.default)(qm.default,t,e)}p0.exports=Su.default});var Di=m((U3,m0)=>{"use strict";m0.exports=Ae;var Cu=Be().codes,Im=Cu.ERR_METHOD_NOT_IMPLEMENTED,Nm=Cu.ERR_MULTIPLE_CALLBACK,jm=Cu.ERR_TRANSFORM_ALREADY_TRANSFORMING,$m=Cu.ERR_TRANSFORM_WITH_LENGTH_0,Au=ut();_t()(Ae,Au);function Bm(t,e){var r=this._transformState;r.transforming=!1;var u=r.writecb;if(u===null)return this.emit("error",new Nm);r.writechunk=null,r.writecb=null,e!=null&&this.push(e),u(t);var n=this._readableState;n.reading=!1,(n.needReadable||n.length<n.highWaterMark)&&this._read(n.highWaterMark)}function Ae(t){if(!(this instanceof Ae))return new Ae(t);Au.call(this,t),this._transformState={afterTransform:Bm.bind(this),needTransform:!1,transforming:!1,writecb:null,writechunk:null,writeencoding:null},this._readableState.needReadable=!0,this._readableState.sync=!1,t&&(typeof t.transform=="function"&&(this._transform=t.transform),typeof t.flush=="function"&&(this._flush=t.flush)),this.on("prefinish",zm)}function zm(){var t=this;typeof this._flush=="function"&&!this._readableState.destroyed?this._flush(function(e,r){g0(t,e,r)}):g0(this,null,null)}Ae.prototype.push=function(t,e){return this._transformState.needTransform=!1,Au.prototype.push.call(this,t,e)};Ae.prototype._transform=function(t,e,r){r(new Im("_transform()"))};Ae.prototype._write=function(t,e,r){var u=this._transformState;if(u.writecb=r,u.writechunk=t,u.writeencoding=e,!u.transforming){var n=this._readableState;(u.needTransform||n.needReadable||n.length<n.highWaterMark)&&this._read(n.highWaterMark)}};Ae.prototype._read=function(t){var e=this._transformState;e.writechunk!==null&&!e.transforming?(e.transforming=!0,this._transform(e.writechunk,e.writeencoding,e.afterTransform)):e.needTransform=!0};Ae.prototype._destroy=function(t,e){Au.prototype._destroy.call(this,t,function(r){e(r)})};function g0(t,e,r){if(e)return t.emit("error",e);if(r!=null&&t.push(r),t._writableState.length)throw new $m;if(t._transformState.transforming)throw new jm;return t.push(null)}});var _0=m((V3,y0)=>{"use strict";y0.exports=Xt;var b0=Di();_t()(Xt,b0);function Xt(t){if(!(this instanceof Xt))return new Xt(t);b0.call(this,t)}Xt.prototype._transform=function(t,e,r){r(null,t)}});var k0=m((G3,w0)=>{"use strict";var Ti;function Hm(t){var e=!1;return function(){e||(e=!0,t.apply(void 0,arguments))}}var E0=Be().codes,Um=E0.ERR_MISSING_ARGS,Vm=E0.ERR_STREAM_DESTROYED;function x0(t){if(t)throw t}function Gm(t){return t.setHeader&&typeof t.abort=="function"}function Wm(t,e,r,u){u=Hm(u);var n=!1;t.on("close",function(){n=!0}),Ti===void 0&&(Ti=eu()),Ti(t,{readable:e,writable:r},function(s){if(s)return u(s);n=!0,u()});var i=!1;return function(s){if(!n&&!i){if(i=!0,Gm(t))return t.abort();if(typeof t.destroy=="function")return t.destroy();u(s||new Vm("pipe"))}}}function v0(t){t()}function Km(t,e){return t.pipe(e)}function Ym(t){return!t.length||typeof t[t.length-1]!="function"?x0:t.pop()}function Zm(){for(var t=arguments.length,e=new Array(t),r=0;r<t;r++)e[r]=arguments[r];var u=Ym(e);if(Array.isArray(e[0])&&(e=e[0]),e.length<2)throw new Um("streams");var n,i=e.map(function(s,a){var o=a<e.length-1,c=a>0;return Wm(s,o,c,function(f){n||(n=f),f&&i.forEach(v0),!o&&(i.forEach(v0),u(n))})});return e.reduce(Km)}w0.exports=Zm});var it=m((oe,er)=>{var Qt=require("stream");process.env.READABLE_STREAM==="disable"&&Qt?(er.exports=Qt.Readable,Object.assign(er.exports,Qt),er.exports.Stream=Qt):(oe=er.exports=fi(),oe.Stream=Qt||oe,oe.Readable=oe,oe.Writable=ou(),oe.Duplex=ut(),oe.Transform=Di(),oe.PassThrough=_0(),oe.finished=eu(),oe.pipeline=k0())});var S0=m((W3,T0)=>{var St=[],tr=[],Si=function(){};function Ai(t){return~St.indexOf(t)?!1:(St.push(t),!0)}function Mi(t){Si=t}function Jm(t){for(var e=[],r=0;r<St.length;r++){if(St[r].async){e.push(St[r]);continue}if(St[r](t))return!0}return e.length?new Promise(function(n){Promise.all(e.map(function(s){return s(t)})).then(function(s){n(s.some(Boolean))})}):!1}function Ri(t){return~tr.indexOf(t)?!1:(tr.push(t),!0)}function Ci(){Si.apply(Si,arguments)}function D0(t){for(var e=0;e<tr.length;e++)t=tr[e].apply(tr[e],arguments);return t}function Pi(t,e){var r=Object.prototype.hasOwnProperty;for(var u in e)r.call(e,u)&&(t[u]=e[u]);return t}function Xm(t){return t.enabled=!1,t.modify=Ri,t.set=Mi,t.use=Ai,Pi(function(){return!1},t)}function Qm(t){function e(){var r=Array.prototype.slice.call(arguments,0);return Ci.call(Ci,t,D0(r,t)),!0}return t.enabled=!0,t.modify=Ri,t.set=Mi,t.use=Ai,Pi(e,t)}T0.exports=function(e){return e.introduce=Pi,e.enabled=Jm,e.process=D0,e.modify=Ri,e.write=Ci,e.nope=Xm,e.yep=Qm,e.set=Mi,e.use=Ai,e}});var A0=m((K3,C0)=>{var eb=S0(),tb=eb(function t(e,r){return r=r||{},r.namespace=e,r.prod=!0,r.dev=!1,r.force||t.force?t.yep(r):t.nope(r)});C0.exports=tb});var rr=m((Y3,M0)=>{M0.exports=A0()});var P0=m((Z3,R0)=>{"use strict";var Fi=require("fs"),{StringDecoder:rb}=require("string_decoder"),{Stream:ub}=it();function nb(){}R0.exports=(t,e)=>{let r=Buffer.alloc(65536),u=new rb("utf8"),n=new ub,i="",s=0,a=0;return t.start===-1&&delete t.start,n.readable=!0,n.destroy=()=>{n.destroyed=!0,n.emit("end"),n.emit("close")},Fi.open(t.file,"a+","0644",(o,c)=>{if(o){e?e(o):n.emit("error",o),n.destroy();return}(function f(){if(n.destroyed){Fi.close(c,nb);return}return Fi.read(c,r,0,r.length,s,(d,p)=>{if(d){e?e(d):n.emit("error",d),n.destroy();return}if(!p)return i&&((t.start==null||a>t.start)&&(e?e(null,i):n.emit("line",i)),a++,i=""),setTimeout(f,1e3);let h=u.write(r.slice(0,p));e||n.emit("data",h),h=(i+h).split(/\n+/);let l=h.length-1,g=0;for(;g<l;g++)(t.start==null||a>t.start)&&(e?e(null,h[g]):n.emit("line",h[g])),a++;return i=h[l],s+=p,f()})})()}),e?n.destroy:n}});var L0=m((X3,q0)=>{"use strict";var ue=require("fs"),W=require("path"),F0=h0(),ib=require("zlib"),{MESSAGE:sb}=z(),{Stream:ab,PassThrough:O0}=it(),ob=kt(),he=rr()("winston:file"),cb=require("os"),lb=P0();q0.exports=class extends ob{constructor(e={}){super(e),this.name=e.name||"file";function r(u,...n){n.slice(1).forEach(i=>{if(e[i])throw new Error(`Cannot set ${i} and ${u} together`)})}if(this._stream=new O0,this._stream.setMaxListeners(30),this._onError=this._onError.bind(this),e.filename||e.dirname)r("filename or dirname","stream"),this._basename=this.filename=e.filename?W.basename(e.filename):"winston.log",this.dirname=e.dirname||W.dirname(e.filename),this.options=e.options||{flags:"a"};else if(e.stream)console.warn("options.stream will be removed in winston@4. Use winston.transports.Stream"),r("stream","filename","maxsize"),this._dest=this._stream.pipe(this._setupStream(e.stream)),this.dirname=W.dirname(this._dest.path);else throw new Error("Cannot log to file without filename or stream.");this.maxsize=e.maxsize||null,this.rotationFormat=e.rotationFormat||!1,this.zippedArchive=e.zippedArchive||!1,this.maxFiles=e.maxFiles||null,this.eol=typeof e.eol=="string"?e.eol:cb.EOL,this.tailable=e.tailable||!1,this.lazy=e.lazy||!1,this._size=0,this._pendingSize=0,this._created=0,this._drain=!1,this._opening=!1,this._ending=!1,this._fileExist=!1,this.dirname&&this._createLogDirIfNotExist(this.dirname),this.lazy||this.open()}finishIfEnding(){this._ending&&(this._opening?this.once("open",()=>{this._stream.once("finish",()=>this.emit("finish")),setImmediate(()=>this._stream.end())}):(this._stream.once("finish",()=>this.emit("finish")),setImmediate(()=>this._stream.end())))}log(e,r=()=>{}){if(this.silent)return r(),!0;if(this._drain){this._stream.once("drain",()=>{this._drain=!1,this.log(e,r)});return}if(this._rotate){this._stream.once("rotate",()=>{this._rotate=!1,this.log(e,r)});return}if(this.lazy){if(!this._fileExist){this._opening||this.open(),this.once("open",()=>{this._fileExist=!0,this.log(e,r)});return}if(this._needsNewFile(this._pendingSize)){this._dest.once("close",()=>{this._opening||this.open(),this.once("open",()=>{this.log(e,r)})});return}}let u=`${e[sb]}${this.eol}`,n=Buffer.byteLength(u);function i(){if(this._size+=n,this._pendingSize-=n,he("logged %s %s",this._size,u),this.emit("logged",e),!this._rotate&&!this._opening&&this._needsNewFile()){if(this.lazy){this._endStream(()=>{this.emit("fileclosed")});return}this._rotate=!0,this._endStream(()=>this._rotateFile())}}this._pendingSize+=n,this._opening&&!this.rotatedWhileOpening&&this._needsNewFile(this._size+this._pendingSize)&&(this.rotatedWhileOpening=!0);let s=this._stream.write(u,i.bind(this));return s?r():(this._drain=!0,this._stream.once("drain",()=>{this._drain=!1,r()})),he("written",s,this._drain),this.finishIfEnding(),s}query(e,r){typeof e=="function"&&(r=e,e={}),e=d(e);let u=W.join(this.dirname,this.filename),n="",i=[],s=0,a=ue.createReadStream(u,{encoding:"utf8"});a.on("error",p=>{if(a.readable&&a.destroy(),!!r)return p.code!=="ENOENT"?r(p):r(null,i)}),a.on("data",p=>{p=(n+p).split(/\n+/);let h=p.length-1,l=0;for(;l<h;l++)(!e.start||s>=e.start)&&o(p[l]),s++;n=p[h]}),a.on("close",()=>{n&&o(n,!0),e.order==="desc"&&(i=i.reverse()),r&&r(null,i)});function o(p,h){try{let l=JSON.parse(p);f(l)&&c(l)}catch(l){h||a.emit("error",l)}}function c(p){if(e.rows&&i.length>=e.rows&&e.order!=="desc"){a.readable&&a.destroy();return}e.fields&&(p=e.fields.reduce((h,l)=>(h[l]=p[l],h),{})),e.order==="desc"&&i.length>=e.rows&&i.shift(),i.push(p)}function f(p){if(!p||typeof p!="object")return;let h=new Date(p.timestamp);if(!(e.from&&h<e.from||e.until&&h>e.until||e.level&&e.level!==p.level))return!0}function d(p){return p=p||{},p.rows=p.rows||p.limit||10,p.start=p.start||0,p.until=p.until||new Date,typeof p.until!="object"&&(p.until=new Date(p.until)),p.from=p.from||p.until-24*60*60*1e3,typeof p.from!="object"&&(p.from=new Date(p.from)),p.order=p.order||"desc",p}}stream(e={}){let r=W.join(this.dirname,this.filename),u=new ab,n={file:r,start:e.start};return u.destroy=lb(n,(i,s)=>{if(i)return u.emit("error",i);try{u.emit("data",s),s=JSON.parse(s),u.emit("log",s)}catch(a){u.emit("error",a)}}),u}open(){this.filename&&(this._opening||(this._opening=!0,this.stat((e,r)=>{if(e)return this.emit("error",e);he("stat done: %s { size: %s }",this.filename,r),this._size=r,this._dest=this._createStream(this._stream),this._opening=!1,this.once("open",()=>{this._stream.emit("rotate")||(this._rotate=!1)})})))}stat(e){let r=this._getFile(),u=W.join(this.dirname,r);ue.stat(u,(n,i)=>{if(n&&n.code==="ENOENT")return he("ENOENT\xA0ok",u),this.filename=r,e(null,0);if(n)return he(`err ${n.code} ${u}`),e(n);if(!i||this._needsNewFile(i.size))return this._incFile(()=>this.stat(e));this.filename=r,e(null,i.size)})}close(e){this._stream&&this._stream.end(()=>{e&&e(),this.emit("flush"),this.emit("closed")})}_needsNewFile(e){return e=e||this._size,this.maxsize&&e>=this.maxsize}_onError(e){this.emit("error",e)}_setupStream(e){return e.on("error",this._onError),e}_cleanupStream(e){return e.removeListener("error",this._onError),e.destroy(),e}_rotateFile(){this._incFile(()=>this.open())}_endStream(e=()=>{}){this._dest?(this._stream.unpipe(this._dest),this._dest.end(()=>{this._cleanupStream(this._dest),e()})):e()}_createStream(e){let r=W.join(this.dirname,this.filename);he("create stream start",r,this.options);let u=ue.createWriteStream(r,this.options).on("error",n=>he(n)).on("close",()=>he("close",u.path,u.bytesWritten)).on("open",()=>{he("file open ok",r),this.emit("open",r),e.pipe(u),this.rotatedWhileOpening&&(this._stream=new O0,this._stream.setMaxListeners(30),this._rotateFile(),this.rotatedWhileOpening=!1,this._cleanupStream(u),e.end())});return he("create stream ok",r),u}_incFile(e){he("_incFile",this.filename);let r=W.extname(this._basename),u=W.basename(this._basename,r),n=[];this.zippedArchive&&n.push(function(i){let s=this._created>0&&!this.tailable?this._created:"";this._compressFile(W.join(this.dirname,`${u}${s}${r}`),W.join(this.dirname,`${u}${s}${r}.gz`),i)}.bind(this)),n.push(function(i){this.tailable?this._checkMaxFilesTailable(r,u,i):(this._created+=1,this._checkMaxFilesIncrementing(r,u,i))}.bind(this)),F0(n,e)}_getFile(){let e=W.extname(this._basename),r=W.basename(this._basename,e),u=this.rotationFormat?this.rotationFormat():this._created;return!this.tailable&&this._created?`${r}${u}${e}`:`${r}${e}`}_checkMaxFilesIncrementing(e,r,u){if(!this.maxFiles||this._created<this.maxFiles)return setImmediate(u);let n=this._created-this.maxFiles,i=n!==0?n:"",s=this.zippedArchive?".gz":"",a=`${r}${i}${e}${s}`,o=W.join(this.dirname,a);ue.unlink(o,u)}_checkMaxFilesTailable(e,r,u){let n=[];if(!this.maxFiles)return;let i=this.zippedArchive?".gz":"";for(let s=this.maxFiles-1;s>1;s--)n.push(function(a,o){let c=`${r}${a-1}${e}${i}`,f=W.join(this.dirname,c);ue.exists(f,d=>{if(!d)return o(null);c=`${r}${a}${e}${i}`,ue.rename(f,W.join(this.dirname,c),o)})}.bind(this,s));F0(n,()=>{ue.rename(W.join(this.dirname,`${r}${e}${i}`),W.join(this.dirname,`${r}1${e}${i}`),u)})}_compressFile(e,r,u){ue.access(e,ue.F_OK,n=>{if(n)return u();var i=ib.createGzip(),s=ue.createReadStream(e),a=ue.createWriteStream(r);a.on("finish",()=>{ue.unlink(e,u)}),s.pipe(i).pipe(a)})}_createLogDirIfNotExist(e){ue.existsSync(e)||ue.mkdirSync(e,{recursive:!0})}}});var N0=m((e6,I0)=>{"use strict";var fb=require("http"),db=require("https"),{Stream:pb}=it(),hb=kt(),{configure:gb}=Bt();I0.exports=class extends hb{constructor(e={}){super(e),this.options=e,this.name=e.name||"http",this.ssl=!!e.ssl,this.host=e.host||"localhost",this.port=e.port,this.auth=e.auth,this.path=e.path||"",this.maximumDepth=e.maximumDepth,this.agent=e.agent,this.headers=e.headers||{},this.headers["content-type"]="application/json",this.batch=e.batch||!1,this.batchInterval=e.batchInterval||5e3,this.batchCount=e.batchCount||10,this.batchOptions=[],this.batchTimeoutID=-1,this.batchCallback={},this.port||(this.port=this.ssl?443:80)}log(e,r){this._request(e,null,null,(u,n)=>{n&&n.statusCode!==200&&(u=new Error(`Invalid HTTP Status Code: ${n.statusCode}`)),u?this.emit("warn",u):this.emit("logged",e)}),r&&setImmediate(r)}query(e,r){typeof e=="function"&&(r=e,e={}),e={method:"query",params:this.normalizeQuery(e)};let u=e.params.auth||null;delete e.params.auth;let n=e.params.path||null;delete e.params.path,this._request(e,u,n,(i,s,a)=>{if(s&&s.statusCode!==200&&(i=new Error(`Invalid HTTP Status Code: ${s.statusCode}`)),i)return r(i);if(typeof a=="string")try{a=JSON.parse(a)}catch(o){return r(o)}r(null,a)})}stream(e={}){let r=new pb;e={method:"stream",params:e};let u=e.params.path||null;delete e.params.path;let n=e.params.auth||null;delete e.params.auth;let i="",s=this._request(e,n,u);return r.destroy=()=>s.destroy(),s.on("data",a=>{a=(i+a).split(/\n+/);let o=a.length-1,c=0;for(;c<o;c++)try{r.emit("log",JSON.parse(a[c]))}catch(f){r.emit("error",f)}i=a[o]}),s.on("error",a=>r.emit("error",a)),r}_request(e,r,u,n){e=e||{},r=r||this.auth,u=u||this.path||"",this.batch?this._doBatch(e,n,r,u):this._doRequest(e,n,r,u)}_doBatch(e,r,u,n){if(this.batchOptions.push(e),this.batchOptions.length===1){let i=this;this.batchCallback=r,this.batchTimeoutID=setTimeout(function(){i.batchTimeoutID=-1,i._doBatchRequest(i.batchCallback,u,n)},this.batchInterval)}this.batchOptions.length===this.batchCount&&this._doBatchRequest(this.batchCallback,u,n)}_doBatchRequest(e,r,u){this.batchTimeoutID>0&&(clearTimeout(this.batchTimeoutID),this.batchTimeoutID=-1);let n=this.batchOptions.slice();this.batchOptions=[],this._doRequest(n,e,r,u)}_doRequest(e,r,u,n){let i=Object.assign({},this.headers);u&&u.bearer&&(i.Authorization=`Bearer ${u.bearer}`);let s=(this.ssl?db:fb).request({...this.options,method:"POST",host:this.host,port:this.port,path:`/${n.replace(/^\//,"")}`,headers:i,auth:u&&u.username&&u.password?`${u.username}:${u.password}`:"",agent:this.agent});s.on("error",r),s.on("response",o=>o.on("end",()=>r(null,o)).resume());let a=gb({...this.maximumDepth&&{maximumDepth:this.maximumDepth}});s.end(Buffer.from(a(e,this.options.replacer),"utf8"))}}});var Oi=m((t6,j0)=>{"use strict";var ve=t=>t!==null&&typeof t=="object"&&typeof t.pipe=="function";ve.writable=t=>ve(t)&&t.writable!==!1&&typeof t._write=="function"&&typeof t._writableState=="object";ve.readable=t=>ve(t)&&t.readable!==!1&&typeof t._read=="function"&&typeof t._readableState=="object";ve.duplex=t=>ve.writable(t)&&ve.readable(t);ve.transform=t=>ve.duplex(t)&&typeof t._transform=="function";j0.exports=ve});var B0=m((u6,$0)=>{"use strict";var mb=Oi(),{MESSAGE:bb}=z(),yb=require("os"),_b=kt();$0.exports=class extends _b{constructor(e={}){if(super(e),!e.stream||!mb(e.stream))throw new Error("options.stream is required.");this._stream=e.stream,this._stream.setMaxListeners(1/0),this.isObjectMode=e.stream._writableState.objectMode,this.eol=typeof e.eol=="string"?e.eol:yb.EOL}log(e,r){if(setImmediate(()=>this.emit("logged",e)),this.isObjectMode){this._stream.write(e),r&&r();return}this._stream.write(`${e[bb]}${this.eol}`),r&&r()}}});var z0=m(ur=>{"use strict";Object.defineProperty(ur,"Console",{configurable:!0,enumerable:!0,get(){return Pc()}});Object.defineProperty(ur,"File",{configurable:!0,enumerable:!0,get(){return L0()}});Object.defineProperty(ur,"Http",{configurable:!0,enumerable:!0,get(){return N0()}});Object.defineProperty(ur,"Stream",{configurable:!0,enumerable:!0,get(){return B0()}})});var Ru=m(nr=>{"use strict";var Mu=Vn(),{configs:qi}=z();nr.cli=Mu.levels(qi.cli);nr.npm=Mu.levels(qi.npm);nr.syslog=Mu.levels(qi.syslog);nr.addColors=Mu.levels});var U0=m((Pu,H0)=>{"use strict";Object.defineProperty(Pu,"__esModule",{value:!0});var xb=du(),vb=st(xb),Eb=Eu(),wb=st(Eb),kb=ki(),Db=st(kb),Tb=vi(),Sb=st(Tb),Cb=Ei(),Ab=st(Cb),Mb=nt(),Rb=st(Mb),Pb=Tt(),Fb=st(Pb);function st(t){return t&&t.__esModule?t:{default:t}}function Ob(t,e,r){r=(0,Sb.default)(r);var u=0,n=0,{length:i}=t,s=!1;i===0&&r(null);function a(o,c){o===!1&&(s=!0),s!==!0&&(o?r(o):(++n===i||c===wb.default)&&r(null))}for(;u<i;u++)e(t[u],u,(0,Ab.default)(a))}function qb(t,e,r){return(0,Db.default)(t,1/0,e,r)}function Lb(t,e,r){var u=(0,vb.default)(t)?Ob:qb;return u(t,(0,Rb.default)(e),r)}Pu.default=(0,Fb.default)(Lb,3);H0.exports=Pu.default});var G0=m((Fu,V0)=>{"use strict";Object.defineProperty(Fu,"__esModule",{value:!0});Fu.default=Ib;function Ib(t){return(e,r,u)=>t(e,u)}V0.exports=Fu.default});var Lu=m((qu,W0)=>{"use strict";Object.defineProperty(qu,"__esModule",{value:!0});var Nb=U0(),jb=Ou(Nb),$b=G0(),Bb=Ou($b),zb=nt(),Hb=Ou(zb),Ub=Tt(),Vb=Ou(Ub);function Ou(t){return t&&t.__esModule?t:{default:t}}function Gb(t,e,r){return(0,jb.default)(t,(0,Bb.default)((0,Hb.default)(e)),r)}qu.default=(0,Vb.default)(Gb,3);W0.exports=qu.default});var Y0=m((s6,K0)=>{"use strict";var Wb=Object.prototype.toString;K0.exports=function(e){if(typeof e.displayName=="string"&&e.constructor.name)return e.displayName;if(typeof e.name=="string"&&e.name)return e.name;if(typeof e=="object"&&e.constructor&&typeof e.constructor.name=="string")return e.constructor.name;var r=e.toString(),u=Wb.call(e).slice(8,-1);return u==="Function"?r=r.substring(r.indexOf("(")+1,r.indexOf(")")):r=u,r||"anonymous"}});var Li=m((a6,Z0)=>{"use strict";var Kb=Y0();Z0.exports=function(e){var r=0,u;function n(){return r||(r=1,u=e.apply(this,arguments),e=null),u}return n.displayName=Kb(e),n}});var Ii=m(sr=>{sr.get=function(t){var e=Error.stackTraceLimit;Error.stackTraceLimit=1/0;var r={},u=Error.prepareStackTrace;Error.prepareStackTrace=function(i,s){return s},Error.captureStackTrace(r,t||sr.get);var n=r.stack;return Error.prepareStackTrace=u,Error.stackTraceLimit=e,n};sr.parse=function(t){if(!t.stack)return[];var e=this,r=t.stack.split(`
-`).slice(1);return r.map(function(u){if(u.match(/^\s*[-]{4,}$/))return e._createParsedCallSite({fileName:u,lineNumber:null,functionName:null,typeName:null,methodName:null,columnNumber:null,native:null});var n=u.match(/at (?:(.+)\s+\()?(?:(.+?):(\d+)(?::(\d+))?|([^)]+))\)?/);if(n){var i=null,s=null,a=null,o=null,c=null,f=n[5]==="native";if(n[1]){a=n[1];var d=a.lastIndexOf(".");if(a[d-1]=="."&&d--,d>0){i=a.substr(0,d),s=a.substr(d+1);var p=i.indexOf(".Module");p>0&&(a=a.substr(p+1),i=i.substr(0,p))}o=null}s&&(o=i,c=s),s==="<anonymous>"&&(c=null,a=null);var h={fileName:n[2]||null,lineNumber:parseInt(n[3],10)||null,functionName:a,typeName:o,methodName:c,columnNumber:parseInt(n[4],10)||null,native:f};return e._createParsedCallSite(h)}}).filter(function(u){return!!u})};function ir(t){for(var e in t)this[e]=t[e]}var Yb=["this","typeName","functionName","methodName","fileName","lineNumber","columnNumber","function","evalOrigin"],Zb=["topLevel","eval","native","constructor"];Yb.forEach(function(t){ir.prototype[t]=null,ir.prototype["get"+t[0].toUpperCase()+t.substr(1)]=function(){return this[t]}});Zb.forEach(function(t){ir.prototype[t]=!1,ir.prototype["is"+t[0].toUpperCase()+t.substr(1)]=function(){return this[t]}});sr._createParsedCallSite=function(t){return new ir(t)}});var X0=m((l6,J0)=>{"use strict";var{Writable:Jb}=it();J0.exports=class extends Jb{constructor(e){if(super({objectMode:!0}),!e)throw new Error("ExceptionStream requires a TransportStream instance.");this.handleExceptions=!0,this.transport=e}_write(e,r,u){return e.exception?this.transport.log(e,u):(u(),!0)}}});var ji=m((d6,tl)=>{"use strict";var Q0=require("os"),Xb=Lu(),Ni=rr()("winston:exception"),Qb=Li(),el=Ii(),e2=X0();tl.exports=class{constructor(e){if(!e)throw new Error("Logger is required to handle exceptions");this.logger=e,this.handlers=new Map}handle(...e){e.forEach(r=>{if(Array.isArray(r))return r.forEach(u=>this._addHandler(u));this._addHandler(r)}),this.catcher||(this.catcher=this._uncaughtException.bind(this),process.on("uncaughtException",this.catcher))}unhandle(){this.catcher&&(process.removeListener("uncaughtException",this.catcher),this.catcher=!1,Array.from(this.handlers.values()).forEach(e=>this.logger.unpipe(e)))}getAllInfo(e){let r=null;return e&&(r=typeof e=="string"?e:e.message),{error:e,level:"error",message:[`uncaughtException: ${r||"(no error message)"}`,e&&e.stack||"  No stack trace"].join(`
-`),stack:e&&e.stack,exception:!0,date:new Date().toString(),process:this.getProcessInfo(),os:this.getOsInfo(),trace:this.getTrace(e)}}getProcessInfo(){return{pid:process.pid,uid:process.getuid?process.getuid():null,gid:process.getgid?process.getgid():null,cwd:process.cwd(),execPath:process.execPath,version:process.version,argv:process.argv,memoryUsage:process.memoryUsage()}}getOsInfo(){return{loadavg:Q0.loadavg(),uptime:Q0.uptime()}}getTrace(e){return(e?el.parse(e):el.get()).map(u=>({column:u.getColumnNumber(),file:u.getFileName(),function:u.getFunctionName(),line:u.getLineNumber(),method:u.getMethodName(),native:u.isNative()}))}_addHandler(e){if(!this.handlers.has(e)){e.handleExceptions=!0;let r=new e2(e);this.handlers.set(e,r),this.logger.pipe(r)}}_uncaughtException(e){let r=this.getAllInfo(e),u=this._getExceptionHandlers(),n=typeof this.logger.exitOnError=="function"?this.logger.exitOnError(e):this.logger.exitOnError,i;!u.length&&n&&(console.warn("winston: exitOnError cannot be true with no exception handlers."),console.warn("winston: not exiting process."),n=!1);function s(){Ni("doExit",n),Ni("process._exiting",process._exiting),n&&!process._exiting&&(i&&clearTimeout(i),process.exit(1))}if(!u||u.length===0)return process.nextTick(s);Xb(u,(a,o)=>{let c=Qb(o),f=a.transport||a;function d(p){return()=>{Ni(p),c()}}f._ending=!0,f.once("finish",d("finished")),f.once("error",d("error"))},()=>n&&s()),this.logger.log(r),n&&(i=setTimeout(s,3e3))}_getExceptionHandlers(){return this.logger.transports.filter(e=>(e.transport||e).handleExceptions)}}});var ul=m((h6,rl)=>{"use strict";var{Writable:t2}=it();rl.exports=class extends t2{constructor(e){if(super({objectMode:!0}),!e)throw new Error("RejectionStream requires a TransportStream instance.");this.handleRejections=!0,this.transport=e}_write(e,r,u){return e.rejection?this.transport.log(e,u):(u(),!0)}}});var Bi=m((m6,sl)=>{"use strict";var nl=require("os"),r2=Lu(),$i=rr()("winston:rejection"),u2=Li(),il=Ii(),n2=ul();sl.exports=class{constructor(e){if(!e)throw new Error("Logger is required to handle rejections");this.logger=e,this.handlers=new Map}handle(...e){e.forEach(r=>{if(Array.isArray(r))return r.forEach(u=>this._addHandler(u));this._addHandler(r)}),this.catcher||(this.catcher=this._unhandledRejection.bind(this),process.on("unhandledRejection",this.catcher))}unhandle(){this.catcher&&(process.removeListener("unhandledRejection",this.catcher),this.catcher=!1,Array.from(this.handlers.values()).forEach(e=>this.logger.unpipe(e)))}getAllInfo(e){let r=null;return e&&(r=typeof e=="string"?e:e.message),{error:e,level:"error",message:[`unhandledRejection: ${r||"(no error message)"}`,e&&e.stack||"  No stack trace"].join(`
-`),stack:e&&e.stack,rejection:!0,date:new Date().toString(),process:this.getProcessInfo(),os:this.getOsInfo(),trace:this.getTrace(e)}}getProcessInfo(){return{pid:process.pid,uid:process.getuid?process.getuid():null,gid:process.getgid?process.getgid():null,cwd:process.cwd(),execPath:process.execPath,version:process.version,argv:process.argv,memoryUsage:process.memoryUsage()}}getOsInfo(){return{loadavg:nl.loadavg(),uptime:nl.uptime()}}getTrace(e){return(e?il.parse(e):il.get()).map(u=>({column:u.getColumnNumber(),file:u.getFileName(),function:u.getFunctionName(),line:u.getLineNumber(),method:u.getMethodName(),native:u.isNative()}))}_addHandler(e){if(!this.handlers.has(e)){e.handleRejections=!0;let r=new n2(e);this.handlers.set(e,r),this.logger.pipe(r)}}_unhandledRejection(e){let r=this.getAllInfo(e),u=this._getRejectionHandlers(),n=typeof this.logger.exitOnError=="function"?this.logger.exitOnError(e):this.logger.exitOnError,i;!u.length&&n&&(console.warn("winston: exitOnError cannot be true with no rejection handlers."),console.warn("winston: not exiting process."),n=!1);function s(){$i("doExit",n),$i("process._exiting",process._exiting),n&&!process._exiting&&(i&&clearTimeout(i),process.exit(1))}if(!u||u.length===0)return process.nextTick(s);r2(u,(a,o)=>{let c=u2(o),f=a.transport||a;function d(p){return()=>{$i(p),c()}}f._ending=!0,f.once("finish",d("finished")),f.once("error",d("error"))},()=>n&&s()),this.logger.log(r),n&&(i=setTimeout(s,3e3))}_getRejectionHandlers(){return this.logger.transports.filter(e=>(e.transport||e).handleRejections)}}});var ol=m((b6,al)=>{"use strict";var zi=class{constructor(e){let r=Iu();if(typeof e!="object"||Array.isArray(e)||!(e instanceof r))throw new Error("Logger is required for profiling");this.logger=e,this.start=Date.now()}done(...e){typeof e[e.length-1]=="function"&&(console.warn("Callback function no longer supported as of winston@3.0.0"),e.pop());let r=typeof e[e.length-1]=="object"?e.pop():{};return r.level=r.level||"info",r.durationMs=Date.now()-this.start,this.logger.write(r)}};al.exports=zi});var Iu=m((y6,dl)=>{"use strict";var{Stream:i2,Transform:s2}=it(),cl=Lu(),{LEVEL:Ee,SPLAT:ll}=z(),fl=Oi(),a2=ji(),o2=Bi(),c2=yi(),l2=ol(),{warn:f2}=Gn(),d2=Ru(),p2=/%[scdjifoO%]/g,Nu=class extends s2{constructor(e){super({objectMode:!0}),this.configure(e)}child(e){let r=this;return Object.create(r,{write:{value:function(u){let n=Object.assign({},e,u);u instanceof Error&&(n.stack=u.stack,n.message=u.message),r.write(n)}}})}configure({silent:e,format:r,defaultMeta:u,levels:n,level:i="info",exitOnError:s=!0,transports:a,colors:o,emitErrs:c,formatters:f,padLevels:d,rewriters:p,stripColors:h,exceptionHandlers:l,rejectionHandlers:g}={}){if(this.transports.length&&this.clear(),this.silent=e,this.format=r||this.format||$n()(),this.defaultMeta=u||null,this.levels=n||this.levels||d2.npm.levels,this.level=i,this.exceptions&&this.exceptions.unhandle(),this.rejections&&this.rejections.unhandle(),this.exceptions=new a2(this),this.rejections=new o2(this),this.profilers={},this.exitOnError=s,a&&(a=Array.isArray(a)?a:[a],a.forEach(_=>this.add(_))),o||c||f||d||p||h)throw new Error(["{ colors, emitErrs, formatters, padLevels, rewriters, stripColors } were removed in winston@3.0.0.","Use a custom winston.format(function) instead.","See: https://github.com/winstonjs/winston/tree/master/UPGRADE-3.0.md"].join(`
-`));l&&this.exceptions.handle(l),g&&this.rejections.handle(g)}isLevelEnabled(e){let r=Hi(this.levels,e);if(r===null)return!1;let u=Hi(this.levels,this.level);return u===null?!1:!this.transports||this.transports.length===0?u>=r:this.transports.findIndex(i=>{let s=Hi(this.levels,i.level);return s===null&&(s=u),s>=r})!==-1}log(e,r,...u){if(arguments.length===1)return e[Ee]=e.level,this._addDefaultMeta(e),this.write(e),this;if(arguments.length===2)return r&&typeof r=="object"?(r[Ee]=r.level=e,this._addDefaultMeta(r),this.write(r),this):(r={[Ee]:e,level:e,message:r},this._addDefaultMeta(r),this.write(r),this);let[n]=u;if(typeof n=="object"&&n!==null&&!(r&&r.match&&r.match(p2))){let s=Object.assign({},this.defaultMeta,n,{[Ee]:e,[ll]:u,level:e,message:r});return n.message&&(s.message=`${s.message} ${n.message}`),n.stack&&(s.stack=n.stack),n.cause&&(s.cause=n.cause),this.write(s),this}return this.write(Object.assign({},this.defaultMeta,{[Ee]:e,[ll]:u,level:e,message:r})),this}_transform(e,r,u){if(this.silent)return u();e[Ee]||(e[Ee]=e.level),!this.levels[e[Ee]]&&this.levels[e[Ee]]!==0&&console.error("[winston] Unknown logger level: %s",e[Ee]),this._readableState.pipes||console.error("[winston] Attempt to write logs with no transports, which can increase memory usage: %j",e);try{this.push(this.format.transform(e,this.format.options))}finally{this._writableState.sync=!1,u()}}_final(e){let r=this.transports.slice();cl(r,(u,n)=>{if(!u||u.finished)return setImmediate(n);u.once("finish",n),u.end()},e)}add(e){let r=!fl(e)||e.log.length>2?new c2({transport:e}):e;if(!r._writableState||!r._writableState.objectMode)throw new Error("Transports must WritableStreams in objectMode. Set { objectMode: true }.");return this._onEvent("error",r),this._onEvent("warn",r),this.pipe(r),e.handleExceptions&&this.exceptions.handle(),e.handleRejections&&this.rejections.handle(),this}remove(e){if(!e)return this;let r=e;return(!fl(e)||e.log.length>2)&&(r=this.transports.filter(u=>u.transport===e)[0]),r&&this.unpipe(r),this}clear(){return this.unpipe(),this}close(){return this.exceptions.unhandle(),this.rejections.unhandle(),this.clear(),this.emit("close"),this}setLevels(){f2.deprecated("setLevels")}query(e,r){typeof e=="function"&&(r=e,e={}),e=e||{};let u={},n=Object.assign({},e.query||{});function i(a,o){e.query&&typeof a.formatQuery=="function"&&(e.query=a.formatQuery(n)),a.query(e,(c,f)=>{if(c)return o(c);typeof a.formatResults=="function"&&(f=a.formatResults(f,e.format)),o(null,f)})}function s(a,o){i(a,(c,f)=>{o&&(f=c||f,f&&(u[a.name]=f),o()),o=null})}cl(this.transports.filter(a=>!!a.query),s,()=>r(null,u))}stream(e={}){let r=new i2,u=[];return r._streams=u,r.destroy=()=>{let n=u.length;for(;n--;)u[n].destroy()},this.transports.filter(n=>!!n.stream).forEach(n=>{let i=n.stream(e);i&&(u.push(i),i.on("log",s=>{s.transport=s.transport||[],s.transport.push(n.name),r.emit("log",s)}),i.on("error",s=>{s.transport=s.transport||[],s.transport.push(n.name),r.emit("error",s)}))}),r}startTimer(){return new l2(this)}profile(e,...r){let u=Date.now();if(this.profilers[e]){let n=this.profilers[e];delete this.profilers[e],typeof r[r.length-2]=="function"&&(console.warn("Callback function no longer supported as of winston@3.0.0"),r.pop());let i=typeof r[r.length-1]=="object"?r.pop():{};return i.level=i.level||"info",i.durationMs=u-n,i.message=i.message||e,this.write(i)}return this.profilers[e]=u,this}handleExceptions(...e){console.warn("Deprecated: .handleExceptions() will be removed in winston@4. Use .exceptions.handle()"),this.exceptions.handle(...e)}unhandleExceptions(...e){console.warn("Deprecated: .unhandleExceptions() will be removed in winston@4. Use .exceptions.unhandle()"),this.exceptions.unhandle(...e)}cli(){throw new Error(["Logger.cli() was removed in winston@3.0.0","Use a custom winston.formats.cli() instead.","See: https://github.com/winstonjs/winston/tree/master/UPGRADE-3.0.md"].join(`
-`))}_onEvent(e,r){function u(n){e==="error"&&!this.transports.includes(r)&&this.add(r),this.emit(e,n,r)}r["__winston"+e]||(r["__winston"+e]=u.bind(this),r.on(e,r["__winston"+e]))}_addDefaultMeta(e){this.defaultMeta&&Object.assign(e,this.defaultMeta)}};function Hi(t,e){let r=t[e];return!r&&r!==0?null:r}Object.defineProperty(Nu.prototype,"transports",{configurable:!1,enumerable:!0,get(){let{pipes:t}=this._readableState;return Array.isArray(t)?t:[t].filter(Boolean)}});dl.exports=Nu});var Ui=m((_6,pl)=>{"use strict";var{LEVEL:h2}=z(),g2=Ru(),m2=Iu(),b2=rr()("winston:create-logger");function y2(t){return"is"+t.charAt(0).toUpperCase()+t.slice(1)+"Enabled"}pl.exports=function(t={}){t.levels=t.levels||g2.npm.levels;class e extends m2{constructor(n){super(n)}}let r=new e(t);return Object.keys(t.levels).forEach(function(u){if(b2('Define prototype method for "%s"',u),u==="log"){console.warn('Level "log" not defined: conflicts with the method "log". Use a different level name.');return}e.prototype[u]=function(...n){let i=this||r;if(n.length===1){let[s]=n,a=s&&s.message&&s||{message:s};return a.level=a[h2]=u,i._addDefaultMeta(a),i.write(a),this||r}return n.length===0?(i.log(u,""),i):i.log(u,...n)},e.prototype[y2(u)]=function(){return(this||r).isLevelEnabled(u)}}),r}});var gl=m((v6,hl)=>{"use strict";var _2=Ui();hl.exports=class{constructor(e={}){this.loggers=new Map,this.options=e}add(e,r){if(!this.loggers.has(e)){r=Object.assign({},r||this.options);let u=r.transports||this.options.transports;u?r.transports=Array.isArray(u)?u.slice():[u]:r.transports=[];let n=_2(r);n.on("close",()=>this._delete(e)),this.loggers.set(e,n)}return this.loggers.get(e)}get(e,r){return this.add(e,r)}has(e){return!!this.loggers.has(e)}close(e){if(e)return this._removeLogger(e);this.loggers.forEach((r,u)=>this._removeLogger(u))}_removeLogger(e){if(!this.loggers.has(e))return;this.loggers.get(e).close(),this._delete(e)}_delete(e){this.loggers.delete(e)}}});var bl=m(q=>{"use strict";var ml=Vn(),{warn:ar}=Gn();q.version=qo().version;q.transports=z0();q.config=Ru();q.addColors=ml.levels;q.format=ml.format;q.createLogger=Ui();q.Logger=Iu();q.ExceptionHandler=ji();q.RejectionHandler=Bi();q.Container=gl();q.Transport=kt();q.loggers=new q.Container;var we=q.createLogger();Object.keys(q.config.npm.levels).concat(["log","query","stream","add","remove","clear","profile","startTimer","handleExceptions","unhandleExceptions","handleRejections","unhandleRejections","configure","child"]).forEach(t=>q[t]=(...e)=>we[t](...e));Object.defineProperty(q,"level",{get(){return we.level},set(t){we.level=t}});Object.defineProperty(q,"exceptions",{get(){return we.exceptions}});Object.defineProperty(q,"rejections",{get(){return we.rejections}});["exitOnError"].forEach(t=>{Object.defineProperty(q,t,{get(){return we[t]},set(e){we[t]=e}})});Object.defineProperty(q,"default",{get(){return{exceptionHandlers:we.exceptionHandlers,rejectionHandlers:we.rejectionHandlers,transports:we.transports}}});ar.deprecated(q,"setLevels");ar.forFunctions(q,"useFormat",["cli"]);ar.forProperties(q,"useFormat",["padLevels","stripColors"]);ar.forFunctions(q,"deprecated",["addRewriter","addFilter","clone","extend"]);ar.forProperties(q,"deprecated",["emitErrs","levelLength"])});var N2={};Fl(N2,{FileType:()=>ot,LogLevel:()=>Ir,MessageRole:()=>Me,ModelType:()=>Te,PRDParser:()=>Le,TaskFlowEngine:()=>qr,TaskFlowService:()=>or,TaskManager:()=>Ne,TaskPlanner:()=>Ie,TaskPriority:()=>ht,TaskStatus:()=>pt,TaskType:()=>Nt,TaskVisualizer:()=>Lr,VERSION:()=>I2,VisualizationType:()=>vn,chat:()=>M2,executeTool:()=>v2,generateTaskPlan:()=>q2,generateTests:()=>L2,getAllTasks:()=>T2,getAvailableModelTypes:()=>R2,getConfig:()=>O2,getNextTasks:()=>C2,getServerInfo:()=>w2,getTaskById:()=>S2,getTools:()=>E2,parsePRD:()=>k2,parsePRDFromFile:()=>D2,taskFlowService:()=>Q,updateConfig:()=>F2,updateTaskStatus:()=>A2,validateModelApiKey:()=>P2});module.exports=Ol(N2);var ca=B(require("fs-extra")),la=B(require("path"));var Me=(u=>(u.USER="user",u.ASSISTANT="assistant",u.SYSTEM="system",u))(Me||{}),ot=(s=>(s.MARKDOWN="markdown",s.PDF="pdf",s.WORD="word",s.TEXT="text",s.JSON="json",s.UNKNOWN="unknown",s))(ot||{});var De=B(require("fs-extra")),Rr=B(require("path")),oa=B(aa());var Mr=class{constructor(e){this.logger=e,this.markdownParser=new oa.default({html:!0,linkify:!0,typographer:!0})}async processDocument(e,r={}){try{if(this.logger.info(`\u5F00\u59CB\u5904\u7406\u6587\u6863: ${e}`),!await De.pathExists(e))throw new Error(`\u6587\u4EF6\u4E0D\u5B58\u5728: ${e}`);let u=await De.stat(e),n=this.detectDocumentType(e),i=await this.readFileContent(e,n),s={fileName:Rr.basename(e),fileSize:u.size,createdAt:u.birthtime,modifiedAt:u.mtime,documentType:n,language:r.detectLanguage?this.detectLanguage(i):"zh-CN",wordCount:this.countWords(i),estimatedReadTime:Math.ceil(this.countWords(i)/200)},a=await this.parseDocumentStructure(i,n,r),o={title:this.extractTitle(i,n)||s.fileName,sections:a,metadata:s};return this.logger.info(`\u6587\u6863\u5904\u7406\u5B8C\u6210: ${a.length} \u4E2A\u7AE0\u8282`),o}catch(u){throw this.logger.error(`\u6587\u6863\u5904\u7406\u5931\u8D25: ${u.message}`),u}}detectDocumentType(e){switch(Rr.extname(e).toLowerCase()){case".md":case".markdown":return"markdown";case".txt":return"text";case".json":return"json";case".html":case".htm":return"html";case".docx":case".doc":return"word";case".pdf":return"pdf";default:return"text"}}async readFileContent(e,r){switch(r){case"markdown":case"text":case"html":case"json":return await De.readFile(e,"utf-8");case"word":return this.logger.warn("Word\u6587\u6863\u89E3\u6790\u6682\u672A\u5B9E\u73B0\uFF0C\u5C06\u4F5C\u4E3A\u6587\u672C\u5904\u7406"),await De.readFile(e,"utf-8");case"pdf":return this.logger.warn("PDF\u6587\u6863\u89E3\u6790\u6682\u672A\u5B9E\u73B0\uFF0C\u5C06\u4F5C\u4E3A\u6587\u672C\u5904\u7406"),await De.readFile(e,"utf-8");default:return await De.readFile(e,"utf-8")}}async parseDocumentStructure(e,r,u){switch(r){case"markdown":return this.parseMarkdownStructure(e,u);case"text":return this.parseTextStructure(e,u);case"json":return this.parseJsonStructure(e,u);case"html":return this.parseHtmlStructure(e,u);default:return this.parseTextStructure(e,u)}}parseMarkdownStructure(e,r){let u=[],n=e.split(`
-`),i=null,s=0;for(let a=0;a<n.length;a++){let o=n[a].trim(),c=o.match(/^(#{1,6})\s+(.+)$/);if(c){let f=c[1].length,d=c[2].trim();i&&u.push(i),i={id:`section-${++s}`,title:d,content:"",level:f,subsections:[],type:this.classifySectionType(d),keywords:r.extractKeywords?this.extractKeywords(d):[],importance:r.calculateImportance?this.calculateImportance(d,""):.5}}else i&&o&&(i.content+=o+`
-`)}return i&&u.push(i),(r.calculateImportance||r.extractKeywords)&&u.forEach(a=>{r.extractKeywords&&(a.keywords=this.extractKeywords(a.title+" "+a.content)),r.calculateImportance&&(a.importance=this.calculateImportance(a.title,a.content))}),this.buildSectionHierarchy(u)}parseTextStructure(e,r){let u=[];return e.split(/\n\s*\n/).filter(i=>i.trim()).forEach((i,s)=>{let a=i.trim().split(`
-`),o=a[0].trim(),c=a.slice(1).join(`
-`).trim();u.push({id:`section-${s+1}`,title:o||`\u6BB5\u843D ${s+1}`,content:c,level:1,subsections:[],type:this.classifySectionType(o),keywords:r.extractKeywords?this.extractKeywords(i):[],importance:r.calculateImportance?this.calculateImportance(o,c):.5})}),u}parseJsonStructure(e,r){try{let u=JSON.parse(e),n=[];return Array.isArray(u)?u.forEach((i,s)=>{n.push(this.createSectionFromObject(i,`item-${s}`,1))}):typeof u=="object"&&Object.entries(u).forEach(([i,s],a)=>{n.push(this.createSectionFromObject({[i]:s},`section-${a+1}`,1))}),n}catch(u){return this.logger.error(`JSON\u89E3\u6790\u5931\u8D25: ${u.message}`),[]}}parseHtmlStructure(e,r){let u=[],n=/<h([1-6])[^>]*>(.*?)<\/h[1-6]>/gi,i,s=0;for(;(i=n.exec(e))!==null;){let a=parseInt(i[1]),o=i[2].replace(/<[^>]*>/g,"").trim();u.push({id:`section-${++s}`,title:o,content:"",level:a,subsections:[],type:this.classifySectionType(o),keywords:r.extractKeywords?this.extractKeywords(o):[],importance:r.calculateImportance?this.calculateImportance(o,""):.5})}return this.buildSectionHierarchy(u)}createSectionFromObject(e,r,u){let n=typeof e=="object"&&e!==null?Object.keys(e)[0]||r:String(e),i=typeof e=="object"&&e!==null?JSON.stringify(e,null,2):String(e);return{id:r,title:n,content:i,level:u,subsections:[],type:this.classifySectionType(n),keywords:this.extractKeywords(i),importance:this.calculateImportance(n,i)}}buildSectionHierarchy(e){let r=[],u=[];for(let n of e){for(;u.length>0&&u[u.length-1].level>=n.level;)u.pop();u.length===0?r.push(n):u[u.length-1].subsections.push(n),u.push(n)}return r}classifySectionType(e){let r=e.toLowerCase();return r.includes("\u6982\u8FF0")||r.includes("overview")||r.includes("\u7B80\u4ECB")?"overview":r.includes("\u9700\u6C42")||r.includes("requirement")?"requirements":r.includes("\u529F\u80FD")||r.includes("feature")?"features":r.includes("\u6280\u672F")||r.includes("technical")||r.includes("\u67B6\u6784")?"technical":r.includes("\u65F6\u95F4")||r.includes("timeline")||r.includes("\u8BA1\u5212")?"timeline":r.includes("\u8D44\u6E90")||r.includes("resource")?"resources":r.includes("\u9644\u5F55")||r.includes("appendix")?"appendix":"other"}extractKeywords(e){let r=e.toLowerCase().replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s]/g," ").split(/\s+/).filter(n=>n.length>1),u=new Map;return r.forEach(n=>{u.set(n,(u.get(n)||0)+1)}),Array.from(u.entries()).sort((n,i)=>i[1]-n[1]).slice(0,10).map(([n])=>n)}calculateImportance(e,r){let u=.5,n=["\u6838\u5FC3","\u5173\u952E","\u91CD\u8981","\u5FC5\u987B","\u4E3B\u8981","core","key","important","critical","main"],i=e.toLowerCase();n.forEach(o=>{i.includes(o)&&(u+=.1)});let s=r.length;switch(s>1e3&&(u+=.1),s>2e3&&(u+=.1),this.classifySectionType(e)){case"requirements":case"features":u+=.2;break;case"technical":u+=.15;break;case"overview":u+=.1;break}return Math.min(1,u)}extractTitle(e,r){switch(r){case"markdown":{let u=e.match(/^#\s+(.+)$/m);return u?u[1].trim():null}case"html":{let u=e.match(/<h1[^>]*>(.*?)<\/h1>/i);return u?u[1].replace(/<[^>]*>/g,"").trim():null}default:{let u=e.split(`
-`)[0].trim();return u.length>0&&u.length<100?u:null}}}detectLanguage(e){let r=e.match(/[\u4e00-\u9fa5]/g),u=e.replace(/\s/g,"").length;return r&&r.length/u>.3?"zh-CN":"en-US"}countWords(e){let r=e.match(/[\u4e00-\u9fa5]/g),u=e.match(/[a-zA-Z]+/g),n=r?r.length:0,i=u?u.length:0;return n+i}};var pt=(p=>(p.NOT_STARTED="not_started",p.PENDING="pending",p.IN_PROGRESS="in_progress",p.RUNNING="running",p.COMPLETED="completed",p.DONE="done",p.CANCELLED="cancelled",p.FAILED="failed",p.BLOCKED="blocked",p.ON_HOLD="on_hold",p.REVIEW="review",p.TODO="todo",p))(pt||{}),ht=(n=>(n.LOW="low",n.MEDIUM="medium",n.HIGH="high",n.CRITICAL="critical",n))(ht||{}),Nt=(c=>(c.FEATURE="feature",c.BUG_FIX="bug_fix",c.REFACTOR="refactor",c.TEST="test",c.DOCUMENT="document",c.ANALYSIS="analysis",c.DESIGN="design",c.DEPLOYMENT="deployment",c.RESEARCH="research",c))(Nt||{});var Pr=class{constructor(e){this.requirementPatterns={functional:[/系统(应该|必须|需要|能够)(.+)/gi,/用户(可以|能够|应该)(.+)/gi,/应用程序(应该|必须|需要)(.+)/gi,/(实现|支持|提供)(.+)功能/gi,/the system (should|must|shall|will)(.+)/gi,/users (can|should|must|will be able to)(.+)/gi],nonFunctional:[/(性能|响应时间|吞吐量)(.+)/gi,/(安全|权限|认证)(.+)/gi,/(可用性|稳定性|可靠性)(.+)/gi,/(兼容性|扩展性|可维护性)(.+)/gi,/(performance|security|usability|reliability)(.+)/gi],userStory:[/作为(.+?)，我希望(.+?)，以便(.+)/gi,/As a (.+?), I want (.+?) so that (.+)/gi,/Given (.+?) when (.+?) then (.+)/gi],constraint:[/(限制|约束|不能|禁止)(.+)/gi,/(constraint|limitation|restriction)(.+)/gi]};this.priorityKeywords={critical:["\u5173\u952E","\u6838\u5FC3","\u91CD\u8981","\u5FC5\u987B","critical","essential","must","key"],high:["\u9AD8","\u4F18\u5148","\u91CD\u70B9","high","priority","important"],medium:["\u4E2D\u7B49","\u4E00\u822C","\u666E\u901A","medium","normal","standard"],low:["\u4F4E","\u6B21\u8981","\u53EF\u9009","low","optional","nice to have"]};this.complexityKeywords={high:["\u590D\u6742","\u56F0\u96BE","\u6311\u6218","\u96C6\u6210","\u7B97\u6CD5","complex","difficult","challenging","integration"],medium:["\u4E2D\u7B49","\u6807\u51C6","\u5E38\u89C4","medium","standard","typical"],low:["\u7B80\u5355","\u57FA\u7840","\u76F4\u63A5","simple","basic","straightforward"]};this.logger=e}async extractRequirements(e,r={}){try{this.logger.info("\u5F00\u59CB\u63D0\u53D6\u9700\u6C42");let u=[],n=[],i=[];for(let a of e.sections){let o=await this.extractFromSection(a,r);u.push(...o)}r.detectDependencies&&this.detectDependencies(u);let s=this.generateSummary(u);return i.push(...this.generateSuggestions(u,s)),n.push(...this.validateRequirements(u)),this.logger.info(`\u9700\u6C42\u63D0\u53D6\u5B8C\u6210: ${u.length} \u4E2A\u9700\u6C42`),{requirements:u,summary:s,warnings:n,suggestions:i}}catch(u){throw this.logger.error(`\u9700\u6C42\u63D0\u53D6\u5931\u8D25: ${u.message}`),u}}async extractFromSection(e,r){let u=[],n=e.title+`
-`+e.content;switch(e.type){case"requirements":u.push(...this.extractFunctionalRequirements(e,n)),u.push(...this.extractNonFunctionalRequirements(e,n));break;case"features":u.push(...this.extractFeatureRequirements(e,n)),r.includeUserStories&&u.push(...this.extractUserStories(e,n));break;case"technical":u.push(...this.extractTechnicalRequirements(e,n));break;default:u.push(...this.extractGeneralRequirements(e,n));break}for(let i of e.subsections){let s=await this.extractFromSection(i,r);u.push(...s)}return u}extractFunctionalRequirements(e,r){let u=[],n=1;return this.requirementPatterns.functional.forEach(i=>{let s;for(;(s=i.exec(r))!==null;){let a=s[0].trim();a.length>10&&u.push(this.createRequirement(`${e.id}-func-${n++}`,this.extractTitle(a),a,"functional",e,r))}}),u}extractNonFunctionalRequirements(e,r){let u=[],n=1;return this.requirementPatterns.nonFunctional.forEach(i=>{let s;for(;(s=i.exec(r))!==null;){let a=s[0].trim();a.length>10&&u.push(this.createRequirement(`${e.id}-nonfunc-${n++}`,this.extractTitle(a),a,"non_functional",e,r))}}),u}extractFeatureRequirements(e,r){let u=[],n=r.split(`
-`).filter(s=>s.trim()),i=1;return n.forEach(s=>{let a=s.trim();this.isFunctionDescription(a)&&u.push(this.createRequirement(`${e.id}-feature-${i++}`,this.extractTitle(a),a,"functional",e,r))}),u}extractUserStories(e,r){let u=[],n=1;return this.requirementPatterns.userStory.forEach(i=>{let s;for(;(s=i.exec(r))!==null;){let a=s[0].trim();u.push(this.createRequirement(`${e.id}-story-${n++}`,`\u7528\u6237\u6545\u4E8B ${n}`,a,"user_story",e,r))}}),u}extractTechnicalRequirements(e,r){let u=[],n=["\u6280\u672F\u6808","\u67B6\u6784","\u6570\u636E\u5E93","\u6846\u67B6","\u63A5\u53E3","API","\u670D\u52A1","\u7EC4\u4EF6"],i=r.split(`
-`).filter(a=>a.trim()),s=1;return i.forEach(a=>{let o=a.trim();n.some(c=>o.includes(c))&&o.length>10&&u.push(this.createRequirement(`${e.id}-tech-${s++}`,this.extractTitle(o),o,"technical",e,r))}),u}extractGeneralRequirements(e,r){let u=[],n=r.split(`
-`).filter(s=>s.trim()),i=1;return n.forEach(s=>{let a=s.trim();this.isRequirementLike(a)&&u.push(this.createRequirement(`${e.id}-req-${i++}`,this.extractTitle(a),a,"business",e,r))}),u}createRequirement(e,r,u,n,i,s){return{id:e,title:r,description:u,type:n,priority:this.analyzePriority(u),category:i.title,source:i.id,dependencies:[],acceptanceCriteria:this.extractAcceptanceCriteria(u),estimatedEffort:this.estimateEffort(u,n),complexity:this.analyzeComplexity(u),tags:this.extractTags(u),stakeholders:this.extractStakeholders(u),businessValue:this.calculateBusinessValue(u,n),technicalRisk:this.calculateTechnicalRisk(u,n),metadata:{extractedAt:new Date,confidence:this.calculateConfidence(u,n),extractionMethod:"pattern_matching",keywords:i.keywords,relatedSections:[i.id]}}}analyzePriority(e){let r=e.toLowerCase();for(let[u,n]of Object.entries(this.priorityKeywords))if(n.some(i=>r.includes(i)))return u;return"medium"}analyzeComplexity(e){let r=e.toLowerCase();for(let[u,n]of Object.entries(this.complexityKeywords))if(n.some(i=>r.includes(i)))return u;return e.length>200?"high":e.length>100?"medium":"low"}estimateEffort(e,r){let u=8;switch(r){case"technical":u=16;break;case"non_functional":u=12;break;case"user_story":u=6;break}switch(this.analyzeComplexity(e)){case"high":u*=2;break;case"low":u*=.5;break}return Math.round(u)}calculateBusinessValue(e,r){let u=5,n=["\u6536\u5165","\u7528\u6237","\u4F53\u9A8C","\u6548\u7387","\u6210\u672C","revenue","user","experience","efficiency"],i=e.toLowerCase();return n.forEach(s=>{i.includes(s)&&(u+=1)}),r==="business"&&(u+=2),r==="user_story"&&(u+=1),Math.min(10,u)}calculateTechnicalRisk(e,r){let u=3,n=["\u96C6\u6210","\u65B0\u6280\u672F","\u7B97\u6CD5","\u6027\u80FD","\u5B89\u5168","integration","new","algorithm","performance","security"],i=e.toLowerCase();return n.forEach(s=>{i.includes(s)&&(u+=1)}),r==="technical"&&(u+=2),r==="non_functional"&&(u+=1),Math.min(10,u)}calculateConfidence(e,r){let u=.5;return this.requirementPatterns.functional.some(n=>n.test(e))&&(u+=.3),e.length>20&&e.length<500&&(u+=.2),Math.min(1,u)}extractAcceptanceCriteria(e){let r=[];return[/验收标准[：:]\s*(.+)/gi,/acceptance criteria[：:]\s*(.+)/gi,/given (.+?) when (.+?) then (.+)/gi].forEach(n=>{let i;for(;(i=n.exec(e))!==null;)r.push(i[1]||i[0])}),r}extractTags(e){let r=[],u={UI:["\u754C\u9762","\u9875\u9762","\u6309\u94AE","UI","interface","page","button"],API:["\u63A5\u53E3","API","service","\u670D\u52A1"],Database:["\u6570\u636E\u5E93","\u5B58\u50A8","database","storage"],Security:["\u5B89\u5168","\u6743\u9650","security","permission","auth"],Performance:["\u6027\u80FD","\u901F\u5EA6","performance","speed"]},n=e.toLowerCase();return Object.entries(u).forEach(([i,s])=>{s.some(a=>n.includes(a))&&r.push(i)}),r}extractStakeholders(e){let r=[];return[/用户/g,/管理员/g,/开发者/g,/测试人员/g,/user/gi,/admin/gi,/developer/gi,/tester/gi].forEach(n=>{let i=e.match(n);i&&r.push(...i)}),[...new Set(r)]}detectDependencies(e){e.forEach(r=>{e.forEach(u=>{r.id!==u.id&&this.hasDependencyRelation(r.description,u.description)&&r.dependencies.push(u.id)})})}hasDependencyRelation(e,r){return["\u57FA\u4E8E","\u4F9D\u8D56","\u9700\u8981","\u4F7F\u7528","based on","depends on","requires","uses"].some(n=>e.toLowerCase().includes(n)&&r.toLowerCase().includes(n))}generateSummary(e){let r=e.filter(p=>p.type==="functional").length,u=e.filter(p=>p.type==="non_functional").length,n=e.filter(p=>p.type==="user_story").length,i=e.filter(p=>p.priority==="high"||p.priority==="critical").length,s=e.reduce((p,h)=>p+h.estimatedEffort,0),a=e.map(p=>{switch(p.complexity){case"high":return 3;case"medium":return 2;case"low":return 1;default:return 2}}),o=a.reduce((p,h)=>p+h,0)/a.length,c=o>2.5?"high":o>1.5?"medium":"low",f=e.reduce((p,h)=>p+h.metadata.confidence,0)/e.length,d=Math.min(1,f*(e.length/10));return{totalRequirements:e.length,functionalRequirements:r,nonFunctionalRequirements:u,userStories:n,highPriorityRequirements:i,estimatedTotalEffort:s,averageComplexity:c,coverageScore:d}}generateSuggestions(e,r){let u=[];return r.totalRequirements<5&&u.push("\u9700\u6C42\u6570\u91CF\u8F83\u5C11\uFF0C\u5EFA\u8BAE\u68C0\u67E5\u662F\u5426\u9057\u6F0F\u4E86\u91CD\u8981\u9700\u6C42"),r.nonFunctionalRequirements===0&&u.push("\u672A\u53D1\u73B0\u975E\u529F\u80FD\u9700\u6C42\uFF0C\u5EFA\u8BAE\u8865\u5145\u6027\u80FD\u3001\u5B89\u5168\u3001\u53EF\u7528\u6027\u7B49\u65B9\u9762\u7684\u9700\u6C42"),r.highPriorityRequirements/r.totalRequirements>.8&&u.push("\u9AD8\u4F18\u5148\u7EA7\u9700\u6C42\u6BD4\u4F8B\u8FC7\u9AD8\uFF0C\u5EFA\u8BAE\u91CD\u65B0\u8BC4\u4F30\u9700\u6C42\u4F18\u5148\u7EA7"),r.coverageScore<.6&&u.push("\u9700\u6C42\u8986\u76D6\u5EA6\u8F83\u4F4E\uFF0C\u5EFA\u8BAE\u8865\u5145\u66F4\u8BE6\u7EC6\u7684\u9700\u6C42\u63CF\u8FF0"),r.estimatedTotalEffort/r.totalRequirements>20&&u.push("\u5E73\u5747\u5DE5\u4F5C\u91CF\u8F83\u9AD8\uFF0C\u5EFA\u8BAE\u5C06\u590D\u6742\u9700\u6C42\u62C6\u5206\u4E3A\u66F4\u5C0F\u7684\u4EFB\u52A1"),u}validateRequirements(e){let r=[];return e.forEach(u=>{u.description.length<10&&r.push(`\u9700\u6C42 ${u.id} \u63CF\u8FF0\u8FC7\u4E8E\u7B80\u77ED`),u.metadata.confidence<.3&&r.push(`\u9700\u6C42 ${u.id} \u63D0\u53D6\u7F6E\u4FE1\u5EA6\u8F83\u4F4E`),u.acceptanceCriteria.length===0&&r.push(`\u9700\u6C42 ${u.id} \u7F3A\u5C11\u9A8C\u6536\u6807\u51C6`)}),r}isFunctionDescription(e){return[/^[-*+]\s+/,/^\d+\.\s+/,/^[a-zA-Z0-9]+[.)]\s+/,/功能|特性|能力/].some(u=>u.test(e))&&e.length>10}isRequirementLike(e){return["\u9700\u8981","\u5E94\u8BE5","\u5FC5\u987B","\u80FD\u591F","\u652F\u6301","\u5B9E\u73B0","\u63D0\u4F9B","need","should","must","shall","support","implement","provide"].some(u=>e.toLowerCase().includes(u))&&e.length>15}extractTitle(e){let r=e.substring(0,50).trim();return r.endsWith("...")?r:r+(e.length>50?"...":"")}};var Le=class{constructor(e,r){this.modelCoordinator=e,this.logger=r,this.documentProcessor=new Mr(r),this.requirementExtractor=new Pr(r)}async parseFromFile(e,r){try{if(this.logger.info(`\u5F00\u59CB\u89E3\u6790PRD\u6587\u4EF6\uFF1A${e}`),!await ca.pathExists(e))throw new Error(`\u6587\u4EF6\u4E0D\u5B58\u5728\uFF1A${e}`);let u={extractTables:!0,extractImages:!1,detectLanguage:!0,analyzeStructure:!0,extractKeywords:!0,calculateImportance:!0},n=await this.documentProcessor.processDocument(e,u),i={includeUserStories:r?.extractUserStories??!0,detectDependencies:r?.detectDependencies??!0,estimateEffort:r?.estimateEffort??!0,analyzePriority:r?.analyzePriority??!0,extractAcceptanceCriteria:r?.extractAcceptanceCriteria??!0,detectStakeholders:r?.detectStakeholders??!0},s=await this.requirementExtractor.extractRequirements(n,i);return this.convertToParseResult(n,s)}catch(u){throw this.logger.error(`\u89E3\u6790PRD\u6587\u4EF6\u5931\u8D25\uFF1A${u.message}`),u}}async parseContent(e,r="markdown",u){try{let n=this.preprocessContent(e,r),i=await this.modelCoordinator.parsePRD(n,u);try{let s=JSON.parse(i.content);return this.validateParseResult(s),this.logger.info("PRD\u89E3\u6790\u6210\u529F"),s}catch(s){throw this.logger.error(`\u89E3\u6790\u6A21\u578B\u8FD4\u56DE\u7ED3\u679C\u5931\u8D25\uFF1A${s.message}`),new Error(`\u65E0\u6CD5\u89E3\u6790\u6A21\u578B\u8FD4\u56DE\u7684JSON\u7ED3\u679C\uFF1A${s.message}`)}}catch(n){throw this.logger.error(`\u89E3\u6790PRD\u5185\u5BB9\u5931\u8D25\uFF1A${n.message}`),n}}preprocessContent(e,r){switch(r){case"markdown":return e;case"json":try{let u=JSON.parse(e);return JSON.stringify(u,null,2)}catch{return e}default:return e}}detectFileType(e){switch(la.extname(e).toLowerCase()){case".md":case".markdown":return"markdown";case".pdf":return"pdf";case".docx":case".doc":return"word";case".txt":return"text";case".json":return"json";default:return"unknown"}}validateParseResult(e){if(e.title||this.logger.warn("\u89E3\u6790\u7ED3\u679C\u7F3A\u5C11\u6807\u9898"),e.description||this.logger.warn("\u89E3\u6790\u7ED3\u679C\u7F3A\u5C11\u63CF\u8FF0"),!Array.isArray(e.sections)||e.sections.length===0)throw new Error("\u89E3\u6790\u7ED3\u679C\u5FC5\u987B\u5305\u542B\u81F3\u5C11\u4E00\u4E2A\u7AE0\u8282");e.sections.forEach((r,u)=>{r.title||this.logger.warn(`\u7B2C${u+1}\u4E2A\u7AE0\u8282\u7F3A\u5C11\u6807\u9898`),Array.isArray(r.features)||(this.logger.warn(`\u7B2C${u+1}\u4E2A\u7AE0\u8282\u7684features\u5B57\u6BB5\u4E0D\u662F\u6570\u7EC4`),r.features=[])})}convertToParseResult(e,r){let u=r.requirements.map(i=>({id:i.id,name:i.title,description:i.description,priority:i.priority,type:i.type,dependencies:i.dependencies,estimatedHours:i.estimatedEffort,tags:i.tags,acceptanceCriteria:i.acceptanceCriteria,complexity:i.complexity,businessValue:i.businessValue,technicalRisk:i.technicalRisk,stakeholders:i.stakeholders,category:i.category,status:"not_started",createdAt:i.metadata.extractedAt,updatedAt:i.metadata.extractedAt}));return{id:`prd-${Date.now()}`,title:e.title,description:this.extractDescription(e),sections:[],metadata:{version:"1.0.0",features:u,fileName:e.metadata.fileName,fileSize:e.metadata.fileSize,parsedAt:new Date,language:e.metadata.language,wordCount:e.metadata.wordCount,estimatedReadTime:e.metadata.estimatedReadTime,extractionSummary:r.summary,warnings:r.warnings,suggestions:r.suggestions,documentStructure:{sectionsCount:e.sections.length,maxDepth:this.calculateMaxDepth(e.sections),hasTableOfContents:this.hasTableOfContents(e),primaryLanguage:e.metadata.language},createdAt:new Date,updatedAt:new Date}}}extractDescription(e){let r=e.sections.find(u=>u.type==="overview"||u.title.toLowerCase().includes("\u6982\u8FF0")||u.title.toLowerCase().includes("\u7B80\u4ECB")||u.title.toLowerCase().includes("overview"));return r?r.content.substring(0,500).trim():e.sections.length>0?e.sections[0].content.substring(0,500).trim():"\u4ECEPRD\u6587\u6863\u81EA\u52A8\u63D0\u53D6\u7684\u4EA7\u54C1\u9700\u6C42"}calculateMaxDepth(e){let r=0,u=(n,i=1)=>{r=Math.max(r,i),n.forEach(s=>{s.subsections&&s.subsections.length>0&&u(s.subsections,i+1)})};return u(e),r}hasTableOfContents(e){return e.sections.some(r=>r.title.toLowerCase().includes("\u76EE\u5F55")||r.title.toLowerCase().includes("contents")||r.title.toLowerCase().includes("toc"))}};var Fr=B(require("fs-extra")),fa=B(require("path"));var Ie=class{constructor(e,r){this.modelCoordinator=e,this.logger=r}async generateTaskPlan(e,r){try{this.logger.info("\u5F00\u59CB\u751F\u6210\u4EFB\u52A1\u8BA1\u5212");let u=await this.modelCoordinator.planTasks(e,r);try{let n=JSON.parse(u.content);return this.validateTaskPlan(n),this.postProcessTaskPlan(n),this.logger.info(`\u4EFB\u52A1\u8BA1\u5212\u751F\u6210\u6210\u529F\uFF0C\u5171 ${n.tasks.length} \u4E2A\u4EFB\u52A1`),n}catch(n){throw this.logger.error(`\u89E3\u6790\u6A21\u578B\u8FD4\u56DE\u7684\u4EFB\u52A1\u8BA1\u5212\u5931\u8D25\uFF1A${n.message}`),new Error(`\u65E0\u6CD5\u89E3\u6790\u6A21\u578B\u8FD4\u56DE\u7684JSON\u7ED3\u679C\uFF1A${n.message}`)}}catch(u){throw this.logger.error(`\u751F\u6210\u4EFB\u52A1\u8BA1\u5212\u5931\u8D25\uFF1A${u.message}`),u}}async optimizeTaskPlan(e,r){try{return this.logger.info("\u5F00\u59CB\u4F18\u5316\u4EFB\u52A1\u8BA1\u5212"),this.optimizeDependencies(e),this.optimizePriorities(e,r),this.identifyParallelTasks(e,r),this.balanceWorkload(e,r),this.logger.info("\u4EFB\u52A1\u8BA1\u5212\u4F18\u5316\u5B8C\u6210"),e}catch(u){throw this.logger.error(`\u4F18\u5316\u4EFB\u52A1\u8BA1\u5212\u5931\u8D25\uFF1A${u.message}`),u}}async saveTaskPlan(e,r){try{await Fr.ensureDir(fa.dirname(r)),await Fr.writeFile(r,JSON.stringify(e,null,2),"utf-8"),this.logger.info(`\u4EFB\u52A1\u8BA1\u5212\u5DF2\u4FDD\u5B58\u81F3 ${r}`)}catch(u){throw this.logger.error(`\u4FDD\u5B58\u4EFB\u52A1\u8BA1\u5212\u5931\u8D25\uFF1A${u.message}`),u}}validateTaskPlan(e){if(e.name||this.logger.warn("\u4EFB\u52A1\u8BA1\u5212\u7F3A\u5C11\u540D\u79F0"),e.description||this.logger.warn("\u4EFB\u52A1\u8BA1\u5212\u7F3A\u5C11\u63CF\u8FF0"),!Array.isArray(e.tasks))throw new Error("\u4EFB\u52A1\u8BA1\u5212\u5FC5\u987B\u5305\u542Btasks\u6570\u7EC4");e.tasks.forEach((r,u)=>{if(!r.id)throw new Error(`\u7B2C${u+1}\u4E2A\u4EFB\u52A1\u7F3A\u5C11ID`);r.title||this.logger.warn(`\u4EFB\u52A1 ${r.id} \u7F3A\u5C11\u6807\u9898`),r.priority||(this.logger.warn(`\u4EFB\u52A1 ${r.id} \u7F3A\u5C11\u4F18\u5148\u7EA7\uFF0C\u8BBE\u7F6E\u4E3A\u9ED8\u8BA4\u503C'medium'`),r.priority="medium"),r.type||(this.logger.warn(`\u4EFB\u52A1 ${r.id} \u7F3A\u5C11\u7C7B\u578B\uFF0C\u8BBE\u7F6E\u4E3A\u9ED8\u8BA4\u503C'feature'`),r.type="feature"),Array.isArray(r.dependencies)||(this.logger.warn(`\u4EFB\u52A1 ${r.id} \u7684dependencies\u5B57\u6BB5\u4E0D\u662F\u6570\u7EC4\uFF0C\u8BBE\u7F6E\u4E3A\u7A7A\u6570\u7EC4`),r.dependencies=[]),r.status||(r.status="not_started")})}postProcessTaskPlan(e){let r=new Set;e.tasks.forEach(u=>{if(r.has(u.id)){let n=this.generateUniqueId(u.id,r);this.logger.warn(`\u53D1\u73B0\u91CD\u590D\u7684\u4EFB\u52A1ID: ${u.id}\uFF0C\u81EA\u52A8\u66F4\u65B0\u4E3A: ${n}`),u.id=n}r.add(u.id),u.dependencies=u.dependencies.filter(n=>!r.has(n)&&n!==u.id?(this.logger.warn(`\u4EFB\u52A1 ${u.id} \u4F9D\u8D56\u7684\u4EFB\u52A1 ${n} \u4E0D\u5B58\u5728\uFF0C\u5DF2\u79FB\u9664\u6B64\u4F9D\u8D56`),!1):n===u.id?(this.logger.warn(`\u4EFB\u52A1 ${u.id} \u4E0D\u80FD\u4F9D\u8D56\u81EA\u8EAB\uFF0C\u5DF2\u79FB\u9664\u6B64\u4F9D\u8D56`),!1):!0)}),this.checkCircularDependencies(e)}generateUniqueId(e,r){let u=1,n=`${e}_${u}`;for(;r.has(n);)u++,n=`${e}_${u}`;return n}checkCircularDependencies(e){let r=new Map;e.tasks.forEach(i=>{r.set(i.id,[...i.dependencies])});let u=new Set,n=new Set;e.tasks.forEach(i=>{this.detectCycle(i.id,r,u,n)})}detectCycle(e,r,u,n){if(n.has(e))return this.logger.warn(`\u68C0\u6D4B\u5230\u5FAA\u73AF\u4F9D\u8D56\uFF0C\u5305\u542B\u4EFB\u52A1: ${e}`),!0;if(u.has(e))return!1;u.add(e),n.add(e);let i=r.get(e)||[];for(let s of i)if(this.detectCycle(s,r,u,n)){let a=r.get(e)||[];r.set(e,a.filter(o=>o!==s)),this.logger.warn(`\u79FB\u9664\u5FAA\u73AF\u4F9D\u8D56: ${e} -> ${s}`)}return n.delete(e),!1}optimizeDependencies(e){this.logger.info("\u4F18\u5316\u4EFB\u52A1\u4F9D\u8D56\u5173\u7CFB"),e.tasks.forEach(r=>{let u=this.removeRedundantDependencies(r.dependencies,e);r.dependencies=u}),this.checkCircularDependencies(e)}removeRedundantDependencies(e,r){if(e.length<=1)return e;let u=new Map;r.tasks.forEach(i=>u.set(i.id,i));let n=[];for(let i of e){if(!u.get(i))continue;let a=!1;for(let o of e)if(o!==i&&this.hasTransitiveDependency(o,i,u)){a=!0;break}a||n.push(i)}return n}hasTransitiveDependency(e,r,u){let n=new Set,i=[e];for(;i.length>0;){let s=i.shift();if(n.has(s))continue;n.add(s);let a=u.get(s);if(a)for(let o of a.dependencies){if(o===r)return!0;n.has(o)||i.push(o)}}return!1}optimizePriorities(e,r){this.logger.info("\u4F18\u5316\u4EFB\u52A1\u4F18\u5148\u7EA7"),e.tasks.forEach(u=>{let n=this.findDependentTasks(u.id,e);n.length>=3?u.priority="high":n.length>=2&&(u.priority="medium"),this.isOnCriticalPath(u.id,e)&&(u.priority="critical")})}findDependentTasks(e,r){return r.tasks.filter(u=>u.dependencies.includes(e))}isOnCriticalPath(e,r){if(!r.tasks.find(s=>s.id===e))return!1;let n=this.calculateDependencyDepth(e,r),i=this.calculateAverageDependencyDepth(r);return n>i*1.5}calculateDependencyDepth(e,r){let u=new Set,n=i=>{if(u.has(i))return 0;u.add(i);let s=r.tasks.find(o=>o.id===i);if(!s||s.dependencies.length===0)return 1;let a=0;for(let o of s.dependencies)a=Math.max(a,n(o));return a+1};return n(e)}calculateAverageDependencyDepth(e){let r=e.tasks.map(u=>this.calculateDependencyDepth(u.id,e));return r.reduce((u,n)=>u+n,0)/r.length}identifyParallelTasks(e,r){this.logger.info("\u8BC6\u522B\u5E76\u884C\u4EFB\u52A1"),this.findParallelGroups(e,3).forEach((i,s)=>{i.forEach(a=>{a.tags||(a.tags=[]),a.tags.push(`parallel-group-${s+1}`)})})}findParallelGroups(e,r){let u=[],n=new Set;return e.tasks.forEach(i=>{if(n.has(i.id))return;let s=this.findParallelTasks(i,e,n);s.length>1&&s.length<=r&&(u.push(s),s.forEach(a=>n.add(a.id)))}),u}findParallelTasks(e,r,u){let n=[e];return r.tasks.forEach(i=>{i.id===e.id||u.has(i.id)||this.canRunInParallel(e,i,r)&&n.push(i)}),n}canRunInParallel(e,r,u){return!(e.dependencies.includes(r.id)||r.dependencies.includes(e.id)||this.hasIndirectDependency(e.id,r.id,u)||this.hasIndirectDependency(r.id,e.id,u)||e.type===r.type&&(e.type==="deployment"||e.type==="test"))}hasIndirectDependency(e,r,u){let n=new Map;return u.tasks.forEach(i=>n.set(i.id,i)),this.hasTransitiveDependency(e,r,n)}balanceWorkload(e,r){this.logger.info("\u5E73\u8861\u5DE5\u4F5C\u91CF");let u=r?.considerTeamSize||3,i=e.tasks.reduce((s,a)=>s+(a.estimatedHours||8),0)/u;e.tasks.forEach(s=>{let a=s.estimatedHours||8;a>i*.5&&(s.tags||(s.tags=[]),s.tags.push("consider-splitting"),s.notes||(s.notes=""),s.notes+=`
-\u5EFA\u8BAE\u62C6\u5206\uFF1A\u9884\u8BA1\u5DE5\u4F5C\u91CF ${a} \u5C0F\u65F6\uFF0C\u8D85\u8FC7\u5E73\u5747\u503C\u768450%`)})}};var je=B(require("fs-extra")),Or=B(require("path"));var Ne=class{constructor(e,r){this.taskPlan=null;this.autoSaveInterval=null;this.logger=e,this.configManager=r;let u=this.configManager.get("taskSettings",{outputDir:"./tasks",autoSave:!0,saveInterval:300});this.taskFilePath=Or.join(u.outputDir,"tasks.json"),u.autoSave&&this.startAutoSave(u.saveInterval*1e3)}async loadTaskPlan(e){let r=e||this.taskFilePath;try{if(!je.existsSync(r))throw new Error(`\u4EFB\u52A1\u8BA1\u5212\u6587\u4EF6\u4E0D\u5B58\u5728\uFF1A${r}`);let u=await je.readFile(r,"utf-8");return this.taskPlan=JSON.parse(u),this.logger.info(`\u6210\u529F\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212\uFF0C\u5171 ${this.taskPlan.tasks.length} \u4E2A\u4EFB\u52A1`),this.taskPlan}catch(u){throw this.logger.error(`\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212\u5931\u8D25\uFF1A${u.message}`),u}}async saveTaskPlan(e){let r=e||this.taskFilePath;if(!this.taskPlan)throw new Error("\u6CA1\u6709\u4EFB\u52A1\u8BA1\u5212\u53EF\u4FDD\u5B58\uFF0C\u8BF7\u5148\u52A0\u8F7D\u6216\u521B\u5EFA\u4EFB\u52A1\u8BA1\u5212");try{await je.ensureDir(Or.dirname(r)),await je.writeFile(r,JSON.stringify(this.taskPlan,null,2),"utf-8"),this.logger.info(`\u4EFB\u52A1\u8BA1\u5212\u5DF2\u4FDD\u5B58\u81F3 ${r}`)}catch(u){throw this.logger.error(`\u4FDD\u5B58\u4EFB\u52A1\u8BA1\u5212\u5931\u8D25\uFF1A${u.message}`),u}}setTaskPlan(e){this.taskPlan=e,this.logger.info(`\u8BBE\u7F6E\u4EFB\u52A1\u8BA1\u5212\u6210\u529F\uFF0C\u5171 ${e.tasks.length} \u4E2A\u4EFB\u52A1`)}getTaskPlan(){return this.taskPlan}getAllTasks(){if(!this.taskPlan)throw new Error("\u6CA1\u6709\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212");return[...this.taskPlan.tasks]}getTaskById(e){if(!this.taskPlan)throw new Error("\u6CA1\u6709\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212");if(e.includes(".")){let[r,u]=e.split("."),n=this.taskPlan.tasks.find(a=>a.id===r);if(!n||!n.subtasks)return null;let i=`${r}.${u}`,s=n.subtasks.find(a=>a.id===i);return s?{id:s.id,name:s.name,title:s.name,description:s.description,status:s.status,priority:"medium",type:"feature",dependencies:[],createdAt:new Date,updatedAt:new Date,tags:[],subtasks:[]}:null}return this.taskPlan.tasks.find(r=>r.id===e)||null}filterTasks(e){if(!this.taskPlan)throw new Error("\u6CA1\u6709\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212");return this.taskPlan.tasks.filter(r=>{if(e.status){if(Array.isArray(e.status)){if(!e.status.includes(r.status))return!1}else if(r.status!==e.status)return!1}if(e.type){if(Array.isArray(e.type)){if(!e.type.includes(r.type))return!1}else if(r.type!==e.type)return!1}if(e.assignee&&r.assignee!==e.assignee)return!1;if(e.priority){if(Array.isArray(e.priority)){if(!e.priority.includes(r.priority))return!1}else if(r.priority!==e.priority)return!1}return!0})}addTask(e){if(!this.taskPlan)throw new Error("\u6CA1\u6709\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212");if(this.taskPlan.tasks.find(u=>u.id===e.id))throw new Error(`\u4EFB\u52A1ID ${e.id} \u5DF2\u5B58\u5728`);return this.taskPlan.tasks.push(e),this.logger.info(`\u6DFB\u52A0\u65B0\u4EFB\u52A1 ${e.id}: ${e.name}`),e}updateTask(e,r){if(!this.taskPlan)throw new Error("\u6CA1\u6709\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212");if(e.includes(".")){let[i]=e.split("."),s=this.taskPlan.tasks.findIndex(f=>f.id===i);if(s<0||!this.taskPlan.tasks[s].subtasks)return null;let a=e,o=this.taskPlan.tasks[s].subtasks.findIndex(f=>f.id===a);if(o<0)return null;let c=this.taskPlan.tasks[s].subtasks[o];return r.name&&(c.name=r.name),r.description&&(c.description=r.description),r.status&&(c.status=r.status),this.logger.info(`\u66F4\u65B0\u5B50\u4EFB\u52A1 ${e}: ${c.name}`),{id:c.id,name:c.name,title:c.name,description:c.description,status:c.status,priority:"medium",type:"feature",dependencies:[],subtasks:[],createdAt:new Date,updatedAt:new Date,tags:[]}}let u=this.taskPlan.tasks.findIndex(i=>i.id===e);if(u<0)return null;let n=this.taskPlan.tasks[u];return r.name&&(n.name=r.name),r.description&&(n.description=r.description),r.status&&(n.status=r.status),r.priority&&(n.priority=r.priority),r.assignee&&(n.assignee=r.assignee),this.logger.info(`\u66F4\u65B0\u4EFB\u52A1 ${e}: ${n.name}`),n}removeTask(e){if(!this.taskPlan)throw new Error("\u6CA1\u6709\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212");if(e.includes(".")){let[u]=e.split("."),n=this.taskPlan.tasks.findIndex(a=>a.id===u);if(n<0||!this.taskPlan.tasks[n].subtasks)return!1;let i=e,s=this.taskPlan.tasks[n].subtasks.findIndex(a=>a.id===i);return s<0?!1:(this.taskPlan.tasks[n].subtasks.splice(s,1),this.logger.info(`\u5220\u9664\u5B50\u4EFB\u52A1 ${e}`),!0)}let r=this.taskPlan.tasks.findIndex(u=>u.id===e);return r<0?!1:(this.taskPlan.tasks.splice(r,1),this.taskPlan.tasks.forEach(u=>{u.dependencies=u.dependencies.filter(n=>n!==e)}),this.logger.info(`\u5220\u9664\u4EFB\u52A1 ${e}`),!0)}addSubtask(e,r){if(!this.taskPlan)throw new Error("\u6CA1\u6709\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212");let u=this.taskPlan.tasks.find(n=>n.id===e);if(!u)throw new Error(`\u7236\u4EFB\u52A1 ${e} \u4E0D\u5B58\u5728`);return Array.isArray(u.subtasks)||(u.subtasks=[]),r.id||(r.id=`${e}.${u.subtasks.length+1}`),r.status||(r.status="todo"),u.subtasks.push(r),this.logger.info(`\u4E3A\u4EFB\u52A1 ${e} \u6DFB\u52A0\u5B50\u4EFB\u52A1 ${r.id}: ${r.name}`),r}getNextTasks(){if(!this.taskPlan)throw new Error("\u6CA1\u6709\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212");return this.taskPlan.tasks.filter(r=>r.status!=="done"&&r.status!=="review").filter(r=>!r.dependencies||r.dependencies.length===0?!0:r.dependencies.every(u=>{let n=this.getTaskById(u);return n&&n.status==="done"}))}addDependency(e,r){if(!this.taskPlan)throw new Error("\u6CA1\u6709\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212");let u=this.getTaskById(e);if(!u)throw new Error(`\u4EFB\u52A1 ${e} \u4E0D\u5B58\u5728`);if(!this.getTaskById(r))throw new Error(`\u4F9D\u8D56\u7684\u4EFB\u52A1 ${r} \u4E0D\u5B58\u5728`);if(e===r)throw new Error("\u4EFB\u52A1\u4E0D\u80FD\u4F9D\u8D56\u81EA\u8EAB");if(this.checkCircularDependency(r,e))throw new Error("\u6DFB\u52A0\u6B64\u4F9D\u8D56\u4F1A\u5BFC\u81F4\u5FAA\u73AF\u4F9D\u8D56");return Array.isArray(u.dependencies)||(u.dependencies=[]),u.dependencies.includes(r)?!1:(u.dependencies.push(r),this.logger.info(`\u4E3A\u4EFB\u52A1 ${e} \u6DFB\u52A0\u4F9D\u8D56: ${r}`),!0)}removeDependency(e,r){if(!this.taskPlan)throw new Error("\u6CA1\u6709\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212");let u=this.getTaskById(e);if(!u||!Array.isArray(u.dependencies))return!1;let n=u.dependencies.indexOf(r);return n<0?!1:(u.dependencies.splice(n,1),this.logger.info(`\u4ECE\u4EFB\u52A1 ${e} \u79FB\u9664\u4F9D\u8D56: ${r}`),!0)}checkCircularDependency(e,r){if(!this.taskPlan)return!1;let u=new Map;this.taskPlan.tasks.forEach(o=>{u.set(o.id,[...o.dependencies||[]])});let n=u.get(e)||[];n.push(r),u.set(e,n);let i=new Set,s=new Set,a=o=>{if(s.has(o))return!0;if(i.has(o))return!1;i.add(o),s.add(o);let c=u.get(o)||[];for(let f of c)if(a(f))return!0;return s.delete(o),!1};return a(e)}startAutoSave(e){this.autoSaveInterval&&clearInterval(this.autoSaveInterval),this.autoSaveInterval=setInterval(async()=>{if(this.taskPlan)try{await this.saveTaskPlan()}catch(r){this.logger.error(`\u81EA\u52A8\u4FDD\u5B58\u4EFB\u52A1\u8BA1\u5212\u5931\u8D25\uFF1A${r.message}`)}},e),this.logger.info(`\u542F\u52A8\u81EA\u52A8\u4FDD\u5B58\uFF0C\u95F4\u9694: ${e/1e3} \u79D2`)}stopAutoSave(){this.autoSaveInterval&&(clearInterval(this.autoSaveInterval),this.autoSaveInterval=null,this.logger.info("\u505C\u6B62\u81EA\u52A8\u4FDD\u5B58"))}destroy(){this.stopAutoSave()}};var qr=class{constructor(e,r,u){this.logger=e,this.configManager=r,this.modelCoordinator=u,this.config=this.configManager.get("engine",{autoSave:!0,saveInterval:300,outputDir:"./taskflow",defaultModel:"deepseek",enableOptimization:!0}),this.prdParser=new Le(this.modelCoordinator,this.logger),this.taskPlanner=new Ie(this.modelCoordinator,this.logger),this.taskManager=new Ne(this.logger,this.configManager),this.logger.info("TaskFlow AI \u5F15\u64CE\u521D\u59CB\u5316\u5B8C\u6210")}async processFromPRD(e,r,u){try{this.logger.info(`\u5F00\u59CB\u5904\u7406PRD\u6587\u4EF6: ${e}`);let n=await this.parsePRD(e,r);if(!n.success||!n.data)return{success:!1,message:"PRD\u89E3\u6790\u5931\u8D25",errors:n.errors};let i=await this.generateTaskPlan(n.data,u);if(!i.success||!i.data)return{success:!1,message:"\u4EFB\u52A1\u8BA1\u5212\u751F\u6210\u5931\u8D25",errors:i.errors};if(this.config.enableOptimization){let s=await this.optimizeTaskPlan(i.data,u);s.success&&s.data&&(i.data=s.data)}return this.taskManager.setTaskPlan(i.data),this.config.autoSave&&await this.taskManager.saveTaskPlan(),this.logger.info("PRD\u5904\u7406\u5B8C\u6210\uFF0C\u4EFB\u52A1\u8BA1\u5212\u5DF2\u751F\u6210"),{success:!0,data:i.data,message:`\u6210\u529F\u751F\u6210\u5305\u542B ${i.data.tasks.length} \u4E2A\u4EFB\u52A1\u7684\u8BA1\u5212`,metadata:{prdFile:e,tasksCount:i.data.tasks.length,processedAt:new Date().toISOString()}}}catch(n){return this.logger.error(`\u5904\u7406PRD\u5931\u8D25: ${n.message}`),{success:!1,message:"\u5904\u7406PRD\u65F6\u53D1\u751F\u9519\u8BEF",errors:[n.message]}}}async parsePRD(e,r){try{return this.logger.info(`\u5F00\u59CB\u89E3\u6790PRD: ${e}`),{success:!0,data:await this.prdParser.parseFromFile(e,r),message:"PRD\u89E3\u6790\u6210\u529F"}}catch(u){return this.logger.error(`PRD\u89E3\u6790\u5931\u8D25: ${u.message}`),{success:!1,message:"PRD\u89E3\u6790\u5931\u8D25",errors:[u.message]}}}async generateTaskPlan(e,r){try{this.logger.info("\u5F00\u59CB\u751F\u6210\u4EFB\u52A1\u8BA1\u5212");let u=await this.taskPlanner.generateTaskPlan(e,r);return{success:!0,data:u,message:`\u4EFB\u52A1\u8BA1\u5212\u751F\u6210\u6210\u529F\uFF0C\u5305\u542B ${u.tasks.length} \u4E2A\u4EFB\u52A1`}}catch(u){return this.logger.error(`\u4EFB\u52A1\u8BA1\u5212\u751F\u6210\u5931\u8D25: ${u.message}`),{success:!1,message:"\u4EFB\u52A1\u8BA1\u5212\u751F\u6210\u5931\u8D25",errors:[u.message]}}}async optimizeTaskPlan(e,r){try{return this.logger.info("\u5F00\u59CB\u4F18\u5316\u4EFB\u52A1\u8BA1\u5212"),{success:!0,data:await this.taskPlanner.optimizeTaskPlan(e,r),message:"\u4EFB\u52A1\u8BA1\u5212\u4F18\u5316\u5B8C\u6210"}}catch(u){return this.logger.error(`\u4EFB\u52A1\u8BA1\u5212\u4F18\u5316\u5931\u8D25: ${u.message}`),{success:!1,message:"\u4EFB\u52A1\u8BA1\u5212\u4F18\u5316\u5931\u8D25",errors:[u.message]}}}getCurrentTaskPlan(){return this.taskManager.getTaskPlan()}getRecommendedTasks(){return this.taskManager.getNextTasks()}async updateTaskStatus(e,r){try{let u=this.taskManager.updateTask(e,{status:r});return u?(this.config.autoSave&&await this.taskManager.saveTaskPlan(),{success:!0,data:u,message:`\u4EFB\u52A1 ${e} \u72B6\u6001\u5DF2\u66F4\u65B0\u4E3A ${r}`}):{success:!1,message:`\u4EFB\u52A1 ${e} \u4E0D\u5B58\u5728`}}catch(u){return this.logger.error(`\u66F4\u65B0\u4EFB\u52A1\u72B6\u6001\u5931\u8D25: ${u.message}`),{success:!1,message:"\u66F4\u65B0\u4EFB\u52A1\u72B6\u6001\u5931\u8D25",errors:[u.message]}}}getProgressStats(){let e=this.taskManager.getTaskPlan();if(!e)return{total:0,completed:0,inProgress:0,notStarted:0,blocked:0,completionRate:0};let r={total:e.tasks.length,completed:0,inProgress:0,notStarted:0,blocked:0,completionRate:0};return e.tasks.forEach(u=>{switch(u.status){case"completed":r.completed++;break;case"in_progress":r.inProgress++;break;case"not_started":r.notStarted++;break;case"blocked":r.blocked++;break}}),r.completionRate=r.total>0?r.completed/r.total*100:0,r}destroy(){this.taskManager.destroy(),this.logger.info("TaskFlow AI \u5F15\u64CE\u5DF2\u9500\u6BC1")}};var vn=(i=>(i.GANTT="gantt",i.DEPENDENCY="dependency",i.KANBAN="kanban",i.TIMELINE="timeline",i.PROGRESS="progress",i))(vn||{}),Lr=class{constructor(e){this.logger=e}generateVisualization(e,r){switch(this.logger.info(`\u751F\u6210 ${r.type} \u53EF\u89C6\u5316`),r.type){case"gantt":return this.generateGanttChart(e,r);case"dependency":return this.generateDependencyGraph(e,r);case"kanban":return this.generateKanbanBoard(e,r);case"timeline":return this.generateTimeline(e,r);case"progress":return this.generateProgressChart(e,r);default:throw new Error(`\u4E0D\u652F\u6301\u7684\u53EF\u89C6\u5316\u7C7B\u578B: ${r.type}`)}}generateGanttChart(e,r){let u=[],n=new Date;e.tasks.forEach(s=>{let a={id:s.id,name:s.title,start:this.formatDate(n),duration:s.estimatedHours||8,dependencies:s.dependencies.length>0?s.dependencies:void 0,progress:s.progress||0,assignee:s.assignee};u.push(a),n=new Date(n.getTime()+(s.estimatedHours||8)*60*60*1e3)});let i={title:e.name||"\u4EFB\u52A1\u7518\u7279\u56FE",tasks:u};return r.format==="mermaid"?this.generateMermaidGantt(i):i}generateMermaidGantt(e){let r=`gantt
-    title ${e.title}
-    dateFormat YYYY-MM-DD
-    axisFormat %m-%d
+'use strict';
 
-`;return e.tasks.forEach(u=>{let n=u.progress??0,i=n===100?"done":n>0?"active":"",s=`${u.duration}h`;r+=`    ${u.name} :${i}, ${u.id}, ${u.start}, ${s}
-`}),r}generateDependencyGraph(e,r){let u=[],n=[];e.tasks.forEach(s=>{u.push({id:s.id,label:s.title,type:s.type,status:s.status,priority:s.priority})}),e.tasks.forEach(s=>{s.dependencies.forEach(a=>{n.push({from:a,to:s.id,type:"dependency"})})});let i={nodes:u,edges:n};return r.format==="mermaid"?this.generateMermaidDependencyGraph(i):i}generateMermaidDependencyGraph(e){let r=`graph TD
-`;return e.nodes.forEach(u=>{let n=this.getNodeShape(u.status),i=this.getNodeStyle(u.priority);r+=`    ${u.id}${n}["${u.label}"]
-`,i&&(r+=`    class ${u.id} ${i}
-`)}),r+=`
-`,e.edges.forEach(u=>{r+=`    ${u.from} --> ${u.to}
-`}),r+=`
-`,r+=`    classDef high fill:#ff6b6b,stroke:#333,stroke-width:2px
-`,r+=`    classDef medium fill:#feca57,stroke:#333,stroke-width:2px
-`,r+=`    classDef low fill:#48dbfb,stroke:#333,stroke-width:2px
-`,r+=`    classDef critical fill:#ff3838,stroke:#333,stroke-width:3px
-`,r}getNodeShape(e){switch(e){case"completed":return"(())";case"in_progress":return"([])";case"blocked":return"{[]}";default:return"[]"}}getNodeStyle(e){switch(e){case"critical":return"critical";case"high":return"high";case"medium":return"medium";case"low":return"low";default:return""}}generateKanbanBoard(e,r){let u=[{id:"not_started",title:"\u5F85\u5F00\u59CB",tasks:[]},{id:"in_progress",title:"\u8FDB\u884C\u4E2D",tasks:[]},{id:"completed",title:"\u5DF2\u5B8C\u6210",tasks:[]},{id:"blocked",title:"\u88AB\u963B\u585E",tasks:[]}];return e.tasks.forEach(n=>{let i={id:n.id,title:n.title,description:n.description,priority:n.priority,assignee:n.assignee,tags:n.tags},s=u.find(a=>a.id===n.status);s&&s.tasks.push(i)}),{columns:u}}generateTimeline(e,r){return{title:e.name||"\u9879\u76EE\u65F6\u95F4\u7EBF",events:e.tasks.map((n,i)=>({id:n.id,title:n.title,date:this.calculateTaskStartDate(n,i),duration:n.estimatedHours||8,status:n.status,priority:n.priority}))}}generateProgressChart(e,r){let u={total:e.tasks.length,completed:0,inProgress:0,notStarted:0,blocked:0};e.tasks.forEach(i=>{switch(i.status){case"completed":u.completed++;break;case"in_progress":u.inProgress++;break;case"not_started":u.notStarted++;break;case"blocked":u.blocked++;break}});let n=u.completed/u.total*100;return{stats:u,completionRate:n,chartData:[{label:"\u5DF2\u5B8C\u6210",value:u.completed,color:"#4CAF50"},{label:"\u8FDB\u884C\u4E2D",value:u.inProgress,color:"#FF9800"},{label:"\u672A\u5F00\u59CB",value:u.notStarted,color:"#9E9E9E"},{label:"\u88AB\u963B\u585E",value:u.blocked,color:"#F44336"}]}}formatDate(e){return e.toISOString().split("T")[0]}calculateTaskStartDate(e,r){let u=new Date;return u.setDate(u.getDate()+r),this.formatDate(u)}};var Se=B(require("fs")),jr=B(require("path")),da=B(require("os"));var Te=(a=>(a.BAIDU="baidu",a.XUNFEI="xunfei",a.ZHIPU="zhipu",a.DEEPSEEK="deepseek",a.QWEN="qwen",a.SPARK="spark",a.MOONSHOT="moonshot",a))(Te||{}),Ir=(n=>(n.ERROR="error",n.WARN="warn",n.INFO="info",n.DEBUG="debug",n))(Ir||{});var Nr=class{constructor(){this.configPath=jr.join(da.homedir(),".taskflow-ai","config.json"),this.config=this.loadConfig()}loadConfig(){try{if(Se.existsSync(this.configPath)){let e=Se.readFileSync(this.configPath,"utf8");return JSON.parse(e)}}catch(e){console.warn(`\u52A0\u8F7D\u914D\u7F6E\u6587\u4EF6\u5931\u8D25: ${e.message}`)}return{models:{default:"deepseek",apiKeys:{},endpoints:{}},ui:{theme:"light",language:"zh-CN"},features:{autoSave:!0,notifications:!0}}}saveConfig(){try{let e=jr.dirname(this.configPath);Se.existsSync(e)||Se.mkdirSync(e,{recursive:!0}),Se.writeFileSync(this.configPath,JSON.stringify(this.config,null,2))}catch(e){console.error(`\u4FDD\u5B58\u914D\u7F6E\u6587\u4EF6\u5931\u8D25: ${e.message}`)}}get(e,r){let u=e.split("."),n=this.config;for(let i of u)if(n&&typeof n=="object"&&i in n)n=n[i];else return r;return n}set(e,r){let u=e.split("."),n=this.config;for(let i=0;i<u.length-1;i++){let s=u[i];(!n[s]||typeof n[s]!="object")&&(n[s]={}),n=n[s]}n[u[u.length-1]]=r,this.saveConfig()}getAll(){return{...this.config}}update(e){this.config={...this.config,...e},this.saveConfig()}reset(){this.config=this.loadConfig()}getConfig(){return this.getAll()}updateConfig(e,r=!1){this.update(e)}getDefaultModelType(){return this.get("models.default","deepseek")}};var ce=B(bl()),Vi=B(require("path")),yl=B(require("fs-extra")),ju=class t{constructor(e){let r=Vi.default.join(process.env.HOME||process.env.USERPROFILE||".",".config","mcp","logs");yl.default.ensureDirSync(r);let u=e.file||Vi.default.join(r,"mcp.log"),n=ce.default.format.combine(ce.default.format.colorize(),ce.default.format.timestamp(),ce.default.format.printf(({timestamp:a,level:o,message:c})=>`${a} ${o}: ${c}`)),i=ce.default.format.combine(ce.default.format.timestamp(),ce.default.format.json()),s=[];(e.output==="console"||e.output==="both")&&s.push(new ce.default.transports.Console({format:n,level:e.level})),(e.output==="file"||e.output==="both")&&s.push(new ce.default.transports.File({filename:u,format:i,level:e.level,maxsize:5242880,maxFiles:5})),this.logger=ce.default.createLogger({level:e.level,levels:ce.default.config.npm.levels,defaultMeta:{service:"mcp"},transports:s})}static getInstance(e){return t.instance||(t.instance=new t(e)),t.instance}updateConfig(e){t.instance=new t(e)}error(e,r){this.logger.error(e,r)}warn(e,r){this.logger.warn(e,r)}info(e,r){this.logger.info(e,r)}debug(e,r){this.logger.debug(e,r)}log(e,r,u){this.logger.log(e,r,u)}};var $u=B(require("axios"));var ke=class{constructor(e){this.modelType=e}getModelType(){return this.modelType}handleRequestError(e){if(e&&typeof e=="object"&&"response"in e){let r=e.response,u=r?.status,n=r?.data,i=`HTTP Error ${u}`;throw n&&typeof n=="object"&&(i+=`: ${JSON.stringify(n)}`),u===401||u===403?new Error(`\u8BA4\u8BC1\u5931\u8D25\uFF1A${i}\uFF0C\u8BF7\u68C0\u67E5API\u5BC6\u94A5\u662F\u5426\u6B63\u786E`):u===429?new Error(`\u8BF7\u6C42\u901F\u7387\u9650\u5236\uFF1A${i}\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5`):new Error(`API\u8C03\u7528\u5931\u8D25\uFF1A${i}`)}else if(e&&typeof e=="object"&&"request"in e){let r=e.message||"\u7F51\u7EDC\u9519\u8BEF";throw new Error(`\u8BF7\u6C42\u8D85\u65F6\u6216\u7F51\u7EDC\u9519\u8BEF\uFF1A${r}`)}else{let r=e?.message||"\u672A\u77E5\u9519\u8BEF";throw new Error(`\u8BF7\u6C42\u914D\u7F6E\u9519\u8BEF\uFF1A${r}`)}}};var Bu=class extends ke{constructor(r){super("baidu");this.accessToken=null;this.tokenExpireTime=0;let u=r.get("models.baidu",{apiKey:"",secretKey:"",endpoint:"https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/",modelVersion:"ernie-bot-4"});if(this.apiKey=u.apiKey,this.secretKey=u.secretKey,this.endpoint=u.endpoint||"https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/",this.modelVersion=u.modelVersion||"ernie-bot-4",!this.apiKey||!this.secretKey)throw new Error("\u767E\u5EA6\u6587\u5FC3API\u5BC6\u94A5\u672A\u914D\u7F6E\uFF0C\u8BF7\u4F7F\u7528 mcp config \u547D\u4EE4\u8BBE\u7F6E model.baidu.apiKey \u548C model.baidu.secretKey")}async chat(r,u){try{await this.ensureAccessToken();let n=this.buildRequestBody(r,u),i=`${this.endpoint}${this.modelVersion}?access_token=${this.accessToken}`,s=await $u.default.post(i,n,{headers:{"Content-Type":"application/json"},timeout:u?.timeout||3e4});return this.processResponse(s.data)}catch(n){return this.handleRequestError(n)}}async chatStream(r,u,n){try{await this.ensureAccessToken();let i=this.buildRequestBody(r,{...n,stream:!0}),s=`${this.endpoint}${this.modelVersion}?access_token=${this.accessToken}`,o=(await $u.default.post(s,i,{headers:{"Content-Type":"application/json"},responseType:"stream",timeout:n?.timeout||6e4})).data;return new Promise((c,f)=>{let d="";o.on("data",p=>{let h=p.toString();d+=h;let l=d.split(`
-`);d=l.pop()||"";for(let g of l)if(g.startsWith("data: ")){let _=g.substring(6);try{let E=JSON.parse(_);u(E.result,E.is_end||!1)}catch{}}}),o.on("end",()=>{u("",!0),c()}),o.on("error",p=>{f(p)})})}catch(i){return this.handleRequestError(i)}}async validateApiKey(){try{return await this.ensureAccessToken(),!!this.accessToken}catch{return!1}}buildRequestBody(r,u){return{messages:r.messages.map(i=>({role:this.mapRole(i.role),content:i.content})),temperature:u?.temperature??r.temperature??.7,top_p:r.topP??.8,stream:u?.stream??!1,user_id:"mcp-user"}}processResponse(r){return{content:r.result,finishReason:r.is_end?"stop":void 0,usage:r.usage?{promptTokens:r.usage.prompt_tokens,completionTokens:r.usage.completion_tokens,totalTokens:r.usage.total_tokens}:void 0}}mapRole(r){switch(r){case"user":return"user";case"assistant":return"assistant";case"system":return"system";default:return"user"}}async ensureAccessToken(){let r=Date.now();if(!(this.accessToken&&r<this.tokenExpireTime))try{let u=`https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${this.apiKey}&client_secret=${this.secretKey}`,n=await $u.default.post(u);if(n.data&&n.data.access_token)this.accessToken=n.data.access_token,this.tokenExpireTime=r+(n.data.expires_in||2592e3)*1e3-864e5;else throw new Error("\u83B7\u53D6\u8BBF\u95EE\u4EE4\u724C\u5931\u8D25\uFF1A\u54CD\u5E94\u4E2D\u6CA1\u6709access_token\u5B57\u6BB5")}catch(u){throw this.accessToken=null,this.tokenExpireTime=0,new Error(`\u83B7\u53D6\u767E\u5EA6\u6587\u5FC3\u8BBF\u95EE\u4EE4\u724C\u5931\u8D25\uFF1A${u.message}`)}}};var Gi=B(require("axios"));var zu=class extends ke{constructor(e){super("deepseek");let r=e.get("models.deepseek",{apiKey:"",endpoint:"https://api.deepseek.com/v1/chat/completions",modelVersion:"deepseek-chat"});if(this.apiKey=r.apiKey,this.endpoint=r.endpoint||"https://api.deepseek.com/v1/chat/completions",this.modelVersion=r.modelVersion||"deepseek-chat",!this.apiKey)throw new Error("DeepSeek API\u5BC6\u94A5\u672A\u914D\u7F6E\uFF0C\u8BF7\u4F7F\u7528 mcp config \u547D\u4EE4\u8BBE\u7F6E model.deepseek.apiKey")}async chat(e,r){try{let u=this.buildRequestBody(e,r),n=await Gi.default.post(this.endpoint,u,{headers:{"Content-Type":"application/json",Authorization:`Bearer ${this.apiKey}`},timeout:r?.timeout||3e4});return this.processResponse(n.data)}catch(u){return this.handleRequestError(u)}}async chatStream(e,r,u){try{let n=this.buildRequestBody(e,{...u,stream:!0}),s=(await Gi.default.post(this.endpoint,n,{headers:{"Content-Type":"application/json",Authorization:`Bearer ${this.apiKey}`},responseType:"stream",timeout:u?.timeout||6e4})).data;return new Promise((a,o)=>{let c="";s.on("data",f=>{let d=f.toString();c+=d;let p=c.split(`
-`);c=p.pop()||"";for(let h of p)if(h.startsWith("data: ")){let l=h.substring(6);if(l==="[DONE]"){r("",!0);continue}try{let g=JSON.parse(l);if(g.choices&&g.choices.length>0){let _=g.choices[0].message?.content||"",E=g.choices[0].finish_reason==="stop";r(_,E)}}catch{}}}),s.on("end",()=>{r("",!0),a()}),s.on("error",f=>{o(f)})})}catch(n){return this.handleRequestError(n)}}async validateApiKey(){try{return await this.chat({messages:[{role:"user",content:"Hello"}],maxTokens:5},{temperature:.1}),!0}catch{return!1}}buildRequestBody(e,r){let u=e.messages.map(n=>({role:this.mapRole(n.role),content:n.content}));return{model:this.modelVersion,messages:u,temperature:r?.temperature??e.temperature??.7,top_p:e.topP??.8,max_tokens:r?.maxTokens??e.maxTokens??1024,stream:r?.stream??!1}}processResponse(e){if(!e.choices||e.choices.length===0)throw new Error("\u65E0\u6548\u7684\u54CD\u5E94\u683C\u5F0F\uFF1A\u6CA1\u6709\u8FD4\u56DEchoices\u5B57\u6BB5");let r=e.choices[0];return{content:r.message?.content||"",finishReason:r.finish_reason,usage:e.usage?{promptTokens:e.usage.prompt_tokens,completionTokens:e.usage.completion_tokens,totalTokens:e.usage.total_tokens}:void 0}}mapRole(e){switch(e){case"user":return"user";case"assistant":return"assistant";case"system":return"system";default:return"user"}}};var Wi=B(require("axios")),_l=B(require("crypto"));var Hu=class extends ke{constructor(e){super("zhipu");let r=e.get("models.zhipu",{apiKey:"",endpoint:"https://open.bigmodel.cn/api/paas/v4/chat/completions",modelVersion:"glm-4"});if(this.apiKey=r.apiKey,this.endpoint=r.endpoint||"https://open.bigmodel.cn/api/paas/v4/chat/completions",this.modelVersion=r.modelVersion||"glm-4",!this.apiKey)throw new Error("\u667A\u8C31AI API\u5BC6\u94A5\u672A\u914D\u7F6E\uFF0C\u8BF7\u4F7F\u7528 yasi config \u547D\u4EE4\u8BBE\u7F6E model.zhipu.apiKey")}async chat(e,r){try{let u=this.buildRequestBody(e,r),n=this.generateAuthHeaders(),i=await Wi.default.post(this.endpoint,u,{headers:{"Content-Type":"application/json",Authorization:n.Authorization,Date:n.Date},timeout:r?.timeout||3e4});return this.processResponse(i.data)}catch(u){return this.handleRequestError(u)}}async chatStream(e,r,u){try{let n=this.buildRequestBody(e,{...u,stream:!0}),i=this.generateAuthHeaders(),a=(await Wi.default.post(this.endpoint,n,{headers:{"Content-Type":"application/json",Authorization:i.Authorization,Date:i.Date,Accept:"text/event-stream"},responseType:"stream",timeout:u?.timeout||6e4})).data;return new Promise((o,c)=>{let f="";a.on("data",d=>{let p=d.toString();f+=p;let h=f.split(`
-`);f=h.pop()||"";for(let l of h)if(l.startsWith("data: ")){let g=l.substring(6);if(g==="[DONE]"){r("",!0);continue}try{let _=JSON.parse(g);if(_.choices&&_.choices.length>0){let E=_.choices[0].delta?.content||"",x=_.choices[0].finish_reason==="stop";r(E,x)}}catch{}}}),a.on("end",()=>{r("",!0),o()}),a.on("error",d=>{c(d)})})}catch(n){return this.handleRequestError(n)}}async validateApiKey(){try{return await this.chat({messages:[{role:"user",content:"Hello"}],maxTokens:5},{temperature:.1}),!0}catch{return!1}}buildRequestBody(e,r){let u=e.messages.map(n=>({role:this.mapRole(n.role),content:n.content}));return{model:this.modelVersion,messages:u,temperature:r?.temperature??e.temperature??.7,top_p:e.topP??.8,max_tokens:r?.maxTokens??e.maxTokens??1024,stream:r?.stream??!1}}processResponse(e){if(!e.choices||e.choices.length===0)throw new Error("\u65E0\u6548\u7684\u54CD\u5E94\u683C\u5F0F\uFF1A\u6CA1\u6709\u8FD4\u56DEchoices\u5B57\u6BB5");let r=e.choices[0];return{content:r.message?.content||"",finishReason:r.finish_reason,usage:e.usage?{promptTokens:e.usage.prompt_tokens,completionTokens:e.usage.completion_tokens,totalTokens:e.usage.total_tokens}:void 0}}mapRole(e){switch(e){case"user":return"user";case"assistant":return"assistant";case"system":return"system";default:return"user"}}generateAuthHeaders(){if(!this.apiKey.startsWith("zhipu-"))throw new Error('\u667A\u8C31AI API\u5BC6\u94A5\u683C\u5F0F\u4E0D\u6B63\u786E\uFF0C\u5E94\u4EE5"zhipu-"\u5F00\u5934');let[e,r]=this.apiKey.substring(6).split(".");if(!e||!r)throw new Error("\u667A\u8C31AI API\u5BC6\u94A5\u683C\u5F0F\u4E0D\u6B63\u786E\uFF0C\u65E0\u6CD5\u63D0\u53D6id\u548Csecret");let u=new Date().toUTCString(),n=`date: ${u}
-POST /api/paas/v4/chat/completions HTTP/1.1`,i=_l.createHmac("sha256",r).update(n).digest("base64");return{Authorization:`hmac username="${e}", algorithm="hmac-sha256", headers="date request-line", signature="${i}"`,Date:u}}};var xl=B(require("axios"));var Uu=class extends ke{constructor(e){super("qwen");let r=e.get("models.qwen");if(!r)throw new Error("Qwen\u6A21\u578B\u914D\u7F6E\u672A\u627E\u5230");this.apiKey=r.apiKey,this.endpoint=r.endpoint||"https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation",this.modelVersion=r.modelVersion||"qwen-turbo",this.client=xl.default.create({baseURL:this.endpoint,headers:{Authorization:`Bearer ${this.apiKey}`,"Content-Type":"application/json","X-DashScope-SSE":"disable"},timeout:3e4})}async chat(e,r){try{let u=this.buildRequestData(e),n=await this.client.post("",u);if(n.data.output&&n.data.output.text)return{content:n.data.output.text,usage:{promptTokens:n.data.usage?.input_tokens||0,completionTokens:n.data.usage?.output_tokens||0,totalTokens:n.data.usage?.total_tokens||0},finishReason:n.data.output.finish_reason||"stop"};throw new Error("Invalid response format from Qwen API")}catch(u){this.handleRequestError(u)}}async chatStream(e,r,u){try{let n={...this.buildRequestData(e),parameters:{...this.buildRequestData(e).parameters,incremental_output:!0}},i=await this.client.post("",n,{headers:{Authorization:`Bearer ${this.apiKey}`,"Content-Type":"application/json","X-DashScope-SSE":"enable",Accept:"text/event-stream"},responseType:"stream"}),s="";i.data.on("data",a=>{s+=a.toString();let o=s.split(`
-`);s=o.pop()||"";for(let c of o)if(c.startsWith("data: ")){let f=c.slice(6);if(f==="[DONE]"){r("",!0);return}try{let d=JSON.parse(f);d.output&&d.output.text&&r(d.output.text,!1)}catch{}}}),i.data.on("end",()=>{r("",!0)})}catch(n){this.handleRequestError(n)}}async validateApiKey(){try{let e={messages:[{role:"user",content:"Hello"}],maxTokens:10};return await this.chat(e),!0}catch{return!1}}buildRequestData(e){let r=e.messages.map(u=>({role:u.role,content:u.content}));return{model:this.modelVersion,input:{messages:r},parameters:{max_tokens:e.maxTokens||2e3,temperature:e.temperature||.7,top_p:e.topP||.9,repetition_penalty:1.1,result_format:"text"}}}};var Vu=class{constructor(e){this.modelCache=new Map;this.configManager=e}createModelAdapter(e){let r=e||this.configManager.getDefaultModelType(),u=this.modelCache.get(r);if(u)return u;let n;switch(r){case"baidu":n=new Bu(this.configManager);break;case"deepseek":n=new zu(this.configManager);break;case"zhipu":n=new Hu(this.configManager);break;case"qwen":n=new Uu(this.configManager);break;default:throw new Error(`\u4E0D\u652F\u6301\u7684\u6A21\u578B\u7C7B\u578B: ${r}`)}return this.modelCache.set(r,n),n}clearCache(e){e?this.modelCache.delete(e):this.modelCache.clear()}getAvailableModelTypes(){return["baidu","deepseek","zhipu"]}async validateModelApiKey(e){try{return await this.createModelAdapter(e).validateApiKey()}catch{return!1}}};var Gu=class{constructor(e){this.configManager=e,this.modelFactory=new Vu(e)}async chat(e,r,u){return await this.modelFactory.createModelAdapter(r).chat({messages:e},u)}async chatStream(e,r,u,n){return await this.modelFactory.createModelAdapter(u).chatStream({messages:e},r,n)}async parsePRD(e,r){let u=r?.modelType||this.configManager.getDefaultModelType(),n=`\u4F60\u662F\u4E00\u4F4D\u4E13\u4E1A\u7684PRD\u9700\u6C42\u5206\u6790\u5E08\uFF0C\u8BF7\u5E2E\u6211\u89E3\u6790\u4EE5\u4E0BPRD\u6587\u6863\uFF0C\u63D0\u53D6\u5176\u4E2D\u7684\u5173\u952E\u4FE1\u606F\u3002
-\u8BF7\u6309\u7167\u4EE5\u4E0BJSON\u683C\u5F0F\u8F93\u51FA\u7ED3\u679C\uFF1A
+var commander = require('commander');
+var chalk = require('chalk');
+var fs = require('fs-extra');
+var path = require('path');
+var winston = require('winston');
+var Conf = require('conf');
+var inquirer = require('inquirer');
+var ora = require('ora');
+var boxen = require('boxen');
+var fs$1 = require('fs');
+var os = require('os');
+var axios = require('axios');
+var crypto = require('crypto');
+var MarkdownIt = require('markdown-it');
+
+function _interopNamespaceDefault(e) {
+    var n = Object.create(null);
+    if (e) {
+        Object.keys(e).forEach(function (k) {
+            if (k !== 'default') {
+                var d = Object.getOwnPropertyDescriptor(e, k);
+                Object.defineProperty(n, k, d.get ? d : {
+                    enumerable: true,
+                    get: function () { return e[k]; }
+                });
+            }
+        });
+    }
+    n.default = e;
+    return Object.freeze(n);
+}
+
+var fs__namespace = /*#__PURE__*/_interopNamespaceDefault(fs);
+var path__namespace = /*#__PURE__*/_interopNamespaceDefault(path);
+var fs__namespace$1 = /*#__PURE__*/_interopNamespaceDefault(fs$1);
+var os__namespace = /*#__PURE__*/_interopNamespaceDefault(os);
+var crypto__namespace = /*#__PURE__*/_interopNamespaceDefault(crypto);
+
+/**
+ * 模型相关类型定义
+ */
+/**
+ * 消息角色
+ */
+var MessageRole;
+(function (MessageRole) {
+    MessageRole["USER"] = "user";
+    MessageRole["ASSISTANT"] = "assistant";
+    MessageRole["SYSTEM"] = "system";
+})(MessageRole || (MessageRole = {}));
+/**
+ * 文件类型
+ */
+var FileType;
+(function (FileType) {
+    FileType["MARKDOWN"] = "markdown";
+    FileType["PDF"] = "pdf";
+    FileType["WORD"] = "word";
+    FileType["TEXT"] = "text";
+    FileType["JSON"] = "json";
+    FileType["UNKNOWN"] = "unknown";
+})(FileType || (FileType = {}));
+
+/**
+ * 文档处理器 - 支持多种格式的文档解析
+ * 作为PRD解析引擎的核心组件
+ */
+/**
+ * 文档类型枚举
+ */
+var DocumentType;
+(function (DocumentType) {
+    DocumentType["MARKDOWN"] = "markdown";
+    DocumentType["TEXT"] = "text";
+    DocumentType["JSON"] = "json";
+    DocumentType["HTML"] = "html";
+    DocumentType["WORD"] = "word";
+    DocumentType["PDF"] = "pdf";
+})(DocumentType || (DocumentType = {}));
+/**
+ * 章节类型枚举
+ */
+var SectionType;
+(function (SectionType) {
+    SectionType["OVERVIEW"] = "overview";
+    SectionType["REQUIREMENTS"] = "requirements";
+    SectionType["FEATURES"] = "features";
+    SectionType["TECHNICAL"] = "technical";
+    SectionType["TIMELINE"] = "timeline";
+    SectionType["RESOURCES"] = "resources";
+    SectionType["APPENDIX"] = "appendix";
+    SectionType["OTHER"] = "other";
+})(SectionType || (SectionType = {}));
+/**
+ * 文档处理器类
+ */
+class DocumentProcessor {
+    constructor(logger) {
+        this.logger = logger;
+        this.markdownParser = new MarkdownIt({
+            html: true,
+            linkify: true,
+            typographer: true
+        });
+    }
+    /**
+     * 处理文档文件
+     * @param filePath 文件路径
+     * @param options 处理选项
+     */
+    async processDocument(filePath, options = {}) {
+        try {
+            this.logger.info(`开始处理文档: ${filePath}`);
+            // 检查文件是否存在
+            if (!await fs__namespace.pathExists(filePath)) {
+                throw new Error(`文件不存在: ${filePath}`);
+            }
+            // 获取文件信息
+            const stats = await fs__namespace.stat(filePath);
+            const documentType = this.detectDocumentType(filePath);
+            // 读取文件内容
+            const content = await this.readFileContent(filePath, documentType);
+            // 生成元数据
+            const metadata = {
+                fileName: path__namespace.basename(filePath),
+                fileSize: stats.size,
+                createdAt: stats.birthtime,
+                modifiedAt: stats.mtime,
+                documentType,
+                language: options.detectLanguage ? this.detectLanguage(content) : 'zh-CN',
+                wordCount: this.countWords(content),
+                estimatedReadTime: Math.ceil(this.countWords(content) / 200) // 假设每分钟200字
+            };
+            // 解析文档结构
+            const sections = await this.parseDocumentStructure(content, documentType, options);
+            const documentStructure = {
+                title: this.extractTitle(content, documentType) || metadata.fileName,
+                sections,
+                metadata
+            };
+            this.logger.info(`文档处理完成: ${sections.length} 个章节`);
+            return documentStructure;
+        }
+        catch (error) {
+            this.logger.error(`文档处理失败: ${error.message}`);
+            throw error;
+        }
+    }
+    /**
+     * 检测文档类型
+     * @param filePath 文件路径
+     */
+    detectDocumentType(filePath) {
+        const ext = path__namespace.extname(filePath).toLowerCase();
+        switch (ext) {
+            case '.md':
+            case '.markdown':
+                return DocumentType.MARKDOWN;
+            case '.txt':
+                return DocumentType.TEXT;
+            case '.json':
+                return DocumentType.JSON;
+            case '.html':
+            case '.htm':
+                return DocumentType.HTML;
+            case '.docx':
+            case '.doc':
+                return DocumentType.WORD;
+            case '.pdf':
+                return DocumentType.PDF;
+            default:
+                return DocumentType.TEXT;
+        }
+    }
+    /**
+     * 读取文件内容
+     * @param filePath 文件路径
+     * @param documentType 文档类型
+     */
+    async readFileContent(filePath, documentType) {
+        switch (documentType) {
+            case DocumentType.MARKDOWN:
+            case DocumentType.TEXT:
+            case DocumentType.HTML:
+            case DocumentType.JSON:
+                return await fs__namespace.readFile(filePath, 'utf-8');
+            case DocumentType.WORD:
+                // TODO: 实现Word文档解析
+                this.logger.warn('Word文档解析暂未实现，将作为文本处理');
+                return await fs__namespace.readFile(filePath, 'utf-8');
+            case DocumentType.PDF:
+                // TODO: 实现PDF文档解析
+                this.logger.warn('PDF文档解析暂未实现，将作为文本处理');
+                return await fs__namespace.readFile(filePath, 'utf-8');
+            default:
+                return await fs__namespace.readFile(filePath, 'utf-8');
+        }
+    }
+    /**
+     * 解析文档结构
+     * @param content 文档内容
+     * @param documentType 文档类型
+     * @param options 处理选项
+     */
+    async parseDocumentStructure(content, documentType, options) {
+        switch (documentType) {
+            case DocumentType.MARKDOWN:
+                return this.parseMarkdownStructure(content, options);
+            case DocumentType.TEXT:
+                return this.parseTextStructure(content, options);
+            case DocumentType.JSON:
+                return this.parseJsonStructure(content, options);
+            case DocumentType.HTML:
+                return this.parseHtmlStructure(content, options);
+            default:
+                return this.parseTextStructure(content, options);
+        }
+    }
+    /**
+     * 解析Markdown文档结构
+     * @param content Markdown内容
+     * @param options 处理选项
+     */
+    parseMarkdownStructure(content, options) {
+        const sections = [];
+        const lines = content.split('\n');
+        let currentSection = null;
+        let sectionCounter = 0;
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            // 检测标题
+            const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
+            if (headerMatch) {
+                const level = headerMatch[1].length;
+                const title = headerMatch[2].trim();
+                // 保存上一个章节
+                if (currentSection) {
+                    sections.push(currentSection);
+                }
+                // 创建新章节
+                currentSection = {
+                    id: `section-${++sectionCounter}`,
+                    title,
+                    content: '',
+                    level,
+                    subsections: [],
+                    type: this.classifySectionType(title),
+                    keywords: options.extractKeywords ? this.extractKeywords(title) : [],
+                    importance: options.calculateImportance ? this.calculateImportance(title, '') : 0.5
+                };
+            }
+            else if (currentSection && line) {
+                // 添加内容到当前章节
+                currentSection.content += line + '\n';
+            }
+        }
+        // 添加最后一个章节
+        if (currentSection) {
+            sections.push(currentSection);
+        }
+        // 后处理：更新重要性评分和关键词
+        if (options.calculateImportance || options.extractKeywords) {
+            sections.forEach(section => {
+                if (options.extractKeywords) {
+                    section.keywords = this.extractKeywords(section.title + ' ' + section.content);
+                }
+                if (options.calculateImportance) {
+                    section.importance = this.calculateImportance(section.title, section.content);
+                }
+            });
+        }
+        return this.buildSectionHierarchy(sections);
+    }
+    /**
+     * 解析纯文本文档结构
+     * @param content 文本内容
+     * @param options 处理选项
+     */
+    parseTextStructure(content, options) {
+        const sections = [];
+        const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim());
+        paragraphs.forEach((paragraph, index) => {
+            const lines = paragraph.trim().split('\n');
+            const title = lines[0].trim();
+            const content = lines.slice(1).join('\n').trim();
+            sections.push({
+                id: `section-${index + 1}`,
+                title: title || `段落 ${index + 1}`,
+                content,
+                level: 1,
+                subsections: [],
+                type: this.classifySectionType(title),
+                keywords: options.extractKeywords ? this.extractKeywords(paragraph) : [],
+                importance: options.calculateImportance ? this.calculateImportance(title, content) : 0.5
+            });
+        });
+        return sections;
+    }
+    /**
+     * 解析JSON文档结构
+     * @param content JSON内容
+     * @param options 处理选项
+     */
+    parseJsonStructure(content, _options) {
+        try {
+            const data = JSON.parse(content);
+            const sections = [];
+            if (Array.isArray(data)) {
+                data.forEach((item, index) => {
+                    sections.push(this.createSectionFromObject(item, `item-${index}`, 1));
+                });
+            }
+            else if (typeof data === 'object') {
+                Object.entries(data).forEach(([key, value], index) => {
+                    sections.push(this.createSectionFromObject({ [key]: value }, `section-${index + 1}`, 1));
+                });
+            }
+            return sections;
+        }
+        catch (error) {
+            this.logger.error(`JSON解析失败: ${error.message}`);
+            return [];
+        }
+    }
+    /**
+     * 解析HTML文档结构
+     * @param content HTML内容
+     * @param options 处理选项
+     */
+    parseHtmlStructure(content, options) {
+        // 简化的HTML解析，提取标题和内容
+        const sections = [];
+        const headerRegex = /<h([1-6])[^>]*>(.*?)<\/h[1-6]>/gi;
+        let match;
+        let sectionCounter = 0;
+        while ((match = headerRegex.exec(content)) !== null) {
+            const level = parseInt(match[1]);
+            const title = match[2].replace(/<[^>]*>/g, '').trim();
+            sections.push({
+                id: `section-${++sectionCounter}`,
+                title,
+                content: '', // TODO: 提取对应的内容
+                level,
+                subsections: [],
+                type: this.classifySectionType(title),
+                keywords: options.extractKeywords ? this.extractKeywords(title) : [],
+                importance: options.calculateImportance ? this.calculateImportance(title, '') : 0.5
+            });
+        }
+        return this.buildSectionHierarchy(sections);
+    }
+    /**
+     * 从对象创建章节
+     * @param obj 对象
+     * @param id 章节ID
+     * @param level 层级
+     */
+    createSectionFromObject(obj, id, level) {
+        const title = typeof obj === 'object' && obj !== null ?
+            Object.keys(obj)[0] || id :
+            String(obj);
+        const content = typeof obj === 'object' && obj !== null ?
+            JSON.stringify(obj, null, 2) :
+            String(obj);
+        return {
+            id,
+            title,
+            content,
+            level,
+            subsections: [],
+            type: this.classifySectionType(title),
+            keywords: this.extractKeywords(content),
+            importance: this.calculateImportance(title, content)
+        };
+    }
+    /**
+     * 构建章节层次结构
+     * @param sections 扁平的章节列表
+     */
+    buildSectionHierarchy(sections) {
+        const result = [];
+        const stack = [];
+        for (const section of sections) {
+            // 找到合适的父级
+            while (stack.length > 0 && stack[stack.length - 1].level >= section.level) {
+                stack.pop();
+            }
+            if (stack.length === 0) {
+                // 顶级章节
+                result.push(section);
+            }
+            else {
+                // 子章节
+                stack[stack.length - 1].subsections.push(section);
+            }
+            stack.push(section);
+        }
+        return result;
+    }
+    /**
+     * 分类章节类型
+     * @param title 章节标题
+     */
+    classifySectionType(title) {
+        const titleLower = title.toLowerCase();
+        if (titleLower.includes('概述') || titleLower.includes('overview') || titleLower.includes('简介')) {
+            return SectionType.OVERVIEW;
+        }
+        if (titleLower.includes('需求') || titleLower.includes('requirement')) {
+            return SectionType.REQUIREMENTS;
+        }
+        if (titleLower.includes('功能') || titleLower.includes('feature')) {
+            return SectionType.FEATURES;
+        }
+        if (titleLower.includes('技术') || titleLower.includes('technical') || titleLower.includes('架构')) {
+            return SectionType.TECHNICAL;
+        }
+        if (titleLower.includes('时间') || titleLower.includes('timeline') || titleLower.includes('计划')) {
+            return SectionType.TIMELINE;
+        }
+        if (titleLower.includes('资源') || titleLower.includes('resource')) {
+            return SectionType.RESOURCES;
+        }
+        if (titleLower.includes('附录') || titleLower.includes('appendix')) {
+            return SectionType.APPENDIX;
+        }
+        return SectionType.OTHER;
+    }
+    /**
+     * 提取关键词
+     * @param text 文本内容
+     */
+    extractKeywords(text) {
+        // 简化的关键词提取
+        const words = text
+            .toLowerCase()
+            .replace(/[^\u4e00-\u9fa5a-zA-Z0-9\s]/g, ' ')
+            .split(/\s+/)
+            .filter(word => word.length > 1);
+        // 统计词频
+        const wordCount = new Map();
+        words.forEach(word => {
+            wordCount.set(word, (wordCount.get(word) || 0) + 1);
+        });
+        // 返回出现频率最高的词
+        return Array.from(wordCount.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10)
+            .map(([word]) => word);
+    }
+    /**
+     * 计算章节重要性
+     * @param title 标题
+     * @param content 内容
+     */
+    calculateImportance(title, content) {
+        let score = 0.5; // 基础分数
+        // 基于标题的重要性关键词
+        const importantKeywords = [
+            '核心', '关键', '重要', '必须', '主要', 'core', 'key', 'important', 'critical', 'main'
+        ];
+        const titleLower = title.toLowerCase();
+        importantKeywords.forEach(keyword => {
+            if (titleLower.includes(keyword)) {
+                score += 0.1;
+            }
+        });
+        // 基于内容长度
+        const contentLength = content.length;
+        if (contentLength > 1000)
+            score += 0.1;
+        if (contentLength > 2000)
+            score += 0.1;
+        // 基于章节类型
+        const sectionType = this.classifySectionType(title);
+        switch (sectionType) {
+            case SectionType.REQUIREMENTS:
+            case SectionType.FEATURES:
+                score += 0.2;
+                break;
+            case SectionType.TECHNICAL:
+                score += 0.15;
+                break;
+            case SectionType.OVERVIEW:
+                score += 0.1;
+                break;
+        }
+        return Math.min(1.0, score);
+    }
+    /**
+     * 提取文档标题
+     * @param content 文档内容
+     * @param documentType 文档类型
+     */
+    extractTitle(content, documentType) {
+        switch (documentType) {
+            case DocumentType.MARKDOWN: {
+                const mdTitleMatch = content.match(/^#\s+(.+)$/m);
+                return mdTitleMatch ? mdTitleMatch[1].trim() : null;
+            }
+            case DocumentType.HTML: {
+                const htmlTitleMatch = content.match(/<h1[^>]*>(.*?)<\/h1>/i);
+                return htmlTitleMatch ? htmlTitleMatch[1].replace(/<[^>]*>/g, '').trim() : null;
+            }
+            default: {
+                const firstLine = content.split('\n')[0].trim();
+                return firstLine.length > 0 && firstLine.length < 100 ? firstLine : null;
+            }
+        }
+    }
+    /**
+     * 检测文档语言
+     * @param content 文档内容
+     */
+    detectLanguage(content) {
+        // 简化的语言检测
+        const chineseChars = content.match(/[\u4e00-\u9fa5]/g);
+        const totalChars = content.replace(/\s/g, '').length;
+        if (chineseChars && chineseChars.length / totalChars > 0.3) {
+            return 'zh-CN';
+        }
+        return 'en-US';
+    }
+    /**
+     * 统计单词数量
+     * @param content 文档内容
+     */
+    countWords(content) {
+        // 中英文混合的单词统计
+        const chineseChars = content.match(/[\u4e00-\u9fa5]/g);
+        const englishWords = content.match(/[a-zA-Z]+/g);
+        const chineseCount = chineseChars ? chineseChars.length : 0;
+        const englishCount = englishWords ? englishWords.length : 0;
+        return chineseCount + englishCount;
+    }
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * TaskFlow AI 任务相关类型定义
+ */
+/**
+ * 任务状态枚举
+ */
+var TaskStatus;
+(function (TaskStatus) {
+    TaskStatus["NOT_STARTED"] = "not_started";
+    TaskStatus["PENDING"] = "pending";
+    TaskStatus["IN_PROGRESS"] = "in_progress";
+    TaskStatus["RUNNING"] = "running";
+    TaskStatus["COMPLETED"] = "completed";
+    TaskStatus["DONE"] = "done";
+    TaskStatus["CANCELLED"] = "cancelled";
+    TaskStatus["FAILED"] = "failed";
+    TaskStatus["BLOCKED"] = "blocked";
+    TaskStatus["ON_HOLD"] = "on_hold";
+    TaskStatus["REVIEW"] = "review";
+    TaskStatus["TODO"] = "todo";
+})(TaskStatus || (TaskStatus = {}));
+/**
+ * 任务优先级
+ */
+var TaskPriority;
+(function (TaskPriority) {
+    TaskPriority["LOW"] = "low";
+    TaskPriority["MEDIUM"] = "medium";
+    TaskPriority["HIGH"] = "high";
+    TaskPriority["CRITICAL"] = "critical";
+})(TaskPriority || (TaskPriority = {}));
+/**
+ * 任务类型
+ */
+var TaskType;
+(function (TaskType) {
+    TaskType["FEATURE"] = "feature";
+    TaskType["BUG_FIX"] = "bug_fix";
+    TaskType["REFACTOR"] = "refactor";
+    TaskType["TEST"] = "test";
+    TaskType["DOCUMENT"] = "document";
+    TaskType["ANALYSIS"] = "analysis";
+    TaskType["DESIGN"] = "design";
+    TaskType["DEPLOYMENT"] = "deployment";
+    TaskType["RESEARCH"] = "research";
+})(TaskType || (TaskType = {}));
+
+/**
+ * 需求提取器 - 从文档中智能提取和分析需求
+ * 使用自然语言处理和模式匹配技术
+ */
+/**
+ * 需求类型枚举
+ */
+var RequirementType;
+(function (RequirementType) {
+    RequirementType["FUNCTIONAL"] = "functional";
+    RequirementType["NON_FUNCTIONAL"] = "non_functional";
+    RequirementType["BUSINESS"] = "business";
+    RequirementType["TECHNICAL"] = "technical";
+    RequirementType["USER_STORY"] = "user_story";
+    RequirementType["CONSTRAINT"] = "constraint";
+    RequirementType["ASSUMPTION"] = "assumption"; // 假设条件
+})(RequirementType || (RequirementType = {}));
+/**
+ * 需求提取器类
+ */
+class RequirementExtractor {
+    constructor(logger) {
+        // 需求识别模式
+        this.requirementPatterns = {
+            functional: [
+                /系统(应该|必须|需要|能够)(.+)/gi,
+                /用户(可以|能够|应该)(.+)/gi,
+                /应用程序(应该|必须|需要)(.+)/gi,
+                /(实现|支持|提供)(.+)功能/gi,
+                /the system (should|must|shall|will)(.+)/gi,
+                /users (can|should|must|will be able to)(.+)/gi
+            ],
+            nonFunctional: [
+                /(性能|响应时间|吞吐量)(.+)/gi,
+                /(安全|权限|认证)(.+)/gi,
+                /(可用性|稳定性|可靠性)(.+)/gi,
+                /(兼容性|扩展性|可维护性)(.+)/gi,
+                /(performance|security|usability|reliability)(.+)/gi
+            ],
+            userStory: [
+                /作为(.+?)，我希望(.+?)，以便(.+)/gi,
+                /As a (.+?), I want (.+?) so that (.+)/gi,
+                /Given (.+?) when (.+?) then (.+)/gi
+            ],
+            constraint: [
+                /(限制|约束|不能|禁止)(.+)/gi,
+                /(constraint|limitation|restriction)(.+)/gi
+            ]
+        };
+        // 优先级关键词
+        this.priorityKeywords = {
+            critical: ['关键', '核心', '重要', '必须', 'critical', 'essential', 'must', 'key'],
+            high: ['高', '优先', '重点', 'high', 'priority', 'important'],
+            medium: ['中等', '一般', '普通', 'medium', 'normal', 'standard'],
+            low: ['低', '次要', '可选', 'low', 'optional', 'nice to have']
+        };
+        // 复杂度关键词
+        this.complexityKeywords = {
+            high: ['复杂', '困难', '挑战', '集成', '算法', 'complex', 'difficult', 'challenging', 'integration'],
+            medium: ['中等', '标准', '常规', 'medium', 'standard', 'typical'],
+            low: ['简单', '基础', '直接', 'simple', 'basic', 'straightforward']
+        };
+        this.logger = logger;
+    }
+    /**
+     * 从文档结构中提取需求
+     * @param documentStructure 文档结构
+     * @param options 提取选项
+     */
+    async extractRequirements(documentStructure, options = {}) {
+        try {
+            this.logger.info('开始提取需求');
+            const requirements = [];
+            const warnings = [];
+            const suggestions = [];
+            // 遍历所有章节提取需求
+            for (const section of documentStructure.sections) {
+                const sectionRequirements = await this.extractFromSection(section, options);
+                requirements.push(...sectionRequirements);
+            }
+            // 后处理：检测依赖关系
+            if (options.detectDependencies) {
+                this.detectDependencies(requirements);
+            }
+            // 生成摘要
+            const summary = this.generateSummary(requirements);
+            // 生成建议
+            suggestions.push(...this.generateSuggestions(requirements, summary));
+            // 验证结果
+            warnings.push(...this.validateRequirements(requirements));
+            this.logger.info(`需求提取完成: ${requirements.length} 个需求`);
+            return {
+                requirements,
+                summary,
+                warnings,
+                suggestions
+            };
+        }
+        catch (error) {
+            this.logger.error(`需求提取失败: ${error.message}`);
+            throw error;
+        }
+    }
+    /**
+     * 从单个章节提取需求
+     * @param section 文档章节
+     * @param options 提取选项
+     */
+    async extractFromSection(section, options) {
+        const requirements = [];
+        const content = section.title + '\n' + section.content;
+        // 根据章节类型选择提取策略
+        switch (section.type) {
+            case SectionType.REQUIREMENTS:
+                requirements.push(...this.extractFunctionalRequirements(section, content));
+                requirements.push(...this.extractNonFunctionalRequirements(section, content));
+                break;
+            case SectionType.FEATURES:
+                requirements.push(...this.extractFeatureRequirements(section, content));
+                if (options.includeUserStories) {
+                    requirements.push(...this.extractUserStories(section, content));
+                }
+                break;
+            case SectionType.TECHNICAL:
+                requirements.push(...this.extractTechnicalRequirements(section, content));
+                break;
+            default:
+                // 通用提取
+                requirements.push(...this.extractGeneralRequirements(section, content));
+                break;
+        }
+        // 递归处理子章节
+        for (const subsection of section.subsections) {
+            const subRequirements = await this.extractFromSection(subsection, options);
+            requirements.push(...subRequirements);
+        }
+        return requirements;
+    }
+    /**
+     * 提取功能需求
+     * @param section 章节
+     * @param content 内容
+     */
+    extractFunctionalRequirements(section, content) {
+        const requirements = [];
+        let reqCounter = 1;
+        this.requirementPatterns.functional.forEach(pattern => {
+            let match;
+            while ((match = pattern.exec(content)) !== null) {
+                const description = match[0].trim();
+                if (description.length > 10) { // 过滤太短的匹配
+                    requirements.push(this.createRequirement(`${section.id}-func-${reqCounter++}`, this.extractTitle(description), description, RequirementType.FUNCTIONAL, section, content));
+                }
+            }
+        });
+        return requirements;
+    }
+    /**
+     * 提取非功能需求
+     * @param section 章节
+     * @param content 内容
+     */
+    extractNonFunctionalRequirements(section, content) {
+        const requirements = [];
+        let reqCounter = 1;
+        this.requirementPatterns.nonFunctional.forEach(pattern => {
+            let match;
+            while ((match = pattern.exec(content)) !== null) {
+                const description = match[0].trim();
+                if (description.length > 10) {
+                    requirements.push(this.createRequirement(`${section.id}-nonfunc-${reqCounter++}`, this.extractTitle(description), description, RequirementType.NON_FUNCTIONAL, section, content));
+                }
+            }
+        });
+        return requirements;
+    }
+    /**
+     * 提取功能特性需求
+     * @param section 章节
+     * @param content 内容
+     */
+    extractFeatureRequirements(section, content) {
+        const requirements = [];
+        // 按行分析，查找功能描述
+        const lines = content.split('\n').filter(line => line.trim());
+        let reqCounter = 1;
+        lines.forEach(line => {
+            const trimmedLine = line.trim();
+            // 检查是否是功能描述（列表项、编号项等）
+            if (this.isFunctionDescription(trimmedLine)) {
+                requirements.push(this.createRequirement(`${section.id}-feature-${reqCounter++}`, this.extractTitle(trimmedLine), trimmedLine, RequirementType.FUNCTIONAL, section, content));
+            }
+        });
+        return requirements;
+    }
+    /**
+     * 提取用户故事
+     * @param section 章节
+     * @param content 内容
+     */
+    extractUserStories(section, content) {
+        const requirements = [];
+        let storyCounter = 1;
+        this.requirementPatterns.userStory.forEach(pattern => {
+            let match;
+            while ((match = pattern.exec(content)) !== null) {
+                const description = match[0].trim();
+                requirements.push(this.createRequirement(`${section.id}-story-${storyCounter++}`, `用户故事 ${storyCounter}`, description, RequirementType.USER_STORY, section, content));
+            }
+        });
+        return requirements;
+    }
+    /**
+     * 提取技术需求
+     * @param section 章节
+     * @param content 内容
+     */
+    extractTechnicalRequirements(section, content) {
+        const requirements = [];
+        // 查找技术相关的描述
+        const techKeywords = ['技术栈', '架构', '数据库', '框架', '接口', 'API', '服务', '组件'];
+        const lines = content.split('\n').filter(line => line.trim());
+        let reqCounter = 1;
+        lines.forEach(line => {
+            const trimmedLine = line.trim();
+            if (techKeywords.some(keyword => trimmedLine.includes(keyword)) && trimmedLine.length > 10) {
+                requirements.push(this.createRequirement(`${section.id}-tech-${reqCounter++}`, this.extractTitle(trimmedLine), trimmedLine, RequirementType.TECHNICAL, section, content));
+            }
+        });
+        return requirements;
+    }
+    /**
+     * 提取通用需求
+     * @param section 章节
+     * @param content 内容
+     */
+    extractGeneralRequirements(section, content) {
+        const requirements = [];
+        // 简单的基于关键词的提取
+        const lines = content.split('\n').filter(line => line.trim());
+        let reqCounter = 1;
+        lines.forEach(line => {
+            const trimmedLine = line.trim();
+            if (this.isRequirementLike(trimmedLine)) {
+                requirements.push(this.createRequirement(`${section.id}-req-${reqCounter++}`, this.extractTitle(trimmedLine), trimmedLine, RequirementType.BUSINESS, section, content));
+            }
+        });
+        return requirements;
+    }
+    /**
+     * 创建需求对象
+     * @param id 需求ID
+     * @param title 标题
+     * @param description 描述
+     * @param type 类型
+     * @param section 来源章节
+     * @param content 章节内容
+     */
+    createRequirement(id, title, description, type, section, _content) {
+        return {
+            id,
+            title,
+            description,
+            type,
+            priority: this.analyzePriority(description),
+            category: section.title,
+            source: section.id,
+            dependencies: [],
+            acceptanceCriteria: this.extractAcceptanceCriteria(description),
+            estimatedEffort: this.estimateEffort(description, type),
+            complexity: this.analyzeComplexity(description),
+            tags: this.extractTags(description),
+            stakeholders: this.extractStakeholders(description),
+            businessValue: this.calculateBusinessValue(description, type),
+            technicalRisk: this.calculateTechnicalRisk(description, type),
+            metadata: {
+                extractedAt: new Date(),
+                confidence: this.calculateConfidence(description, type),
+                extractionMethod: 'pattern_matching',
+                keywords: section.keywords,
+                relatedSections: [section.id]
+            }
+        };
+    }
+    /**
+     * 分析优先级
+     * @param text 文本
+     */
+    analyzePriority(text) {
+        const textLower = text.toLowerCase();
+        for (const [priority, keywords] of Object.entries(this.priorityKeywords)) {
+            if (keywords.some(keyword => textLower.includes(keyword))) {
+                return priority;
+            }
+        }
+        return TaskPriority.MEDIUM;
+    }
+    /**
+     * 分析复杂度
+     * @param text 文本
+     */
+    analyzeComplexity(text) {
+        const textLower = text.toLowerCase();
+        for (const [complexity, keywords] of Object.entries(this.complexityKeywords)) {
+            if (keywords.some(keyword => textLower.includes(keyword))) {
+                return complexity;
+            }
+        }
+        // 基于文本长度判断
+        if (text.length > 200)
+            return 'high';
+        if (text.length > 100)
+            return 'medium';
+        return 'low';
+    }
+    /**
+     * 估算工作量
+     * @param description 描述
+     * @param type 类型
+     */
+    estimateEffort(description, type) {
+        let baseHours = 8; // 基础工作量
+        // 根据类型调整
+        switch (type) {
+            case RequirementType.TECHNICAL:
+                baseHours = 16;
+                break;
+            case RequirementType.NON_FUNCTIONAL:
+                baseHours = 12;
+                break;
+            case RequirementType.USER_STORY:
+                baseHours = 6;
+                break;
+        }
+        // 根据复杂度调整
+        const complexity = this.analyzeComplexity(description);
+        switch (complexity) {
+            case 'high':
+                baseHours *= 2;
+                break;
+            case 'low':
+                baseHours *= 0.5;
+                break;
+        }
+        return Math.round(baseHours);
+    }
+    /**
+     * 计算业务价值
+     * @param description 描述
+     * @param type 类型
+     */
+    calculateBusinessValue(description, type) {
+        let value = 5; // 基础值
+        const valueKeywords = ['收入', '用户', '体验', '效率', '成本', 'revenue', 'user', 'experience', 'efficiency'];
+        const textLower = description.toLowerCase();
+        valueKeywords.forEach(keyword => {
+            if (textLower.includes(keyword)) {
+                value += 1;
+            }
+        });
+        // 根据类型调整
+        if (type === RequirementType.BUSINESS)
+            value += 2;
+        if (type === RequirementType.USER_STORY)
+            value += 1;
+        return Math.min(10, value);
+    }
+    /**
+     * 计算技术风险
+     * @param description 描述
+     * @param type 类型
+     */
+    calculateTechnicalRisk(description, type) {
+        let risk = 3; // 基础风险
+        const riskKeywords = ['集成', '新技术', '算法', '性能', '安全', 'integration', 'new', 'algorithm', 'performance', 'security'];
+        const textLower = description.toLowerCase();
+        riskKeywords.forEach(keyword => {
+            if (textLower.includes(keyword)) {
+                risk += 1;
+            }
+        });
+        // 根据类型调整
+        if (type === RequirementType.TECHNICAL)
+            risk += 2;
+        if (type === RequirementType.NON_FUNCTIONAL)
+            risk += 1;
+        return Math.min(10, risk);
+    }
+    /**
+     * 计算提取置信度
+     * @param description 描述
+     * @param type 类型
+     */
+    calculateConfidence(description, _type) {
+        let confidence = 0.5;
+        // 基于模式匹配的置信度
+        if (this.requirementPatterns.functional.some(pattern => pattern.test(description))) {
+            confidence += 0.3;
+        }
+        // 基于长度和结构
+        if (description.length > 20 && description.length < 500) {
+            confidence += 0.2;
+        }
+        return Math.min(1.0, confidence);
+    }
+    /**
+     * 提取验收标准
+     * @param description 描述
+     */
+    extractAcceptanceCriteria(description) {
+        const criteria = [];
+        // 查找验收标准相关的模式
+        const criteriaPatterns = [
+            /验收标准[：:]\s*(.+)/gi,
+            /acceptance criteria[：:]\s*(.+)/gi,
+            /given (.+?) when (.+?) then (.+)/gi
+        ];
+        criteriaPatterns.forEach(pattern => {
+            let match;
+            while ((match = pattern.exec(description)) !== null) {
+                criteria.push(match[1] || match[0]);
+            }
+        });
+        return criteria;
+    }
+    /**
+     * 提取标签
+     * @param description 描述
+     */
+    extractTags(description) {
+        const tags = [];
+        // 基于关键词生成标签
+        const tagKeywords = {
+            'UI': ['界面', '页面', '按钮', 'UI', 'interface', 'page', 'button'],
+            'API': ['接口', 'API', 'service', '服务'],
+            'Database': ['数据库', '存储', 'database', 'storage'],
+            'Security': ['安全', '权限', 'security', 'permission', 'auth'],
+            'Performance': ['性能', '速度', 'performance', 'speed']
+        };
+        const textLower = description.toLowerCase();
+        Object.entries(tagKeywords).forEach(([tag, keywords]) => {
+            if (keywords.some(keyword => textLower.includes(keyword))) {
+                tags.push(tag);
+            }
+        });
+        return tags;
+    }
+    /**
+     * 提取干系人
+     * @param description 描述
+     */
+    extractStakeholders(description) {
+        const stakeholders = [];
+        const stakeholderPatterns = [
+            /用户/g, /管理员/g, /开发者/g, /测试人员/g,
+            /user/gi, /admin/gi, /developer/gi, /tester/gi
+        ];
+        stakeholderPatterns.forEach(pattern => {
+            const matches = description.match(pattern);
+            if (matches) {
+                stakeholders.push(...matches);
+            }
+        });
+        return [...new Set(stakeholders)]; // 去重
+    }
+    /**
+     * 检测依赖关系
+     * @param requirements 需求列表
+     */
+    detectDependencies(requirements) {
+        // 简化的依赖检测：基于关键词匹配
+        requirements.forEach(req => {
+            requirements.forEach(otherReq => {
+                if (req.id !== otherReq.id) {
+                    // 检查是否有依赖关系的关键词
+                    if (this.hasDependencyRelation(req.description, otherReq.description)) {
+                        req.dependencies.push(otherReq.id);
+                    }
+                }
+            });
+        });
+    }
+    /**
+     * 检查是否有依赖关系
+     * @param desc1 描述1
+     * @param desc2 描述2
+     */
+    hasDependencyRelation(desc1, desc2) {
+        // 简化的依赖检测逻辑
+        const dependencyKeywords = ['基于', '依赖', '需要', '使用', 'based on', 'depends on', 'requires', 'uses'];
+        return dependencyKeywords.some(keyword => desc1.toLowerCase().includes(keyword) &&
+            desc2.toLowerCase().includes(keyword));
+    }
+    /**
+     * 生成摘要
+     * @param requirements 需求列表
+     */
+    generateSummary(requirements) {
+        const functionalCount = requirements.filter(r => r.type === RequirementType.FUNCTIONAL).length;
+        const nonFunctionalCount = requirements.filter(r => r.type === RequirementType.NON_FUNCTIONAL).length;
+        const userStoryCount = requirements.filter(r => r.type === RequirementType.USER_STORY).length;
+        const highPriorityCount = requirements.filter(r => r.priority === TaskPriority.HIGH || r.priority === TaskPriority.CRITICAL).length;
+        const totalEffort = requirements.reduce((sum, req) => sum + req.estimatedEffort, 0);
+        const complexityScores = requirements.map(r => {
+            switch (r.complexity) {
+                case 'high': return 3;
+                case 'medium': return 2;
+                case 'low': return 1;
+                default: return 2;
+            }
+        });
+        const avgComplexityScore = complexityScores.reduce((sum, score) => sum + score, 0) / complexityScores.length;
+        const avgComplexity = avgComplexityScore > 2.5 ? 'high' : avgComplexityScore > 1.5 ? 'medium' : 'low';
+        // 计算覆盖度评分（基于需求的完整性和质量）
+        const avgConfidence = requirements.reduce((sum, req) => sum + req.metadata.confidence, 0) / requirements.length;
+        const coverageScore = Math.min(1.0, avgConfidence * (requirements.length / 10)); // 假设10个需求为完整覆盖
+        return {
+            totalRequirements: requirements.length,
+            functionalRequirements: functionalCount,
+            nonFunctionalRequirements: nonFunctionalCount,
+            userStories: userStoryCount,
+            highPriorityRequirements: highPriorityCount,
+            estimatedTotalEffort: totalEffort,
+            averageComplexity: avgComplexity,
+            coverageScore
+        };
+    }
+    /**
+     * 生成建议
+     * @param requirements 需求列表
+     * @param summary 摘要
+     */
+    generateSuggestions(requirements, summary) {
+        const suggestions = [];
+        if (summary.totalRequirements < 5) {
+            suggestions.push('需求数量较少，建议检查是否遗漏了重要需求');
+        }
+        if (summary.nonFunctionalRequirements === 0) {
+            suggestions.push('未发现非功能需求，建议补充性能、安全、可用性等方面的需求');
+        }
+        if (summary.highPriorityRequirements / summary.totalRequirements > 0.8) {
+            suggestions.push('高优先级需求比例过高，建议重新评估需求优先级');
+        }
+        if (summary.coverageScore < 0.6) {
+            suggestions.push('需求覆盖度较低，建议补充更详细的需求描述');
+        }
+        const avgEffort = summary.estimatedTotalEffort / summary.totalRequirements;
+        if (avgEffort > 20) {
+            suggestions.push('平均工作量较高，建议将复杂需求拆分为更小的任务');
+        }
+        return suggestions;
+    }
+    /**
+     * 验证需求
+     * @param requirements 需求列表
+     */
+    validateRequirements(requirements) {
+        const warnings = [];
+        requirements.forEach(req => {
+            if (req.description.length < 10) {
+                warnings.push(`需求 ${req.id} 描述过于简短`);
+            }
+            if (req.metadata.confidence < 0.3) {
+                warnings.push(`需求 ${req.id} 提取置信度较低`);
+            }
+            if (req.acceptanceCriteria.length === 0) {
+                warnings.push(`需求 ${req.id} 缺少验收标准`);
+            }
+        });
+        return warnings;
+    }
+    /**
+     * 判断是否是功能描述
+     * @param line 文本行
+     */
+    isFunctionDescription(line) {
+        const patterns = [
+            /^[-*+]\s+/, // 列表项
+            /^\d+\.\s+/, // 编号项
+            /^[a-zA-Z0-9]+[.)]\s+/, // 字母或数字编号
+            /功能|特性|能力/
+        ];
+        return patterns.some(pattern => pattern.test(line)) && line.length > 10;
+    }
+    /**
+     * 判断是否像需求
+     * @param line 文本行
+     */
+    isRequirementLike(line) {
+        const requirementIndicators = [
+            '需要', '应该', '必须', '能够', '支持', '实现', '提供',
+            'need', 'should', 'must', 'shall', 'support', 'implement', 'provide'
+        ];
+        return requirementIndicators.some(indicator => line.toLowerCase().includes(indicator)) && line.length > 15;
+    }
+    /**
+     * 提取标题
+     * @param text 文本
+     */
+    extractTitle(text) {
+        // 提取前50个字符作为标题
+        const title = text.substring(0, 50).trim();
+        return title.endsWith('...') ? title : title + (text.length > 50 ? '...' : '');
+    }
+}
+
+/**
+ * PRD解析器类
+ * 负责解析产品需求文档，整合文档处理和需求提取功能
+ */
+class PRDParser {
+    /**
+     * 创建PRD解析器实例
+     * @param modelCoordinator 模型协调器实例
+     * @param logger 日志记录器实例
+     */
+    constructor(modelCoordinator, logger) {
+        this.modelCoordinator = modelCoordinator;
+        this.logger = logger;
+        this.documentProcessor = new DocumentProcessor(logger);
+        this.requirementExtractor = new RequirementExtractor(logger);
+    }
+    /**
+     * 从文件中解析PRD
+     * @param filePath PRD文件路径
+     * @param options 解析选项
+     */
+    async parseFromFile(filePath, options) {
+        var _a, _b, _c, _d, _e, _f;
+        try {
+            this.logger.info(`开始解析PRD文件：${filePath}`);
+            // 检查文件是否存在
+            if (!await fs__namespace.pathExists(filePath)) {
+                throw new Error(`文件不存在：${filePath}`);
+            }
+            // 使用文档处理器处理文档
+            const processingOptions = {
+                extractTables: true,
+                extractImages: false,
+                detectLanguage: true,
+                analyzeStructure: true,
+                extractKeywords: true,
+                calculateImportance: true
+            };
+            const documentStructure = await this.documentProcessor.processDocument(filePath, processingOptions);
+            // 使用需求提取器提取需求
+            const extractionOptions = {
+                includeUserStories: (_a = options === null || options === void 0 ? void 0 : options.extractUserStories) !== null && _a !== void 0 ? _a : true,
+                detectDependencies: (_b = options === null || options === void 0 ? void 0 : options.detectDependencies) !== null && _b !== void 0 ? _b : true,
+                estimateEffort: (_c = options === null || options === void 0 ? void 0 : options.estimateEffort) !== null && _c !== void 0 ? _c : true,
+                analyzePriority: (_d = options === null || options === void 0 ? void 0 : options.analyzePriority) !== null && _d !== void 0 ? _d : true,
+                extractAcceptanceCriteria: (_e = options === null || options === void 0 ? void 0 : options.extractAcceptanceCriteria) !== null && _e !== void 0 ? _e : true,
+                detectStakeholders: (_f = options === null || options === void 0 ? void 0 : options.detectStakeholders) !== null && _f !== void 0 ? _f : true
+            };
+            const extractionResult = await this.requirementExtractor.extractRequirements(documentStructure, extractionOptions);
+            // 转换为ParsedPRD格式
+            return this.convertToParseResult(documentStructure, extractionResult);
+        }
+        catch (error) {
+            this.logger.error(`解析PRD文件失败：${error.message}`);
+            throw error;
+        }
+    }
+    /**
+     * 解析PRD内容
+     * @param content PRD文档内容
+     * @param fileType 文件类型
+     * @param options 解析选项
+     */
+    async parseContent(content, fileType = FileType.MARKDOWN, options) {
+        try {
+            // 处理不同文件类型的内容
+            const processedContent = this.preprocessContent(content, fileType);
+            // 使用模型解析内容
+            const response = await this.modelCoordinator.parsePRD(processedContent, options);
+            // 解析并验证模型返回的JSON结果
+            try {
+                const result = JSON.parse(response.content);
+                this.validateParseResult(result);
+                this.logger.info('PRD解析成功');
+                return result;
+            }
+            catch (error) {
+                this.logger.error(`解析模型返回结果失败：${error.message}`);
+                throw new Error(`无法解析模型返回的JSON结果：${error.message}`);
+            }
+        }
+        catch (error) {
+            this.logger.error(`解析PRD内容失败：${error.message}`);
+            throw error;
+        }
+    }
+    /**
+     * 预处理不同类型的文档内容
+     * @param content 文档内容
+     * @param fileType 文件类型
+     */
+    preprocessContent(content, fileType) {
+        // 根据不同文件类型进行预处理
+        switch (fileType) {
+            case FileType.MARKDOWN:
+                // Markdown格式不需要特殊处理
+                return content;
+            case FileType.JSON:
+                // 如果是JSON格式，尝试解析并美化输出
+                try {
+                    const parsed = JSON.parse(content);
+                    return JSON.stringify(parsed, null, 2);
+                }
+                catch {
+                    // 如果解析失败，直接返回原内容
+                    return content;
+                }
+            default:
+                // 其他格式暂时不做特殊处理
+                return content;
+        }
+    }
+    /**
+     * 根据文件扩展名检测文件类型
+     * @param filePath 文件路径
+     */
+    detectFileType(filePath) {
+        const ext = path__namespace.extname(filePath).toLowerCase();
+        switch (ext) {
+            case '.md':
+            case '.markdown':
+                return FileType.MARKDOWN;
+            case '.pdf':
+                return FileType.PDF;
+            case '.docx':
+            case '.doc':
+                return FileType.WORD;
+            case '.txt':
+                return FileType.TEXT;
+            case '.json':
+                return FileType.JSON;
+            default:
+                return FileType.UNKNOWN;
+        }
+    }
+    /**
+     * 验证解析结果是否符合预期格式
+     * @param result 解析结果
+     */
+    validateParseResult(result) {
+        // 验证基本结构
+        if (!result.title) {
+            this.logger.warn('解析结果缺少标题');
+        }
+        if (!result.description) {
+            this.logger.warn('解析结果缺少描述');
+        }
+        if (!Array.isArray(result.sections) || result.sections.length === 0) {
+            throw new Error('解析结果必须包含至少一个章节');
+        }
+        // 验证每个章节的结构
+        result.sections.forEach((section, index) => {
+            if (!section.title) {
+                this.logger.warn(`第${index + 1}个章节缺少标题`);
+            }
+            if (!Array.isArray(section.features)) {
+                this.logger.warn(`第${index + 1}个章节的features字段不是数组`);
+                section.features = [];
+            }
+        });
+    }
+    /**
+     * 转换为ParsedPRD格式
+     * @param documentStructure 文档结构
+     * @param extractionResult 需求提取结果
+     */
+    convertToParseResult(documentStructure, extractionResult) {
+        // 将需求转换为功能特性
+        const features = extractionResult.requirements.map(req => ({
+            id: req.id,
+            name: req.title,
+            description: req.description,
+            priority: req.priority,
+            type: req.type,
+            dependencies: req.dependencies,
+            estimatedHours: req.estimatedEffort,
+            tags: req.tags,
+            acceptanceCriteria: req.acceptanceCriteria,
+            complexity: req.complexity,
+            businessValue: req.businessValue,
+            technicalRisk: req.technicalRisk,
+            stakeholders: req.stakeholders,
+            category: req.category,
+            status: 'not_started',
+            createdAt: req.metadata.extractedAt,
+            updatedAt: req.metadata.extractedAt
+        }));
+        // 构建ParsedPRD对象
+        const parsedPRD = {
+            id: `prd-${Date.now()}`,
+            title: documentStructure.title,
+            description: this.extractDescription(documentStructure),
+            sections: [], // 临时空数组，后续会填充
+            metadata: {
+                version: '1.0.0',
+                features,
+                fileName: documentStructure.metadata.fileName,
+                fileSize: documentStructure.metadata.fileSize,
+                parsedAt: new Date(),
+                language: documentStructure.metadata.language,
+                wordCount: documentStructure.metadata.wordCount,
+                estimatedReadTime: documentStructure.metadata.estimatedReadTime,
+                extractionSummary: extractionResult.summary,
+                warnings: extractionResult.warnings,
+                suggestions: extractionResult.suggestions,
+                documentStructure: {
+                    sectionsCount: documentStructure.sections.length,
+                    maxDepth: this.calculateMaxDepth(documentStructure.sections),
+                    hasTableOfContents: this.hasTableOfContents(documentStructure),
+                    primaryLanguage: documentStructure.metadata.language
+                },
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }
+        };
+        return parsedPRD;
+    }
+    /**
+     * 提取文档描述
+     * @param documentStructure 文档结构
+     */
+    extractDescription(documentStructure) {
+        // 查找概述或简介章节
+        const overviewSection = documentStructure.sections.find(section => section.type === 'overview' ||
+            section.title.toLowerCase().includes('概述') ||
+            section.title.toLowerCase().includes('简介') ||
+            section.title.toLowerCase().includes('overview'));
+        if (overviewSection) {
+            return overviewSection.content.substring(0, 500).trim();
+        }
+        // 如果没有找到概述章节，使用第一个章节的内容
+        if (documentStructure.sections.length > 0) {
+            return documentStructure.sections[0].content.substring(0, 500).trim();
+        }
+        return '从PRD文档自动提取的产品需求';
+    }
+    /**
+     * 计算最大深度
+     * @param sections 章节列表
+     */
+    calculateMaxDepth(sections) {
+        let maxDepth = 0;
+        const calculateDepth = (sectionList, currentDepth = 1) => {
+            maxDepth = Math.max(maxDepth, currentDepth);
+            sectionList.forEach(section => {
+                if (section.subsections && section.subsections.length > 0) {
+                    calculateDepth(section.subsections, currentDepth + 1);
+                }
+            });
+        };
+        calculateDepth(sections);
+        return maxDepth;
+    }
+    /**
+     * 检查是否有目录
+     * @param documentStructure 文档结构
+     */
+    hasTableOfContents(documentStructure) {
+        return documentStructure.sections.some(section => section.title.toLowerCase().includes('目录') ||
+            section.title.toLowerCase().includes('contents') ||
+            section.title.toLowerCase().includes('toc'));
+    }
+}
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/**
+ * 任务规划器类
+ * 负责根据PRD生成任务计划
+ */
+class TaskPlanner {
+    /**
+     * 创建任务规划器实例
+     * @param modelCoordinator 模型协调器实例
+     * @param logger 日志记录器
+     */
+    constructor(modelCoordinator, logger) {
+        this.modelCoordinator = modelCoordinator;
+        this.logger = logger;
+    }
+    /**
+     * 根据PRD解析结果生成任务计划
+     * @param prdResult PRD解析结果
+     * @param options 规划选项
+     */
+    async generateTaskPlan(prdResult, options) {
+        try {
+            this.logger.info('开始生成任务计划');
+            // 使用模型生成任务计划
+            const response = await this.modelCoordinator.planTasks(prdResult, options);
+            try {
+                // 解析模型返回的任务计划
+                const taskPlan = JSON.parse(response.content);
+                this.validateTaskPlan(taskPlan);
+                // 后处理任务计划
+                this.postProcessTaskPlan(taskPlan);
+                this.logger.info(`任务计划生成成功，共 ${taskPlan.tasks.length} 个任务`);
+                return taskPlan;
+            }
+            catch (error) {
+                this.logger.error(`解析模型返回的任务计划失败：${error.message}`);
+                throw new Error(`无法解析模型返回的JSON结果：${error.message}`);
+            }
+        }
+        catch (error) {
+            this.logger.error(`生成任务计划失败：${error.message}`);
+            throw error;
+        }
+    }
+    /**
+     * 优化任务计划
+     * @param taskPlan 原始任务计划
+     * @param options 优化选项
+     */
+    async optimizeTaskPlan(taskPlan, options) {
+        try {
+            this.logger.info('开始优化任务计划');
+            // 1. 依赖关系优化
+            this.optimizeDependencies(taskPlan);
+            // 2. 优先级优化
+            this.optimizePriorities(taskPlan, options);
+            // 3. 并行任务识别
+            this.identifyParallelTasks(taskPlan, options);
+            // 4. 工作量平衡
+            this.balanceWorkload(taskPlan, options);
+            this.logger.info('任务计划优化完成');
+            return taskPlan;
+        }
+        catch (error) {
+            this.logger.error(`优化任务计划失败：${error.message}`);
+            throw error;
+        }
+    }
+    /**
+     * 将任务计划保存到文件
+     * @param taskPlan 任务计划
+     * @param outputPath 输出路径
+     */
+    async saveTaskPlan(taskPlan, outputPath) {
+        try {
+            // 确保目录存在
+            await fs__namespace.ensureDir(path__namespace.dirname(outputPath));
+            // 写入文件
+            await fs__namespace.writeFile(outputPath, JSON.stringify(taskPlan, null, 2), 'utf-8');
+            this.logger.info(`任务计划已保存至 ${outputPath}`);
+        }
+        catch (error) {
+            this.logger.error(`保存任务计划失败：${error.message}`);
+            throw error;
+        }
+    }
+    /**
+     * 验证任务计划是否符合预期格式
+     * @param taskPlan 任务计划
+     */
+    validateTaskPlan(taskPlan) {
+        // 验证基本结构
+        if (!taskPlan.name) {
+            this.logger.warn('任务计划缺少名称');
+        }
+        if (!taskPlan.description) {
+            this.logger.warn('任务计划缺少描述');
+        }
+        if (!Array.isArray(taskPlan.tasks)) {
+            throw new Error('任务计划必须包含tasks数组');
+        }
+        // 验证每个任务的结构
+        taskPlan.tasks.forEach((task, index) => {
+            if (!task.id) {
+                throw new Error(`第${index + 1}个任务缺少ID`);
+            }
+            if (!task.title) {
+                this.logger.warn(`任务 ${task.id} 缺少标题`);
+            }
+            if (!task.priority) {
+                this.logger.warn(`任务 ${task.id} 缺少优先级，设置为默认值'medium'`);
+                task.priority = TaskPriority.MEDIUM;
+            }
+            if (!task.type) {
+                this.logger.warn(`任务 ${task.id} 缺少类型，设置为默认值'feature'`);
+                task.type = TaskType.FEATURE;
+            }
+            if (!Array.isArray(task.dependencies)) {
+                this.logger.warn(`任务 ${task.id} 的dependencies字段不是数组，设置为空数组`);
+                task.dependencies = [];
+            }
+            // 设置默认状态
+            if (!task.status) {
+                task.status = TaskStatus.NOT_STARTED;
+            }
+        });
+    }
+    /**
+     * 后处理任务计划，添加一些自动生成的信息
+     * @param taskPlan 任务计划
+     */
+    postProcessTaskPlan(taskPlan) {
+        // 检查任务ID的唯一性
+        const taskIds = new Set();
+        taskPlan.tasks.forEach(task => {
+            if (taskIds.has(task.id)) {
+                // 如果ID重复，生成新的ID
+                const newId = this.generateUniqueId(task.id, taskIds);
+                this.logger.warn(`发现重复的任务ID: ${task.id}，自动更新为: ${newId}`);
+                task.id = newId;
+            }
+            taskIds.add(task.id);
+            // 验证依赖是否存在
+            task.dependencies = task.dependencies.filter(depId => {
+                if (!taskIds.has(depId) && depId !== task.id) {
+                    this.logger.warn(`任务 ${task.id} 依赖的任务 ${depId} 不存在，已移除此依赖`);
+                    return false;
+                }
+                if (depId === task.id) {
+                    this.logger.warn(`任务 ${task.id} 不能依赖自身，已移除此依赖`);
+                    return false;
+                }
+                return true;
+            });
+            // Note: Subtasks are not part of the Task interface in this implementation
+        });
+        // 检测依赖环
+        this.checkCircularDependencies(taskPlan);
+    }
+    /**
+     * 生成唯一ID
+     * @param baseId 基础ID
+     * @param existingIds 已存在的ID集合
+     */
+    generateUniqueId(baseId, existingIds) {
+        let counter = 1;
+        let newId = `${baseId}_${counter}`;
+        while (existingIds.has(newId)) {
+            counter++;
+            newId = `${baseId}_${counter}`;
+        }
+        return newId;
+    }
+    /**
+     * 检测任务依赖是否存在循环依赖
+     * @param taskPlan 任务计划
+     */
+    checkCircularDependencies(taskPlan) {
+        const graph = new Map();
+        // 构建依赖图
+        taskPlan.tasks.forEach(task => {
+            graph.set(task.id, [...task.dependencies]);
+        });
+        const visited = new Set();
+        const recStack = new Set();
+        // 对每个任务进行DFS检测
+        taskPlan.tasks.forEach(task => {
+            this.detectCycle(task.id, graph, visited, recStack);
+        });
+    }
+    /**
+     * 使用DFS检测有向图中的环
+     * @param node 当前节点
+     * @param graph 依赖图
+     * @param visited 已访问节点集合
+     * @param recStack 递归栈
+     */
+    detectCycle(node, graph, visited, recStack) {
+        if (recStack.has(node)) {
+            // 检测到环，记录并移除造成环的依赖
+            this.logger.warn(`检测到循环依赖，包含任务: ${node}`);
+            return true;
+        }
+        if (visited.has(node)) {
+            return false;
+        }
+        visited.add(node);
+        recStack.add(node);
+        const neighbors = graph.get(node) || [];
+        for (const neighbor of neighbors) {
+            if (this.detectCycle(neighbor, graph, visited, recStack)) {
+                // 发现循环依赖，从图中移除这条边
+                const deps = graph.get(node) || [];
+                graph.set(node, deps.filter(d => d !== neighbor));
+                this.logger.warn(`移除循环依赖: ${node} -> ${neighbor}`);
+            }
+        }
+        recStack.delete(node);
+        return false;
+    }
+    /**
+     * 优化任务依赖关系
+     * @param taskPlan 任务计划
+     */
+    optimizeDependencies(taskPlan) {
+        this.logger.info('优化任务依赖关系');
+        // 移除冗余依赖
+        taskPlan.tasks.forEach(task => {
+            const optimizedDeps = this.removeRedundantDependencies(task.dependencies, taskPlan);
+            task.dependencies = optimizedDeps;
+        });
+        // 重新检测循环依赖
+        this.checkCircularDependencies(taskPlan);
+    }
+    /**
+     * 移除冗余依赖（传递依赖）
+     * @param dependencies 依赖列表
+     * @param taskPlan 任务计划
+     */
+    removeRedundantDependencies(dependencies, taskPlan) {
+        if (dependencies.length <= 1) {
+            return dependencies;
+        }
+        const taskMap = new Map();
+        taskPlan.tasks.forEach(task => taskMap.set(task.id, task));
+        const result = [];
+        for (const depId of dependencies) {
+            const depTask = taskMap.get(depId);
+            if (!depTask)
+                continue;
+            // 检查是否存在传递依赖
+            let isRedundant = false;
+            for (const otherId of dependencies) {
+                if (otherId === depId)
+                    continue;
+                if (this.hasTransitiveDependency(otherId, depId, taskMap)) {
+                    isRedundant = true;
+                    break;
+                }
+            }
+            if (!isRedundant) {
+                result.push(depId);
+            }
+        }
+        return result;
+    }
+    /**
+     * 检查是否存在传递依赖
+     * @param fromId 起始任务ID
+     * @param toId 目标任务ID
+     * @param taskMap 任务映射
+     */
+    hasTransitiveDependency(fromId, toId, taskMap) {
+        const visited = new Set();
+        const queue = [fromId];
+        while (queue.length > 0) {
+            const currentId = queue.shift();
+            if (visited.has(currentId))
+                continue;
+            visited.add(currentId);
+            const currentTask = taskMap.get(currentId);
+            if (!currentTask)
+                continue;
+            for (const depId of currentTask.dependencies) {
+                if (depId === toId) {
+                    return true;
+                }
+                if (!visited.has(depId)) {
+                    queue.push(depId);
+                }
+            }
+        }
+        return false;
+    }
+    /**
+     * 优化任务优先级
+     * @param taskPlan 任务计划
+     * @param options 优化选项
+     */
+    optimizePriorities(taskPlan, _options) {
+        this.logger.info('优化任务优先级');
+        // 基于依赖关系调整优先级
+        taskPlan.tasks.forEach(task => {
+            // 如果任务有很多依赖者，提高其优先级
+            const dependents = this.findDependentTasks(task.id, taskPlan);
+            if (dependents.length >= 3) {
+                task.priority = TaskPriority.HIGH;
+            }
+            else if (dependents.length >= 2) {
+                task.priority = TaskPriority.MEDIUM;
+            }
+            // 关键路径上的任务提高优先级
+            if (this.isOnCriticalPath(task.id, taskPlan)) {
+                task.priority = TaskPriority.CRITICAL;
+            }
+        });
+    }
+    /**
+     * 查找依赖某个任务的所有任务
+     * @param taskId 任务ID
+     * @param taskPlan 任务计划
+     */
+    findDependentTasks(taskId, taskPlan) {
+        return taskPlan.tasks.filter(task => task.dependencies.includes(taskId));
+    }
+    /**
+     * 检查任务是否在关键路径上
+     * @param taskId 任务ID
+     * @param taskPlan 任务计划
+     */
+    isOnCriticalPath(taskId, taskPlan) {
+        // 简化的关键路径检测：检查任务是否有长依赖链
+        const task = taskPlan.tasks.find(t => t.id === taskId);
+        if (!task)
+            return false;
+        const maxDepth = this.calculateDependencyDepth(taskId, taskPlan);
+        const avgDepth = this.calculateAverageDependencyDepth(taskPlan);
+        return maxDepth > avgDepth * 1.5;
+    }
+    /**
+     * 计算任务的依赖深度
+     * @param taskId 任务ID
+     * @param taskPlan 任务计划
+     */
+    calculateDependencyDepth(taskId, taskPlan) {
+        const visited = new Set();
+        const dfs = (id) => {
+            if (visited.has(id))
+                return 0;
+            visited.add(id);
+            const task = taskPlan.tasks.find(t => t.id === id);
+            if (!task || task.dependencies.length === 0) {
+                return 1;
+            }
+            let maxDepth = 0;
+            for (const depId of task.dependencies) {
+                maxDepth = Math.max(maxDepth, dfs(depId));
+            }
+            return maxDepth + 1;
+        };
+        return dfs(taskId);
+    }
+    /**
+     * 计算平均依赖深度
+     * @param taskPlan 任务计划
+     */
+    calculateAverageDependencyDepth(taskPlan) {
+        const depths = taskPlan.tasks.map(task => this.calculateDependencyDepth(task.id, taskPlan));
+        return depths.reduce((sum, depth) => sum + depth, 0) / depths.length;
+    }
+    /**
+     * 识别可并行执行的任务
+     * @param taskPlan 任务计划
+     * @param options 优化选项
+     */
+    identifyParallelTasks(taskPlan, _options) {
+        this.logger.info('识别并行任务');
+        const maxParallel = 3; // Default maximum parallel tasks
+        // 为可并行的任务添加标签
+        const parallelGroups = this.findParallelGroups(taskPlan, maxParallel);
+        parallelGroups.forEach((group, index) => {
+            group.forEach(task => {
+                if (!task.tags)
+                    task.tags = [];
+                task.tags.push(`parallel-group-${index + 1}`);
+            });
+        });
+    }
+    /**
+     * 查找可并行执行的任务组
+     * @param taskPlan 任务计划
+     * @param maxGroupSize 最大组大小
+     */
+    findParallelGroups(taskPlan, maxGroupSize) {
+        const groups = [];
+        const processed = new Set();
+        taskPlan.tasks.forEach(task => {
+            if (processed.has(task.id))
+                return;
+            const parallelTasks = this.findParallelTasks(task, taskPlan, processed);
+            if (parallelTasks.length > 1 && parallelTasks.length <= maxGroupSize) {
+                groups.push(parallelTasks);
+                parallelTasks.forEach(t => processed.add(t.id));
+            }
+        });
+        return groups;
+    }
+    /**
+     * 查找与指定任务可并行执行的任务
+     * @param task 基准任务
+     * @param taskPlan 任务计划
+     * @param processed 已处理的任务
+     */
+    findParallelTasks(task, taskPlan, processed) {
+        const parallel = [task];
+        taskPlan.tasks.forEach(otherTask => {
+            if (otherTask.id === task.id || processed.has(otherTask.id))
+                return;
+            // 检查是否可以并行执行
+            if (this.canRunInParallel(task, otherTask, taskPlan)) {
+                parallel.push(otherTask);
+            }
+        });
+        return parallel;
+    }
+    /**
+     * 检查两个任务是否可以并行执行
+     * @param task1 任务1
+     * @param task2 任务2
+     * @param taskPlan 任务计划
+     */
+    canRunInParallel(task1, task2, taskPlan) {
+        // 检查直接依赖关系
+        if (task1.dependencies.includes(task2.id) || task2.dependencies.includes(task1.id)) {
+            return false;
+        }
+        // 检查间接依赖关系
+        if (this.hasIndirectDependency(task1.id, task2.id, taskPlan) ||
+            this.hasIndirectDependency(task2.id, task1.id, taskPlan)) {
+            return false;
+        }
+        // 检查资源冲突（简化版本：同类型任务可能冲突）
+        if (task1.type === task2.type &&
+            (task1.type === TaskType.DEPLOYMENT || task1.type === TaskType.TEST)) {
+            return false;
+        }
+        return true;
+    }
+    /**
+     * 检查是否存在间接依赖关系
+     * @param fromId 起始任务ID
+     * @param toId 目标任务ID
+     * @param taskPlan 任务计划
+     */
+    hasIndirectDependency(fromId, toId, taskPlan) {
+        const taskMap = new Map();
+        taskPlan.tasks.forEach(task => taskMap.set(task.id, task));
+        return this.hasTransitiveDependency(fromId, toId, taskMap);
+    }
+    /**
+     * 平衡工作量
+     * @param taskPlan 任务计划
+     * @param options 优化选项
+     */
+    balanceWorkload(taskPlan, options) {
+        this.logger.info('平衡工作量');
+        const teamSize = (options === null || options === void 0 ? void 0 : options.considerTeamSize) || 3;
+        // 计算总工作量
+        const totalHours = taskPlan.tasks.reduce((sum, task) => sum + (task.estimatedHours || 8), 0);
+        const avgHoursPerPerson = totalHours / teamSize;
+        // 标记工作量过大的任务，建议拆分
+        taskPlan.tasks.forEach(task => {
+            const estimatedHours = task.estimatedHours || 8;
+            if (estimatedHours > avgHoursPerPerson * 0.5) {
+                if (!task.tags)
+                    task.tags = [];
+                task.tags.push('consider-splitting');
+                if (!task.notes) {
+                    task.notes = '';
+                }
+                task.notes += `\n建议拆分：预计工作量 ${estimatedHours} 小时，超过平均值的50%`;
+            }
+        });
+    }
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * 任务管理器类
+ * 负责管理任务计划中的任务
+ */
+class TaskManager {
+    /**
+     * 创建任务管理器实例
+     * @param logger 日志记录器
+     * @param configManager 配置管理器
+     */
+    constructor(logger, configManager) {
+        this.taskPlan = null;
+        this.autoSaveInterval = null;
+        this.logger = logger;
+        this.configManager = configManager;
+        // 获取任务文件路径配置
+        const taskSettings = this.configManager.get('taskSettings', {
+            outputDir: './tasks',
+            autoSave: true,
+            saveInterval: 300
+        });
+        this.taskFilePath = path__namespace.join(taskSettings.outputDir, 'tasks.json');
+        // 启动自动保存
+        if (taskSettings.autoSave) {
+            this.startAutoSave(taskSettings.saveInterval * 1000);
+        }
+    }
+    /**
+     * 加载任务计划
+     * @param filePath 任务计划文件路径，不指定则使用默认路径
+     */
+    async loadTaskPlan(filePath) {
+        const targetPath = filePath || this.taskFilePath;
+        try {
+            // 检查文件是否存在
+            if (!fs__namespace.existsSync(targetPath)) {
+                throw new Error(`任务计划文件不存在：${targetPath}`);
+            }
+            // 读取任务文件
+            const content = await fs__namespace.readFile(targetPath, 'utf-8');
+            this.taskPlan = JSON.parse(content);
+            this.logger.info(`成功加载任务计划，共 ${this.taskPlan.tasks.length} 个任务`);
+            return this.taskPlan;
+        }
+        catch (error) {
+            this.logger.error(`加载任务计划失败：${error.message}`);
+            throw error;
+        }
+    }
+    /**
+     * 保存任务计划
+     * @param filePath 保存路径，不指定则使用默认路径
+     */
+    async saveTaskPlan(filePath) {
+        const targetPath = filePath || this.taskFilePath;
+        if (!this.taskPlan) {
+            throw new Error('没有任务计划可保存，请先加载或创建任务计划');
+        }
+        try {
+            // 确保目录存在
+            await fs__namespace.ensureDir(path__namespace.dirname(targetPath));
+            // 写入文件
+            await fs__namespace.writeFile(targetPath, JSON.stringify(this.taskPlan, null, 2), 'utf-8');
+            this.logger.info(`任务计划已保存至 ${targetPath}`);
+        }
+        catch (error) {
+            this.logger.error(`保存任务计划失败：${error.message}`);
+            throw error;
+        }
+    }
+    /**
+     * 设置任务计划
+     * @param taskPlan 任务计划
+     */
+    setTaskPlan(taskPlan) {
+        this.taskPlan = taskPlan;
+        this.logger.info(`设置任务计划成功，共 ${taskPlan.tasks.length} 个任务`);
+    }
+    /**
+     * 获取任务计划
+     */
+    getTaskPlan() {
+        return this.taskPlan;
+    }
+    /**
+     * 获取所有任务
+     */
+    getAllTasks() {
+        if (!this.taskPlan) {
+            throw new Error('没有加载任务计划');
+        }
+        return [...this.taskPlan.tasks];
+    }
+    /**
+     * 根据ID获取任务
+     * @param id 任务ID
+     */
+    getTaskById(id) {
+        if (!this.taskPlan) {
+            throw new Error('没有加载任务计划');
+        }
+        // 检查是否是子任务ID（包含点号）
+        if (id.includes('.')) {
+            const [parentId, subtaskId] = id.split('.');
+            // 找到父任务
+            const parentTask = this.taskPlan.tasks.find(task => task.id === parentId);
+            if (!parentTask || !parentTask.subtasks) {
+                return null;
+            }
+            // 查找完整的子任务ID
+            const fullSubtaskId = `${parentId}.${subtaskId}`;
+            const subtask = parentTask.subtasks.find(st => st.id === fullSubtaskId);
+            // 如果找到子任务，将其转换为Task类型返回
+            if (subtask) {
+                return {
+                    id: subtask.id,
+                    name: subtask.name,
+                    title: subtask.name,
+                    description: subtask.description,
+                    status: subtask.status,
+                    priority: TaskPriority.MEDIUM, // 子任务默认继承父任务的优先级
+                    type: TaskType.FEATURE, // 子任务默认类型
+                    dependencies: [],
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    tags: [],
+                    subtasks: []
+                };
+            }
+            return null;
+        }
+        // 查找主任务
+        return this.taskPlan.tasks.find(task => task.id === id) || null;
+    }
+    /**
+     * 过滤任务
+     * @param filter 过滤条件
+     */
+    filterTasks(filter) {
+        if (!this.taskPlan) {
+            throw new Error('没有加载任务计划');
+        }
+        return this.taskPlan.tasks.filter(task => {
+            // 按状态过滤
+            if (filter.status) {
+                if (Array.isArray(filter.status)) {
+                    if (!filter.status.includes(task.status)) {
+                        return false;
+                    }
+                }
+                else if (task.status !== filter.status) {
+                    return false;
+                }
+            }
+            // 按类型过滤
+            if (filter.type) {
+                if (Array.isArray(filter.type)) {
+                    if (!filter.type.includes(task.type)) {
+                        return false;
+                    }
+                }
+                else if (task.type !== filter.type) {
+                    return false;
+                }
+            }
+            // 按负责人过滤
+            if (filter.assignee && task.assignee !== filter.assignee) {
+                return false;
+            }
+            // 按优先级过滤
+            if (filter.priority) {
+                if (Array.isArray(filter.priority)) {
+                    if (!filter.priority.includes(task.priority)) {
+                        return false;
+                    }
+                }
+                else if (task.priority !== filter.priority) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+    /**
+     * 添加新任务
+     * @param task 任务
+     */
+    addTask(task) {
+        if (!this.taskPlan) {
+            throw new Error('没有加载任务计划');
+        }
+        // 检查ID是否已存在
+        const existingTask = this.taskPlan.tasks.find(t => t.id === task.id);
+        if (existingTask) {
+            throw new Error(`任务ID ${task.id} 已存在`);
+        }
+        // 添加新任务
+        this.taskPlan.tasks.push(task);
+        this.logger.info(`添加新任务 ${task.id}: ${task.name}`);
+        return task;
+    }
+    /**
+     * 更新任务
+     * @param id 任务ID
+     * @param data 更新数据
+     */
+    updateTask(id, data) {
+        if (!this.taskPlan) {
+            throw new Error('没有加载任务计划');
+        }
+        // 检查是否是子任务
+        if (id.includes('.')) {
+            const [parentId] = id.split('.');
+            // 找到父任务
+            const parentTaskIndex = this.taskPlan.tasks.findIndex(task => task.id === parentId);
+            if (parentTaskIndex < 0 || !this.taskPlan.tasks[parentTaskIndex].subtasks) {
+                return null;
+            }
+            // 查找完整的子任务ID
+            const fullSubtaskId = id;
+            const subtaskIndex = this.taskPlan.tasks[parentTaskIndex].subtasks.findIndex(st => st.id === fullSubtaskId);
+            if (subtaskIndex < 0) {
+                return null;
+            }
+            // 更新子任务
+            const subtask = this.taskPlan.tasks[parentTaskIndex].subtasks[subtaskIndex];
+            if (data.name)
+                subtask.name = data.name;
+            if (data.description)
+                subtask.description = data.description;
+            if (data.status)
+                subtask.status = data.status;
+            this.logger.info(`更新子任务 ${id}: ${subtask.name}`);
+            // 构造返回的任务对象
+            return {
+                id: subtask.id,
+                name: subtask.name,
+                title: subtask.name,
+                description: subtask.description,
+                status: subtask.status,
+                priority: TaskPriority.MEDIUM,
+                type: TaskType.FEATURE,
+                dependencies: [],
+                subtasks: [],
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                tags: []
+            };
+        }
+        // 更新主任务
+        const taskIndex = this.taskPlan.tasks.findIndex(task => task.id === id);
+        if (taskIndex < 0) {
+            return null;
+        }
+        const task = this.taskPlan.tasks[taskIndex];
+        if (data.name)
+            task.name = data.name;
+        if (data.description)
+            task.description = data.description;
+        if (data.status)
+            task.status = data.status;
+        if (data.priority)
+            task.priority = data.priority;
+        if (data.assignee)
+            task.assignee = data.assignee;
+        this.logger.info(`更新任务 ${id}: ${task.name}`);
+        return task;
+    }
+    /**
+     * 删除任务
+     * @param id 任务ID
+     */
+    removeTask(id) {
+        if (!this.taskPlan) {
+            throw new Error('没有加载任务计划');
+        }
+        // 检查是否是子任务
+        if (id.includes('.')) {
+            const [parentId] = id.split('.');
+            // 找到父任务
+            const parentTaskIndex = this.taskPlan.tasks.findIndex(task => task.id === parentId);
+            if (parentTaskIndex < 0 || !this.taskPlan.tasks[parentTaskIndex].subtasks) {
+                return false;
+            }
+            // 查找完整的子任务ID
+            const fullSubtaskId = id;
+            const subtaskIndex = this.taskPlan.tasks[parentTaskIndex].subtasks.findIndex(st => st.id === fullSubtaskId);
+            if (subtaskIndex < 0) {
+                return false;
+            }
+            // 删除子任务
+            this.taskPlan.tasks[parentTaskIndex].subtasks.splice(subtaskIndex, 1);
+            this.logger.info(`删除子任务 ${id}`);
+            return true;
+        }
+        // 删除主任务
+        const taskIndex = this.taskPlan.tasks.findIndex(task => task.id === id);
+        if (taskIndex < 0) {
+            return false;
+        }
+        // 删除任务
+        this.taskPlan.tasks.splice(taskIndex, 1);
+        // 清理其他任务对该任务的依赖
+        this.taskPlan.tasks.forEach(task => {
+            task.dependencies = task.dependencies.filter(depId => depId !== id);
+        });
+        this.logger.info(`删除任务 ${id}`);
+        return true;
+    }
+    /**
+     * 添加子任务
+     * @param parentId 父任务ID
+     * @param subtask 子任务
+     */
+    addSubtask(parentId, subtask) {
+        if (!this.taskPlan) {
+            throw new Error('没有加载任务计划');
+        }
+        // 找到父任务
+        const parentTask = this.taskPlan.tasks.find(task => task.id === parentId);
+        if (!parentTask) {
+            throw new Error(`父任务 ${parentId} 不存在`);
+        }
+        // 确保subtasks是数组
+        if (!Array.isArray(parentTask.subtasks)) {
+            parentTask.subtasks = [];
+        }
+        // 设置子任务ID（如果没有的话）
+        if (!subtask.id) {
+            subtask.id = `${parentId}.${parentTask.subtasks.length + 1}`;
+        }
+        // 设置默认状态
+        if (!subtask.status) {
+            subtask.status = TaskStatus.TODO;
+        }
+        // 添加子任务
+        parentTask.subtasks.push(subtask);
+        this.logger.info(`为任务 ${parentId} 添加子任务 ${subtask.id}: ${subtask.name}`);
+        return subtask;
+    }
+    /**
+     * 获取下一个要处理的任务
+     */
+    getNextTasks() {
+        if (!this.taskPlan) {
+            throw new Error('没有加载任务计划');
+        }
+        // 查找所有未完成的任务
+        const pendingTasks = this.taskPlan.tasks.filter(task => task.status !== TaskStatus.DONE && task.status !== TaskStatus.REVIEW);
+        // 筛选出可以开始的任务（没有未完成的依赖项）
+        return pendingTasks.filter(task => {
+            // 检查依赖
+            if (!task.dependencies || task.dependencies.length === 0) {
+                return true;
+            }
+            // 检查所有依赖任务是否已完成
+            return task.dependencies.every(depId => {
+                const depTask = this.getTaskById(depId);
+                return depTask && depTask.status === TaskStatus.DONE;
+            });
+        });
+    }
+    /**
+     * 添加依赖关系
+     * @param taskId 任务ID
+     * @param dependsOnId 依赖的任务ID
+     */
+    addDependency(taskId, dependsOnId) {
+        if (!this.taskPlan) {
+            throw new Error('没有加载任务计划');
+        }
+        // 找到任务
+        const task = this.getTaskById(taskId);
+        if (!task) {
+            throw new Error(`任务 ${taskId} 不存在`);
+        }
+        // 检查依赖任务是否存在
+        const dependsOnTask = this.getTaskById(dependsOnId);
+        if (!dependsOnTask) {
+            throw new Error(`依赖的任务 ${dependsOnId} 不存在`);
+        }
+        // 检查是否为自身
+        if (taskId === dependsOnId) {
+            throw new Error('任务不能依赖自身');
+        }
+        // 检查循环依赖
+        if (this.checkCircularDependency(dependsOnId, taskId)) {
+            throw new Error('添加此依赖会导致循环依赖');
+        }
+        // 检查依赖是否已存在
+        if (!Array.isArray(task.dependencies)) {
+            task.dependencies = [];
+        }
+        if (task.dependencies.includes(dependsOnId)) {
+            return false; // 依赖已存在
+        }
+        // 添加依赖
+        task.dependencies.push(dependsOnId);
+        this.logger.info(`为任务 ${taskId} 添加依赖: ${dependsOnId}`);
+        return true;
+    }
+    /**
+     * 移除依赖关系
+     * @param taskId 任务ID
+     * @param dependsOnId 依赖的任务ID
+     */
+    removeDependency(taskId, dependsOnId) {
+        if (!this.taskPlan) {
+            throw new Error('没有加载任务计划');
+        }
+        // 找到任务
+        const task = this.getTaskById(taskId);
+        if (!task || !Array.isArray(task.dependencies)) {
+            return false;
+        }
+        // 查找依赖索引
+        const index = task.dependencies.indexOf(dependsOnId);
+        if (index < 0) {
+            return false;
+        }
+        // 移除依赖
+        task.dependencies.splice(index, 1);
+        this.logger.info(`从任务 ${taskId} 移除依赖: ${dependsOnId}`);
+        return true;
+    }
+    /**
+     * 检查是否存在循环依赖
+     * @param task1Id 任务1ID
+     * @param task2Id 任务2ID
+     */
+    checkCircularDependency(task1Id, task2Id) {
+        if (!this.taskPlan) {
+            return false;
+        }
+        // 构建依赖图
+        const graph = new Map();
+        this.taskPlan.tasks.forEach(task => {
+            graph.set(task.id, [...(task.dependencies || [])]);
+        });
+        // 临时添加新依赖
+        const task1Deps = graph.get(task1Id) || [];
+        task1Deps.push(task2Id);
+        graph.set(task1Id, task1Deps);
+        // 检查是否有环
+        const visited = new Set();
+        const recStack = new Set();
+        const hasCycle = (node) => {
+            if (recStack.has(node)) {
+                return true;
+            }
+            if (visited.has(node)) {
+                return false;
+            }
+            visited.add(node);
+            recStack.add(node);
+            const neighbors = graph.get(node) || [];
+            for (const neighbor of neighbors) {
+                if (hasCycle(neighbor)) {
+                    return true;
+                }
+            }
+            recStack.delete(node);
+            return false;
+        };
+        return hasCycle(task1Id);
+    }
+    /**
+     * 开始自动保存任务计划
+     * @param interval 保存间隔（毫秒）
+     */
+    startAutoSave(interval) {
+        // 停止现有的自动保存
+        if (this.autoSaveInterval) {
+            clearInterval(this.autoSaveInterval);
+        }
+        // 设置新的自动保存
+        this.autoSaveInterval = setInterval(async () => {
+            if (this.taskPlan) {
+                try {
+                    await this.saveTaskPlan();
+                }
+                catch (error) {
+                    this.logger.error(`自动保存任务计划失败：${error.message}`);
+                }
+            }
+        }, interval);
+        this.logger.info(`启动自动保存，间隔: ${interval / 1000} 秒`);
+    }
+    /**
+     * 停止自动保存
+     */
+    stopAutoSave() {
+        if (this.autoSaveInterval) {
+            clearInterval(this.autoSaveInterval);
+            this.autoSaveInterval = null;
+            this.logger.info('停止自动保存');
+        }
+    }
+    /**
+     * 析构函数，清理资源
+     */
+    destroy() {
+        this.stopAutoSave();
+    }
+}
+
+/**
+ * TaskFlow AI 任务可视化模块
+ * 负责生成各种任务可视化图表
+ */
+/**
+ * 可视化类型枚举
+ */
+var VisualizationType;
+(function (VisualizationType) {
+    VisualizationType["GANTT"] = "gantt";
+    VisualizationType["DEPENDENCY"] = "dependency";
+    VisualizationType["KANBAN"] = "kanban";
+    VisualizationType["TIMELINE"] = "timeline";
+    VisualizationType["PROGRESS"] = "progress";
+})(VisualizationType || (VisualizationType = {}));
+/**
+ * 任务可视化器类
+ */
+class TaskVisualizer {
+    constructor(logger) {
+        this.logger = logger;
+    }
+    /**
+     * 生成可视化数据
+     * @param taskPlan 任务计划
+     * @param options 可视化选项
+     */
+    generateVisualization(taskPlan, options) {
+        this.logger.info(`生成 ${options.type} 可视化`);
+        switch (options.type) {
+            case VisualizationType.GANTT:
+                return this.generateGanttChart(taskPlan, options);
+            case VisualizationType.DEPENDENCY:
+                return this.generateDependencyGraph(taskPlan, options);
+            case VisualizationType.KANBAN:
+                return this.generateKanbanBoard(taskPlan, options);
+            case VisualizationType.TIMELINE:
+                return this.generateTimeline(taskPlan, options);
+            case VisualizationType.PROGRESS:
+                return this.generateProgressChart(taskPlan, options);
+            default:
+                throw new Error(`不支持的可视化类型: ${options.type}`);
+        }
+    }
+    /**
+     * 生成甘特图
+     * @param taskPlan 任务计划
+     * @param options 选项
+     */
+    generateGanttChart(taskPlan, options) {
+        const ganttTasks = [];
+        let currentDate = new Date();
+        taskPlan.tasks.forEach(task => {
+            const ganttTask = {
+                id: task.id,
+                name: task.title,
+                start: this.formatDate(currentDate),
+                duration: task.estimatedHours || 8,
+                dependencies: task.dependencies.length > 0 ? task.dependencies : undefined,
+                progress: task.progress || 0,
+                assignee: task.assignee
+            };
+            ganttTasks.push(ganttTask);
+            // 计算下一个任务的开始时间
+            currentDate = new Date(currentDate.getTime() + (task.estimatedHours || 8) * 60 * 60 * 1000);
+        });
+        const ganttData = {
+            title: taskPlan.name || '任务甘特图',
+            tasks: ganttTasks
+        };
+        if (options.format === 'mermaid') {
+            return this.generateMermaidGantt(ganttData);
+        }
+        return ganttData;
+    }
+    /**
+     * 生成Mermaid格式的甘特图
+     * @param ganttData 甘特图数据
+     */
+    generateMermaidGantt(ganttData) {
+        let mermaid = `gantt\n    title ${ganttData.title}\n    dateFormat YYYY-MM-DD\n    axisFormat %m-%d\n\n`;
+        ganttData.tasks.forEach(task => {
+            var _a;
+            const progress = (_a = task.progress) !== null && _a !== void 0 ? _a : 0;
+            const status = progress === 100 ? 'done' : progress > 0 ? 'active' : '';
+            const duration = `${task.duration}h`;
+            mermaid += `    ${task.name} :${status}, ${task.id}, ${task.start}, ${duration}\n`;
+        });
+        return mermaid;
+    }
+    /**
+     * 生成依赖关系图
+     * @param taskPlan 任务计划
+     * @param options 选项
+     */
+    generateDependencyGraph(taskPlan, options) {
+        const nodes = [];
+        const edges = [];
+        // 生成节点
+        taskPlan.tasks.forEach(task => {
+            nodes.push({
+                id: task.id,
+                label: task.title,
+                type: task.type,
+                status: task.status,
+                priority: task.priority
+            });
+        });
+        // 生成边
+        taskPlan.tasks.forEach(task => {
+            task.dependencies.forEach(depId => {
+                edges.push({
+                    from: depId,
+                    to: task.id,
+                    type: 'dependency'
+                });
+            });
+        });
+        const graph = { nodes, edges };
+        if (options.format === 'mermaid') {
+            return this.generateMermaidDependencyGraph(graph);
+        }
+        return graph;
+    }
+    /**
+     * 生成Mermaid格式的依赖关系图
+     * @param graph 依赖关系图数据
+     */
+    generateMermaidDependencyGraph(graph) {
+        let mermaid = `graph TD\n`;
+        // 添加节点定义
+        graph.nodes.forEach(node => {
+            const shape = this.getNodeShape(node.status);
+            const style = this.getNodeStyle(node.priority);
+            mermaid += `    ${node.id}${shape}["${node.label}"]\n`;
+            if (style) {
+                mermaid += `    class ${node.id} ${style}\n`;
+            }
+        });
+        mermaid += '\n';
+        // 添加边
+        graph.edges.forEach(edge => {
+            mermaid += `    ${edge.from} --> ${edge.to}\n`;
+        });
+        // 添加样式定义
+        mermaid += '\n';
+        mermaid += '    classDef high fill:#ff6b6b,stroke:#333,stroke-width:2px\n';
+        mermaid += '    classDef medium fill:#feca57,stroke:#333,stroke-width:2px\n';
+        mermaid += '    classDef low fill:#48dbfb,stroke:#333,stroke-width:2px\n';
+        mermaid += '    classDef critical fill:#ff3838,stroke:#333,stroke-width:3px\n';
+        return mermaid;
+    }
+    /**
+     * 获取节点形状
+     * @param status 任务状态
+     */
+    getNodeShape(status) {
+        switch (status) {
+            case TaskStatus.COMPLETED:
+                return '(())';
+            case TaskStatus.IN_PROGRESS:
+                return '([])';
+            case TaskStatus.BLOCKED:
+                return '{[]}';
+            default:
+                return '[]';
+        }
+    }
+    /**
+     * 获取节点样式
+     * @param priority 优先级
+     */
+    getNodeStyle(priority) {
+        switch (priority) {
+            case 'critical':
+                return 'critical';
+            case 'high':
+                return 'high';
+            case 'medium':
+                return 'medium';
+            case 'low':
+                return 'low';
+            default:
+                return '';
+        }
+    }
+    /**
+     * 生成看板
+     * @param taskPlan 任务计划
+     * @param options 选项
+     */
+    generateKanbanBoard(taskPlan, _options) {
+        const columns = [
+            { id: 'not_started', title: '待开始', tasks: [] },
+            { id: 'in_progress', title: '进行中', tasks: [] },
+            { id: 'completed', title: '已完成', tasks: [] },
+            { id: 'blocked', title: '被阻塞', tasks: [] }
+        ];
+        taskPlan.tasks.forEach(task => {
+            const kanbanTask = {
+                id: task.id,
+                title: task.title,
+                description: task.description,
+                priority: task.priority,
+                assignee: task.assignee,
+                tags: task.tags
+            };
+            const column = columns.find(col => col.id === task.status);
+            if (column) {
+                column.tasks.push(kanbanTask);
+            }
+        });
+        return { columns };
+    }
+    /**
+     * 生成时间线
+     * @param taskPlan 任务计划
+     * @param options 选项
+     */
+    generateTimeline(taskPlan, _options) {
+        // 简化的时间线实现
+        const timeline = {
+            title: taskPlan.name || '项目时间线',
+            events: taskPlan.tasks.map((task, index) => ({
+                id: task.id,
+                title: task.title,
+                date: this.calculateTaskStartDate(task, index),
+                duration: task.estimatedHours || 8,
+                status: task.status,
+                priority: task.priority
+            }))
+        };
+        return timeline;
+    }
+    /**
+     * 生成进度图表
+     * @param taskPlan 任务计划
+     * @param options 选项
+     */
+    generateProgressChart(taskPlan, _options) {
+        const stats = {
+            total: taskPlan.tasks.length,
+            completed: 0,
+            inProgress: 0,
+            notStarted: 0,
+            blocked: 0
+        };
+        taskPlan.tasks.forEach(task => {
+            switch (task.status) {
+                case TaskStatus.COMPLETED:
+                    stats.completed++;
+                    break;
+                case TaskStatus.IN_PROGRESS:
+                    stats.inProgress++;
+                    break;
+                case TaskStatus.NOT_STARTED:
+                    stats.notStarted++;
+                    break;
+                case TaskStatus.BLOCKED:
+                    stats.blocked++;
+                    break;
+            }
+        });
+        const completionRate = (stats.completed / stats.total) * 100;
+        return {
+            stats,
+            completionRate,
+            chartData: [
+                { label: '已完成', value: stats.completed, color: '#4CAF50' },
+                { label: '进行中', value: stats.inProgress, color: '#FF9800' },
+                { label: '未开始', value: stats.notStarted, color: '#9E9E9E' },
+                { label: '被阻塞', value: stats.blocked, color: '#F44336' }
+            ]
+        };
+    }
+    /**
+     * 格式化日期
+     * @param date 日期
+     */
+    formatDate(date) {
+        return date.toISOString().split('T')[0];
+    }
+    /**
+     * 计算任务开始日期
+     * @param task 任务
+     * @param index 索引
+     */
+    calculateTaskStartDate(task, index) {
+        // 简化实现：基于索引计算开始日期
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() + index);
+        return this.formatDate(startDate);
+    }
+}
+
+/**
+ * 配置相关类型定义
+ */
+/**
+ * 模型类型枚举
+ */
+var ModelType;
+(function (ModelType) {
+    ModelType["BAIDU"] = "baidu";
+    ModelType["XUNFEI"] = "xunfei";
+    ModelType["ZHIPU"] = "zhipu";
+    ModelType["DEEPSEEK"] = "deepseek";
+    ModelType["QWEN"] = "qwen";
+    ModelType["SPARK"] = "spark";
+    ModelType["MOONSHOT"] = "moonshot";
+})(ModelType || (ModelType = {}));
+/**
+ * 日志级别
+ */
+var LogLevel;
+(function (LogLevel) {
+    LogLevel["ERROR"] = "error";
+    LogLevel["WARN"] = "warn";
+    LogLevel["INFO"] = "info";
+    LogLevel["DEBUG"] = "debug";
+})(LogLevel || (LogLevel = {}));
+/**
+ * 默认配置
+ */
+const DEFAULT_CONFIG = {
+    models: {
+        default: ModelType.BAIDU,
+    },
+    taskSettings: {
+        outputDir: './tasks',
+        autoSave: true,
+        saveInterval: 300,
+    },
+    testSettings: {
+        framework: 'jest',
+        outputDir: './tests',
+        coverage: true,
+    },
+    logger: {
+        level: LogLevel.INFO,
+        output: 'console',
+    },
+};
+
+/**
+ * 简化的配置管理器
+ * 负责管理应用程序的配置信息
+ */
+class SimpleConfigManager {
+    constructor() {
+        this.configPath = path__namespace.join(os__namespace.homedir(), '.taskflow-ai', 'config.json');
+        this.config = this.loadConfig();
+    }
+    loadConfig() {
+        try {
+            if (fs__namespace$1.existsSync(this.configPath)) {
+                const configData = fs__namespace$1.readFileSync(this.configPath, 'utf8');
+                return JSON.parse(configData);
+            }
+        }
+        catch (error) {
+            console.warn(`加载配置文件失败: ${error.message}`);
+        }
+        // 返回默认配置
+        return {
+            models: {
+                default: ModelType.DEEPSEEK,
+                apiKeys: {},
+                endpoints: {}
+            },
+            ui: {
+                theme: 'light',
+                language: 'zh-CN'
+            },
+            features: {
+                autoSave: true,
+                notifications: true
+            }
+        };
+    }
+    saveConfig() {
+        try {
+            const configDir = path__namespace.dirname(this.configPath);
+            if (!fs__namespace$1.existsSync(configDir)) {
+                fs__namespace$1.mkdirSync(configDir, { recursive: true });
+            }
+            fs__namespace$1.writeFileSync(this.configPath, JSON.stringify(this.config, null, 2));
+        }
+        catch (error) {
+            console.error(`保存配置文件失败: ${error.message}`);
+        }
+    }
+    /**
+     * 获取配置值
+     */
+    get(key, defaultValue) {
+        const keys = key.split('.');
+        let value = this.config;
+        for (const k of keys) {
+            if (value && typeof value === 'object' && value !== null && k in value) {
+                value = value[k];
+            }
+            else {
+                return defaultValue;
+            }
+        }
+        return value;
+    }
+    /**
+     * 设置配置值
+     */
+    set(key, value) {
+        const keys = key.split('.');
+        let current = this.config;
+        for (let i = 0; i < keys.length - 1; i++) {
+            const k = keys[i];
+            if (!current[k] || typeof current[k] !== 'object') {
+                current[k] = {};
+            }
+            current = current[k];
+        }
+        current[keys[keys.length - 1]] = value;
+        this.saveConfig();
+    }
+    /**
+     * 获取所有配置
+     */
+    getAll() {
+        return { ...this.config };
+    }
+    /**
+     * 更新配置
+     */
+    update(newConfig) {
+        this.config = { ...this.config, ...newConfig };
+        this.saveConfig();
+    }
+    /**
+     * 重置配置
+     */
+    reset() {
+        this.config = this.loadConfig();
+    }
+    /**
+     * 获取配置（兼容原ConfigManager接口）
+     */
+    getConfig() {
+        return this.getAll();
+    }
+    /**
+     * 更新配置（兼容原ConfigManager接口）
+     */
+    updateConfig(config, _isProjectLevel = false) {
+        this.update(config);
+    }
+    /**
+     * 获取默认模型类型
+     */
+    getDefaultModelType() {
+        return this.get('models.default', ModelType.DEEPSEEK);
+    }
+}
+
+/**
+ * 日志服务，用于记录应用运行日志
+ */
+class Logger {
+    /**
+     * 创建日志服务实例
+     * @param config 日志配置
+     */
+    constructor(config) {
+        const logDir = path.join(process.env.HOME || process.env.USERPROFILE || '.', '.config', 'mcp', 'logs');
+        fs.ensureDirSync(logDir);
+        const logFile = config.file || path.join(logDir, 'mcp.log');
+        const consoleFormat = winston.format.combine(winston.format.colorize(), winston.format.timestamp(), winston.format.printf(({ timestamp, level, message }) => {
+            return `${timestamp} ${level}: ${message}`;
+        }));
+        const fileFormat = winston.format.combine(winston.format.timestamp(), winston.format.json());
+        const transports = [];
+        // 根据配置添加控制台日志传输
+        if (config.output === 'console' || config.output === 'both') {
+            transports.push(new winston.transports.Console({
+                format: consoleFormat,
+                level: config.level,
+            }));
+        }
+        // 根据配置添加文件日志传输
+        if (config.output === 'file' || config.output === 'both') {
+            transports.push(new winston.transports.File({
+                filename: logFile,
+                format: fileFormat,
+                level: config.level,
+                maxsize: 5242880, // 5MB
+                maxFiles: 5,
+            }));
+        }
+        this.logger = winston.createLogger({
+            level: config.level,
+            levels: winston.config.npm.levels,
+            defaultMeta: { service: 'mcp' },
+            transports,
+        });
+    }
+    /**
+     * 获取日志服务实例
+     * @param config 日志配置
+     */
+    static getInstance(config) {
+        if (!Logger.instance) {
+            Logger.instance = new Logger(config);
+        }
+        return Logger.instance;
+    }
+    /**
+     * 更新日志配置
+     * @param config 日志配置
+     */
+    updateConfig(config) {
+        Logger.instance = new Logger(config);
+    }
+    /**
+     * 记录错误级别日志
+     * @param message 日志消息
+     * @param meta 元数据
+     */
+    error(message, meta) {
+        this.logger.error(message, meta);
+    }
+    /**
+     * 记录警告级别日志
+     * @param message 日志消息
+     * @param meta 元数据
+     */
+    warn(message, meta) {
+        this.logger.warn(message, meta);
+    }
+    /**
+     * 记录信息级别日志
+     * @param message 日志消息
+     * @param meta 元数据
+     */
+    info(message, meta) {
+        this.logger.info(message, meta);
+    }
+    /**
+     * 记录调试级别日志
+     * @param message 日志消息
+     * @param meta 元数据
+     */
+    debug(message, meta) {
+        this.logger.debug(message, meta);
+    }
+    /**
+     * 通用日志记录方法
+     * @param level 日志级别
+     * @param message 日志消息
+     * @param meta 元数据
+     */
+    log(level, message, meta) {
+        this.logger.log(level, message, meta);
+    }
+}
+
+var logger = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    Logger: Logger
+});
+
+/**
+ * 基础模型适配器抽象类
+ * 提供模型适配器的通用实现
+ */
+class BaseModelAdapter {
+    constructor(modelType) {
+        this.modelType = modelType;
+    }
+    /**
+     * 获取模型类型
+     */
+    getModelType() {
+        return this.modelType;
+    }
+    /**
+     * 处理HTTP请求错误
+     * @param error 错误对象
+     */
+    handleRequestError(error) {
+        if (error && typeof error === 'object' && 'response' in error) {
+            // 服务器响应了请求，但状态码不是2xx
+            const response = error.response;
+            const statusCode = response === null || response === void 0 ? void 0 : response.status;
+            const data = response === null || response === void 0 ? void 0 : response.data;
+            let message = `HTTP Error ${statusCode}`;
+            if (data && typeof data === 'object') {
+                message += `: ${JSON.stringify(data)}`;
+            }
+            if (statusCode === 401 || statusCode === 403) {
+                throw new Error(`认证失败：${message}，请检查API密钥是否正确`);
+            }
+            else if (statusCode === 429) {
+                throw new Error(`请求速率限制：${message}，请稍后重试`);
+            }
+            else {
+                throw new Error(`API调用失败：${message}`);
+            }
+        }
+        else if (error && typeof error === 'object' && 'request' in error) {
+            // 请求已经发出，但没有收到响应
+            const message = error.message || '网络错误';
+            throw new Error(`请求超时或网络错误：${message}`);
+        }
+        else {
+            // 设置请求时发生了错误
+            const message = (error === null || error === void 0 ? void 0 : error.message) || '未知错误';
+            throw new Error(`请求配置错误：${message}`);
+        }
+    }
+}
+
+/**
+ * 百度文心大模型适配器
+ */
+class BaiduModelAdapter extends BaseModelAdapter {
+    /**
+     * 创建百度文心大模型适配器实例
+     * @param configManager 配置管理器实例
+     */
+    constructor(configManager) {
+        super(ModelType.BAIDU);
+        this.accessToken = null;
+        this.tokenExpireTime = 0;
+        const config = configManager.get(`models.${ModelType.BAIDU}`, {
+            apiKey: '',
+            secretKey: '',
+            endpoint: 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/',
+            modelVersion: 'ernie-bot-4',
+        });
+        this.apiKey = config.apiKey;
+        this.secretKey = config.secretKey;
+        this.endpoint = config.endpoint || 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/';
+        this.modelVersion = config.modelVersion || 'ernie-bot-4';
+        if (!this.apiKey || !this.secretKey) {
+            throw new Error('百度文心API密钥未配置，请使用 mcp config 命令设置 model.baidu.apiKey 和 model.baidu.secretKey');
+        }
+    }
+    /**
+     * 执行聊天请求
+     * @param params 请求参数
+     * @param options 调用选项
+     */
+    async chat(params, options) {
+        try {
+            await this.ensureAccessToken();
+            const requestBody = this.buildRequestBody(params, options);
+            const url = `${this.endpoint}${this.modelVersion}?access_token=${this.accessToken}`;
+            const response = await axios.post(url, requestBody, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                timeout: (options === null || options === void 0 ? void 0 : options.timeout) || 30000,
+            });
+            return this.processResponse(response.data);
+        }
+        catch (error) {
+            return this.handleRequestError(error);
+        }
+    }
+    /**
+     * 流式聊天请求
+     * @param params 请求参数
+     * @param onData 数据回调函数
+     * @param options 调用选项
+     */
+    async chatStream(params, onData, options) {
+        try {
+            await this.ensureAccessToken();
+            const requestBody = this.buildRequestBody(params, { ...options, stream: true });
+            const url = `${this.endpoint}${this.modelVersion}?access_token=${this.accessToken}`;
+            const response = await axios.post(url, requestBody, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                responseType: 'stream',
+                timeout: (options === null || options === void 0 ? void 0 : options.timeout) || 60000,
+            });
+            const stream = response.data;
+            return new Promise((resolve, reject) => {
+                let buffer = '';
+                stream.on('data', (chunk) => {
+                    const chunkString = chunk.toString();
+                    buffer += chunkString;
+                    // 处理SSE格式的响应
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.substring(6);
+                            try {
+                                const parsedData = JSON.parse(data);
+                                onData(parsedData.result, parsedData.is_end || false);
+                            }
+                            catch (e) {
+                                // 忽略非JSON数据
+                            }
+                        }
+                    }
+                });
+                stream.on('end', () => {
+                    onData('', true);
+                    resolve();
+                });
+                stream.on('error', (err) => {
+                    reject(err);
+                });
+            });
+        }
+        catch (error) {
+            return this.handleRequestError(error);
+        }
+    }
+    /**
+     * 验证API密钥
+     */
+    async validateApiKey() {
+        try {
+            await this.ensureAccessToken();
+            return !!this.accessToken;
+        }
+        catch (error) {
+            return false;
+        }
+    }
+    /**
+     * 构建请求体
+     * @param params 请求参数
+     * @param options 调用选项
+     */
+    buildRequestBody(params, options) {
+        var _a, _b, _c, _d;
+        const messages = params.messages.map(msg => ({
+            role: this.mapRole(msg.role),
+            content: msg.content,
+        }));
+        return {
+            messages,
+            temperature: (_b = (_a = options === null || options === void 0 ? void 0 : options.temperature) !== null && _a !== void 0 ? _a : params.temperature) !== null && _b !== void 0 ? _b : 0.7,
+            top_p: (_c = params.topP) !== null && _c !== void 0 ? _c : 0.8,
+            stream: (_d = options === null || options === void 0 ? void 0 : options.stream) !== null && _d !== void 0 ? _d : false,
+            user_id: 'mcp-user',
+        };
+    }
+    /**
+     * 处理响应数据
+     * @param response 响应数据
+     */
+    processResponse(response) {
+        return {
+            content: response.result,
+            finishReason: response.is_end ? 'stop' : undefined,
+            usage: response.usage ? {
+                promptTokens: response.usage.prompt_tokens,
+                completionTokens: response.usage.completion_tokens,
+                totalTokens: response.usage.total_tokens,
+            } : undefined,
+        };
+    }
+    /**
+     * 映射消息角色
+     * @param role 角色
+     */
+    mapRole(role) {
+        switch (role) {
+            case MessageRole.USER:
+                return 'user';
+            case MessageRole.ASSISTANT:
+                return 'assistant';
+            case MessageRole.SYSTEM:
+                return 'system';
+            default:
+                return 'user';
+        }
+    }
+    /**
+     * 确保有效的访问令牌
+     */
+    async ensureAccessToken() {
+        const currentTime = Date.now();
+        // 如果令牌有效，直接返回
+        if (this.accessToken && currentTime < this.tokenExpireTime) {
+            return;
+        }
+        try {
+            const tokenUrl = `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${this.apiKey}&client_secret=${this.secretKey}`;
+            const response = await axios.post(tokenUrl);
+            if (response.data && response.data.access_token) {
+                this.accessToken = response.data.access_token;
+                // 令牌有效期通常是30天，这里设为29天，提前刷新
+                this.tokenExpireTime = currentTime + (response.data.expires_in || 2592000) * 1000 - 86400000;
+            }
+            else {
+                throw new Error('获取访问令牌失败：响应中没有access_token字段');
+            }
+        }
+        catch (error) {
+            this.accessToken = null;
+            this.tokenExpireTime = 0;
+            throw new Error(`获取百度文心访问令牌失败：${error.message}`);
+        }
+    }
+}
+
+/**
+ * DeepSeek大模型适配器
+ */
+class DeepseekModelAdapter extends BaseModelAdapter {
+    /**
+     * 创建DeepSeek大模型适配器实例
+     * @param configManager 配置管理器实例
+     */
+    constructor(configManager) {
+        super(ModelType.DEEPSEEK);
+        const config = configManager.get(`models.${ModelType.DEEPSEEK}`, {
+            apiKey: '',
+            endpoint: 'https://api.deepseek.com/v1/chat/completions',
+            modelVersion: 'deepseek-chat',
+        });
+        this.apiKey = config.apiKey;
+        this.endpoint = config.endpoint || 'https://api.deepseek.com/v1/chat/completions';
+        this.modelVersion = config.modelVersion || 'deepseek-chat';
+        if (!this.apiKey) {
+            throw new Error('DeepSeek API密钥未配置，请使用 mcp config 命令设置 model.deepseek.apiKey');
+        }
+    }
+    /**
+     * 执行聊天请求
+     * @param params 请求参数
+     * @param options 调用选项
+     */
+    async chat(params, options) {
+        try {
+            const requestBody = this.buildRequestBody(params, options);
+            const response = await axios.post(this.endpoint, requestBody, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.apiKey}`
+                },
+                timeout: (options === null || options === void 0 ? void 0 : options.timeout) || 30000,
+            });
+            return this.processResponse(response.data);
+        }
+        catch (error) {
+            return this.handleRequestError(error);
+        }
+    }
+    /**
+     * 流式聊天请求
+     * @param params 请求参数
+     * @param onData 数据回调函数
+     * @param options 调用选项
+     */
+    async chatStream(params, onData, options) {
+        try {
+            const requestBody = this.buildRequestBody(params, { ...options, stream: true });
+            const response = await axios.post(this.endpoint, requestBody, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.apiKey}`
+                },
+                responseType: 'stream',
+                timeout: (options === null || options === void 0 ? void 0 : options.timeout) || 60000,
+            });
+            const stream = response.data;
+            return new Promise((resolve, reject) => {
+                let buffer = '';
+                stream.on('data', (chunk) => {
+                    var _a;
+                    const chunkString = chunk.toString();
+                    buffer += chunkString;
+                    // 处理SSE格式的响应
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.substring(6);
+                            // 检查是否是流结束标记
+                            if (data === '[DONE]') {
+                                onData('', true);
+                                continue;
+                            }
+                            try {
+                                const parsedData = JSON.parse(data);
+                                if (parsedData.choices && parsedData.choices.length > 0) {
+                                    const content = ((_a = parsedData.choices[0].message) === null || _a === void 0 ? void 0 : _a.content) || '';
+                                    const done = parsedData.choices[0].finish_reason === 'stop';
+                                    onData(content, done);
+                                }
+                            }
+                            catch (e) {
+                                // 忽略非JSON数据
+                            }
+                        }
+                    }
+                });
+                stream.on('end', () => {
+                    onData('', true);
+                    resolve();
+                });
+                stream.on('error', (err) => {
+                    reject(err);
+                });
+            });
+        }
+        catch (error) {
+            return this.handleRequestError(error);
+        }
+    }
+    /**
+     * 验证API密钥
+     */
+    async validateApiKey() {
+        try {
+            // 使用一个简单的请求验证API密钥
+            await this.chat({
+                messages: [{ role: MessageRole.USER, content: 'Hello' }],
+                maxTokens: 5
+            }, { temperature: 0.1 });
+            return true;
+        }
+        catch (error) {
+            return false;
+        }
+    }
+    /**
+     * 构建请求体
+     * @param params 请求参数
+     * @param options 调用选项
+     */
+    buildRequestBody(params, options) {
+        var _a, _b, _c, _d, _e, _f;
+        const messages = params.messages.map(msg => ({
+            role: this.mapRole(msg.role),
+            content: msg.content,
+        }));
+        return {
+            model: this.modelVersion,
+            messages,
+            temperature: (_b = (_a = options === null || options === void 0 ? void 0 : options.temperature) !== null && _a !== void 0 ? _a : params.temperature) !== null && _b !== void 0 ? _b : 0.7,
+            top_p: (_c = params.topP) !== null && _c !== void 0 ? _c : 0.8,
+            max_tokens: (_e = (_d = options === null || options === void 0 ? void 0 : options.maxTokens) !== null && _d !== void 0 ? _d : params.maxTokens) !== null && _e !== void 0 ? _e : 1024,
+            stream: (_f = options === null || options === void 0 ? void 0 : options.stream) !== null && _f !== void 0 ? _f : false,
+        };
+    }
+    /**
+     * 处理响应数据
+     * @param response 响应数据
+     */
+    processResponse(response) {
+        var _a;
+        if (!response.choices || response.choices.length === 0) {
+            throw new Error('无效的响应格式：没有返回choices字段');
+        }
+        const choice = response.choices[0];
+        return {
+            content: ((_a = choice.message) === null || _a === void 0 ? void 0 : _a.content) || '',
+            finishReason: choice.finish_reason,
+            usage: response.usage ? {
+                promptTokens: response.usage.prompt_tokens,
+                completionTokens: response.usage.completion_tokens,
+                totalTokens: response.usage.total_tokens,
+            } : undefined,
+        };
+    }
+    /**
+     * 映射消息角色
+     * @param role 角色
+     */
+    mapRole(role) {
+        switch (role) {
+            case MessageRole.USER:
+                return 'user';
+            case MessageRole.ASSISTANT:
+                return 'assistant';
+            case MessageRole.SYSTEM:
+                return 'system';
+            default:
+                return 'user';
+        }
+    }
+}
+
+/**
+ * 智谱AI大模型适配器
+ */
+class ZhipuModelAdapter extends BaseModelAdapter {
+    /**
+     * 创建智谱AI大模型适配器实例
+     * @param configManager 配置管理器实例
+     */
+    constructor(configManager) {
+        super(ModelType.ZHIPU);
+        const config = configManager.get(`models.${ModelType.ZHIPU}`, {
+            apiKey: '',
+            endpoint: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+            modelVersion: 'glm-4',
+        });
+        this.apiKey = config.apiKey;
+        this.endpoint = config.endpoint || 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+        this.modelVersion = config.modelVersion || 'glm-4';
+        if (!this.apiKey) {
+            throw new Error('智谱AI API密钥未配置，请使用 yasi config 命令设置 model.zhipu.apiKey');
+        }
+    }
+    /**
+     * 执行聊天请求
+     * @param params 请求参数
+     * @param options 调用选项
+     */
+    async chat(params, options) {
+        try {
+            const requestBody = this.buildRequestBody(params, options);
+            const headers = this.generateAuthHeaders();
+            const response = await axios.post(this.endpoint, requestBody, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': headers.Authorization,
+                    'Date': headers.Date,
+                },
+                timeout: (options === null || options === void 0 ? void 0 : options.timeout) || 30000,
+            });
+            return this.processResponse(response.data);
+        }
+        catch (error) {
+            return this.handleRequestError(error);
+        }
+    }
+    /**
+     * 流式聊天请求
+     * @param params 请求参数
+     * @param onData 数据回调函数
+     * @param options 调用选项
+     */
+    async chatStream(params, onData, options) {
+        try {
+            const requestBody = this.buildRequestBody(params, { ...options, stream: true });
+            const headers = this.generateAuthHeaders();
+            const response = await axios.post(this.endpoint, requestBody, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': headers.Authorization,
+                    'Date': headers.Date,
+                    'Accept': 'text/event-stream',
+                },
+                responseType: 'stream',
+                timeout: (options === null || options === void 0 ? void 0 : options.timeout) || 60000,
+            });
+            const stream = response.data;
+            return new Promise((resolve, reject) => {
+                let buffer = '';
+                stream.on('data', (chunk) => {
+                    var _a;
+                    const chunkString = chunk.toString();
+                    buffer += chunkString;
+                    // 处理SSE格式的响应
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.substring(6);
+                            // 检查是否是流结束标记
+                            if (data === '[DONE]') {
+                                onData('', true);
+                                continue;
+                            }
+                            try {
+                                const parsedData = JSON.parse(data);
+                                if (parsedData.choices && parsedData.choices.length > 0) {
+                                    const delta = ((_a = parsedData.choices[0].delta) === null || _a === void 0 ? void 0 : _a.content) || '';
+                                    const done = parsedData.choices[0].finish_reason === 'stop';
+                                    onData(delta, done);
+                                }
+                            }
+                            catch (e) {
+                                // 忽略非JSON数据
+                            }
+                        }
+                    }
+                });
+                stream.on('end', () => {
+                    onData('', true);
+                    resolve();
+                });
+                stream.on('error', (err) => {
+                    reject(err);
+                });
+            });
+        }
+        catch (error) {
+            return this.handleRequestError(error);
+        }
+    }
+    /**
+     * 验证API密钥
+     */
+    async validateApiKey() {
+        try {
+            // 使用一个简单的请求验证API密钥
+            await this.chat({
+                messages: [{ role: MessageRole.USER, content: 'Hello' }],
+                maxTokens: 5
+            }, { temperature: 0.1 });
+            return true;
+        }
+        catch (error) {
+            return false;
+        }
+    }
+    /**
+     * 构建请求体
+     * @param params 请求参数
+     * @param options 调用选项
+     */
+    buildRequestBody(params, options) {
+        var _a, _b, _c, _d, _e, _f;
+        const messages = params.messages.map(msg => ({
+            role: this.mapRole(msg.role),
+            content: msg.content,
+        }));
+        return {
+            model: this.modelVersion,
+            messages,
+            temperature: (_b = (_a = options === null || options === void 0 ? void 0 : options.temperature) !== null && _a !== void 0 ? _a : params.temperature) !== null && _b !== void 0 ? _b : 0.7,
+            top_p: (_c = params.topP) !== null && _c !== void 0 ? _c : 0.8,
+            max_tokens: (_e = (_d = options === null || options === void 0 ? void 0 : options.maxTokens) !== null && _d !== void 0 ? _d : params.maxTokens) !== null && _e !== void 0 ? _e : 1024,
+            stream: (_f = options === null || options === void 0 ? void 0 : options.stream) !== null && _f !== void 0 ? _f : false,
+        };
+    }
+    /**
+     * 处理响应数据
+     * @param response 响应数据
+     */
+    processResponse(response) {
+        var _a;
+        if (!response.choices || response.choices.length === 0) {
+            throw new Error('无效的响应格式：没有返回choices字段');
+        }
+        const choice = response.choices[0];
+        return {
+            content: ((_a = choice.message) === null || _a === void 0 ? void 0 : _a.content) || '',
+            finishReason: choice.finish_reason,
+            usage: response.usage ? {
+                promptTokens: response.usage.prompt_tokens,
+                completionTokens: response.usage.completion_tokens,
+                totalTokens: response.usage.total_tokens,
+            } : undefined,
+        };
+    }
+    /**
+     * 映射消息角色
+     * @param role 角色
+     */
+    mapRole(role) {
+        switch (role) {
+            case MessageRole.USER:
+                return 'user';
+            case MessageRole.ASSISTANT:
+                return 'assistant';
+            case MessageRole.SYSTEM:
+                return 'system';
+            default:
+                return 'user';
+        }
+    }
+    /**
+     * 生成智谱API认证头信息
+     */
+    generateAuthHeaders() {
+        // apiKey格式：zhipuai-api-key
+        // 验证apiKey格式是否正确
+        if (!this.apiKey.startsWith('zhipu-')) {
+            throw new Error('智谱AI API密钥格式不正确，应以"zhipu-"开头');
+        }
+        // 从apiKey中提取id和secret
+        const [id, secret] = this.apiKey.substring(6).split('.');
+        if (!id || !secret) {
+            throw new Error('智谱AI API密钥格式不正确，无法提取id和secret');
+        }
+        // 当前GMT时间，形如：Mon, 01 Jul 2023 12:00:00 GMT
+        const date = new Date().toUTCString();
+        // 计算HMAC-SHA256签名
+        const signString = `date: ${date}\nPOST /api/paas/v4/chat/completions HTTP/1.1`;
+        const signature = crypto__namespace
+            .createHmac('sha256', secret)
+            .update(signString)
+            .digest('base64');
+        // 生成Authorization头
+        const authHeader = `hmac username="${id}", algorithm="hmac-sha256", headers="date request-line", signature="${signature}"`;
+        return {
+            Authorization: authHeader,
+            Date: date
+        };
+    }
+}
+
+/**
+ * 阿里通义千问模型提供商
+ * 支持通义千问系列模型的API调用
+ */
+/**
+ * 阿里通义千问模型适配器
+ * 支持通义千问系列模型的API调用
+ */
+class QwenModelAdapter extends BaseModelAdapter {
+    constructor(configManager) {
+        super(ModelType.QWEN);
+        const config = configManager.get(`models.${ModelType.QWEN}`);
+        if (!config) {
+            throw new Error('Qwen模型配置未找到');
+        }
+        this.apiKey = config.apiKey;
+        this.endpoint = config.endpoint || 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation';
+        this.modelVersion = config.modelVersion || 'qwen-turbo';
+        this.client = axios.create({
+            baseURL: this.endpoint,
+            headers: {
+                'Authorization': `Bearer ${this.apiKey}`,
+                'Content-Type': 'application/json',
+                'X-DashScope-SSE': 'disable'
+            },
+            timeout: 30000
+        });
+    }
+    /**
+     * 执行聊天请求
+     */
+    async chat(params, _options) {
+        var _a, _b, _c;
+        try {
+            const requestData = this.buildRequestData(params);
+            const response = await this.client.post('', requestData);
+            if (response.data.output && response.data.output.text) {
+                return {
+                    content: response.data.output.text,
+                    usage: {
+                        promptTokens: ((_a = response.data.usage) === null || _a === void 0 ? void 0 : _a.input_tokens) || 0,
+                        completionTokens: ((_b = response.data.usage) === null || _b === void 0 ? void 0 : _b.output_tokens) || 0,
+                        totalTokens: ((_c = response.data.usage) === null || _c === void 0 ? void 0 : _c.total_tokens) || 0
+                    },
+                    finishReason: response.data.output.finish_reason || 'stop'
+                };
+            }
+            else {
+                throw new Error('Invalid response format from Qwen API');
+            }
+        }
+        catch (error) {
+            this.handleRequestError(error);
+        }
+    }
+    /**
+     * 流式聊天请求
+     */
+    async chatStream(params, onData, _options) {
+        try {
+            const requestData = {
+                ...this.buildRequestData(params),
+                parameters: {
+                    ...this.buildRequestData(params).parameters,
+                    incremental_output: true
+                }
+            };
+            // 启用SSE
+            const response = await this.client.post('', requestData, {
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Content-Type': 'application/json',
+                    'X-DashScope-SSE': 'enable',
+                    'Accept': 'text/event-stream'
+                },
+                responseType: 'stream'
+            });
+            let buffer = '';
+            response.data.on('data', (chunk) => {
+                buffer += chunk.toString();
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || '';
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        if (data === '[DONE]') {
+                            onData('', true);
+                            return;
+                        }
+                        try {
+                            const parsed = JSON.parse(data);
+                            if (parsed.output && parsed.output.text) {
+                                onData(parsed.output.text, false);
+                            }
+                        }
+                        catch (e) {
+                            // 忽略解析错误
+                        }
+                    }
+                }
+            });
+            response.data.on('end', () => {
+                onData('', true);
+            });
+        }
+        catch (error) {
+            this.handleRequestError(error);
+        }
+    }
+    /**
+     * 验证API密钥
+     */
+    async validateApiKey() {
+        try {
+            const testParams = {
+                messages: [{ role: MessageRole.USER, content: 'Hello' }],
+                maxTokens: 10
+            };
+            await this.chat(testParams);
+            return true;
+        }
+        catch (error) {
+            return false;
+        }
+    }
+    /**
+     * 构建请求数据
+     */
+    buildRequestData(params) {
+        const messages = params.messages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+        }));
+        return {
+            model: this.modelVersion,
+            input: {
+                messages: messages
+            },
+            parameters: {
+                max_tokens: params.maxTokens || 2000,
+                temperature: params.temperature || 0.7,
+                top_p: params.topP || 0.9,
+                repetition_penalty: 1.1,
+                result_format: 'text'
+            }
+        };
+    }
+}
+
+/**
+ * 模型工厂类
+ * 负责创建各种模型适配器
+ */
+class ModelFactory {
+    /**
+     * 创建模型工厂实例
+     * @param configManager 配置管理器实例
+     */
+    constructor(configManager) {
+        this.modelCache = new Map();
+        this.configManager = configManager;
+    }
+    /**
+     * 创建模型适配器
+     * @param modelType 模型类型，不传时使用默认模型类型
+     */
+    createModelAdapter(modelType) {
+        // 获取要使用的模型类型
+        const type = modelType || this.configManager.getDefaultModelType();
+        // 如果缓存中有这个模型的适配器实例，直接返回
+        const cached = this.modelCache.get(type);
+        if (cached) {
+            return cached;
+        }
+        // 创建新的适配器实例
+        let adapter;
+        switch (type) {
+            case ModelType.BAIDU:
+                adapter = new BaiduModelAdapter(this.configManager);
+                break;
+            case ModelType.DEEPSEEK:
+                adapter = new DeepseekModelAdapter(this.configManager);
+                break;
+            case ModelType.ZHIPU:
+                adapter = new ZhipuModelAdapter(this.configManager);
+                break;
+            case ModelType.QWEN:
+                adapter = new QwenModelAdapter(this.configManager);
+                break;
+            // TODO: 添加其他模型适配器
+            // case ModelType.XUNFEI:
+            //   adapter = new XunfeiModelAdapter(this.configManager);
+            //   break;
+            default:
+                throw new Error(`不支持的模型类型: ${type}`);
+        }
+        // 将新创建的适配器存入缓存
+        this.modelCache.set(type, adapter);
+        return adapter;
+    }
+    /**
+     * 清除模型适配器缓存
+     * @param modelType 模型类型，不传时清除所有
+     */
+    clearCache(modelType) {
+        if (modelType) {
+            this.modelCache.delete(modelType);
+        }
+        else {
+            this.modelCache.clear();
+        }
+    }
+    /**
+     * 获取所有可用的模型类型
+     */
+    getAvailableModelTypes() {
+        // 更新为已实现的模型适配器
+        return [ModelType.BAIDU, ModelType.DEEPSEEK, ModelType.ZHIPU];
+        // 后续添加其他模型后更新为:
+        // return [ModelType.BAIDU, ModelType.DEEPSEEK, ModelType.ZHIPU, ModelType.XUNFEI];
+    }
+    /**
+     * 验证指定类型模型的API密钥
+     * @param modelType 模型类型
+     */
+    async validateModelApiKey(modelType) {
+        try {
+            const adapter = this.createModelAdapter(modelType);
+            return await adapter.validateApiKey();
+        }
+        catch (error) {
+            return false;
+        }
+    }
+}
+
+/**
+ * 模型协调器
+ * 负责协调多个模型的使用，根据任务类型选择合适的模型
+ */
+class ModelCoordinator {
+    /**
+     * 创建模型协调器实例
+     * @param configManager 配置管理器实例
+     */
+    constructor(configManager) {
+        this.configManager = configManager;
+        this.modelFactory = new ModelFactory(configManager);
+    }
+    /**
+     * 执行聊天请求
+     * @param messages 消息数组
+     * @param modelType 模型类型，不传时使用默认模型
+     * @param options 调用选项
+     */
+    async chat(messages, modelType, options) {
+        const adapter = this.modelFactory.createModelAdapter(modelType);
+        return await adapter.chat({ messages }, options);
+    }
+    /**
+     * 执行流式聊天请求
+     * @param messages 消息数组
+     * @param onData 数据回调
+     * @param modelType 模型类型，不传时使用默认模型
+     * @param options 调用选项
+     */
+    async chatStream(messages, onData, modelType, options) {
+        const adapter = this.modelFactory.createModelAdapter(modelType);
+        return await adapter.chatStream({ messages }, onData, options);
+    }
+    /**
+     * 执行PRD解析任务
+     * @param content PRD文档内容
+     * @param options 解析选项
+     */
+    async parsePRD(content, options) {
+        const modelType = (options === null || options === void 0 ? void 0 : options.modelType) || this.configManager.getDefaultModelType();
+        // 构建系统提示词
+        const systemPrompt = `你是一位专业的PRD需求分析师，请帮我解析以下PRD文档，提取其中的关键信息。
+请按照以下JSON格式输出结果：
 {
-  "title": "\u6587\u6863\u6807\u9898",
-  "description": "\u6587\u6863\u6574\u4F53\u63CF\u8FF0",
+  "title": "文档标题",
+  "description": "文档整体描述",
   "sections": [
     {
-      "title": "\u7AE0\u8282\u6807\u9898",
-      "content": "\u7AE0\u8282\u5185\u5BB9\u6982\u8FF0",
-      "level": \u7AE0\u8282\u5C42\u7EA7,
+      "title": "章节标题",
+      "content": "章节内容概述",
+      "level": 章节层级,
       "features": [
         {
-          "name": "\u529F\u80FD\u540D\u79F0",
-          "description": "\u529F\u80FD\u63CF\u8FF0",
-          "priority": "\u4F18\u5148\u7EA7" // high, medium, low
+          "name": "功能名称",
+          "description": "功能描述",
+          "priority": "优先级" // high, medium, low
         }
       ]
     }
   ]
 }
-\u53EA\u8FD4\u56DEJSON\u683C\u5F0F\u5185\u5BB9\uFF0C\u4E0D\u8981\u6709\u5176\u4ED6\u89E3\u91CA\u3002`,i=`\u4EE5\u4E0B\u662F\u9700\u8981\u89E3\u6790\u7684PRD\u6587\u6863\u5185\u5BB9\uFF1A
+只返回JSON格式内容，不要有其他解释。`;
+        // 用户消息
+        const userPrompt = `以下是需要解析的PRD文档内容：
 
-${e}
+${content}
 
-\u8BF7\u89E3\u6790\u8FD9\u4EFD\u6587\u6863\uFF0C\u6309\u7167\u8981\u6C42\u7684JSON\u683C\u5F0F\u8FD4\u56DE\u7ED3\u679C\u3002`,s=[{role:"system",content:n},{role:"user",content:i}];return await this.chat(s,u)}async planTasks(e,r){let u=r?.modelType||this.configManager.getDefaultModelType(),n=`\u4F60\u662F\u4E00\u4F4D\u4E13\u4E1A\u7684\u9879\u76EE\u89C4\u5212\u5E08\uFF0C\u8BF7\u6839\u636E\u89E3\u6790\u540E\u7684PRD\u5185\u5BB9\uFF0C\u751F\u6210\u8BE6\u7EC6\u7684\u4EFB\u52A1\u8BA1\u5212\u3002
-\u8BF7\u6309\u7167\u4EE5\u4E0B\u8981\u6C42\u62C6\u5206\u4EFB\u52A1\uFF1A
-1. \u5C06\u5927\u7684\u529F\u80FD\u9700\u6C42\u62C6\u5206\u4E3A\u66F4\u5C0F\u7684\u53EF\u6267\u884C\u5B50\u4EFB\u52A1
-2. \u4E3A\u6BCF\u4E2A\u4EFB\u52A1\u5206\u914D\u5408\u7406\u7684\u4F18\u5148\u7EA7\u548C\u7C7B\u578B\u6807\u7B7E
-3. \u786E\u5B9A\u4EFB\u52A1\u4E4B\u95F4\u7684\u4F9D\u8D56\u5173\u7CFB
-4. ${r?.estimateDuration?"\u4F30\u7B97\u6BCF\u4E2A\u4EFB\u52A1\u7684\u5B8C\u6210\u65F6\u95F4\uFF08\u4EE5\u5C0F\u65F6\u4E3A\u5355\u4F4D\uFF09":""}
-5. ${r?.assignTasks?"\u4E3A\u6BCF\u4E2A\u4EFB\u52A1\u5206\u914D\u5408\u9002\u7684\u89D2\u8272":""}
+请解析这份文档，按照要求的JSON格式返回结果。`;
+        const messages = [
+            { role: MessageRole.SYSTEM, content: systemPrompt },
+            { role: MessageRole.USER, content: userPrompt }
+        ];
+        return await this.chat(messages, modelType);
+    }
+    /**
+     * 执行任务规划
+     * @param parsedPRD 解析后的PRD结果
+     * @param options 规划选项
+     */
+    async planTasks(parsedPRD, options) {
+        const modelType = (options === null || options === void 0 ? void 0 : options.modelType) || this.configManager.getDefaultModelType();
+        // 构建系统提示词
+        const systemPrompt = `你是一位专业的项目规划师，请根据解析后的PRD内容，生成详细的任务计划。
+请按照以下要求拆分任务：
+1. 将大的功能需求拆分为更小的可执行子任务
+2. 为每个任务分配合理的优先级和类型标签
+3. 确定任务之间的依赖关系
+4. ${(options === null || options === void 0 ? void 0 : options.estimateDuration) ? '估算每个任务的完成时间（以小时为单位）' : ''}
+5. ${(options === null || options === void 0 ? void 0 : options.assignTasks) ? '为每个任务分配合适的角色' : ''}
 
-\u8BF7\u6309\u7167\u4EE5\u4E0BJSON\u683C\u5F0F\u8F93\u51FA\u7ED3\u679C\uFF1A
+请按照以下JSON格式输出结果：
 {
-  "name": "\u9879\u76EE\u540D\u79F0",
-  "description": "\u9879\u76EE\u63CF\u8FF0",
+  "name": "项目名称",
+  "description": "项目描述",
   "tasks": [
     {
-      "id": "\u552F\u4E00ID",
-      "name": "\u4EFB\u52A1\u540D\u79F0",
-      "description": "\u4EFB\u52A1\u63CF\u8FF0",
-      "priority": "\u4F18\u5148\u7EA7", // high, medium, low
-      "type": "\u4EFB\u52A1\u7C7B\u578B", // feature, bug_fix, refactor, test, document
-      "dependencies": ["\u4F9D\u8D56\u4EFB\u52A1ID"],
-      ${r?.estimateDuration?'"estimatedDuration": \u9884\u8BA1\u8017\u65F6\uFF08\u5C0F\u65F6\uFF09,':""}
-      ${r?.assignTasks?'"assignee": "\u8D1F\u8D23\u89D2\u8272",':""}
+      "id": "唯一ID",
+      "name": "任务名称",
+      "description": "任务描述",
+      "priority": "优先级", // high, medium, low
+      "type": "任务类型", // feature, bug_fix, refactor, test, document
+      "dependencies": ["依赖任务ID"],
+      ${(options === null || options === void 0 ? void 0 : options.estimateDuration) ? '"estimatedDuration": 预计耗时（小时）,' : ''}
+      ${(options === null || options === void 0 ? void 0 : options.assignTasks) ? '"assignee": "负责角色",' : ''}
       "subtasks": [
-        // \u5B50\u4EFB\u52A1\uFF0C\u7ED3\u6784\u4E0E\u7236\u4EFB\u52A1\u76F8\u540C
+        // 子任务，结构与父任务相同
       ]
     }
   ]
 }
-\u53EA\u8FD4\u56DEJSON\u683C\u5F0F\u5185\u5BB9\uFF0C\u4E0D\u8981\u6709\u5176\u4ED6\u89E3\u91CA\u3002`,i=`\u4EE5\u4E0B\u662F\u89E3\u6790\u540E\u7684PRD\u5185\u5BB9\uFF1A
+只返回JSON格式内容，不要有其他解释。`;
+        // 用户消息
+        const userPrompt = `以下是解析后的PRD内容：
 
-${JSON.stringify(e,null,2)}
+${JSON.stringify(parsedPRD, null, 2)}
 
-${r?.taskTemplate?`\u8BF7\u53C2\u8003\u4EE5\u4E0B\u4EFB\u52A1\u6A21\u677F\u8FDB\u884C\u89C4\u5212\uFF1A
-${r.taskTemplate}`:""}
+${(options === null || options === void 0 ? void 0 : options.taskTemplate) ? `请参考以下任务模板进行规划：\n${options.taskTemplate}` : ''}
 
-\u8BF7\u751F\u6210\u8BE6\u7EC6\u7684\u4EFB\u52A1\u8BA1\u5212\uFF0C\u6309\u7167\u8981\u6C42\u7684JSON\u683C\u5F0F\u8FD4\u56DE\u7ED3\u679C\u3002`,s=[{role:"system",content:n},{role:"user",content:i}];return await this.chat(s,u)}async generateTests(e,r){let u=r?.modelType||this.configManager.getDefaultModelType(),i=`\u4F60\u662F\u4E00\u4F4D\u4E13\u4E1A\u7684\u6D4B\u8BD5\u5DE5\u7A0B\u5E08\uFF0C\u8BF7\u6839\u636E\u4EFB\u52A1\u63CF\u8FF0\uFF0C\u751F\u6210\u8BE6\u7EC6\u7684\u6D4B\u8BD5\u7528\u4F8B\u3002
-\u8BF7\u4F7F\u7528 ${r?.framework||this.configManager.get("testSettings.framework","jest")} \u6D4B\u8BD5\u6846\u67B6\u7F16\u5199\u6D4B\u8BD5\u4EE3\u7801\u3002
-\u8981\u6C42\uFF1A
-1. \u6D4B\u8BD5\u9700\u8981\u8986\u76D6\u6B63\u5E38\u529F\u80FD\u8DEF\u5F84
-2. ${r?.includeEdgeCases?"\u6D4B\u8BD5\u9700\u8981\u8986\u76D6\u8FB9\u754C\u6761\u4EF6\u548C\u5F02\u5E38\u60C5\u51B5":""}
-3. ${r?.mockDependencies?"\u4F7F\u7528mock/stub\u5904\u7406\u5916\u90E8\u4F9D\u8D56":""}
-4. \u6D4B\u8BD5\u4EE3\u7801\u5E94\u8BE5\u6E05\u6670\u53EF\u8BFB\uFF0C\u5305\u542B\u5FC5\u8981\u7684\u6CE8\u91CA
-5. \u9075\u5FAA\u6D4B\u8BD5\u6846\u67B6\u7684\u6700\u4F73\u5B9E\u8DF5
+请生成详细的任务计划，按照要求的JSON格式返回结果。`;
+        const messages = [
+            { role: MessageRole.SYSTEM, content: systemPrompt },
+            { role: MessageRole.USER, content: userPrompt }
+        ];
+        return await this.chat(messages, modelType);
+    }
+    /**
+     * 生成测试用例
+     * @param taskDescription 任务描述
+     * @param options 测试生成选项
+     */
+    async generateTests(taskDescription, options) {
+        const modelType = (options === null || options === void 0 ? void 0 : options.modelType) || this.configManager.getDefaultModelType();
+        const framework = (options === null || options === void 0 ? void 0 : options.framework) || this.configManager.get('testSettings.framework', 'jest');
+        // 构建系统提示词
+        const systemPrompt = `你是一位专业的测试工程师，请根据任务描述，生成详细的测试用例。
+请使用 ${framework} 测试框架编写测试代码。
+要求：
+1. 测试需要覆盖正常功能路径
+2. ${(options === null || options === void 0 ? void 0 : options.includeEdgeCases) ? '测试需要覆盖边界条件和异常情况' : ''}
+3. ${(options === null || options === void 0 ? void 0 : options.mockDependencies) ? '使用mock/stub处理外部依赖' : ''}
+4. 测试代码应该清晰可读，包含必要的注释
+5. 遵循测试框架的最佳实践
 
-\u8BF7\u8F93\u51FA\u5B8C\u6574\u53EF\u6267\u884C\u7684\u6D4B\u8BD5\u4EE3\u7801\u3002`,s=`\u4EE5\u4E0B\u662F\u9700\u8981\u7F16\u5199\u6D4B\u8BD5\u7528\u4F8B\u7684\u4EFB\u52A1\u63CF\u8FF0\uFF1A
+请输出完整可执行的测试代码。`;
+        // 用户消息
+        const userPrompt = `以下是需要编写测试用例的任务描述：
 
-${e}
+${taskDescription}
 
-\u8BF7\u4E3A\u6B64\u4EFB\u52A1\u751F\u6210\u6D4B\u8BD5\u7528\u4F8B\u3002`,a=[{role:"system",content:i},{role:"user",content:s}];return await this.chat(a,u)}getAvailableModelTypes(){return this.modelFactory.getAvailableModelTypes()}async validateModelApiKey(e){return await this.modelFactory.validateModelApiKey(e)}};var or=class{constructor(){this.configManager=new Nr,this.logger=ju.getInstance({level:this.configManager.get("logger.level","info"),output:this.configManager.get("logger.output","console"),file:this.configManager.get("logger.file")}),this.modelCoordinator=new Gu(this.configManager),this.prdParser=new Le(this.modelCoordinator,this.logger),this.taskPlanner=new Ie(this.modelCoordinator,this.logger),this.taskManager=new Ne(this.logger,this.configManager),this.logger.info("TaskFlow AI MCP\u670D\u52A1\u521D\u59CB\u5316\u5B8C\u6210")}async parsePRD(e,r="markdown",u){try{return this.logger.info("\u5F00\u59CB\u89E3\u6790PRD\u5185\u5BB9"),{success:!0,data:await this.prdParser.parseContent(e,r,u)}}catch(n){return this.logger.error(`\u89E3\u6790PRD\u5185\u5BB9\u5931\u8D25: ${n.message}`),{success:!1,error:n.message}}}async parsePRDFromFile(e,r){try{return this.logger.info(`\u5F00\u59CB\u89E3\u6790PRD\u6587\u4EF6: ${e}`),{success:!0,data:await this.prdParser.parseFromFile(e,r)}}catch(u){return this.logger.error(`\u89E3\u6790PRD\u6587\u4EF6\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async generateTaskPlan(e,r){try{return this.logger.info("\u5F00\u59CB\u751F\u6210\u4EFB\u52A1\u8BA1\u5212"),{success:!0,data:await this.taskPlanner.generateTaskPlan(e,r)}}catch(u){return this.logger.error(`\u751F\u6210\u4EFB\u52A1\u8BA1\u5212\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async saveTaskPlan(e,r){try{return await this.taskPlanner.saveTaskPlan(e,r),this.taskManager.setTaskPlan(e),{success:!0}}catch(u){return this.logger.error(`\u4FDD\u5B58\u4EFB\u52A1\u8BA1\u5212\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async loadTaskPlan(e){try{return{success:!0,data:await this.taskManager.loadTaskPlan(e)}}catch(r){return this.logger.error(`\u52A0\u8F7D\u4EFB\u52A1\u8BA1\u5212\u5931\u8D25: ${r.message}`),{success:!1,error:r.message}}}getAllTasks(){try{return{success:!0,data:this.taskManager.getAllTasks()}}catch(e){return this.logger.error(`\u83B7\u53D6\u6240\u6709\u4EFB\u52A1\u5931\u8D25: ${e.message}`),{success:!1,error:e.message}}}getTaskById(e){try{let r=this.taskManager.getTaskById(e);return r?{success:!0,data:r}:{success:!1,error:`\u4EFB\u52A1 ${e} \u4E0D\u5B58\u5728`}}catch(r){return this.logger.error(`\u83B7\u53D6\u4EFB\u52A1\u5931\u8D25: ${r.message}`),{success:!1,error:r.message}}}filterTasks(e){try{return{success:!0,data:this.taskManager.filterTasks(e)}}catch(r){return this.logger.error(`\u8FC7\u6EE4\u4EFB\u52A1\u5931\u8D25: ${r.message}`),{success:!1,error:r.message}}}updateTask(e,r){try{let u=this.taskManager.updateTask(e,r);return u?{success:!0,data:u}:{success:!1,error:`\u4EFB\u52A1 ${e} \u4E0D\u5B58\u5728`}}catch(u){return this.logger.error(`\u66F4\u65B0\u4EFB\u52A1\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}getNextTasks(){try{return{success:!0,data:this.taskManager.getNextTasks()}}catch(e){return this.logger.error(`\u83B7\u53D6\u4E0B\u4E00\u4E2A\u4EFB\u52A1\u5931\u8D25: ${e.message}`),{success:!1,error:e.message}}}async chat(e,r,u){try{return{success:!0,data:await this.modelCoordinator.chat(e,r,u)}}catch(n){return this.logger.error(`\u804A\u5929\u8BF7\u6C42\u5931\u8D25: ${n.message}`),{success:!1,error:n.message}}}getAvailableModelTypes(){try{return{success:!0,data:this.modelCoordinator.getAvailableModelTypes()}}catch(e){return this.logger.error(`\u83B7\u53D6\u53EF\u7528\u6A21\u578B\u7C7B\u578B\u5931\u8D25: ${e.message}`),{success:!1,error:e.message}}}async validateModelApiKey(e){try{return{success:!0,data:{valid:await this.modelCoordinator.validateModelApiKey(e)}}}catch(r){return this.logger.error(`\u9A8C\u8BC1\u6A21\u578BAPI\u5BC6\u94A5\u5931\u8D25: ${r.message}`),{success:!1,error:r.message}}}updateConfig(e,r=!1){try{return this.configManager.updateConfig(e,r),e.logger&&this.logger.updateConfig({level:this.configManager.get("logger.level","info"),output:this.configManager.get("logger.output","console"),file:this.configManager.get("logger.file")}),{success:!0}}catch(u){return this.logger.error(`\u66F4\u65B0\u914D\u7F6E\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}getConfig(){try{let r={...this.configManager.getConfig()};return r.models&&Object.keys(r.models).forEach(u=>{if(u!=="default"&&r.models[u]){let n=r.models[u];n&&n.apiKey&&(n.apiKey="******"),n&&n.secretKey&&(n.secretKey="******")}}),{success:!0,data:r}}catch(e){return this.logger.error(`\u83B7\u53D6\u914D\u7F6E\u5931\u8D25: ${e.message}`),{success:!1,error:e.message}}}getTaskStatus(){try{let e=this.taskManager.getAllTasks();return{success:!0,data:{total:e.length,pending:e.filter(u=>u.status==="pending").length,in_progress:e.filter(u=>u.status==="in_progress").length,completed:e.filter(u=>u.status==="completed").length,cancelled:e.filter(u=>u.status==="cancelled").length}}}catch(e){return this.logger.error(`\u83B7\u53D6\u4EFB\u52A1\u72B6\u6001\u5931\u8D25: ${e.message}`),{success:!1,error:e.message}}}updateTaskStatus(e,r,u){try{let n={status:r};u&&Object.assign(n,u);let i=this.taskManager.updateTask(e,n);return i?{success:!0,data:i}:{success:!1,error:`\u4EFB\u52A1 ${e} \u4E0D\u5B58\u5728`}}catch(n){return this.logger.error(`\u66F4\u65B0\u4EFB\u52A1\u72B6\u6001\u5931\u8D25: ${n.message}`),{success:!1,error:n.message}}}getRecommendedTask(){try{let e=this.taskManager.getNextTasks();return{success:!0,data:e.length>0?e[0]:null}}catch(e){return this.logger.error(`\u83B7\u53D6\u63A8\u8350\u4EFB\u52A1\u5931\u8D25: ${e.message}`),{success:!1,error:e.message}}}async generateVisualization(e,r){try{return{success:!0,data:{type:e,data:this.taskManager.getAllTasks(),options:r,generatedAt:new Date().toISOString()}}}catch(u){return this.logger.error(`\u751F\u6210\u53EF\u89C6\u5316\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async createProject(e){try{return{success:!0,data:{id:`project_${Date.now()}`,...e,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:"active"}}}catch(r){return this.logger.error(`\u521B\u5EFA\u9879\u76EE\u5931\u8D25: ${r.message}`),{success:!1,error:r.message}}}async getProjects(e){try{return{success:!0,data:[{id:"project_1",name:"\u793A\u4F8B\u9879\u76EE",description:"\u8FD9\u662F\u4E00\u4E2A\u793A\u4F8B\u9879\u76EE",status:"active",createdAt:new Date().toISOString()}]}}catch(r){return this.logger.error(`\u83B7\u53D6\u9879\u76EE\u5217\u8868\u5931\u8D25: ${r.message}`),{success:!1,error:r.message}}}async getProject(e){try{return{success:!0,data:{id:e,name:"\u793A\u4F8B\u9879\u76EE",description:"\u8FD9\u662F\u4E00\u4E2A\u793A\u4F8B\u9879\u76EE",status:"active",createdAt:new Date().toISOString(),tasks:this.taskManager.getAllTasks()}}}catch(r){return this.logger.error(`\u83B7\u53D6\u9879\u76EE\u8BE6\u60C5\u5931\u8D25: ${r.message}`),{success:!1,error:r.message}}}async updateProject(e,r){try{return{success:!0,data:{id:e,...r,updatedAt:new Date().toISOString()}}}catch(u){return this.logger.error(`\u66F4\u65B0\u9879\u76EE\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async deleteProject(e){try{return{success:!0,message:`\u9879\u76EE ${e} \u5DF2\u5220\u9664`}}catch(r){return this.logger.error(`\u5220\u9664\u9879\u76EE\u5931\u8D25: ${r.message}`),{success:!1,error:r.message}}}async getProjectTasks(e,r){try{return{success:!0,data:this.taskManager.getAllTasks()}}catch(u){return this.logger.error(`\u83B7\u53D6\u9879\u76EE\u4EFB\u52A1\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async getProjectStats(e){try{let r=this.taskManager.getAllTasks();return{success:!0,data:{totalTasks:r.length,completedTasks:r.filter(n=>n.status==="completed").length,inProgressTasks:r.filter(n=>n.status==="in_progress").length,pendingTasks:r.filter(n=>n.status==="pending").length}}}catch(r){return this.logger.error(`\u83B7\u53D6\u9879\u76EE\u7EDF\u8BA1\u5931\u8D25: ${r.message}`),{success:!1,error:r.message}}}async generateTasks(e,r){try{let{requirements:u,options:n}=e.body;return{success:!0,data:[{id:`task_${Date.now()}`,title:"\u793A\u4F8B\u4EFB\u52A1",description:"\u57FA\u4E8E\u9700\u6C42\u751F\u6210\u7684\u793A\u4F8B\u4EFB\u52A1",status:"pending",priority:"medium"}]}}catch(u){return this.logger.error(`\u751F\u6210\u4EFB\u52A1\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async orchestrateTasks(e,r){try{let{tasks:u,options:n}=e.body;return{success:!0,data:u.map((s,a)=>({...s,order:a+1,dependencies:a>0?[u[a-1].id]:[]}))}}catch(u){return this.logger.error(`\u7F16\u6392\u4EFB\u52A1\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async generateDocuments(e,r){try{let{type:u,content:n,options:i}=e.body;return{success:!0,data:{type:u,content:`\u751F\u6210\u7684${u}\u6587\u6863\u5185\u5BB9`,generatedAt:new Date().toISOString()}}}catch(u){return this.logger.error(`\u751F\u6210\u6587\u6863\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async generateCharts(e,r){try{let{type:u,data:n,options:i}=e.body;return{success:!0,data:{type:u,data:n||this.taskManager.getAllTasks(),options:i,generatedAt:new Date().toISOString()}}}catch(u){return this.logger.error(`\u751F\u6210\u56FE\u8868\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async chatStream(e,r){try{let{message:u,context:n}=e.body;r.writeHead(200,{"Content-Type":"text/plain","Transfer-Encoding":"chunked"});let i=`AI\u56DE\u590D: ${u}`;r.write(i),r.end()}catch(u){this.logger.error(`\u804A\u5929\u6D41\u5F0F\u54CD\u5E94\u5931\u8D25: ${u.message}`),r.status(500).json({success:!1,error:u.message})}}async getModels(e,r){try{return{success:!0,data:this.modelCoordinator.getAvailableModelTypes()}}catch(u){return this.logger.error(`\u83B7\u53D6\u6A21\u578B\u5217\u8868\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async getModelStatus(e,r){try{let{modelType:u}=e.params,n=await this.modelCoordinator.validateModelApiKey(u);return{success:!0,data:{modelType:u,status:n?"active":"inactive"}}}catch(u){return this.logger.error(`\u83B7\u53D6\u6A21\u578B\u72B6\u6001\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async validateRequirements(e,r){try{let{requirements:u}=e.body;return{success:!0,data:{valid:!0,issues:[],suggestions:["\u5EFA\u8BAE\u6DFB\u52A0\u66F4\u591A\u7EC6\u8282"]}}}catch(u){return this.logger.error(`\u9A8C\u8BC1\u9700\u6C42\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async estimateEffort(e,r){try{let{tasks:u}=e.body;return{success:!0,data:{totalHours:u.length*8,breakdown:u.map(i=>({taskId:i.id,estimatedHours:8}))}}}catch(u){return this.logger.error(`\u4F30\u7B97\u5DE5\u4F5C\u91CF\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async getUsageStats(e,r){try{return{success:!0,data:{totalRequests:100,successfulRequests:95,failedRequests:5,averageResponseTime:1.2}}}catch(u){return this.logger.error(`\u83B7\u53D6\u4F7F\u7528\u7EDF\u8BA1\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async archiveProject(e,r){try{let{id:u}=e.params;return{success:!0,data:{id:u,status:"archived",archivedAt:new Date().toISOString()}}}catch(u){return this.logger.error(`\u5F52\u6863\u9879\u76EE\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async restoreProject(e,r){try{let u;return typeof e=="string"?u=e:u=e.params.id,{success:!0,data:{id:u,status:"active",restoredAt:new Date().toISOString()}}}catch(u){return this.logger.error(`\u6062\u590D\u9879\u76EE\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async generateProjectReport(e,r){try{let u=await this.getProject(e),n=this.taskManager.getAllTasks(),i=await this.getProjectStats(e);return{success:!0,data:{project:u.data,tasks:n,statistics:i.data,generatedAt:new Date().toISOString(),format:r?.format||"json"}}}catch(u){return this.logger.error(`\u751F\u6210\u9879\u76EE\u62A5\u544A\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async exportProject(e,r){try{let u=await this.getProject(e),n=this.taskManager.getAllTasks();return{success:!0,data:{project:u.data,tasks:n,exportedAt:new Date().toISOString(),format:r}}}catch(u){return this.logger.error(`\u5BFC\u51FA\u9879\u76EE\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}async cloneProject(e,r){try{let u=await this.getProject(e);if(!u.success||!u.data)throw new Error("\u539F\u9879\u76EE\u4E0D\u5B58\u5728\u6216\u83B7\u53D6\u5931\u8D25");return{success:!0,data:{id:`project_${Date.now()}`,name:r.name||`${u.data.name} (\u526F\u672C)`,description:r.description||u.data.description,clonedFrom:e,createdAt:new Date().toISOString()}}}catch(u){return this.logger.error(`\u514B\u9686\u9879\u76EE\u5931\u8D25: ${u.message}`),{success:!1,error:u.message}}}},Q=new or,K=Q;var x2={parse_prd:{name:"parse_prd",description:"\u89E3\u6790PRD\u6587\u6863\u5E76\u751F\u6210\u4EFB\u52A1\u8BA1\u5212",inputSchema:{type:"object",properties:{content:{type:"string",description:"PRD\u6587\u6863\u5185\u5BB9"},fileType:{type:"string",enum:["markdown","text","docx","pdf"],description:"\u6587\u4EF6\u7C7B\u578B",default:"markdown"},modelType:{type:"string",enum:["deepseek","qwen","wenxin","zhipu"],description:"\u4F7F\u7528\u7684AI\u6A21\u578B\u7C7B\u578B"},outputPath:{type:"string",description:"\u4EFB\u52A1\u8BA1\u5212\u8F93\u51FA\u8DEF\u5F84\uFF08\u53EF\u9009\uFF09"}},required:["content"]}},parse_prd_file:{name:"parse_prd_file",description:"\u4ECE\u6587\u4EF6\u89E3\u6790PRD\u6587\u6863\u5E76\u751F\u6210\u4EFB\u52A1\u8BA1\u5212",inputSchema:{type:"object",properties:{filePath:{type:"string",description:"PRD\u6587\u4EF6\u8DEF\u5F84"},modelType:{type:"string",enum:["deepseek","qwen","wenxin","zhipu"],description:"\u4F7F\u7528\u7684AI\u6A21\u578B\u7C7B\u578B"},outputPath:{type:"string",description:"\u4EFB\u52A1\u8BA1\u5212\u8F93\u51FA\u8DEF\u5F84\uFF08\u53EF\u9009\uFF09"}},required:["filePath"]}},get_all_tasks:{name:"get_all_tasks",description:"\u83B7\u53D6\u6240\u6709\u4EFB\u52A1",inputSchema:{type:"object",properties:{}}},get_task_by_id:{name:"get_task_by_id",description:"\u6839\u636EID\u83B7\u53D6\u4EFB\u52A1\u8BE6\u60C5",inputSchema:{type:"object",properties:{id:{type:"string",description:"\u4EFB\u52A1ID"}},required:["id"]}},get_next_tasks:{name:"get_next_tasks",description:"\u83B7\u53D6\u4E0B\u4E00\u4E2A\u8981\u5904\u7406\u7684\u4EFB\u52A1",inputSchema:{type:"object",properties:{}}},update_task_status:{name:"update_task_status",description:"\u66F4\u65B0\u4EFB\u52A1\u72B6\u6001",inputSchema:{type:"object",properties:{id:{type:"string",description:"\u4EFB\u52A1ID"},status:{type:"string",enum:["pending","in_progress","completed","blocked","cancelled"],description:"\u65B0\u7684\u4EFB\u52A1\u72B6\u6001"}},required:["id","status"]}},chat:{name:"chat",description:"\u4F7F\u7528AI\u6A21\u578B\u8FDB\u884C\u5BF9\u8BDD",inputSchema:{type:"object",properties:{messages:{type:"array",items:{type:"object",properties:{role:{type:"string",enum:["user","assistant","system"]},content:{type:"string"}},required:["role","content"]},description:"\u5BF9\u8BDD\u6D88\u606F\u6570\u7EC4"},modelType:{type:"string",enum:["deepseek","qwen","wenxin","zhipu"],description:"\u4F7F\u7528\u7684AI\u6A21\u578B\u7C7B\u578B"}},required:["messages"]}},get_config:{name:"get_config",description:"\u83B7\u53D6\u5F53\u524D\u914D\u7F6E",inputSchema:{type:"object",properties:{}}},update_config:{name:"update_config",description:"\u66F4\u65B0\u914D\u7F6E",inputSchema:{type:"object",properties:{config:{type:"object",description:"\u914D\u7F6E\u5BF9\u8C61"},isProjectLevel:{type:"boolean",description:"\u662F\u5426\u4E3A\u9879\u76EE\u7EA7\u914D\u7F6E",default:!1}},required:["config"]}},get_available_models:{name:"get_available_models",description:"\u83B7\u53D6\u6240\u6709\u53EF\u7528\u7684AI\u6A21\u578B",inputSchema:{type:"object",properties:{}}},validate_model_key:{name:"validate_model_key",description:"\u9A8C\u8BC1AI\u6A21\u578BAPI\u5BC6\u94A5",inputSchema:{type:"object",properties:{modelType:{type:"string",enum:["deepseek","qwen","wenxin","zhipu"],description:"AI\u6A21\u578B\u7C7B\u578B"}},required:["modelType"]}}};async function vl(t,e){try{switch(t){case"parse_prd":return await Q.parsePRD(e.content,e.fileType,{modelType:e.modelType,outputPath:e.outputPath});case"parse_prd_file":return await Q.parsePRDFromFile(e.filePath,{modelType:e.modelType,outputPath:e.outputPath});case"get_all_tasks":return Q.getAllTasks();case"get_task_by_id":return Q.getTaskById(e.id);case"get_next_tasks":return Q.getNextTasks();case"update_task_status":return Q.updateTask(e.id,{status:e.status});case"chat":return await Q.chat(e.messages,e.modelType);case"get_config":return Q.getConfig();case"update_config":return Q.updateConfig(e.config,e.isProjectLevel);case"get_available_models":return Q.getAvailableModelTypes();case"validate_model_key":return await Q.validateModelApiKey(e.modelType);default:return{success:!1,error:`\u672A\u77E5\u7684MCP\u5DE5\u5177: ${t}`}}}catch(r){return{success:!1,error:`\u6267\u884CMCP\u5DE5\u5177\u5931\u8D25: ${r.message}`}}}function El(){return Object.values(x2)}var wl={name:"TaskFlow AI",version:"1.2.0",description:"TaskFlow AI - \u667A\u80FDPRD\u89E3\u6790\u548C\u4EFB\u52A1\u7BA1\u7406\u52A9\u624B",capabilities:{tools:!0,resources:!1,prompts:!1}};async function v2(t,e){return await vl(t,e)}function E2(){return El()}function w2(){return wl}async function k2(t,e){let r=e?.fileType||"markdown",u={modelType:e?.modelType,extractSections:e?.extractSections!==!1,extractFeatures:e?.extractFeatures!==!1,prioritize:e?.prioritize!==!1};try{let n=await K.parsePRD(t,r,u);if(!n.success)return{error:n.error};let i={modelType:e?.modelType,taskTemplate:e?.taskTemplate,estimateDuration:e?.estimateDuration,assignTasks:e?.assignTasks},s=await K.generateTaskPlan(n.data,i);if(!s.success)return{error:s.error};if(e?.outputPath){let a=await K.saveTaskPlan(s.data,e.outputPath);if(!a.success)return{error:a.error}}return{success:!0,data:{prd:n.data,taskPlan:s.data}}}catch(n){return{error:n.message}}}async function D2(t,e){try{let r=await K.parsePRDFromFile(t,{modelType:e?.modelType,extractSections:e?.extractSections!==!1,extractFeatures:e?.extractFeatures!==!1,prioritize:e?.prioritize!==!1});if(!r.success)return{error:r.error};let u={modelType:e?.modelType,taskTemplate:e?.taskTemplate,estimateDuration:e?.estimateDuration,assignTasks:e?.assignTasks},n=await K.generateTaskPlan(r.data,u);if(!n.success)return{error:n.error};if(e?.outputPath){let i=await K.saveTaskPlan(n.data,e.outputPath);if(!i.success)return{error:i.error}}return{success:!0,data:{prd:r.data,taskPlan:n.data}}}catch(r){return{error:r.message}}}async function T2(){return K.getAllTasks()}async function S2(t){return K.getTaskById(t)}async function C2(){return K.getNextTasks()}async function A2(t,e){return K.updateTask(t,{status:e})}async function M2(t,e,r){return K.chat(t,e,r)}async function R2(){return K.getAvailableModelTypes()}async function P2(t){return K.validateModelApiKey(t)}async function F2(t,e=!1){return K.updateConfig(t,e)}async function O2(){return K.getConfig()}async function q2(t,e){try{let r=await K.generateTaskPlan(t,{modelType:e?.modelType,taskTemplate:e?.taskTemplate,estimateDuration:e?.estimateDuration,assignTasks:e?.assignTasks});return r.success?{success:!0,data:r.data}:{error:r.error}}catch(r){return{error:r.message}}}async function L2(t,e){try{return{success:!0,data:await K.modelCoordinator.generateTests(t,{modelType:e?.modelType,framework:e?.framework||"jest",coverage:e?.coverage!==!1,includeEdgeCases:e?.includeEdgeCases!==!1,mockDependencies:e?.mockDependencies!==!1})}}catch(r){return{error:r.message}}}var I2="1.2.0";0&&(module.exports={FileType,LogLevel,MessageRole,ModelType,PRDParser,TaskFlowEngine,TaskFlowService,TaskManager,TaskPlanner,TaskPriority,TaskStatus,TaskType,TaskVisualizer,VERSION,VisualizationType,chat,executeTool,generateTaskPlan,generateTests,getAllTasks,getAvailableModelTypes,getConfig,getNextTasks,getServerInfo,getTaskById,getTools,parsePRD,parsePRDFromFile,taskFlowService,updateConfig,updateTaskStatus,validateModelApiKey});
+请为此任务生成测试用例。`;
+        const messages = [
+            { role: MessageRole.SYSTEM, content: systemPrompt },
+            { role: MessageRole.USER, content: userPrompt }
+        ];
+        return await this.chat(messages, modelType);
+    }
+    /**
+     * 获取可用的模型类型列表
+     */
+    getAvailableModelTypes() {
+        return this.modelFactory.getAvailableModelTypes();
+    }
+    /**
+     * 验证指定类型模型的API密钥
+     * @param modelType 模型类型
+     */
+    async validateModelApiKey(modelType) {
+        return await this.modelFactory.validateModelApiKey(modelType);
+    }
+}
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * TaskFlow AI MCP 服务类
+ */
+class TaskFlowService {
+    /**
+     * 创建TaskFlow AI MCP服务实例
+     */
+    constructor() {
+        // 初始化基础设施
+        this.configManager = new SimpleConfigManager();
+        this.logger = Logger.getInstance({
+            level: this.configManager.get('logger.level', LogLevel.INFO),
+            output: this.configManager.get('logger.output', 'console'),
+            file: this.configManager.get('logger.file')
+        });
+        // 初始化核心服务
+        this.modelCoordinator = new ModelCoordinator(this.configManager);
+        this.prdParser = new PRDParser(this.modelCoordinator, this.logger);
+        this.taskPlanner = new TaskPlanner(this.modelCoordinator, this.logger);
+        this.taskManager = new TaskManager(this.logger, this.configManager);
+        this.logger.info('TaskFlow AI MCP服务初始化完成');
+    }
+    /**
+     * 解析PRD文档内容
+     * @param content PRD文档内容
+     * @param fileType 文件类型
+     * @param options 解析选项
+     */
+    async parsePRD(content, fileType = FileType.MARKDOWN, options) {
+        try {
+            this.logger.info('开始解析PRD内容');
+            const result = await this.prdParser.parseContent(content, fileType, options);
+            return { success: true, data: result };
+        }
+        catch (error) {
+            this.logger.error(`解析PRD内容失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 从文件解析PRD
+     * @param filePath PRD文件路径
+     * @param options 解析选项
+     */
+    async parsePRDFromFile(filePath, options) {
+        try {
+            this.logger.info(`开始解析PRD文件: ${filePath}`);
+            const result = await this.prdParser.parseFromFile(filePath, options);
+            return { success: true, data: result };
+        }
+        catch (error) {
+            this.logger.error(`解析PRD文件失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 根据PRD生成任务计划
+     * @param prdResult PRD解析结果
+     * @param options 规划选项
+     */
+    async generateTaskPlan(prdResult, options) {
+        try {
+            this.logger.info('开始生成任务计划');
+            const taskPlan = await this.taskPlanner.generateTaskPlan(prdResult, options);
+            return { success: true, data: taskPlan };
+        }
+        catch (error) {
+            this.logger.error(`生成任务计划失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 保存任务计划
+     * @param taskPlan 任务计划
+     * @param outputPath 输出路径
+     */
+    async saveTaskPlan(taskPlan, outputPath) {
+        try {
+            await this.taskPlanner.saveTaskPlan(taskPlan, outputPath);
+            // 同时更新任务管理器的任务计划
+            this.taskManager.setTaskPlan(taskPlan);
+            return { success: true };
+        }
+        catch (error) {
+            this.logger.error(`保存任务计划失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 加载任务计划
+     * @param filePath 任务计划文件路径
+     */
+    async loadTaskPlan(filePath) {
+        try {
+            const taskPlan = await this.taskManager.loadTaskPlan(filePath);
+            return { success: true, data: taskPlan };
+        }
+        catch (error) {
+            this.logger.error(`加载任务计划失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 获取所有任务
+     */
+    getAllTasks() {
+        try {
+            const tasks = this.taskManager.getAllTasks();
+            return { success: true, data: tasks };
+        }
+        catch (error) {
+            this.logger.error(`获取所有任务失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 根据ID获取任务
+     * @param id 任务ID
+     */
+    getTaskById(id) {
+        try {
+            const task = this.taskManager.getTaskById(id);
+            if (!task) {
+                return { success: false, error: `任务 ${id} 不存在` };
+            }
+            return { success: true, data: task };
+        }
+        catch (error) {
+            this.logger.error(`获取任务失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 过滤任务
+     * @param filter 过滤条件
+     */
+    filterTasks(filter) {
+        try {
+            const tasks = this.taskManager.filterTasks(filter);
+            return { success: true, data: tasks };
+        }
+        catch (error) {
+            this.logger.error(`过滤任务失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 更新任务
+     * @param id 任务ID
+     * @param data 更新数据
+     */
+    updateTask(id, data) {
+        try {
+            const task = this.taskManager.updateTask(id, data);
+            if (!task) {
+                return { success: false, error: `任务 ${id} 不存在` };
+            }
+            return { success: true, data: task };
+        }
+        catch (error) {
+            this.logger.error(`更新任务失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 获取下一个要处理的任务
+     */
+    getNextTasks() {
+        try {
+            const tasks = this.taskManager.getNextTasks();
+            return { success: true, data: tasks };
+        }
+        catch (error) {
+            this.logger.error(`获取下一个任务失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 使用聊天模型进行对话
+     * @param messages 消息数组
+     * @param modelType 模型类型
+     * @param options 调用选项
+     */
+    async chat(messages, modelType, options) {
+        try {
+            const response = await this.modelCoordinator.chat(messages, modelType, options);
+            return { success: true, data: response };
+        }
+        catch (error) {
+            this.logger.error(`聊天请求失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 获取所有可用的模型类型
+     */
+    getAvailableModelTypes() {
+        try {
+            const modelTypes = this.modelCoordinator.getAvailableModelTypes();
+            return { success: true, data: modelTypes };
+        }
+        catch (error) {
+            this.logger.error(`获取可用模型类型失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 验证指定类型模型的API密钥
+     * @param modelType 模型类型
+     */
+    async validateModelApiKey(modelType) {
+        try {
+            const isValid = await this.modelCoordinator.validateModelApiKey(modelType);
+            return { success: true, data: { valid: isValid } };
+        }
+        catch (error) {
+            this.logger.error(`验证模型API密钥失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 更新配置
+     * @param config 配置对象
+     * @param isProjectLevel 是否为项目级配置
+     */
+    updateConfig(config, isProjectLevel = false) {
+        try {
+            this.configManager.updateConfig(config, isProjectLevel);
+            // 更新日志配置
+            if (config.logger) {
+                this.logger.updateConfig({
+                    level: this.configManager.get('logger.level', LogLevel.INFO),
+                    output: this.configManager.get('logger.output', 'console'),
+                    file: this.configManager.get('logger.file')
+                });
+            }
+            return { success: true };
+        }
+        catch (error) {
+            this.logger.error(`更新配置失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 获取完整配置
+     */
+    getConfig() {
+        try {
+            const config = this.configManager.getConfig();
+            // 移除敏感信息
+            const safeConfig = { ...config };
+            if (safeConfig.models) {
+                Object.keys(safeConfig.models).forEach(key => {
+                    if (key !== 'default' && safeConfig.models[key]) {
+                        const modelConfig = safeConfig.models[key];
+                        if (modelConfig && modelConfig.apiKey) {
+                            modelConfig.apiKey = '******';
+                        }
+                        if (modelConfig && modelConfig.secretKey) {
+                            modelConfig.secretKey = '******';
+                        }
+                    }
+                });
+            }
+            return { success: true, data: safeConfig };
+        }
+        catch (error) {
+            this.logger.error(`获取配置失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 获取任务状态概览
+     */
+    getTaskStatus() {
+        try {
+            const allTasks = this.taskManager.getAllTasks();
+            const stats = {
+                total: allTasks.length,
+                pending: allTasks.filter(t => t.status === 'pending').length,
+                in_progress: allTasks.filter(t => t.status === 'in_progress').length,
+                completed: allTasks.filter(t => t.status === 'completed').length,
+                cancelled: allTasks.filter(t => t.status === 'cancelled').length
+            };
+            return { success: true, data: stats };
+        }
+        catch (error) {
+            this.logger.error(`获取任务状态失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 更新任务状态
+     * @param taskId 任务ID
+     * @param status 新状态
+     * @param data 额外数据
+     */
+    updateTaskStatus(taskId, status, data) {
+        try {
+            const updateData = { status: status };
+            if (data) {
+                Object.assign(updateData, data);
+            }
+            const task = this.taskManager.updateTask(taskId, updateData);
+            if (!task) {
+                return { success: false, error: `任务 ${taskId} 不存在` };
+            }
+            return { success: true, data: task };
+        }
+        catch (error) {
+            this.logger.error(`更新任务状态失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 获取推荐任务
+     */
+    getRecommendedTask() {
+        try {
+            const nextTasks = this.taskManager.getNextTasks();
+            const recommendedTask = nextTasks.length > 0 ? nextTasks[0] : null;
+            return { success: true, data: recommendedTask };
+        }
+        catch (error) {
+            this.logger.error(`获取推荐任务失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 生成可视化
+     * @param type 可视化类型
+     * @param options 选项
+     */
+    async generateVisualization(type, options) {
+        try {
+            // 这里应该调用可视化模块，暂时返回模拟数据
+            const visualization = {
+                type,
+                data: this.taskManager.getAllTasks(),
+                options,
+                generatedAt: new Date().toISOString()
+            };
+            return { success: true, data: visualization };
+        }
+        catch (error) {
+            this.logger.error(`生成可视化失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    // Project Management Methods
+    /**
+     * 创建项目
+     * @param projectData 项目数据
+     */
+    async createProject(projectData) {
+        try {
+            // 模拟项目创建逻辑
+            const project = {
+                id: `project_${Date.now()}`,
+                ...projectData,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                status: 'active'
+            };
+            return { success: true, data: project };
+        }
+        catch (error) {
+            this.logger.error(`创建项目失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 获取项目列表
+     * @param options 查询选项
+     */
+    async getProjects(options) {
+        try {
+            // 模拟项目列表
+            const projects = [
+                {
+                    id: 'project_1',
+                    name: '示例项目',
+                    description: '这是一个示例项目',
+                    status: 'active',
+                    createdAt: new Date().toISOString()
+                }
+            ];
+            return { success: true, data: projects };
+        }
+        catch (error) {
+            this.logger.error(`获取项目列表失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 获取项目详情
+     * @param id 项目ID
+     */
+    async getProject(id) {
+        try {
+            // 模拟项目详情
+            const project = {
+                id,
+                name: '示例项目',
+                description: '这是一个示例项目',
+                status: 'active',
+                createdAt: new Date().toISOString(),
+                tasks: this.taskManager.getAllTasks()
+            };
+            return { success: true, data: project };
+        }
+        catch (error) {
+            this.logger.error(`获取项目详情失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 更新项目
+     * @param id 项目ID
+     * @param updateData 更新数据
+     */
+    async updateProject(id, updateData) {
+        try {
+            const project = {
+                id,
+                ...updateData,
+                updatedAt: new Date().toISOString()
+            };
+            return { success: true, data: project };
+        }
+        catch (error) {
+            this.logger.error(`更新项目失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 删除项目
+     * @param id 项目ID
+     */
+    async deleteProject(id) {
+        try {
+            return { success: true, message: `项目 ${id} 已删除` };
+        }
+        catch (error) {
+            this.logger.error(`删除项目失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 获取项目任务
+     * @param id 项目ID
+     * @param options 查询选项
+     */
+    async getProjectTasks(id, options) {
+        try {
+            const tasks = this.taskManager.getAllTasks();
+            return { success: true, data: tasks };
+        }
+        catch (error) {
+            this.logger.error(`获取项目任务失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 获取项目统计
+     * @param id 项目ID
+     */
+    async getProjectStats(id) {
+        try {
+            const tasks = this.taskManager.getAllTasks();
+            const stats = {
+                totalTasks: tasks.length,
+                completedTasks: tasks.filter(t => t.status === 'completed').length,
+                inProgressTasks: tasks.filter(t => t.status === 'in_progress').length,
+                pendingTasks: tasks.filter(t => t.status === 'pending').length
+            };
+            return { success: true, data: stats };
+        }
+        catch (error) {
+            this.logger.error(`获取项目统计失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    // AI Controller Methods
+    /**
+     * 生成任务
+     * @param req 请求对象
+     * @param res 响应对象
+     */
+    async generateTasks(req, res) {
+        try {
+            const { requirements, options } = req.body;
+            // 模拟任务生成
+            const tasks = [
+                {
+                    id: `task_${Date.now()}`,
+                    title: '示例任务',
+                    description: '基于需求生成的示例任务',
+                    status: 'pending',
+                    priority: 'medium'
+                }
+            ];
+            return { success: true, data: tasks };
+        }
+        catch (error) {
+            this.logger.error(`生成任务失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 编排任务
+     * @param req 请求对象
+     * @param res 响应对象
+     */
+    async orchestrateTasks(req, res) {
+        try {
+            const { tasks, options } = req.body;
+            // 模拟任务编排
+            const orchestratedTasks = tasks.map((task, index) => ({
+                ...task,
+                order: index + 1,
+                dependencies: index > 0 ? [tasks[index - 1].id] : []
+            }));
+            return { success: true, data: orchestratedTasks };
+        }
+        catch (error) {
+            this.logger.error(`编排任务失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 生成文档
+     * @param req 请求对象
+     * @param res 响应对象
+     */
+    async generateDocuments(req, res) {
+        try {
+            const { type, content, options } = req.body;
+            // 模拟文档生成
+            const document = {
+                type,
+                content: `生成的${type}文档内容`,
+                generatedAt: new Date().toISOString()
+            };
+            return { success: true, data: document };
+        }
+        catch (error) {
+            this.logger.error(`生成文档失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 生成图表
+     * @param req 请求对象
+     * @param res 响应对象
+     */
+    async generateCharts(req, res) {
+        try {
+            const { type, data, options } = req.body;
+            // 模拟图表生成
+            const chart = {
+                type,
+                data: data || this.taskManager.getAllTasks(),
+                options,
+                generatedAt: new Date().toISOString()
+            };
+            return { success: true, data: chart };
+        }
+        catch (error) {
+            this.logger.error(`生成图表失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 聊天流式响应
+     * @param req 请求对象
+     * @param res 响应对象
+     */
+    async chatStream(req, res) {
+        try {
+            const { message, context } = req.body;
+            // 模拟流式响应
+            res.writeHead(200, {
+                'Content-Type': 'text/plain',
+                'Transfer-Encoding': 'chunked'
+            });
+            const response = `AI回复: ${message}`;
+            res.write(response);
+            res.end();
+        }
+        catch (error) {
+            this.logger.error(`聊天流式响应失败: ${error.message}`);
+            res.status(500).json({ success: false, error: error.message });
+        }
+    }
+    /**
+     * 获取模型列表
+     * @param req 请求对象
+     * @param res 响应对象
+     */
+    async getModels(req, res) {
+        try {
+            const models = this.modelCoordinator.getAvailableModelTypes();
+            return { success: true, data: models };
+        }
+        catch (error) {
+            this.logger.error(`获取模型列表失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 获取模型状态
+     * @param req 请求对象
+     * @param res 响应对象
+     */
+    async getModelStatus(req, res) {
+        try {
+            const { modelType } = req.params;
+            const isValid = await this.modelCoordinator.validateModelApiKey(modelType);
+            return { success: true, data: { modelType, status: isValid ? 'active' : 'inactive' } };
+        }
+        catch (error) {
+            this.logger.error(`获取模型状态失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 验证需求
+     * @param req 请求对象
+     * @param res 响应对象
+     */
+    async validateRequirements(req, res) {
+        try {
+            const { requirements } = req.body;
+            // 模拟需求验证
+            const validation = {
+                valid: true,
+                issues: [],
+                suggestions: ['建议添加更多细节']
+            };
+            return { success: true, data: validation };
+        }
+        catch (error) {
+            this.logger.error(`验证需求失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 估算工作量
+     * @param req 请求对象
+     * @param res 响应对象
+     */
+    async estimateEffort(req, res) {
+        try {
+            const { tasks } = req.body;
+            // 模拟工作量估算
+            const estimation = {
+                totalHours: tasks.length * 8,
+                breakdown: tasks.map((task) => ({
+                    taskId: task.id,
+                    estimatedHours: 8
+                }))
+            };
+            return { success: true, data: estimation };
+        }
+        catch (error) {
+            this.logger.error(`估算工作量失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 获取使用统计
+     * @param req 请求对象
+     * @param res 响应对象
+     */
+    async getUsageStats(req, res) {
+        try {
+            const stats = {
+                totalRequests: 100,
+                successfulRequests: 95,
+                failedRequests: 5,
+                averageResponseTime: 1.2
+            };
+            return { success: true, data: stats };
+        }
+        catch (error) {
+            this.logger.error(`获取使用统计失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 归档项目
+     * @param req 请求对象
+     * @param res 响应对象
+     */
+    async archiveProject(req, res) {
+        try {
+            const { id } = req.params;
+            const project = {
+                id,
+                status: 'archived',
+                archivedAt: new Date().toISOString()
+            };
+            return { success: true, data: project };
+        }
+        catch (error) {
+            this.logger.error(`归档项目失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    async restoreProject(idOrReq, res) {
+        try {
+            let id;
+            if (typeof idOrReq === 'string') {
+                id = idOrReq;
+            }
+            else {
+                id = idOrReq.params.id;
+            }
+            const project = {
+                id,
+                status: 'active',
+                restoredAt: new Date().toISOString()
+            };
+            return { success: true, data: project };
+        }
+        catch (error) {
+            this.logger.error(`恢复项目失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 生成项目报告
+     * @param id 项目ID
+     * @param options 报告选项
+     */
+    async generateProjectReport(id, options) {
+        try {
+            const project = await this.getProject(id);
+            const tasks = this.taskManager.getAllTasks();
+            const stats = await this.getProjectStats(id);
+            const report = {
+                project: project.data,
+                tasks,
+                statistics: stats.data,
+                generatedAt: new Date().toISOString(),
+                format: (options === null || options === void 0 ? void 0 : options.format) || 'json'
+            };
+            return { success: true, data: report };
+        }
+        catch (error) {
+            this.logger.error(`生成项目报告失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 导出项目
+     * @param id 项目ID
+     * @param format 导出格式
+     */
+    async exportProject(id, format) {
+        try {
+            const project = await this.getProject(id);
+            const tasks = this.taskManager.getAllTasks();
+            const exportData = {
+                project: project.data,
+                tasks,
+                exportedAt: new Date().toISOString(),
+                format
+            };
+            return { success: true, data: exportData };
+        }
+        catch (error) {
+            this.logger.error(`导出项目失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+    /**
+     * 克隆项目
+     * @param id 项目ID
+     * @param options 克隆选项
+     */
+    async cloneProject(id, options) {
+        try {
+            const originalProject = await this.getProject(id);
+            if (!originalProject.success || !originalProject.data) {
+                throw new Error('原项目不存在或获取失败');
+            }
+            const newProject = {
+                id: `project_${Date.now()}`,
+                name: options.name || `${originalProject.data.name} (副本)`,
+                description: options.description || originalProject.data.description,
+                clonedFrom: id,
+                createdAt: new Date().toISOString()
+            };
+            return { success: true, data: newProject };
+        }
+        catch (error) {
+            this.logger.error(`克隆项目失败: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+}
+// 导出单例实例
+const taskFlowService = new TaskFlowService();
+// 保持向后兼容性
+const yasiService = taskFlowService;
+
+/**
+ * TaskFlow AI
+ * 智能PRD文档解析与任务管理助手，专为开发团队设计的AI驱动任务编排工具
+ */
+// 导出核心引擎
+// 版本信息
+const VERSION = '1.2.0';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/**
+ * 配置管理器，负责管理应用的配置信息
+ */
+let ConfigManager$1 = class ConfigManager {
+    /**
+     * 创建配置管理器实例
+     * @param configName 配置名称
+     */
+    constructor(configName = 'mcp') {
+        this.projectConf = null;
+        // 全局配置
+        this.conf = new Conf({
+            configName,
+            defaults: DEFAULT_CONFIG,
+        });
+        // 尝试加载项目级配置
+        const projectConfigPath = path.join(process.cwd(), 'mcp.config.json');
+        if (fs.existsSync(projectConfigPath)) {
+            try {
+                this.projectConf = new Conf({
+                    configName: 'mcp.config',
+                    cwd: process.cwd(),
+                    defaults: DEFAULT_CONFIG,
+                });
+            }
+            catch (error) {
+                console.error('Failed to load project configuration:', error);
+            }
+        }
+    }
+    /**
+     * 获取完整配置
+     */
+    getConfig() {
+        // 如果存在项目配置，合并全局和项目配置
+        if (this.projectConf) {
+            return {
+                ...this.conf.store,
+                ...this.projectConf.store,
+                models: {
+                    ...this.conf.store.models,
+                    ...this.projectConf.store.models,
+                },
+            };
+        }
+        return this.conf.store;
+    }
+    /**
+     * 更新配置
+     * @param config 配置对象
+     * @param isProjectLevel 是否为项目级配置
+     */
+    updateConfig(config, isProjectLevel = false) {
+        const targetConf = isProjectLevel && this.projectConf ? this.projectConf : this.conf;
+        // 递归合并对象
+        const mergeDeep = (target, source) => {
+            for (const key in source) {
+                if (source[key] instanceof Object && key in target) {
+                    mergeDeep(target[key], source[key]);
+                }
+                else {
+                    target[key] = source[key];
+                }
+            }
+            return target;
+        };
+        targetConf.store = mergeDeep({ ...targetConf.store }, config);
+    }
+    /**
+     * 设置配置项
+     * @param key 配置键路径（点分隔，如 'models.baidu.apiKey'）
+     * @param value 配置值
+     * @param isProjectLevel 是否为项目级配置
+     */
+    set(key, value, isProjectLevel = false) {
+        const targetConf = isProjectLevel && this.projectConf ? this.projectConf : this.conf;
+        targetConf.set(key, value);
+    }
+    /**
+     * 获取配置项
+     * @param key 配置键路径
+     * @param defaultValue 默认值
+     */
+    get(key, defaultValue) {
+        // 先尝试从项目配置中获取
+        if (this.projectConf && this.projectConf.has(key)) {
+            return this.projectConf.get(key);
+        }
+        // 再从全局配置中获取
+        return this.conf.get(key, defaultValue);
+    }
+    /**
+     * 检查配置项是否存在
+     * @param key 配置键路径
+     */
+    has(key) {
+        var _a;
+        return ((_a = this.projectConf) === null || _a === void 0 ? void 0 : _a.has(key)) || this.conf.has(key);
+    }
+    /**
+     * 删除配置项
+     * @param key 配置键路径
+     * @param isProjectLevel 是否为项目级配置
+     */
+    delete(key, isProjectLevel = false) {
+        const targetConf = isProjectLevel && this.projectConf ? this.projectConf : this.conf;
+        targetConf.delete(key);
+    }
+    /**
+     * 重置配置
+     * @param isProjectLevel 是否为项目级配置
+     */
+    reset(isProjectLevel = false) {
+        const targetConf = isProjectLevel && this.projectConf ? this.projectConf : this.conf;
+        targetConf.store = DEFAULT_CONFIG;
+    }
+    /**
+     * 初始化项目配置文件
+     * @param directory 项目目录
+     */
+    initProjectConfig(directory) {
+        const configPath = path.join(directory, 'mcp.config.json');
+        fs.writeJsonSync(configPath, DEFAULT_CONFIG, { spaces: 2 });
+        // 重新加载项目配置
+        this.projectConf = new Conf({
+            configName: 'mcp.config',
+            cwd: directory,
+            defaults: DEFAULT_CONFIG,
+        });
+    }
+    /**
+     * 获取当前默认模型类型
+     */
+    getDefaultModelType() {
+        return this.get('models.default', ModelType.BAIDU);
+    }
+    /**
+     * 设置默认模型类型
+     * @param modelType 模型类型
+     * @param isProjectLevel 是否为项目级配置
+     */
+    setDefaultModelType(modelType, isProjectLevel = false) {
+        this.set('models.default', modelType, isProjectLevel);
+    }
+    /**
+     * 获取配置路径
+     * @param isProjectLevel 是否为项目级配置
+     */
+    getConfigPath(isProjectLevel = false) {
+        const targetConf = isProjectLevel && this.projectConf ? this.projectConf : this.conf;
+        return targetConf.path;
+    }
+};
+
+/**
+ * TaskFlow AI 可视化命令
+ * 生成任务计划的各种可视化图表
+ */
+/**
+ * 可视化命令处理器
+ */
+class VisualizeCommand {
+    constructor() {
+        this.logger = Logger.getInstance({ level: LogLevel.INFO, output: 'console' });
+        this.configManager = new ConfigManager$1();
+        this.taskManager = new TaskManager(this.logger, this.configManager);
+        this.visualizer = new TaskVisualizer(this.logger);
+    }
+    /**
+     * 注册可视化命令
+     * @param program Commander程序实例
+     */
+    register(program) {
+        const visualizeCmd = program
+            .command('visualize')
+            .alias('viz')
+            .description('生成任务计划可视化图表')
+            .option('-t, --type <type>', '可视化类型 (gantt|dependency|kanban|timeline|progress)', 'gantt')
+            .option('-f, --format <format>', '输出格式 (mermaid|json|html)', 'mermaid')
+            .option('-o, --output <path>', '输出文件路径')
+            .option('-i, --input <path>', '任务计划文件路径')
+            .option('--include-subtasks', '包含子任务')
+            .option('--show-progress', '显示进度信息')
+            .option('--group-by <field>', '分组字段 (type|assignee|priority)')
+            .action(async (options) => {
+            await this.handleVisualize(options);
+        });
+        // 添加子命令
+        visualizeCmd
+            .command('gantt')
+            .description('生成甘特图')
+            .option('-o, --output <path>', '输出文件路径')
+            .option('-i, --input <path>', '任务计划文件路径')
+            .action(async (options) => {
+            await this.handleVisualize({ ...options, type: 'gantt' });
+        });
+        visualizeCmd
+            .command('dependency')
+            .alias('deps')
+            .description('生成依赖关系图')
+            .option('-o, --output <path>', '输出文件路径')
+            .option('-i, --input <path>', '任务计划文件路径')
+            .action(async (options) => {
+            await this.handleVisualize({ ...options, type: 'dependency' });
+        });
+        visualizeCmd
+            .command('kanban')
+            .description('生成看板视图')
+            .option('-o, --output <path>', '输出文件路径')
+            .option('-i, --input <path>', '任务计划文件路径')
+            .option('--group-by <field>', '分组字段 (type|assignee|priority)')
+            .action(async (options) => {
+            await this.handleVisualize({ ...options, type: 'kanban' });
+        });
+        visualizeCmd
+            .command('progress')
+            .description('生成进度图表')
+            .option('-o, --output <path>', '输出文件路径')
+            .option('-i, --input <path>', '任务计划文件路径')
+            .action(async (options) => {
+            await this.handleVisualize({ ...options, type: 'progress' });
+        });
+    }
+    /**
+     * 处理可视化命令
+     * @param options 命令选项
+     */
+    async handleVisualize(options) {
+        try {
+            console.log(chalk.blue('🎨 TaskFlow AI - 任务可视化'));
+            console.log();
+            // 验证可视化类型
+            const validTypes = ['gantt', 'dependency', 'kanban', 'timeline', 'progress'];
+            const visualizationType = options.type || 'gantt';
+            if (!validTypes.includes(visualizationType)) {
+                console.error(chalk.red(`❌ 无效的可视化类型: ${visualizationType}`));
+                console.log(chalk.gray(`支持的类型: ${validTypes.join(', ')}`));
+                return;
+            }
+            // 加载任务计划
+            const taskPlan = await this.loadTaskPlan(options.input);
+            if (!taskPlan) {
+                return;
+            }
+            console.log(chalk.green(`✅ 已加载任务计划: ${taskPlan.name}`));
+            console.log(chalk.gray(`   任务数量: ${taskPlan.tasks.length}`));
+            console.log();
+            // 生成可视化
+            console.log(chalk.blue(`🔄 生成 ${visualizationType} 可视化...`));
+            const visualizationOptions = {
+                type: visualizationType,
+                format: (options.format || 'mermaid'),
+                includeSubtasks: options.includeSubtasks || false,
+                showProgress: options.showProgress || false,
+                groupBy: options.groupBy
+            };
+            const result = this.visualizer.generateVisualization(taskPlan, visualizationOptions);
+            // 输出结果
+            if (options.output) {
+                const format = options.format || 'mermaid';
+                await this.saveVisualization(result, options.output, format);
+                console.log(chalk.green(`✅ 可视化已保存到: ${options.output}`));
+            }
+            else {
+                // 输出到控制台
+                if (typeof result === 'string') {
+                    console.log(chalk.cyan('📊 可视化结果:'));
+                    console.log();
+                    console.log(result);
+                }
+                else {
+                    console.log(chalk.cyan('📊 可视化数据:'));
+                    console.log();
+                    console.log(JSON.stringify(result, null, 2));
+                }
+            }
+            console.log();
+            console.log(chalk.green('🎉 可视化生成完成!'));
+            // 显示使用提示
+            this.showUsageTips(visualizationType, options.format || 'mermaid');
+        }
+        catch (error) {
+            console.error(chalk.red('❌ 可视化生成失败:'));
+            console.error(chalk.red(error.message));
+            this.logger.error(`可视化生成失败: ${error.message}`);
+        }
+    }
+    /**
+     * 加载任务计划
+     * @param inputPath 输入路径
+     */
+    async loadTaskPlan(inputPath) {
+        try {
+            if (inputPath) {
+                // 从指定文件加载
+                if (!fs__namespace.existsSync(inputPath)) {
+                    console.error(chalk.red(`❌ 任务计划文件不存在: ${inputPath}`));
+                    return null;
+                }
+                return await this.taskManager.loadTaskPlan(inputPath);
+            }
+            else {
+                // 从默认位置加载
+                const defaultPaths = [
+                    './taskflow/tasks.json',
+                    './tasks/tasks.json',
+                    './tasks.json'
+                ];
+                for (const defaultPath of defaultPaths) {
+                    if (fs__namespace.existsSync(defaultPath)) {
+                        return await this.taskManager.loadTaskPlan(defaultPath);
+                    }
+                }
+                console.error(chalk.red('❌ 未找到任务计划文件'));
+                console.log(chalk.gray('请使用 -i 选项指定任务计划文件路径，或确保以下位置存在任务文件:'));
+                defaultPaths.forEach(p => console.log(chalk.gray(`  - ${p}`)));
+                return null;
+            }
+        }
+        catch (error) {
+            console.error(chalk.red(`❌ 加载任务计划失败: ${error.message}`));
+            return null;
+        }
+    }
+    /**
+     * 保存可视化结果
+     * @param result 可视化结果
+     * @param outputPath 输出路径
+     * @param format 格式
+     */
+    async saveVisualization(result, outputPath, _format) {
+        // 确保输出目录存在
+        await fs__namespace.ensureDir(path__namespace.dirname(outputPath));
+        if (typeof result === 'string') {
+            // 字符串结果直接保存
+            await fs__namespace.writeFile(outputPath, result, 'utf-8');
+        }
+        else {
+            // 对象结果转换为JSON保存
+            await fs__namespace.writeFile(outputPath, JSON.stringify(result, null, 2), 'utf-8');
+        }
+    }
+    /**
+     * 显示使用提示
+     * @param type 可视化类型
+     * @param format 格式
+     */
+    showUsageTips(type, format) {
+        console.log(chalk.cyan('💡 使用提示:'));
+        if (format === 'mermaid') {
+            console.log(chalk.gray('  - 可以将Mermaid代码复制到 https://mermaid.live 查看图表'));
+            console.log(chalk.gray('  - 或在支持Mermaid的Markdown编辑器中使用'));
+        }
+        switch (type) {
+            case 'gantt':
+                console.log(chalk.gray('  - 甘特图显示任务时间安排和依赖关系'));
+                console.log(chalk.gray('  - 可用于项目时间规划和进度跟踪'));
+                break;
+            case 'dependency':
+                console.log(chalk.gray('  - 依赖关系图显示任务间的依赖关系'));
+                console.log(chalk.gray('  - 有助于识别关键路径和潜在瓶颈'));
+                break;
+            case 'kanban':
+                console.log(chalk.gray('  - 看板视图适合敏捷开发流程'));
+                console.log(chalk.gray('  - 可按状态、负责人或优先级分组'));
+                break;
+            case 'progress':
+                console.log(chalk.gray('  - 进度图表显示项目整体完成情况'));
+                console.log(chalk.gray('  - 适合向管理层汇报项目状态'));
+                break;
+        }
+    }
+}
+// 导出命令实例
+const visualizeCommand = new VisualizeCommand();
+
+/**
+ * TaskFlow AI 状态管理命令
+ * 查看和更新任务状态
+ */
+/**
+ * 状态命令处理器
+ */
+class StatusCommand {
+    constructor() {
+        this.logger = Logger.getInstance({ level: LogLevel.INFO, output: 'console' });
+        this.configManager = new ConfigManager$1();
+        this.taskManager = new TaskManager(this.logger, this.configManager);
+    }
+    /**
+     * 注册状态命令
+     * @param program Commander程序实例
+     */
+    register(program) {
+        const statusCmd = program
+            .command('status')
+            .description('查看和管理任务状态')
+            .option('-i, --input <path>', '任务计划文件路径')
+            .option('-f, --filter <filter>', '过滤条件 (status|type|assignee|priority)')
+            .option('-v, --verbose', '显示详细信息')
+            .action(async (options) => {
+            await this.handleStatus(options);
+        });
+        // 子命令：更新任务状态
+        statusCmd
+            .command('update <taskId> <status>')
+            .description('更新任务状态')
+            .option('-i, --input <path>', '任务计划文件路径')
+            .action(async (taskId, status, options) => {
+            await this.handleUpdateStatus(taskId, status, options);
+        });
+        // 子命令：显示进度统计
+        statusCmd
+            .command('progress')
+            .alias('stats')
+            .description('显示项目进度统计')
+            .option('-i, --input <path>', '任务计划文件路径')
+            .action(async (options) => {
+            await this.handleProgress(options);
+        });
+        // 子命令：获取下一个任务
+        statusCmd
+            .command('next')
+            .description('获取推荐的下一个任务')
+            .option('-i, --input <path>', '任务计划文件路径')
+            .option('-n, --number <count>', '显示任务数量', '3')
+            .action(async (options) => {
+            await this.handleNext(options);
+        });
+        // 子命令：列出任务
+        statusCmd
+            .command('list')
+            .alias('ls')
+            .description('列出所有任务')
+            .option('-i, --input <path>', '任务计划文件路径')
+            .option('-s, --status <status>', '按状态过滤')
+            .option('-t, --type <type>', '按类型过滤')
+            .option('-a, --assignee <assignee>', '按负责人过滤')
+            .option('-p, --priority <priority>', '按优先级过滤')
+            .action(async (options) => {
+            await this.handleList(options);
+        });
+    }
+    /**
+     * 处理状态命令
+     * @param options 命令选项
+     */
+    async handleStatus(options) {
+        try {
+            console.log(chalk.blue('📊 TaskFlow AI - 任务状态'));
+            console.log();
+            // 加载任务计划
+            const taskPlan = await this.loadTaskPlan(options.input);
+            if (!taskPlan) {
+                return;
+            }
+            console.log(chalk.green(`✅ 项目: ${taskPlan.name}`));
+            console.log(chalk.gray(`   描述: ${taskPlan.description}`));
+            console.log();
+            // 显示进度统计
+            await this.showProgressStats(taskPlan);
+            // 显示任务列表
+            if (options.verbose) {
+                console.log(chalk.cyan('📋 任务列表:'));
+                console.log();
+                this.displayTaskList(taskPlan.tasks, options);
+            }
+        }
+        catch (error) {
+            console.error(chalk.red('❌ 获取状态失败:'));
+            console.error(chalk.red(error.message));
+        }
+    }
+    /**
+     * 处理更新状态命令
+     * @param taskId 任务ID
+     * @param status 新状态
+     * @param options 选项
+     */
+    async handleUpdateStatus(taskId, status, options) {
+        try {
+            console.log(chalk.blue('🔄 TaskFlow AI - 更新任务状态'));
+            console.log();
+            // 验证状态值
+            const validStatuses = Object.values(TaskStatus);
+            if (!validStatuses.includes(status)) {
+                console.error(chalk.red(`❌ 无效的状态值: ${status}`));
+                console.log(chalk.gray(`支持的状态: ${validStatuses.join(', ')}`));
+                return;
+            }
+            // 加载任务计划
+            const taskPlan = await this.loadTaskPlan(options.input);
+            if (!taskPlan) {
+                return;
+            }
+            this.taskManager.setTaskPlan(taskPlan);
+            // 更新任务状态
+            const task = this.taskManager.updateTask(taskId, { status: status });
+            if (!task) {
+                console.error(chalk.red(`❌ 任务不存在: ${taskId}`));
+                return;
+            }
+            // 保存更新
+            await this.taskManager.saveTaskPlan();
+            console.log(chalk.green(`✅ 任务状态已更新:`));
+            console.log(chalk.gray(`   任务: ${task.title}`));
+            console.log(chalk.gray(`   状态: ${this.getStatusDisplay(task.status)} → ${this.getStatusDisplay(status)}`));
+            // 显示相关信息
+            if (status === TaskStatus.COMPLETED) {
+                const nextTasks = this.taskManager.getNextTasks();
+                if (nextTasks.length > 0) {
+                    console.log();
+                    console.log(chalk.cyan('🎯 推荐的下一个任务:'));
+                    nextTasks.slice(0, 3).forEach(nextTask => {
+                        console.log(chalk.gray(`   - ${nextTask.title} (${nextTask.priority})`));
+                    });
+                }
+            }
+        }
+        catch (error) {
+            console.error(chalk.red('❌ 更新状态失败:'));
+            console.error(chalk.red(error.message));
+        }
+    }
+    /**
+     * 处理进度命令
+     * @param options 选项
+     */
+    async handleProgress(options) {
+        try {
+            console.log(chalk.blue('📈 TaskFlow AI - 项目进度'));
+            console.log();
+            // 加载任务计划
+            const taskPlan = await this.loadTaskPlan(options.input);
+            if (!taskPlan) {
+                return;
+            }
+            await this.showProgressStats(taskPlan);
+        }
+        catch (error) {
+            console.error(chalk.red('❌ 获取进度失败:'));
+            console.error(chalk.red(error.message));
+        }
+    }
+    /**
+     * 处理下一个任务命令
+     * @param options 选项
+     */
+    async handleNext(options) {
+        try {
+            console.log(chalk.blue('🎯 TaskFlow AI - 推荐任务'));
+            console.log();
+            // 加载任务计划
+            const taskPlan = await this.loadTaskPlan(options.input);
+            if (!taskPlan) {
+                return;
+            }
+            this.taskManager.setTaskPlan(taskPlan);
+            const nextTasks = this.taskManager.getNextTasks();
+            if (nextTasks.length === 0) {
+                console.log(chalk.yellow('🎉 所有任务都已完成或被阻塞!'));
+                return;
+            }
+            const count = Math.min(parseInt(String(options.count)) || 3, nextTasks.length);
+            console.log(chalk.green(`✅ 推荐的 ${count} 个任务:`));
+            console.log();
+            nextTasks.slice(0, count).forEach((task, index) => {
+                console.log(chalk.cyan(`${index + 1}. ${task.title}`));
+                console.log(chalk.gray(`   ID: ${task.id}`));
+                console.log(chalk.gray(`   优先级: ${this.getPriorityDisplay(task.priority)}`));
+                console.log(chalk.gray(`   类型: ${task.type}`));
+                console.log(chalk.gray(`   预计时间: ${task.estimatedHours || 8} 小时`));
+                if (task.assignee) {
+                    console.log(chalk.gray(`   负责人: ${task.assignee}`));
+                }
+                console.log();
+            });
+        }
+        catch (error) {
+            console.error(chalk.red('❌ 获取推荐任务失败:'));
+            console.error(chalk.red(error.message));
+        }
+    }
+    /**
+     * 处理列表命令
+     * @param options 选项
+     */
+    async handleList(options) {
+        try {
+            console.log(chalk.blue('📋 TaskFlow AI - 任务列表'));
+            console.log();
+            // 加载任务计划
+            const taskPlan = await this.loadTaskPlan(options.input);
+            if (!taskPlan) {
+                return;
+            }
+            this.taskManager.setTaskPlan(taskPlan);
+            // 应用过滤器
+            const filter = {};
+            if (options.status)
+                filter.status = options.status;
+            if (options.type)
+                filter.type = options.type;
+            if (options.assignee)
+                filter.assignee = options.assignee;
+            if (options.priority)
+                filter.priority = options.priority;
+            const tasks = Object.keys(filter).length > 0
+                ? this.taskManager.filterTasks(filter)
+                : this.taskManager.getAllTasks();
+            if (tasks.length === 0) {
+                console.log(chalk.yellow('📭 没有找到匹配的任务'));
+                return;
+            }
+            console.log(chalk.green(`✅ 找到 ${tasks.length} 个任务:`));
+            console.log();
+            this.displayTaskList(tasks, options);
+        }
+        catch (error) {
+            console.error(chalk.red('❌ 获取任务列表失败:'));
+            console.error(chalk.red(error.message));
+        }
+    }
+    /**
+     * 加载任务计划
+     * @param inputPath 输入路径
+     */
+    async loadTaskPlan(inputPath) {
+        try {
+            if (inputPath) {
+                if (!fs__namespace.existsSync(inputPath)) {
+                    console.error(chalk.red(`❌ 任务计划文件不存在: ${inputPath}`));
+                    return null;
+                }
+                return await this.taskManager.loadTaskPlan(inputPath);
+            }
+            else {
+                const defaultPaths = [
+                    './taskflow/tasks.json',
+                    './tasks/tasks.json',
+                    './tasks.json'
+                ];
+                for (const defaultPath of defaultPaths) {
+                    if (fs__namespace.existsSync(defaultPath)) {
+                        return await this.taskManager.loadTaskPlan(defaultPath);
+                    }
+                }
+                console.error(chalk.red('❌ 未找到任务计划文件'));
+                console.log(chalk.gray('请使用 -i 选项指定任务计划文件路径'));
+                return null;
+            }
+        }
+        catch (error) {
+            console.error(chalk.red(`❌ 加载任务计划失败: ${error.message}`));
+            return null;
+        }
+    }
+    /**
+     * 显示进度统计
+     * @param taskPlan 任务计划
+     */
+    async showProgressStats(taskPlan) {
+        const stats = {
+            total: taskPlan.tasks.length,
+            completed: 0,
+            inProgress: 0,
+            notStarted: 0,
+            blocked: 0
+        };
+        taskPlan.tasks.forEach((task) => {
+            switch (task.status) {
+                case TaskStatus.COMPLETED:
+                    stats.completed++;
+                    break;
+                case TaskStatus.IN_PROGRESS:
+                    stats.inProgress++;
+                    break;
+                case TaskStatus.NOT_STARTED:
+                    stats.notStarted++;
+                    break;
+                case TaskStatus.BLOCKED:
+                    stats.blocked++;
+                    break;
+            }
+        });
+        const completionRate = (stats.completed / stats.total) * 100;
+        console.log(chalk.cyan('📊 项目进度:'));
+        console.log(chalk.green(`   完成率: ${completionRate.toFixed(1)}%`));
+        console.log(chalk.gray(`   总任务: ${stats.total}`));
+        console.log(chalk.gray(`   已完成: ${stats.completed}`));
+        console.log(chalk.gray(`   进行中: ${stats.inProgress}`));
+        console.log(chalk.gray(`   未开始: ${stats.notStarted}`));
+        console.log(chalk.gray(`   被阻塞: ${stats.blocked}`));
+        console.log();
+        // 进度条
+        const progressBar = this.generateProgressBar(completionRate);
+        console.log(chalk.cyan(`进度: ${progressBar} ${completionRate.toFixed(1)}%`));
+        console.log();
+    }
+    /**
+     * 显示任务列表
+     * @param tasks 任务列表
+     * @param options 选项
+     */
+    displayTaskList(tasks, _options) {
+        tasks.forEach((task, _index) => {
+            const statusIcon = this.getStatusIcon(task.status);
+            const priorityColor = this.getPriorityColor(task.priority);
+            console.log(`${statusIcon} ${priorityColor(task.title)}`);
+            console.log(chalk.gray(`   ID: ${task.id}`));
+            console.log(chalk.gray(`   状态: ${this.getStatusDisplay(task.status)}`));
+            console.log(chalk.gray(`   优先级: ${this.getPriorityDisplay(task.priority)}`));
+            if (task.assignee) {
+                console.log(chalk.gray(`   负责人: ${task.assignee}`));
+            }
+            if (task.estimatedHours) {
+                console.log(chalk.gray(`   预计时间: ${task.estimatedHours} 小时`));
+            }
+            if (task.dependencies && task.dependencies.length > 0) {
+                console.log(chalk.gray(`   依赖: ${task.dependencies.join(', ')}`));
+            }
+            console.log();
+        });
+    }
+    /**
+     * 获取状态图标
+     * @param status 状态
+     */
+    getStatusIcon(status) {
+        switch (status) {
+            case TaskStatus.COMPLETED:
+                return '✅';
+            case TaskStatus.IN_PROGRESS:
+                return '🔄';
+            case TaskStatus.BLOCKED:
+                return '🚫';
+            case TaskStatus.CANCELLED:
+                return '❌';
+            default:
+                return '⏳';
+        }
+    }
+    /**
+     * 获取状态显示文本
+     * @param status 状态
+     */
+    getStatusDisplay(status) {
+        switch (status) {
+            case TaskStatus.NOT_STARTED:
+                return '未开始';
+            case TaskStatus.IN_PROGRESS:
+                return '进行中';
+            case TaskStatus.COMPLETED:
+                return '已完成';
+            case TaskStatus.BLOCKED:
+                return '被阻塞';
+            case TaskStatus.CANCELLED:
+                return '已取消';
+            default:
+                return status;
+        }
+    }
+    /**
+     * 获取优先级显示文本
+     * @param priority 优先级
+     */
+    getPriorityDisplay(priority) {
+        switch (priority) {
+            case TaskPriority.CRITICAL:
+                return '紧急';
+            case TaskPriority.HIGH:
+                return '高';
+            case TaskPriority.MEDIUM:
+                return '中';
+            case TaskPriority.LOW:
+                return '低';
+            default:
+                return priority;
+        }
+    }
+    /**
+     * 获取优先级颜色函数
+     * @param priority 优先级
+     */
+    getPriorityColor(priority) {
+        switch (priority) {
+            case TaskPriority.CRITICAL:
+                return chalk.red;
+            case TaskPriority.HIGH:
+                return chalk.yellow;
+            case TaskPriority.MEDIUM:
+                return chalk.blue;
+            case TaskPriority.LOW:
+                return chalk.gray;
+            default:
+                return chalk.white;
+        }
+    }
+    /**
+     * 生成进度条
+     * @param percentage 百分比
+     */
+    generateProgressBar(percentage) {
+        const width = 20;
+        const filled = Math.round((percentage / 100) * width);
+        const empty = width - filled;
+        return chalk.green('█'.repeat(filled)) + chalk.gray('░'.repeat(empty));
+    }
+}
+// 导出命令实例
+const statusCommand = new StatusCommand();
+
+/**
+ * TaskFlow AI 交互式命令
+ * 提供用户友好的交互式界面
+ */
+/**
+ * 交互式命令处理器
+ */
+class InteractiveCommand {
+    /**
+     * 注册交互式命令
+     */
+    register(program) {
+        program
+            .command('interactive')
+            .alias('i')
+            .description('启动交互式模式')
+            .action(async () => {
+            await this.startInteractiveMode();
+        });
+    }
+    /**
+     * 启动交互式模式
+     */
+    async startInteractiveMode() {
+        console.clear();
+        // 显示欢迎信息
+        this.showWelcome();
+        let running = true;
+        while (running) {
+            try {
+                const { action } = await inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'action',
+                        message: '请选择要执行的操作:',
+                        choices: [
+                            { name: '📄 解析PRD文档', value: 'parse' },
+                            { name: '📋 查看任务列表', value: 'tasks' },
+                            { name: '⚙️  配置管理', value: 'config' },
+                            { name: '🤖 AI对话', value: 'chat' },
+                            { name: '📊 项目状态', value: 'status' },
+                            { name: '❌ 退出', value: 'exit' }
+                        ]
+                    }
+                ]);
+                if (action === 'exit') {
+                    console.log(chalk.green('\n👋 感谢使用 TaskFlow AI！'));
+                    break;
+                }
+                await this.handleAction(action);
+                // 询问是否继续
+                const { continue: shouldContinue } = await inquirer.prompt([
+                    {
+                        type: 'confirm',
+                        name: 'continue',
+                        message: '是否继续使用？',
+                        default: true
+                    }
+                ]);
+                if (!shouldContinue) {
+                    console.log(chalk.green('\n👋 感谢使用 TaskFlow AI！'));
+                    running = false;
+                }
+                console.log('\n' + '─'.repeat(50) + '\n');
+            }
+            catch (error) {
+                console.error(chalk.red(`❌ 操作失败: ${error.message}`));
+                const { retry } = await inquirer.prompt([
+                    {
+                        type: 'confirm',
+                        name: 'retry',
+                        message: '是否重试？',
+                        default: true
+                    }
+                ]);
+                if (!retry)
+                    break;
+            }
+        }
+    }
+    /**
+     * 显示欢迎信息
+     */
+    showWelcome() {
+        const welcome = boxen(chalk.cyan.bold('TaskFlow AI') + '\n\n' +
+            chalk.white('智能PRD文档解析与任务管理助手') + '\n' +
+            chalk.gray('让AI帮您将产品需求转化为可执行的任务计划'), {
+            padding: 1,
+            margin: 1,
+            borderStyle: 'round',
+            borderColor: 'cyan'
+        });
+        console.log(welcome);
+    }
+    /**
+     * 处理用户选择的操作
+     */
+    async handleAction(action) {
+        switch (action) {
+            case 'parse':
+                await this.handleParsePRD();
+                break;
+            case 'tasks':
+                await this.handleViewTasks();
+                break;
+            case 'config':
+                await this.handleConfig();
+                break;
+            case 'chat':
+                await this.handleChat();
+                break;
+            case 'status':
+                await this.handleStatus();
+                break;
+        }
+    }
+    /**
+     * 处理PRD解析
+     */
+    async handleParsePRD() {
+        var _a;
+        console.log(chalk.blue('\n📄 PRD文档解析'));
+        const { inputType } = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'inputType',
+                message: '请选择输入方式:',
+                choices: [
+                    { name: '📁 从文件读取', value: 'file' },
+                    { name: '✏️  直接输入文本', value: 'text' }
+                ]
+            }
+        ]);
+        let content = '';
+        let filePath = '';
+        if (inputType === 'file') {
+            const { path } = await inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'path',
+                    message: '请输入PRD文件路径:',
+                    validate: (input) => input.trim() !== '' || '文件路径不能为空'
+                }
+            ]);
+            filePath = path;
+        }
+        else {
+            const { text } = await inquirer.prompt([
+                {
+                    type: 'editor',
+                    name: 'text',
+                    message: '请输入PRD文档内容:'
+                }
+            ]);
+            content = text;
+        }
+        // 选择AI模型
+        const { modelType } = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'modelType',
+                message: '请选择AI模型:',
+                choices: [
+                    { name: '🚀 DeepSeek (推荐)', value: 'deepseek' },
+                    { name: '🧠 智谱AI GLM', value: 'zhipu' },
+                    { name: '🌟 通义千问', value: 'qwen' },
+                    { name: '💫 文心一言', value: 'wenxin' }
+                ]
+            }
+        ]);
+        const spinner = ora('正在解析PRD文档...').start();
+        try {
+            let result;
+            if (inputType === 'file') {
+                result = await taskFlowService.parsePRDFromFile(filePath, { modelType });
+            }
+            else {
+                result = await taskFlowService.parsePRD(content, FileType.MARKDOWN, { modelType });
+            }
+            spinner.succeed('PRD解析完成！');
+            if (result.success && result.data) {
+                console.log(chalk.green('\n✅ 解析成功！'));
+                // 检查数据结构并显示相应信息
+                if ('sections' in result.data && result.data.sections) {
+                    console.log(chalk.white(`📋 解析了 ${result.data.sections.length} 个章节`));
+                }
+                else if ('metadata' in result.data && ((_a = result.data.metadata) === null || _a === void 0 ? void 0 : _a.features)) {
+                    console.log(chalk.white(`📋 提取了 ${result.data.metadata.features.length} 个功能特性`));
+                }
+                else {
+                    console.log(chalk.white('📋 PRD解析完成'));
+                }
+                // 询问是否保存
+                const { save } = await inquirer.prompt([
+                    {
+                        type: 'confirm',
+                        name: 'save',
+                        message: '是否保存解析结果？',
+                        default: true
+                    }
+                ]);
+                if (save) {
+                    const { outputPath } = await inquirer.prompt([
+                        {
+                            type: 'input',
+                            name: 'outputPath',
+                            message: '请输入保存路径:',
+                            default: './prd-parsed.json'
+                        }
+                    ]);
+                    await fs__namespace.writeJSON(outputPath, result.data, { spaces: 2 });
+                    console.log(chalk.green(`💾 解析结果已保存到: ${outputPath}`));
+                }
+            }
+            else {
+                console.log(chalk.red(`❌ 解析失败: ${result.error}`));
+            }
+        }
+        catch (error) {
+            spinner.fail('PRD解析失败');
+            throw error;
+        }
+    }
+    /**
+     * 处理查看任务
+     */
+    async handleViewTasks() {
+        console.log(chalk.blue('\n📋 任务列表'));
+        const spinner = ora('正在获取任务列表...').start();
+        try {
+            const result = taskFlowService.getAllTasks();
+            spinner.succeed('任务列表获取完成');
+            if (result.success && result.data && result.data.length > 0) {
+                console.log(chalk.green(`\n📊 共有 ${result.data.length} 个任务\n`));
+                result.data.forEach((task, index) => {
+                    const statusIcon = this.getStatusIcon(task.status);
+                    const priorityColor = this.getPriorityColor(task.priority);
+                    console.log(`${index + 1}. ${statusIcon} ${chalk.white(task.title)} ` +
+                        `${priorityColor(`[${task.priority}]`)} ` +
+                        `${chalk.gray(`(${task.estimatedHours}h)`)}`);
+                });
+            }
+            else {
+                console.log(chalk.yellow('📭 暂无任务'));
+            }
+        }
+        catch (error) {
+            spinner.fail('获取任务列表失败');
+            throw error;
+        }
+    }
+    /**
+     * 处理配置管理
+     */
+    async handleConfig() {
+        console.log(chalk.blue('\n⚙️  配置管理'));
+        const { configAction } = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'configAction',
+                message: '请选择配置操作:',
+                choices: [
+                    { name: '👀 查看当前配置', value: 'view' },
+                    { name: '🔑 设置API密钥', value: 'apikey' },
+                    { name: '🎛️  模型设置', value: 'model' }
+                ]
+            }
+        ]);
+        if (configAction === 'view') {
+            const result = taskFlowService.getConfig();
+            if (result.success) {
+                console.log(chalk.green('\n📋 当前配置:'));
+                console.log(JSON.stringify(result.data, null, 2));
+            }
+        }
+        else if (configAction === 'apikey') {
+            await this.handleApiKeyConfig();
+        }
+        else if (configAction === 'model') {
+            await this.handleModelConfig();
+        }
+    }
+    /**
+     * 处理API密钥配置
+     */
+    async handleApiKeyConfig() {
+        const { modelType } = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'modelType',
+                message: '请选择要配置的模型:',
+                choices: [
+                    { name: 'DeepSeek', value: 'deepseek' },
+                    { name: '智谱AI', value: 'zhipu' },
+                    { name: '通义千问', value: 'qwen' },
+                    { name: '文心一言', value: 'wenxin' }
+                ]
+            }
+        ]);
+        const { apiKey } = await inquirer.prompt([
+            {
+                type: 'password',
+                name: 'apiKey',
+                message: `请输入${modelType}的API密钥:`,
+                mask: '*'
+            }
+        ]);
+        const config = {
+            models: {
+                [modelType]: { apiKey }
+            }
+        };
+        const result = taskFlowService.updateConfig(config);
+        if (result.success) {
+            console.log(chalk.green('✅ API密钥配置成功！'));
+        }
+        else {
+            console.log(chalk.red(`❌ 配置失败: ${result.error}`));
+        }
+    }
+    /**
+     * 处理模型配置
+     */
+    async handleModelConfig() {
+        const { defaultModel } = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'defaultModel',
+                message: '请选择默认模型:',
+                choices: [
+                    { name: 'DeepSeek', value: 'deepseek' },
+                    { name: '智谱AI', value: 'zhipu' },
+                    { name: '通义千问', value: 'qwen' },
+                    { name: '文心一言', value: 'wenxin' }
+                ]
+            }
+        ]);
+        const config = {
+            models: {
+                default: defaultModel
+            }
+        };
+        const result = taskFlowService.updateConfig(config);
+        if (result.success) {
+            console.log(chalk.green('✅ 默认模型设置成功！'));
+        }
+        else {
+            console.log(chalk.red(`❌ 设置失败: ${result.error}`));
+        }
+    }
+    /**
+     * 处理AI对话
+     */
+    async handleChat() {
+        console.log(chalk.blue('\n🤖 AI对话模式'));
+        console.log(chalk.gray('输入 "exit" 退出对话\n'));
+        let chatting = true;
+        while (chatting) {
+            const { message } = await inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'message',
+                    message: '您:',
+                    validate: (input) => input.trim() !== '' || '消息不能为空'
+                }
+            ]);
+            if (message.toLowerCase() === 'exit') {
+                chatting = false;
+                continue;
+            }
+            const spinner = ora('AI正在思考...').start();
+            try {
+                const result = await taskFlowService.chat([
+                    { role: 'user', content: message }
+                ]);
+                spinner.stop();
+                if (result.success && result.data) {
+                    console.log(chalk.cyan('AI:'), result.data.content || result.data);
+                }
+                else {
+                    console.log(chalk.red(`❌ 对话失败: ${result.error}`));
+                }
+            }
+            catch (error) {
+                spinner.fail('对话失败');
+                console.log(chalk.red(`❌ ${error.message}`));
+            }
+            console.log();
+        }
+    }
+    /**
+     * 处理状态查看
+     */
+    async handleStatus() {
+        var _a;
+        console.log(chalk.blue('\n📊 项目状态'));
+        const spinner = ora('正在获取项目状态...').start();
+        try {
+            const tasksResult = taskFlowService.getAllTasks();
+            const configResult = taskFlowService.getConfig();
+            spinner.succeed('状态获取完成');
+            if (tasksResult.success && tasksResult.data) {
+                const tasks = tasksResult.data;
+                const completed = tasks.filter((t) => t.status === TaskStatus.COMPLETED || t.status === TaskStatus.DONE).length;
+                const inProgress = tasks.filter((t) => t.status === TaskStatus.IN_PROGRESS || t.status === TaskStatus.RUNNING).length;
+                const pending = tasks.filter((t) => t.status === TaskStatus.PENDING || t.status === TaskStatus.NOT_STARTED).length;
+                console.log(chalk.green('\n📈 任务统计:'));
+                console.log(`  ✅ 已完成: ${completed}`);
+                console.log(`  🔄 进行中: ${inProgress}`);
+                console.log(`  ⏳ 待开始: ${pending}`);
+                console.log(`  📊 总计: ${tasks.length}`);
+            }
+            if (configResult.success) {
+                const config = configResult.data;
+                console.log(chalk.blue('\n⚙️  配置状态:'));
+                console.log(`  🎯 默认模型: ${((_a = config.models) === null || _a === void 0 ? void 0 : _a.default) || '未设置'}`);
+                console.log(`  🔑 已配置模型: ${Object.keys(config.models || {}).filter(k => k !== 'default').length}`);
+            }
+        }
+        catch (error) {
+            spinner.fail('获取状态失败');
+            throw error;
+        }
+    }
+    /**
+     * 获取状态图标
+     */
+    getStatusIcon(status) {
+        const icons = {
+            'pending': '⏳',
+            'in_progress': '🔄',
+            'completed': '✅',
+            'blocked': '🚫',
+            'cancelled': '❌'
+        };
+        return icons[status] || '❓';
+    }
+    /**
+     * 获取优先级颜色
+     */
+    getPriorityColor(priority) {
+        const colors = {
+            'high': chalk.red,
+            'medium': chalk.yellow,
+            'low': chalk.green
+        };
+        return colors[priority] || chalk.gray;
+    }
+}
+// 导出实例
+const interactiveCommand = new InteractiveCommand();
+
+/**
+ * 模型管理命令
+ * @param program Commander实例
+ */
+function modelsCommand(program) {
+    const modelsCmd = program
+        .command('models')
+        .description('管理AI模型配置和状态');
+    // 列出可用模型
+    modelsCmd
+        .command('list')
+        .description('列出所有可用的AI模型')
+        .option('--detailed', '显示详细信息', false)
+        .action(async (options) => {
+        try {
+            console.log(chalk.blue('📋 可用的AI模型:'));
+            console.log();
+            const models = [
+                {
+                    type: 'deepseek',
+                    name: 'DeepSeek',
+                    description: '高性价比，代码理解能力强',
+                    status: '✅ 可用',
+                    cost: '低',
+                    features: ['代码生成', '逻辑推理', '中英文对话']
+                },
+                {
+                    type: 'zhipu',
+                    name: '智谱GLM-4',
+                    description: '综合能力强，适合复杂任务',
+                    status: '✅ 可用',
+                    cost: '中',
+                    features: ['多轮对话', '文档理解', '创意写作']
+                },
+                {
+                    type: 'qwen',
+                    name: '通义千问',
+                    description: '阿里云大模型，多模态支持',
+                    status: '✅ 可用',
+                    cost: '中',
+                    features: ['长文本处理', '多模态', '专业领域']
+                },
+                {
+                    type: 'spark',
+                    name: '讯飞星火',
+                    description: '语音交互优化，教育场景',
+                    status: '✅ 可用',
+                    cost: '中',
+                    features: ['语音理解', '教育内容', '实时对话']
+                },
+                {
+                    type: 'moonshot',
+                    name: '月之暗面Kimi',
+                    description: '超长上下文，文档处理专家',
+                    status: '✅ 可用',
+                    cost: '高',
+                    features: ['长文本', '文档分析', '信息提取']
+                },
+                {
+                    type: 'baidu',
+                    name: '百度文心一言',
+                    description: '百度大模型，中文优化',
+                    status: '✅ 可用',
+                    cost: '中',
+                    features: ['中文理解', '创意生成', '知识问答']
+                }
+            ];
+            for (const model of models) {
+                console.log(chalk.cyan(`🤖 ${model.name} (${model.type})`));
+                console.log(`   ${model.description}`);
+                console.log(`   状态: ${model.status}`);
+                console.log(`   成本: ${model.cost}`);
+                if (options.detailed) {
+                    console.log(`   特性: ${model.features.join(', ')}`);
+                }
+                console.log();
+            }
+            console.log(chalk.yellow('💡 使用 "taskflow-ai models test <model>" 测试模型连接'));
+            console.log(chalk.yellow('💡 使用 "taskflow-ai config set models.default <model>" 设置默认模型'));
+        }
+        catch (error) {
+            console.error(chalk.red('❌ 获取模型列表失败:'), error);
+        }
+    });
+    // 测试模型连接
+    modelsCmd
+        .command('test <model>')
+        .description('测试指定模型的连接状态')
+        .action(async (model) => {
+        const spinner = ora(`正在测试 ${model} 模型连接...`).start();
+        try {
+            // 这里应该调用实际的模型测试逻辑
+            const isValid = await testModelConnection(model);
+            if (isValid) {
+                spinner.succeed(chalk.green(`✅ ${model} 模型连接正常`));
+            }
+            else {
+                spinner.fail(chalk.red(`❌ ${model} 模型连接失败`));
+                console.log(chalk.yellow('请检查:'));
+                console.log('  1. API密钥是否正确配置');
+                console.log('  2. 网络连接是否正常');
+                console.log('  3. 模型服务是否可用');
+            }
+        }
+        catch (error) {
+            spinner.fail(chalk.red(`❌ 测试 ${model} 模型时出错: ${error}`));
+        }
+    });
+    // 性能基准测试
+    modelsCmd
+        .command('benchmark')
+        .description('运行模型性能基准测试')
+        .option('--models <models>', '指定测试的模型，用逗号分隔', 'deepseek,zhipu,qwen')
+        .option('--iterations <count>', '测试迭代次数', '3')
+        .action(async (options) => {
+        const models = options.models.split(',').map((m) => m.trim());
+        const iterations = parseInt(options.iterations);
+        console.log(chalk.blue('🏃‍♂️ 开始模型性能基准测试'));
+        console.log(`测试模型: ${models.join(', ')}`);
+        console.log(`迭代次数: ${iterations}`);
+        console.log();
+        const results = [];
+        for (const model of models) {
+            const spinner = ora(`测试 ${model} 模型性能...`).start();
+            try {
+                const result = await runBenchmark(model, iterations);
+                results.push({
+                    model,
+                    success: true,
+                    latency: result.avgLatency,
+                    avgLatency: result.avgLatency,
+                    successRate: result.successRate,
+                    tokensPerSecond: result.tokensPerSecond
+                });
+                spinner.succeed(`✅ ${model} 测试完成`);
+            }
+            catch (error) {
+                spinner.fail(`❌ ${model} 测试失败: ${error}`);
+                results.push({
+                    model,
+                    success: false,
+                    latency: 0,
+                    error: error instanceof Error ? error.message : String(error)
+                });
+            }
+        }
+        // 显示结果
+        console.log();
+        console.log(chalk.blue('📊 基准测试结果:'));
+        console.log();
+        const table = results.map(r => {
+            if (r.error) {
+                return `${r.model.padEnd(12)} | 失败: ${r.error}`;
+            }
+            return `${r.model.padEnd(12)} | ${r.avgLatency || r.latency}ms | ${r.successRate || 0}% | ${r.tokensPerSecond || 0} tokens/s`;
+        });
+        console.log('模型        | 平均延迟 | 成功率 | 处理速度');
+        console.log('------------|----------|--------|----------');
+        table.forEach(row => console.log(row));
+    });
+    // 切换默认模型
+    modelsCmd
+        .command('switch <model>')
+        .description('切换默认使用的模型')
+        .action(async (model) => {
+        const spinner = ora(`正在切换默认模型到 ${model}...`).start();
+        try {
+            // 首先测试模型是否可用
+            const isValid = await testModelConnection(model);
+            if (!isValid) {
+                spinner.fail(chalk.red(`❌ 无法切换到 ${model}，模型连接失败`));
+                return;
+            }
+            // 更新配置
+            await taskFlowService.updateConfig({
+                models: {
+                    default: model
+                }
+            });
+            spinner.succeed(chalk.green(`✅ 默认模型已切换到 ${model}`));
+            console.log(chalk.yellow(`💡 使用 "taskflow-ai config list" 查看当前配置`));
+        }
+        catch (error) {
+            spinner.fail(chalk.red(`❌ 切换模型失败: ${error}`));
+        }
+    });
+    // 模型使用统计
+    modelsCmd
+        .command('stats')
+        .description('查看模型使用统计')
+        .option('--period <period>', '统计周期 (day|week|month)', 'week')
+        .action(async (options) => {
+        try {
+            console.log(chalk.blue('📈 模型使用统计'));
+            console.log(`统计周期: ${options.period}`);
+            console.log();
+            // 这里应该从实际的统计数据中获取
+            const stats = await getModelStats(options.period);
+            console.log('模型        | 调用次数 | 成功率 | 平均延迟 | 总成本');
+            console.log('------------|----------|--------|----------|--------');
+            stats.forEach((stat) => {
+                console.log(`${stat.model.padEnd(12)} | ${stat.calls.toString().padEnd(8)} | ${stat.successRate}% | ${stat.avgLatency}ms | $${stat.cost}`);
+            });
+        }
+        catch (error) {
+            console.error(chalk.red('❌ 获取统计数据失败:'), error);
+        }
+    });
+}
+/**
+ * 测试模型连接
+ */
+async function testModelConnection(_model) {
+    try {
+        // 模拟测试逻辑
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return Math.random() > 0.2; // 80%成功率模拟
+    }
+    catch {
+        return false;
+    }
+}
+/**
+ * 运行性能基准测试
+ */
+async function runBenchmark(model, iterations) {
+    const results = [];
+    for (let i = 0; i < iterations; i++) {
+        const start = Date.now();
+        // 模拟API调用
+        await new Promise(resolve => setTimeout(resolve, Math.random() * 2000 + 500));
+        const latency = Date.now() - start;
+        results.push({
+            latency,
+            success: Math.random() > 0.1, // 90%成功率
+            tokens: Math.floor(Math.random() * 1000 + 100)
+        });
+    }
+    const avgLatency = Math.round(results.reduce((sum, r) => sum + r.latency, 0) / results.length);
+    const successRate = Math.round((results.filter(r => r.success).length / results.length) * 100);
+    const avgTokens = Math.round(results.reduce((sum, r) => sum + r.tokens, 0) / results.length);
+    const tokensPerSecond = Math.round(avgTokens / (avgLatency / 1000));
+    return {
+        avgLatency,
+        successRate,
+        tokensPerSecond
+    };
+}
+/**
+ * 获取模型使用统计
+ */
+async function getModelStats(_period) {
+    // 模拟统计数据
+    return [
+        { model: 'deepseek', calls: 156, successRate: 98, avgLatency: 1200, cost: 2.34 },
+        { model: 'zhipu', calls: 89, successRate: 96, avgLatency: 1800, cost: 4.56 },
+        { model: 'qwen', calls: 67, successRate: 94, avgLatency: 1500, cost: 3.21 },
+        { model: 'moonshot', calls: 23, successRate: 99, avgLatency: 2200, cost: 8.90 }
+    ];
+}
+
+/**
+ * MCP (Model Context Protocol) 相关类型定义
+ */
+/**
+ * 环境变量映射
+ */
+const MCP_ENVIRONMENT_VARIABLES = {
+    DEEPSEEK_API_KEY: '${DEEPSEEK_API_KEY}',
+    ZHIPU_API_KEY: '${ZHIPU_API_KEY}',
+    QWEN_API_KEY: '${QWEN_API_KEY}',
+    BAIDU_API_KEY: '${BAIDU_API_KEY}',
+    BAIDU_SECRET_KEY: '${BAIDU_SECRET_KEY}',
+    MOONSHOT_API_KEY: '${MOONSHOT_API_KEY}',
+    SPARK_APP_ID: '${SPARK_APP_ID}',
+    SPARK_API_KEY: '${SPARK_API_KEY}',
+    SPARK_API_SECRET: '${SPARK_API_SECRET}',
+    TASKFLOW_PROJECT_ROOT: '${workspaceFolder}',
+    TASKFLOW_CONFIG_PATH: '.taskflow/config.json',
+    TASKFLOW_LOG_LEVEL: 'info',
+    TASKFLOW_CACHE_ENABLED: 'true',
+    TASKFLOW_AUTO_START: 'true'
+};
+/**
+ * 默认MCP能力
+ */
+const DEFAULT_MCP_CAPABILITIES = {
+    resources: true,
+    tools: true,
+    prompts: true,
+    streaming: true
+};
+/**
+ * 编辑器配置文件路径映射
+ */
+const EDITOR_CONFIG_PATHS = {
+    cursor: '.cursor/mcp.json',
+    windsurf: '.windsurf/mcp.json',
+    trae: '.trae/mcp-config.json',
+    vscode: '.vscode/settings.json'
+};
+/**
+ * 编辑器扩展推荐文件路径
+ */
+const EDITOR_EXTENSIONS_PATHS = {
+    vscode: '.vscode/extensions.json'
+};
+/**
+ * 默认VSCode扩展推荐
+ */
+const DEFAULT_VSCODE_EXTENSIONS = {
+    recommendations: [
+        'taskflow-ai.vscode-taskflow',
+        'ms-vscode.vscode-typescript-next',
+        'esbenp.prettier-vscode',
+        'ms-vscode.vscode-eslint',
+        'bradlc.vscode-tailwindcss',
+        'ms-vscode.vscode-json',
+        'yzhang.markdown-all-in-one'
+    ],
+    unwantedRecommendations: [
+        'ms-vscode.vscode-typescript'
+    ]
+};
+/**
+ * Cursor规则文件内容
+ */
+const CURSOR_RULES_CONTENT = `# TaskFlow AI Cursor 集成规则
+
+## 项目配置
+- 使用 TaskFlow AI 进行智能 PRD 解析和任务管理
+- 支持 6 种 AI 模型：DeepSeek、智谱AI、通义千问、文心一言、月之暗面、讯飞星火
+- MCP 服务端点：通过配置文件自动启动
+
+## AI 模型使用策略
+- **DeepSeek**: 代码生成、重构、技术分析
+- **智谱AI**: 中文内容处理、业务逻辑分析
+- **通义千问**: 通用分析、文档处理
+- **文心一言**: 创意任务、内容优化
+- **月之暗面**: 长文档处理、深度分析
+- **讯飞星火**: 多模态任务、综合处理
+
+## 工作流程
+1. PRD 解析 → 智谱AI 处理中文需求
+2. 架构设计 → DeepSeek 技术方案设计
+3. 代码实现 → DeepSeek 代码生成和优化
+4. 测试编写 → DeepSeek 测试用例生成
+5. 文档生成 → 通义千问 技术文档编写
+
+## 代码规范
+- 严格 TypeScript 类型安全
+- 函数式编程优先
+- 80%+ 测试覆盖率
+- ESLint + Prettier 代码格式化
+
+## 集成功能
+- 自动 PRD 解析和任务创建
+- 智能代码生成和重构
+- 多模型协同工作
+- 实时任务状态同步
+
+## 性能优化
+- 启用 MCP 请求缓存
+- 使用流式响应提升用户体验
+- 智能模型选择减少延迟
+- 批量处理相似请求
+
+## 安全考虑
+- API 密钥通过环境变量管理
+- 敏感信息不写入代码
+- 使用 HTTPS 进行 API 通信
+- 定期轮换 API 密钥
+`;
+
+/**
+ * MCP配置生成器
+ * 负责为不同编辑器生成标准MCP配置文件
+ */
+/**
+ * MCP配置生成器类
+ */
+class MCPConfigGenerator {
+    constructor(logger) {
+        this.logger = logger;
+    }
+    /**
+     * 为指定编辑器生成MCP配置
+     * @param editor 编辑器类型
+     * @param options 配置选项
+     * @returns MCP配置对象
+     */
+    generateMCPConfig(editor, options = {}) {
+        const baseConfig = {
+            editor,
+            serverConfig: {
+                command: 'npx',
+                args: ['-y', '--package=taskflow-ai', 'taskflow-mcp'],
+                timeout: options.timeout || 30000,
+                retries: options.retries || 3
+            },
+            capabilities: DEFAULT_MCP_CAPABILITIES,
+            environment: {
+                ...MCP_ENVIRONMENT_VARIABLES,
+                ...options.customEnvironment
+            }
+        };
+        this.logger.debug(`生成 ${editor} MCP配置`, baseConfig);
+        return baseConfig;
+    }
+    /**
+     * 验证MCP配置
+     * @param config MCP配置对象
+     * @returns 验证结果
+     */
+    validateMCPConfig(config) {
+        const errors = [];
+        const warnings = [];
+        // 验证编辑器类型
+        if (!['windsurf', 'trae', 'cursor', 'vscode'].includes(config.editor)) {
+            errors.push(`不支持的编辑器类型: ${config.editor}`);
+        }
+        // 验证服务器配置
+        if (!config.serverConfig.command) {
+            errors.push('缺少服务器启动命令');
+        }
+        if (!Array.isArray(config.serverConfig.args)) {
+            errors.push('服务器参数必须是数组');
+        }
+        // 验证环境变量
+        const requiredEnvVars = ['DEEPSEEK_API_KEY', 'ZHIPU_API_KEY', 'QWEN_API_KEY'];
+        for (const envVar of requiredEnvVars) {
+            if (!config.environment[envVar]) {
+                warnings.push(`缺少环境变量: ${envVar}`);
+            }
+        }
+        // 验证能力声明
+        if (!config.capabilities.tools && !config.capabilities.resources) {
+            warnings.push('建议至少启用tools或resources能力');
+        }
+        const result = {
+            valid: errors.length === 0,
+            errors: errors.length > 0 ? errors : undefined,
+            warnings: warnings.length > 0 ? warnings : undefined
+        };
+        this.logger.debug('MCP配置验证结果', result);
+        return result;
+    }
+    /**
+     * 导出编辑器特定格式的配置
+     * @param config MCP配置对象
+     * @returns 编辑器特定格式的配置JSON字符串
+     */
+    exportMCPConfig(config) {
+        let editorConfig;
+        switch (config.editor) {
+            case 'cursor':
+                editorConfig = this.generateCursorConfig(config);
+                break;
+            case 'windsurf':
+                editorConfig = this.generateWindsurfConfig(config);
+                break;
+            case 'trae':
+                editorConfig = this.generateTraeConfig(config);
+                break;
+            case 'vscode':
+                editorConfig = this.generateVSCodeConfig(config);
+                break;
+            default:
+                throw new Error(`不支持的编辑器类型: ${config.editor}`);
+        }
+        return JSON.stringify(editorConfig, null, 2);
+    }
+    /**
+     * 生成Cursor配置
+     */
+    generateCursorConfig(config) {
+        return {
+            mcpServers: {
+                'taskflow-ai': {
+                    command: config.serverConfig.command,
+                    args: config.serverConfig.args,
+                    env: config.environment
+                }
+            }
+        };
+    }
+    /**
+     * 生成Windsurf配置
+     */
+    generateWindsurfConfig(config) {
+        return {
+            mcpServers: {
+                'taskflow-ai': {
+                    command: config.serverConfig.command,
+                    args: config.serverConfig.args,
+                    env: config.environment,
+                    capabilities: config.capabilities,
+                    timeout: config.serverConfig.timeout,
+                    retries: config.serverConfig.retries
+                }
+            }
+        };
+    }
+    /**
+     * 生成Trae配置
+     */
+    generateTraeConfig(config) {
+        return {
+            mcp: {
+                version: '1.0',
+                servers: {
+                    taskflow: {
+                        command: config.serverConfig.command,
+                        args: config.serverConfig.args,
+                        environment: config.environment,
+                        capabilities: [
+                            'code_analysis',
+                            'task_management',
+                            'prd_parsing',
+                            'ai_assistance',
+                            'refactoring',
+                            'optimization'
+                        ],
+                        healthCheck: {
+                            enabled: true,
+                            interval: 30000,
+                            timeout: 5000
+                        }
+                    }
+                },
+                client: {
+                    name: 'trae',
+                    version: '1.0.0',
+                    features: {
+                        streaming: true,
+                        contextWindow: 32000,
+                        multiModel: true,
+                        codeCompletion: true,
+                        semanticSearch: true
+                    }
+                }
+            }
+        };
+    }
+    /**
+     * 生成VSCode配置
+     */
+    generateVSCodeConfig(config) {
+        return {
+            'taskflow.mcp.enabled': true,
+            'taskflow.mcp.server': {
+                command: config.serverConfig.command,
+                args: config.serverConfig.args,
+                env: this.convertToVSCodeEnv(config.environment),
+                autoRestart: true,
+                healthCheck: true
+            },
+            'taskflow.ai.models': {
+                primary: 'deepseek',
+                fallback: ['zhipu', 'qwen', 'baidu'],
+                specialized: {
+                    code: 'deepseek',
+                    chinese: 'zhipu',
+                    general: 'qwen',
+                    creative: 'baidu',
+                    longText: 'moonshot',
+                    multimodal: 'spark'
+                },
+                loadBalancing: {
+                    enabled: true,
+                    strategy: 'intelligent',
+                    weights: {
+                        deepseek: 0.3,
+                        zhipu: 0.25,
+                        qwen: 0.2,
+                        baidu: 0.15,
+                        moonshot: 0.05,
+                        spark: 0.05
+                    }
+                }
+            },
+            'taskflow.integration': {
+                autoParseOnSave: true,
+                showTaskProgress: true,
+                enableCodeLens: true,
+                contextMenuIntegration: true,
+                statusBarIntegration: true,
+                sidebarPanel: true
+            },
+            'taskflow.ui': {
+                showStatusBar: true,
+                enableNotifications: true,
+                theme: 'auto',
+                compactMode: false
+            },
+            'files.associations': {
+                '*.prd': 'markdown',
+                '*.taskflow': 'json',
+                '*.mcp': 'json'
+            }
+        };
+    }
+    /**
+     * 转换环境变量为VSCode格式
+     */
+    convertToVSCodeEnv(env) {
+        const vscodeEnv = {};
+        Object.entries(env).forEach(([key, value]) => {
+            if (value.startsWith('${') && value.endsWith('}')) {
+                // 环境变量引用，转换为VSCode格式
+                const envVar = value.slice(2, -1);
+                if (envVar === 'workspaceFolder') {
+                    vscodeEnv[key] = '${workspaceFolder}';
+                }
+                else {
+                    vscodeEnv[key] = `\${env:${envVar}}`;
+                }
+            }
+            else {
+                vscodeEnv[key] = value;
+            }
+        });
+        return vscodeEnv;
+    }
+    /**
+     * 写入配置文件到磁盘
+     * @param config MCP配置对象
+     * @param projectRoot 项目根目录
+     */
+    async writeMCPConfigFiles(config, projectRoot = '.') {
+        const configPath = EDITOR_CONFIG_PATHS[config.editor];
+        const fullPath = path.join(projectRoot, configPath);
+        // 确保目录存在
+        const dir = path.dirname(fullPath);
+        if (!fs$1.existsSync(dir)) {
+            fs$1.mkdirSync(dir, { recursive: true });
+        }
+        // 生成配置内容
+        const configContent = this.exportMCPConfig(config);
+        // 写入配置文件
+        fs$1.writeFileSync(fullPath, configContent, 'utf-8');
+        this.logger.info(`MCP配置文件已生成: ${fullPath}`);
+        // 为特定编辑器生成额外文件
+        await this.generateAdditionalFiles(config, projectRoot);
+    }
+    /**
+     * 生成额外的配置文件
+     */
+    async generateAdditionalFiles(config, projectRoot) {
+        switch (config.editor) {
+            case 'cursor': {
+                // 生成.cursor-rules文件
+                const cursorRulesPath = path.join(projectRoot, '.cursor-rules');
+                fs$1.writeFileSync(cursorRulesPath, CURSOR_RULES_CONTENT, 'utf-8');
+                this.logger.info(`Cursor规则文件已生成: ${cursorRulesPath}`);
+                break;
+            }
+            case 'vscode': {
+                // 生成extensions.json文件
+                const extensionsPath = EDITOR_EXTENSIONS_PATHS.vscode;
+                {
+                    const fullExtensionsPath = path.join(projectRoot, extensionsPath);
+                    const extensionsContent = JSON.stringify(DEFAULT_VSCODE_EXTENSIONS, null, 2);
+                    fs$1.writeFileSync(fullExtensionsPath, extensionsContent, 'utf-8');
+                    this.logger.info(`VSCode扩展推荐文件已生成: ${fullExtensionsPath}`);
+                }
+                break;
+            }
+        }
+    }
+    /**
+     * 测试MCP配置
+     * @param config MCP配置对象
+     * @returns 测试结果
+     */
+    async testMCPConfiguration(config) {
+        const startTime = Date.now();
+        const errors = [];
+        const warnings = [];
+        try {
+            // 验证配置格式
+            const validation = this.validateMCPConfig(config);
+            if (!validation.valid) {
+                errors.push(...(validation.errors || []));
+            }
+            warnings.push(...(validation.warnings || []));
+            // 检查命令可用性
+            if (config.serverConfig.command === 'npx') {
+                // 这里可以添加实际的npx可用性检查
+                // 暂时跳过，因为需要实际执行命令
+            }
+            // 检查环境变量
+            const requiredEnvVars = ['DEEPSEEK_API_KEY', 'ZHIPU_API_KEY'];
+            for (const envVar of requiredEnvVars) {
+                if (!process.env[envVar] && !config.environment[envVar]) {
+                    warnings.push(`环境变量 ${envVar} 未设置`);
+                }
+            }
+            const latency = Date.now() - startTime;
+            return {
+                valid: errors.length === 0,
+                errors: errors.length > 0 ? errors : undefined,
+                warnings: warnings.length > 0 ? warnings : undefined,
+                latency
+            };
+        }
+        catch (error) {
+            errors.push(`测试失败: ${error.message}`);
+            return {
+                valid: false,
+                errors,
+                latency: Date.now() - startTime
+            };
+        }
+    }
+    /**
+     * 获取MCP服务支持的能力
+     * @returns MCP能力对象
+     */
+    getMCPCapabilities() {
+        return {
+            ...DEFAULT_MCP_CAPABILITIES,
+            supportedEditors: ['windsurf', 'trae', 'cursor', 'vscode'],
+            supportedModels: ['deepseek', 'zhipu', 'qwen', 'baidu', 'moonshot', 'spark'],
+            features: {
+                prdParsing: true,
+                taskManagement: true,
+                codeAnalysis: true,
+                multiModelOrchestration: true,
+                streamingResponse: true,
+                configurationGeneration: true
+            }
+        };
+    }
+}
+
+/**
+ * 配置管理器 - 统一管理TaskFlow AI的所有配置
+ * 支持多环境配置、动态配置更新、配置验证等功能
+ */
+/**
+ * 配置环境枚举
+ */
+var ConfigEnvironment;
+(function (ConfigEnvironment) {
+    ConfigEnvironment["DEVELOPMENT"] = "development";
+    ConfigEnvironment["TESTING"] = "testing";
+    ConfigEnvironment["STAGING"] = "staging";
+    ConfigEnvironment["PRODUCTION"] = "production";
+})(ConfigEnvironment || (ConfigEnvironment = {}));
+/**
+ * 配置源类型
+ */
+var ConfigSource;
+(function (ConfigSource) {
+    ConfigSource["FILE"] = "file";
+    ConfigSource["ENVIRONMENT"] = "environment";
+    ConfigSource["DATABASE"] = "database";
+    ConfigSource["REMOTE"] = "remote";
+    ConfigSource["MEMORY"] = "memory";
+})(ConfigSource || (ConfigSource = {}));
+/**
+ * 配置管理器类
+ */
+class ConfigManager {
+    constructor(logger, options) {
+        this.configs = new Map();
+        this.watchers = new Map();
+        this.cache = new Map();
+        this.validationRules = new Map();
+        this.changeListeners = [];
+        this.logger = logger;
+        this.options = {
+            environment: ConfigEnvironment.DEVELOPMENT,
+            configDir: './config',
+            enableFileWatch: true,
+            enableValidation: true,
+            enableCache: true,
+            cacheTimeout: 300000, // 5分钟
+            autoSave: false,
+            backupEnabled: true,
+            encryptSensitive: false,
+            ...options
+        };
+        // 初始化MCP配置生成器
+        this.mcpGenerator = new MCPConfigGenerator(logger);
+        this.initializeDefaultConfigs();
+        this.loadConfigurations();
+        if (this.options.enableFileWatch) {
+            this.setupFileWatching();
+        }
+    }
+    /**
+     * 获取配置值
+     * @param key 配置键
+     * @param defaultValue 默认值
+     */
+    get(key, defaultValue) {
+        // 检查缓存
+        if (this.options.enableCache) {
+            const cached = this.cache.get(key);
+            if (cached && Date.now() - cached.timestamp < this.options.cacheTimeout) {
+                return cached.value;
+            }
+        }
+        const configItem = this.configs.get(key);
+        let value;
+        if (configItem) {
+            value = configItem.value;
+        }
+        else {
+            // 尝试从环境变量获取
+            const envValue = this.getFromEnvironment(key);
+            if (envValue !== undefined) {
+                value = envValue;
+            }
+            else {
+                value = defaultValue;
+            }
+        }
+        // 更新缓存
+        if (this.options.enableCache && value !== undefined) {
+            this.cache.set(key, { value, timestamp: Date.now() });
+        }
+        return value;
+    }
+    /**
+     * 设置配置值
+     * @param key 配置键
+     * @param value 配置值
+     * @param source 配置源
+     */
+    set(key, value, source = ConfigSource.MEMORY) {
+        const oldValue = this.get(key);
+        // 验证配置值
+        if (this.options.enableValidation) {
+            const validation = this.validationRules.get(key);
+            if (validation) {
+                const validationResult = this.validateValue(value, validation);
+                if (validationResult !== true) {
+                    throw new Error(`配置验证失败 ${key}: ${validationResult}`);
+                }
+            }
+        }
+        const configItem = {
+            key,
+            value,
+            type: this.inferType(value),
+            source,
+            lastModified: new Date(),
+            environment: this.options.environment
+        };
+        this.configs.set(key, configItem);
+        // 清除缓存
+        if (this.options.enableCache) {
+            this.cache.delete(key);
+        }
+        // 触发变更事件
+        this.notifyChange({
+            key,
+            oldValue,
+            newValue: value,
+            source,
+            timestamp: new Date(),
+            environment: this.options.environment
+        });
+        // 自动保存
+        if (this.options.autoSave && source !== ConfigSource.FILE) {
+            this.saveToFile();
+        }
+        this.logger.debug(`配置已更新: ${key} = ${JSON.stringify(value)}`);
+    }
+    /**
+     * 检查配置是否存在
+     * @param key 配置键
+     */
+    has(key) {
+        return this.configs.has(key) || this.getFromEnvironment(key) !== undefined;
+    }
+    /**
+     * 删除配置
+     * @param key 配置键
+     */
+    delete(key) {
+        var _a;
+        const existed = this.configs.has(key);
+        if (existed) {
+            const oldValue = (_a = this.configs.get(key)) === null || _a === void 0 ? void 0 : _a.value;
+            this.configs.delete(key);
+            this.cache.delete(key);
+            // 触发变更事件
+            this.notifyChange({
+                key,
+                oldValue,
+                newValue: undefined,
+                source: ConfigSource.MEMORY,
+                timestamp: new Date(),
+                environment: this.options.environment
+            });
+            if (this.options.autoSave) {
+                this.saveToFile();
+            }
+            this.logger.debug(`配置已删除: ${key}`);
+        }
+        return existed;
+    }
+    /**
+     * 清空所有配置
+     */
+    clear() {
+        const keys = Array.from(this.configs.keys());
+        this.configs.clear();
+        this.cache.clear();
+        keys.forEach(key => {
+            this.notifyChange({
+                key,
+                oldValue: undefined,
+                newValue: undefined,
+                source: ConfigSource.MEMORY,
+                timestamp: new Date(),
+                environment: this.options.environment
+            });
+        });
+        if (this.options.autoSave) {
+            this.saveToFile();
+        }
+        this.logger.info('所有配置已清空');
+    }
+    /**
+     * 获取所有配置
+     */
+    getAll() {
+        const result = {};
+        this.configs.forEach((item, key) => {
+            result[key] = item.value;
+        });
+        return result;
+    }
+    /**
+     * 批量设置配置
+     * @param configs 配置对象
+     * @param source 配置源
+     */
+    setMany(configs, source = ConfigSource.MEMORY) {
+        Object.entries(configs).forEach(([key, value]) => {
+            this.set(key, value, source);
+        });
+    }
+    /**
+     * 监听配置变更
+     * @param key 配置键，为空则监听所有变更
+     * @param callback 回调函数
+     */
+    watch(key, callback) {
+        if (key) {
+            if (!this.watchers.has(key)) {
+                this.watchers.set(key, []);
+            }
+            this.watchers.get(key).push(callback);
+            // 返回取消监听的函数
+            return () => {
+                const callbacks = this.watchers.get(key);
+                if (callbacks) {
+                    const index = callbacks.indexOf(callback);
+                    if (index > -1) {
+                        callbacks.splice(index, 1);
+                    }
+                }
+            };
+        }
+        else {
+            this.changeListeners.push(callback);
+            return () => {
+                const index = this.changeListeners.indexOf(callback);
+                if (index > -1) {
+                    this.changeListeners.splice(index, 1);
+                }
+            };
+        }
+    }
+    /**
+     * 添加配置验证规则
+     * @param key 配置键
+     * @param validation 验证规则
+     */
+    addValidation(key, validation) {
+        this.validationRules.set(key, validation);
+    }
+    /**
+     * 验证所有配置
+     */
+    validateAll() {
+        const errors = [];
+        this.validationRules.forEach((validation, key) => {
+            const value = this.get(key);
+            const result = this.validateValue(value, validation);
+            if (result !== true) {
+                errors.push(`${key}: ${result}`);
+            }
+        });
+        return {
+            valid: errors.length === 0,
+            errors
+        };
+    }
+    /**
+     * 从文件加载配置
+     * @param filePath 文件路径
+     */
+    loadFromFile(filePath) {
+        const configPath = filePath || this.getConfigFilePath();
+        if (!fs$1.existsSync(configPath)) {
+            this.logger.warn(`配置文件不存在: ${configPath}`);
+            return;
+        }
+        try {
+            const content = fs$1.readFileSync(configPath, 'utf-8');
+            const configs = JSON.parse(content);
+            Object.entries(configs).forEach(([key, value]) => {
+                this.set(key, value, ConfigSource.FILE);
+            });
+            this.logger.info(`配置已从文件加载: ${configPath}`);
+        }
+        catch (error) {
+            this.logger.error(`加载配置文件失败: ${error.message}`);
+            throw error;
+        }
+    }
+    /**
+     * 保存配置到文件
+     * @param filePath 文件路径
+     */
+    saveToFile(filePath) {
+        const configPath = filePath || this.getConfigFilePath();
+        try {
+            // 创建备份
+            if (this.options.backupEnabled && fs$1.existsSync(configPath)) {
+                const backupPath = `${configPath}.backup.${Date.now()}`;
+                const content = fs$1.readFileSync(configPath, 'utf-8');
+                fs$1.writeFileSync(backupPath, content);
+            }
+            const configs = this.getAll();
+            const content = JSON.stringify(configs, null, 2);
+            fs$1.writeFileSync(configPath, content, 'utf-8');
+            this.logger.info(`配置已保存到文件: ${configPath}`);
+        }
+        catch (error) {
+            this.logger.error(`保存配置文件失败: ${error.message}`);
+            throw error;
+        }
+    }
+    /**
+     * 重新加载配置
+     */
+    reload() {
+        this.logger.info('重新加载配置');
+        this.cache.clear();
+        this.loadConfigurations();
+    }
+    /**
+     * 获取配置统计信息
+     */
+    getStats() {
+        const configsBySource = {
+            [ConfigSource.FILE]: 0,
+            [ConfigSource.ENVIRONMENT]: 0,
+            [ConfigSource.DATABASE]: 0,
+            [ConfigSource.REMOTE]: 0,
+            [ConfigSource.MEMORY]: 0
+        };
+        const configsByType = {};
+        this.configs.forEach(item => {
+            configsBySource[item.source]++;
+            configsByType[item.type] = (configsByType[item.type] || 0) + 1;
+        });
+        return {
+            totalConfigs: this.configs.size,
+            configsBySource,
+            configsByType,
+            cacheHitRate: this.cache.size / Math.max(this.configs.size, 1)
+        };
+    }
+    // 私有方法
+    /**
+     * 初始化默认配置
+     */
+    initializeDefaultConfigs() {
+        const defaultConfigs = {
+            // 应用配置
+            'app.name': 'TaskFlow AI',
+            'app.version': '1.0.0',
+            'app.environment': this.options.environment,
+            // 服务器配置
+            'server.port': 3000,
+            'server.host': '0.0.0.0',
+            'server.timeout': 30000,
+            // 数据库配置
+            'database.host': 'localhost',
+            'database.port': 5432,
+            'database.name': 'taskflow',
+            'database.pool.min': 2,
+            'database.pool.max': 10,
+            // 日志配置
+            'logging.level': 'info',
+            'logging.format': 'json',
+            'logging.file.enabled': true,
+            'logging.file.path': './logs/app.log',
+            // AI模型配置
+            'ai.models.default': 'alibaba_qwen',
+            'ai.models.timeout': 30000,
+            'ai.models.retryCount': 3,
+            // 缓存配置
+            'cache.enabled': true,
+            'cache.ttl': 300,
+            'cache.maxSize': 1000,
+            // 安全配置
+            'security.jwt.secret': 'your-secret-key',
+            'security.jwt.expiresIn': '24h',
+            'security.cors.enabled': true,
+            'security.rateLimit.enabled': true,
+            'security.rateLimit.max': 100
+        };
+        Object.entries(defaultConfigs).forEach(([key, value]) => {
+            if (!this.configs.has(key)) {
+                this.set(key, value, ConfigSource.MEMORY);
+            }
+        });
+        // 添加验证规则
+        this.addValidationRules();
+    }
+    /**
+     * 添加验证规则
+     */
+    addValidationRules() {
+        this.addValidation('server.port', {
+            type: 'number',
+            min: 1,
+            max: 65535,
+            required: true
+        });
+        this.addValidation('database.port', {
+            type: 'number',
+            min: 1,
+            max: 65535,
+            required: true
+        });
+        this.addValidation('logging.level', {
+            type: 'string',
+            enum: ['error', 'warn', 'info', 'debug'],
+            required: true
+        });
+        this.addValidation('ai.models.timeout', {
+            type: 'number',
+            min: 1000,
+            max: 300000,
+            required: true
+        });
+    }
+    /**
+     * 加载配置
+     */
+    loadConfigurations() {
+        // 1. 从文件加载
+        try {
+            this.loadFromFile();
+        }
+        catch (error) {
+            this.logger.warn('从文件加载配置失败，使用默认配置');
+        }
+        // 2. 从环境变量覆盖
+        this.loadFromEnvironment();
+    }
+    /**
+     * 从环境变量加载配置
+     */
+    loadFromEnvironment() {
+        const envPrefix = 'TASKFLOW_';
+        Object.keys(process.env).forEach(envKey => {
+            if (envKey.startsWith(envPrefix)) {
+                const configKey = envKey
+                    .substring(envPrefix.length)
+                    .toLowerCase()
+                    .replace(/_/g, '.');
+                const envValue = process.env[envKey];
+                if (envValue !== undefined) {
+                    const parsedValue = this.parseEnvironmentValue(envValue);
+                    this.set(configKey, parsedValue, ConfigSource.ENVIRONMENT);
+                }
+            }
+        });
+    }
+    /**
+     * 从环境变量获取值
+     * @param key 配置键
+     */
+    getFromEnvironment(key) {
+        const envKey = `TASKFLOW_${key.toUpperCase().replace(/\./g, '_')}`;
+        const envValue = process.env[envKey];
+        if (envValue !== undefined) {
+            return this.parseEnvironmentValue(envValue);
+        }
+        return undefined;
+    }
+    /**
+     * 解析环境变量值
+     * @param value 环境变量值
+     */
+    parseEnvironmentValue(value) {
+        // 尝试解析为JSON
+        if (value.startsWith('{') || value.startsWith('[')) {
+            try {
+                return JSON.parse(value);
+            }
+            catch {
+                return value;
+            }
+        }
+        // 解析布尔值
+        if (value.toLowerCase() === 'true')
+            return true;
+        if (value.toLowerCase() === 'false')
+            return false;
+        // 解析数字
+        if (/^\d+$/.test(value))
+            return parseInt(value, 10);
+        if (/^\d+\.\d+$/.test(value))
+            return parseFloat(value);
+        return value;
+    }
+    /**
+     * 推断值类型
+     * @param value 值
+     */
+    inferType(value) {
+        if (Array.isArray(value))
+            return 'array';
+        const type = typeof value;
+        if (type === 'string' || type === 'number' || type === 'boolean') {
+            return type;
+        }
+        return 'object';
+    }
+    /**
+     * 验证配置值
+     * @param value 配置值
+     * @param validation 验证规则
+     */
+    validateValue(value, validation) {
+        // 必填检查
+        if (validation.required && (value === undefined || value === null)) {
+            return '配置值不能为空';
+        }
+        if (value === undefined || value === null) {
+            return true; // 非必填且为空，跳过验证
+        }
+        // 类型检查
+        if (validation.type) {
+            const actualType = this.inferType(value);
+            if (actualType !== validation.type) {
+                return `期望类型 ${validation.type}，实际类型 ${actualType}`;
+            }
+        }
+        // 数值范围检查
+        if (typeof value === 'number') {
+            if (validation.min !== undefined && value < validation.min) {
+                return `值不能小于 ${validation.min}`;
+            }
+            if (validation.max !== undefined && value > validation.max) {
+                return `值不能大于 ${validation.max}`;
+            }
+        }
+        // 字符串长度检查
+        if (typeof value === 'string') {
+            if (validation.min !== undefined && value.length < validation.min) {
+                return `长度不能小于 ${validation.min}`;
+            }
+            if (validation.max !== undefined && value.length > validation.max) {
+                return `长度不能大于 ${validation.max}`;
+            }
+        }
+        // 正则表达式检查
+        if (validation.pattern && typeof value === 'string') {
+            const regex = new RegExp(validation.pattern);
+            if (!regex.test(value)) {
+                return `值不匹配模式 ${validation.pattern}`;
+            }
+        }
+        // 枚举值检查
+        if (validation.enum && !validation.enum.includes(value)) {
+            return `值必须是以下之一: ${validation.enum.join(', ')}`;
+        }
+        // 自定义验证
+        if (validation.custom) {
+            const result = validation.custom(value);
+            if (result !== true) {
+                return typeof result === 'string' ? result : '自定义验证失败';
+            }
+        }
+        return true;
+    }
+    /**
+     * 获取配置文件路径
+     */
+    getConfigFilePath() {
+        const fileName = `config.${this.options.environment}.json`;
+        return path.resolve(this.options.configDir, fileName);
+    }
+    /**
+     * 设置文件监听
+     */
+    setupFileWatching() {
+        const configPath = this.getConfigFilePath();
+        if (fs$1.existsSync(configPath)) {
+            fs$1.watchFile(configPath, (curr, prev) => {
+                if (curr.mtime !== prev.mtime) {
+                    this.logger.info('配置文件已更改，重新加载配置');
+                    this.reload();
+                }
+            });
+        }
+    }
+    /**
+     * 通知配置变更
+     * @param event 变更事件
+     */
+    notifyChange(event) {
+        // 通知全局监听器
+        this.changeListeners.forEach(listener => {
+            try {
+                listener(event);
+            }
+            catch (error) {
+                this.logger.error(`配置变更监听器执行失败: ${error.message}`);
+            }
+        });
+        // 通知特定键的监听器
+        const keyWatchers = this.watchers.get(event.key);
+        if (keyWatchers) {
+            keyWatchers.forEach(watcher => {
+                try {
+                    watcher(event);
+                }
+                catch (error) {
+                    this.logger.error(`配置变更监听器执行失败: ${error.message}`);
+                }
+            });
+        }
+    }
+    // ==================== MCP 配置管理方法 ====================
+    /**
+     * 为指定编辑器生成MCP配置
+     * @param editor 编辑器类型
+     * @param options 配置选项
+     * @returns MCP配置对象
+     */
+    generateMCPConfig(editor, options) {
+        this.logger.info(`生成 ${editor} 编辑器的MCP配置`);
+        return this.mcpGenerator.generateMCPConfig(editor, options);
+    }
+    /**
+     * 验证MCP配置
+     * @param config MCP配置对象
+     * @returns 验证结果
+     */
+    validateMCPConfig(config) {
+        this.logger.debug(`验证 ${config.editor} 编辑器的MCP配置`);
+        return this.mcpGenerator.validateMCPConfig(config);
+    }
+    /**
+     * 导出MCP配置为JSON字符串
+     * @param editor 编辑器类型
+     * @param options 配置选项
+     * @returns JSON格式的配置字符串
+     */
+    exportMCPConfig(editor, options) {
+        const config = this.generateMCPConfig(editor, options);
+        return this.mcpGenerator.exportMCPConfig(config);
+    }
+    /**
+     * 导入MCP配置
+     * @param editor 编辑器类型
+     * @param configJson JSON格式的配置字符串
+     */
+    importMCPConfig(editor, configJson) {
+        try {
+            const config = JSON.parse(configJson);
+            this.logger.info(`导入 ${editor} 编辑器的MCP配置`);
+            // 这里可以添加配置导入逻辑
+            this.logger.debug('MCP配置导入成功', config);
+        }
+        catch (error) {
+            this.logger.error(`导入MCP配置失败: ${error.message}`);
+            throw error;
+        }
+    }
+    /**
+     * 测试MCP配置
+     * @param editor 编辑器类型
+     * @param options 配置选项
+     * @returns 测试结果
+     */
+    async testMCPConfiguration(editor, options) {
+        this.logger.info(`测试 ${editor} 编辑器的MCP配置`);
+        const config = this.generateMCPConfig(editor, options);
+        return await this.mcpGenerator.testMCPConfiguration(config);
+    }
+    /**
+     * 获取MCP服务支持的能力
+     * @returns MCP能力对象
+     */
+    getMCPCapabilities() {
+        return this.mcpGenerator.getMCPCapabilities();
+    }
+    /**
+     * 写入MCP配置文件到磁盘
+     * @param editor 编辑器类型
+     * @param projectRoot 项目根目录
+     * @param options 配置选项
+     */
+    async writeMCPConfigFiles(editor, projectRoot = '.', options) {
+        const config = this.generateMCPConfig(editor, options);
+        await this.mcpGenerator.writeMCPConfigFiles(config, projectRoot);
+    }
+    /**
+     * 为所有支持的编辑器生成MCP配置文件
+     * @param projectRoot 项目根目录
+     * @param options 配置选项
+     */
+    async generateAllMCPConfigs(projectRoot = '.', options) {
+        const editors = ['windsurf', 'trae', 'cursor', 'vscode'];
+        this.logger.info('开始生成所有编辑器的MCP配置文件');
+        for (const editor of editors) {
+            try {
+                await this.writeMCPConfigFiles(editor, projectRoot, options);
+                this.logger.info(`✅ ${editor} MCP配置生成成功`);
+            }
+            catch (error) {
+                this.logger.error(`❌ ${editor} MCP配置生成失败: ${error.message}`);
+            }
+        }
+        this.logger.info('所有编辑器的MCP配置文件生成完成');
+    }
+}
+
+var configManager = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    get ConfigEnvironment () { return ConfigEnvironment; },
+    ConfigManager: ConfigManager,
+    get ConfigSource () { return ConfigSource; }
+});
+
+/**
+ * MCP 配置管理命令
+ * 提供 MCP (Model Context Protocol) 配置的生成、验证和测试功能
+ */
+/**
+ * 创建 MCP 命令
+ */
+function createMCPCommand() {
+    const logger = Logger.getInstance({
+        level: LogLevel.INFO,
+        output: 'console'
+    });
+    const config = new ConfigManager(logger);
+    const mcpCommand = new commander.Command('mcp')
+        .description('MCP (Model Context Protocol) 配置管理');
+    // mcp validate 命令
+    mcpCommand
+        .command('validate')
+        .description('验证 MCP 配置文件')
+        .option('--editor <editor>', '指定编辑器 (windsurf/trae/cursor/vscode)')
+        .option('--all', '验证所有编辑器配置')
+        .action(async (options) => {
+        var _a, _b, _c, _d;
+        const spinner = ora('验证 MCP 配置...').start();
+        try {
+            if (options.all) {
+                // 验证所有编辑器配置
+                const editors = ['windsurf', 'trae', 'cursor', 'vscode'];
+                let allValid = true;
+                for (const editor of editors) {
+                    const mcpConfig = config.generateMCPConfig(editor);
+                    const result = config.validateMCPConfig(mcpConfig);
+                    if (result.valid) {
+                        console.log(chalk.green(`✅ ${editor} 配置有效`));
+                    }
+                    else {
+                        console.log(chalk.red(`❌ ${editor} 配置无效:`));
+                        (_a = result.errors) === null || _a === void 0 ? void 0 : _a.forEach(error => {
+                            console.log(chalk.red(`   - ${error}`));
+                        });
+                        allValid = false;
+                    }
+                    if ((_b = result.warnings) === null || _b === void 0 ? void 0 : _b.length) {
+                        result.warnings.forEach(warning => {
+                            console.log(chalk.yellow(`   ⚠️ ${warning}`));
+                        });
+                    }
+                }
+                spinner.succeed(allValid ? '所有配置验证通过' : '部分配置验证失败');
+            }
+            else if (options.editor) {
+                // 验证特定编辑器配置
+                const editor = options.editor;
+                const mcpConfig = config.generateMCPConfig(editor);
+                const result = config.validateMCPConfig(mcpConfig);
+                if (result.valid) {
+                    spinner.succeed(`${editor} 配置验证通过`);
+                }
+                else {
+                    spinner.fail(`${editor} 配置验证失败`);
+                    (_c = result.errors) === null || _c === void 0 ? void 0 : _c.forEach(error => {
+                        console.log(chalk.red(`❌ ${error}`));
+                    });
+                }
+                if ((_d = result.warnings) === null || _d === void 0 ? void 0 : _d.length) {
+                    result.warnings.forEach(warning => {
+                        console.log(chalk.yellow(`⚠️ ${warning}`));
+                    });
+                }
+            }
+            else {
+                spinner.fail('请指定编辑器或使用 --all 选项');
+            }
+        }
+        catch (error) {
+            spinner.fail(`验证失败: ${error.message}`);
+            process.exit(1);
+        }
+    });
+    // mcp test 命令
+    mcpCommand
+        .command('test')
+        .description('测试 MCP 配置有效性')
+        .option('--editor <editor>', '指定编辑器')
+        .option('--all-editors', '测试所有编辑器配置')
+        .option('--all-models', '测试所有 AI 模型连接')
+        .action(async (options) => {
+        var _a, _b, _c, _d, _e;
+        const spinner = ora('测试 MCP 配置...').start();
+        try {
+            if (options.allModels) {
+                // 测试所有 AI 模型
+                const models = ['deepseek', 'zhipu', 'qwen', 'baidu', 'moonshot', 'spark'];
+                console.log(chalk.blue('\n🧪 测试 AI 模型连接:'));
+                for (const model of models) {
+                    try {
+                        const testResult = await config.testMCPConfiguration('cursor', {
+                            customEnvironment: { PREFERRED_MODEL: model }
+                        });
+                        if (testResult.valid) {
+                            console.log(chalk.green(`✅ ${model} 连接正常 (${testResult.latency}ms)`));
+                        }
+                        else {
+                            console.log(chalk.red(`❌ ${model} 连接失败`));
+                            (_a = testResult.errors) === null || _a === void 0 ? void 0 : _a.forEach(error => {
+                                console.log(chalk.red(`   - ${error}`));
+                            });
+                        }
+                    }
+                    catch (error) {
+                        console.log(chalk.red(`❌ ${model} 测试异常: ${error.message}`));
+                    }
+                }
+                spinner.succeed('AI 模型连接测试完成');
+            }
+            else if (options.allEditors) {
+                // 测试所有编辑器配置
+                const editors = ['windsurf', 'trae', 'cursor', 'vscode'];
+                console.log(chalk.blue('\n🧪 测试编辑器配置:'));
+                for (const editor of editors) {
+                    try {
+                        const testResult = await config.testMCPConfiguration(editor);
+                        if (testResult.valid) {
+                            console.log(chalk.green(`✅ ${editor} 配置测试通过 (${testResult.latency}ms)`));
+                        }
+                        else {
+                            console.log(chalk.red(`❌ ${editor} 配置测试失败`));
+                            (_b = testResult.errors) === null || _b === void 0 ? void 0 : _b.forEach(error => {
+                                console.log(chalk.red(`   - ${error}`));
+                            });
+                        }
+                        if ((_c = testResult.warnings) === null || _c === void 0 ? void 0 : _c.length) {
+                            testResult.warnings.forEach(warning => {
+                                console.log(chalk.yellow(`   ⚠️ ${warning}`));
+                            });
+                        }
+                    }
+                    catch (error) {
+                        console.log(chalk.red(`❌ ${editor} 测试异常: ${error.message}`));
+                    }
+                }
+                spinner.succeed('编辑器配置测试完成');
+            }
+            else if (options.editor) {
+                // 测试特定编辑器
+                const editor = options.editor;
+                const testResult = await config.testMCPConfiguration(editor);
+                if (testResult.valid) {
+                    spinner.succeed(`${editor} 配置测试通过 (${testResult.latency}ms)`);
+                }
+                else {
+                    spinner.fail(`${editor} 配置测试失败`);
+                    (_d = testResult.errors) === null || _d === void 0 ? void 0 : _d.forEach(error => {
+                        console.log(chalk.red(`❌ ${error}`));
+                    });
+                }
+                if ((_e = testResult.warnings) === null || _e === void 0 ? void 0 : _e.length) {
+                    testResult.warnings.forEach(warning => {
+                        console.log(chalk.yellow(`⚠️ ${warning}`));
+                    });
+                }
+            }
+            else {
+                spinner.fail('请指定测试选项');
+            }
+        }
+        catch (error) {
+            spinner.fail(`测试失败: ${error.message}`);
+            process.exit(1);
+        }
+    });
+    // mcp regenerate 命令
+    mcpCommand
+        .command('regenerate')
+        .description('重新生成 MCP 配置文件')
+        .option('--editor <editor>', '指定编辑器')
+        .option('--force', '覆盖现有配置')
+        .action(async (options) => {
+        const spinner = ora('重新生成 MCP 配置...').start();
+        try {
+            if (options.editor) {
+                // 重新生成特定编辑器配置
+                const editor = options.editor;
+                await config.writeMCPConfigFiles(editor, '.', {
+                    includeAllModels: true,
+                    enableStreaming: true,
+                    enableHealthCheck: true
+                });
+                spinner.succeed(`${editor} MCP 配置重新生成完成`);
+            }
+            else {
+                // 重新生成所有编辑器配置
+                await config.generateAllMCPConfigs('.', {
+                    includeAllModels: true,
+                    enableStreaming: true,
+                    enableHealthCheck: true
+                });
+                spinner.succeed('所有 MCP 配置重新生成完成');
+            }
+            console.log(chalk.blue('\n📋 生成的配置文件:'));
+            console.log(chalk.gray('  .cursor/mcp.json          - Cursor 编辑器配置'));
+            console.log(chalk.gray('  .cursor-rules             - Cursor AI 规则'));
+            console.log(chalk.gray('  .windsurf/mcp.json        - Windsurf 编辑器配置'));
+            console.log(chalk.gray('  .trae/mcp-config.json     - Trae 编辑器配置'));
+            console.log(chalk.gray('  .vscode/settings.json     - VSCode 编辑器配置'));
+            console.log(chalk.gray('  .vscode/extensions.json   - VSCode 扩展推荐'));
+            console.log(chalk.green('\n🎉 MCP 配置生成完成！现在可以在编辑器中使用 TaskFlow AI 了。'));
+        }
+        catch (error) {
+            spinner.fail(`重新生成失败: ${error.message}`);
+            process.exit(1);
+        }
+    });
+    // mcp info 命令
+    mcpCommand
+        .command('info')
+        .description('显示 MCP 服务信息')
+        .action(async () => {
+        const capabilities = config.getMCPCapabilities();
+        console.log(chalk.blue('\n📊 TaskFlow AI MCP 服务信息:'));
+        console.log(chalk.gray('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+        console.log(chalk.green('\n🎯 支持的编辑器:'));
+        capabilities.supportedEditors.forEach((editor) => {
+            console.log(chalk.gray(`  ✓ ${editor}`));
+        });
+        console.log(chalk.green('\n🤖 支持的 AI 模型:'));
+        capabilities.supportedModels.forEach((model) => {
+            console.log(chalk.gray(`  ✓ ${model}`));
+        });
+        console.log(chalk.green('\n⚡ 支持的功能:'));
+        Object.entries(capabilities.features).forEach(([feature, supported]) => {
+            const icon = supported ? '✓' : '✗';
+            const color = supported ? chalk.gray : chalk.red;
+            console.log(color(`  ${icon} ${feature}`));
+        });
+        console.log(chalk.green('\n🔧 MCP 能力:'));
+        Object.entries(capabilities).forEach(([capability, supported]) => {
+            if (typeof supported === 'boolean') {
+                const icon = supported ? '✓' : '✗';
+                const color = supported ? chalk.gray : chalk.red;
+                console.log(color(`  ${icon} ${capability}`));
+            }
+        });
+        console.log(chalk.blue('\n📖 使用说明:'));
+        console.log(chalk.gray('  1. 运行 taskflow init 生成配置文件'));
+        console.log(chalk.gray('  2. 设置环境变量中的 API 密钥'));
+        console.log(chalk.gray('  3. 打开编辑器，服务将自动启动'));
+        console.log(chalk.gray('  4. 开始使用 AI 驱动的开发功能'));
+    });
+    return mcpCommand;
+}
+
+/**
+ * 类型安全的错误处理系统
+ */
+/**
+ * 基础错误类
+ */
+class TaskFlowError extends Error {
+    constructor(message, code, context) {
+        super(message);
+        this.name = this.constructor.name;
+        this.code = code;
+        this.timestamp = context.timestamp || new Date().toISOString();
+        this.context = context;
+        // 确保错误堆栈正确显示
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, this.constructor);
+        }
+    }
+    /**
+     * 序列化错误信息
+     */
+    toJSON() {
+        return {
+            name: this.name,
+            message: this.message,
+            code: this.code,
+            context: this.context,
+            stack: this.stack || ''
+        };
+    }
+}
+/**
+ * 错误处理工具类
+ */
+class ErrorHandler {
+    /**
+     * 安全地处理未知错误
+     */
+    static handleUnknownError(error, source) {
+        if (error instanceof TaskFlowError) {
+            return error;
+        }
+        if (error instanceof Error) {
+            const context = {
+                timestamp: new Date().toISOString(),
+                source,
+                details: {
+                    originalName: error.name,
+                    originalStack: error.stack || ''
+                }
+            };
+            return new TaskFlowError(error.message, 'UNKNOWN_ERROR', context);
+        }
+        if (typeof error === 'string') {
+            const context = {
+                timestamp: new Date().toISOString(),
+                source,
+                details: {}
+            };
+            return new TaskFlowError(error, 'STRING_ERROR', context);
+        }
+        const context = {
+            timestamp: new Date().toISOString(),
+            source,
+            details: {
+                errorType: typeof error,
+                errorValue: String(error)
+            }
+        };
+        return new TaskFlowError('An unknown error occurred', 'UNKNOWN_ERROR', context);
+    }
+    /**
+     * 检查错误是否可重试
+     */
+    static isRetryable(error) {
+        var _a;
+        const retryableCodes = ['NETWORK_ERROR', 'API_ERROR', 'PERFORMANCE_ERROR'];
+        return retryableCodes.includes(error.code) &&
+            ((_a = error.context.details) === null || _a === void 0 ? void 0 : _a.retryable) === true;
+    }
+    /**
+     * 获取错误的严重程度
+     */
+    static getSeverity(error) {
+        const criticalCodes = ['FILESYSTEM_ERROR', 'CONFIGURATION_ERROR'];
+        const highCodes = ['API_ERROR', 'NETWORK_ERROR'];
+        const mediumCodes = ['VALIDATION_ERROR', 'PARSE_ERROR'];
+        if (criticalCodes.includes(error.code))
+            return 'critical';
+        if (highCodes.includes(error.code))
+            return 'high';
+        if (mediumCodes.includes(error.code))
+            return 'medium';
+        return 'low';
+    }
+    /**
+     * 格式化错误消息用于用户显示
+     */
+    static formatUserMessage(error) {
+        var _a;
+        const baseMessage = error.message;
+        const suggestion = (_a = error.context.details) === null || _a === void 0 ? void 0 : _a.suggestion;
+        if (suggestion) {
+            return `${baseMessage}\n💡 建议: ${suggestion}`;
+        }
+        return baseMessage;
+    }
+    /**
+     * 创建错误报告
+     */
+    static createErrorReport(error) {
+        return {
+            id: this.generateErrorId(),
+            timestamp: error.timestamp,
+            severity: this.getSeverity(error),
+            retryable: this.isRetryable(error),
+            error: error.toJSON(),
+            environment: {
+                nodeVersion: process.version,
+                platform: process.platform,
+                arch: process.arch
+            }
+        };
+    }
+    /**
+     * 生成错误ID
+     */
+    static generateErrorId() {
+        return `err_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+}
+
+/**
+ * TaskFlow AI CLI入口
+ */
+// 全局错误处理器
+function handleGlobalError(error) {
+    const taskFlowError = ErrorHandler.handleUnknownError(error, 'cli');
+    const userMessage = ErrorHandler.formatUserMessage(taskFlowError);
+    console.error(chalk.red('❌ 错误:'), userMessage);
+    // 在开发模式下显示详细错误信息
+    if (process.env.NODE_ENV === 'development') {
+        console.error(chalk.gray('详细错误信息:'));
+        console.error(taskFlowError.stack);
+    }
+    // 记录错误报告
+    const errorReport = ErrorHandler.createErrorReport(taskFlowError);
+    console.error(chalk.gray(`错误ID: ${errorReport.id}`));
+    process.exit(1);
+}
+// 捕获未处理的异常
+process.on('uncaughtException', handleGlobalError);
+process.on('unhandledRejection', handleGlobalError);
+// 创建命令行程序
+const program = new commander.Command();
+// 设置版本号和描述
+program
+    .name('taskflow')
+    .description(chalk.cyan('TaskFlow AI - 智能PRD文档解析与任务管理助手'))
+    .version(VERSION)
+    .addHelpText('before', chalk.cyan.bold('TaskFlow AI') + ' - 让AI帮您将产品需求转化为可执行的任务计划\n')
+    .addHelpText('after', `
+${chalk.yellow('快速开始:')}
+  ${chalk.green('taskflow interactive')}     启动交互式模式 (推荐新用户)
+  ${chalk.green('taskflow init')}            初始化新项目
+  ${chalk.green('taskflow parse <file>')}    解析PRD文档
+
+${chalk.yellow('示例:')}
+  ${chalk.gray('taskflow parse ./prd.md')}
+  ${chalk.gray('taskflow status --verbose')}
+  ${chalk.gray('taskflow config set model.deepseek.apiKey <your-key>')}
+
+${chalk.yellow('更多信息:')}
+  ${chalk.blue('https://github.com/your-org/taskflow-ai')}
+`);
+// 注册命令
+visualizeCommand.register(program);
+statusCommand.register(program);
+interactiveCommand.register(program);
+modelsCommand(program);
+// 注册MCP命令
+program.addCommand(createMCPCommand());
+// 快速开始命令
+program
+    .command('init')
+    .description('初始化TaskFlow AI项目并生成MCP配置')
+    .option('--editor <editor>', '指定编辑器 (windsurf/trae/cursor/vscode)', 'all')
+    .option('--force', '覆盖现有配置文件')
+    .action(async (options) => {
+    console.log(chalk.blue('🚀 TaskFlow AI - 项目初始化'));
+    console.log();
+    try {
+        const fs = await import('fs-extra');
+        const path = await import('path');
+        const { Logger } = await Promise.resolve().then(function () { return logger; });
+        const { ConfigManager } = await Promise.resolve().then(function () { return configManager; });
+        const projectDir = process.cwd(); // 在当前目录初始化
+        const logger$1 = Logger.getInstance({
+            level: LogLevel.INFO,
+            output: 'console'
+        });
+        const config = new ConfigManager(logger$1);
+        // 创建基本目录结构
+        await fs.default.ensureDir(path.join(projectDir, '.taskflow'));
+        await fs.default.ensureDir(path.join(projectDir, 'docs'));
+        await fs.default.ensureDir(path.join(projectDir, 'tasks'));
+        await fs.default.ensureDir(path.join(projectDir, 'output'));
+        // 创建示例PRD文件
+        const samplePRD = `# 示例产品需求文档
+
+## 1. 产品概述
+
+### 1.1 产品名称
+示例Web应用
+
+### 1.2 产品描述
+这是一个示例的Web应用产品需求文档，用于演示TaskFlow AI的功能。
+
+## 2. 功能需求
+
+### 2.1 用户管理
+- 用户注册功能
+- 用户登录功能
+- 用户信息管理
+
+### 2.2 内容管理
+- 内容创建功能
+- 内容编辑功能
+- 内容删除功能
+
+### 2.3 权限管理
+- 角色管理
+- 权限分配
+- 访问控制
+
+## 3. 非功能需求
+
+### 3.1 性能要求
+- 页面加载时间不超过3秒
+- 支持1000并发用户
+
+### 3.2 安全要求
+- 数据加密传输
+- 用户身份验证
+- 防止SQL注入
+
+## 4. 技术要求
+
+### 4.1 前端技术
+- React.js
+- TypeScript
+- Tailwind CSS
+
+### 4.2 后端技术
+- Node.js
+- Express.js
+- MongoDB
+`;
+        await fs.default.writeFile(path.join(projectDir, 'docs', 'sample-prd.md'), samplePRD);
+        // 生成MCP配置文件
+        console.log(chalk.blue('📝 生成MCP配置文件...'));
+        if (options.editor === 'all') {
+            // 生成所有编辑器配置
+            await config.generateAllMCPConfigs(projectDir, {
+                includeAllModels: true,
+                enableStreaming: true,
+                enableHealthCheck: true
+            });
+            console.log(chalk.green('✅ 所有编辑器MCP配置生成完成'));
+        }
+        else {
+            // 生成特定编辑器配置
+            await config.writeMCPConfigFiles(options.editor, projectDir, {
+                includeAllModels: true,
+                enableStreaming: true,
+                enableHealthCheck: true
+            });
+            console.log(chalk.green(`✅ ${options.editor} MCP配置生成完成`));
+        }
+        // 创建配置文件
+        const taskflowConfig = {
+            project: {
+                name: "示例项目",
+                description: "TaskFlow AI 示例项目"
+            },
+            engine: {
+                autoSave: true,
+                saveInterval: 300,
+                outputDir: "./output",
+                defaultModel: "deepseek",
+                enableOptimization: true
+            }
+        };
+        await fs.default.writeFile(path.join(projectDir, 'taskflow.config.json'), JSON.stringify(taskflowConfig, null, 2));
+        // 创建环境变量模板
+        const envTemplate = `# TaskFlow AI 环境变量配置
+# 请填入您的API密钥
+
+# DeepSeek API
+DEEPSEEK_API_KEY=your-deepseek-api-key
+
+# 智谱AI API
+ZHIPU_API_KEY=your-zhipu-api-key
+
+# 通义千问 API
+QWEN_API_KEY=your-qwen-api-key
+
+# 文心一言 API
+BAIDU_API_KEY=your-baidu-api-key
+BAIDU_SECRET_KEY=your-baidu-secret-key
+
+# 月之暗面 API
+MOONSHOT_API_KEY=your-moonshot-api-key
+
+# 讯飞星火 API
+SPARK_APP_ID=your-spark-app-id
+SPARK_API_KEY=your-spark-api-key
+SPARK_API_SECRET=your-spark-api-secret
+
+# TaskFlow 配置
+TASKFLOW_LOG_LEVEL=info
+TASKFLOW_CACHE_ENABLED=true
+`;
+        await fs.default.writeFile(path.join(projectDir, '.env.example'), envTemplate);
+        console.log(chalk.green('🎉 TaskFlow AI 项目初始化完成！'));
+        console.log();
+        console.log(chalk.yellow('📁 生成的文件：'));
+        console.log('  ├── .cursor/mcp.json          # Cursor MCP配置');
+        console.log('  ├── .cursor-rules             # Cursor AI规则');
+        console.log('  ├── .windsurf/mcp.json        # Windsurf MCP配置');
+        console.log('  ├── .trae/mcp-config.json     # Trae MCP配置');
+        console.log('  ├── .vscode/settings.json     # VSCode MCP配置');
+        console.log('  ├── .vscode/extensions.json   # VSCode扩展推荐');
+        console.log('  ├── .taskflow/                # TaskFlow配置目录');
+        console.log('  ├── docs/sample-prd.md        # 示例PRD文档');
+        console.log('  ├── taskflow.config.json      # TaskFlow配置');
+        console.log('  └── .env.example              # 环境变量模板');
+        console.log();
+        console.log(chalk.blue('🔧 下一步设置：'));
+        console.log('  1. 复制 .env.example 为 .env');
+        console.log('  2. 在 .env 中填入您的API密钥');
+        console.log('  3. 打开您的AI编辑器（Cursor/Windsurf/Trae/VSCode）');
+        console.log('  4. 编辑器会自动启动TaskFlow AI MCP服务');
+        console.log();
+        console.log(chalk.green('🚀 现在可以开始使用AI驱动的开发体验了！'));
+    }
+    catch (error) {
+        console.error(chalk.red('❌ 初始化失败:'));
+        console.error(chalk.red(error.message));
+    }
+});
+// 解析PRD命令
+program
+    .command('parse <file>')
+    .description('解析PRD文档并生成任务计划')
+    .option('-o, --output <path>', '输出任务计划的路径', './taskflow/tasks.json')
+    .option('-m, --model <type>', '使用的模型类型', 'deepseek')
+    .option('--optimize', '启用任务计划优化', true)
+    .option('--estimate-effort', '估算工作量', true)
+    .option('--detect-dependencies', '检测依赖关系', true)
+    .action(async (file, options) => {
+    console.log(chalk.blue('📄 TaskFlow AI - PRD解析'));
+    console.log();
+    try {
+        const fs = await import('fs-extra');
+        const path = await import('path');
+        const ora = await import('ora');
+        const spinner = ora.default('正在解析PRD文档...').start();
+        // 检查文件是否存在
+        if (!fs.default.existsSync(file)) {
+            spinner.fail(`文件不存在: ${file}`);
+            process.exit(1);
+        }
+        // 这里应该调用TaskFlow引擎进行解析
+        // 暂时使用模拟数据
+        spinner.text = '正在生成任务计划...';
+        // 模拟处理时间
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        const outputPath = path.resolve(process.cwd(), options.output);
+        await fs.default.ensureDir(path.dirname(outputPath));
+        // 生成示例任务计划
+        const taskPlan = {
+            id: 'project-' + Date.now(),
+            name: '示例项目任务计划',
+            description: '基于PRD文档生成的任务计划',
+            tasks: [
+                {
+                    id: 'task-1',
+                    title: '项目初始化',
+                    description: '创建项目结构，配置开发环境',
+                    status: 'not_started',
+                    priority: 'high',
+                    type: 'setup',
+                    dependencies: [],
+                    estimatedHours: 4,
+                    tags: ['setup', 'infrastructure'],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                },
+                {
+                    id: 'task-2',
+                    title: '用户管理模块',
+                    description: '实现用户注册、登录、信息管理功能',
+                    status: 'not_started',
+                    priority: 'high',
+                    type: 'feature',
+                    dependencies: ['task-1'],
+                    estimatedHours: 16,
+                    tags: ['user', 'authentication'],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                },
+                {
+                    id: 'task-3',
+                    title: '内容管理模块',
+                    description: '实现内容的创建、编辑、删除功能',
+                    status: 'not_started',
+                    priority: 'medium',
+                    type: 'feature',
+                    dependencies: ['task-2'],
+                    estimatedHours: 20,
+                    tags: ['content', 'crud'],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                }
+            ],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            status: 'active'
+        };
+        await fs.default.writeFile(outputPath, JSON.stringify(taskPlan, null, 2));
+        spinner.succeed(`成功解析PRD并生成任务计划`);
+        console.log();
+        console.log(chalk.green('✅ 任务计划已生成:'));
+        console.log(chalk.gray(`   文件: ${outputPath}`));
+        console.log(chalk.gray(`   任务数量: ${taskPlan.tasks.length}`));
+        console.log();
+        console.log(chalk.cyan('🎯 下一步:'));
+        console.log(chalk.gray(`   taskflow status -i ${outputPath}`));
+        console.log(chalk.gray(`   taskflow visualize gantt -i ${outputPath}`));
+    }
+    catch (error) {
+        console.error(chalk.red('❌ 解析失败:'));
+        console.error(chalk.red(error.message));
+        process.exit(1);
+    }
+});
+// 帮助命令
+program
+    .command('help')
+    .description('显示帮助信息')
+    .action(() => {
+    console.log(chalk.blue('🤖 TaskFlow AI - 智能PRD文档解析与任务管理助手'));
+    console.log();
+    console.log(chalk.cyan('📖 主要功能:'));
+    console.log(chalk.gray('  • PRD文档智能解析'));
+    console.log(chalk.gray('  • AI任务编排优化'));
+    console.log(chalk.gray('  • 任务状态管理'));
+    console.log(chalk.gray('  • 可视化图表生成'));
+    console.log();
+    console.log(chalk.cyan('🚀 快速开始:'));
+    console.log(chalk.gray('  1. taskflow init                    # 初始化项目'));
+    console.log(chalk.gray('  2. taskflow parse docs/prd.md       # 解析PRD文档'));
+    console.log(chalk.gray('  3. taskflow status                  # 查看任务状态'));
+    console.log(chalk.gray('  4. taskflow visualize gantt         # 生成甘特图'));
+    console.log();
+    console.log(chalk.cyan('📋 常用命令:'));
+    console.log(chalk.gray('  taskflow parse <file>               # 解析PRD文档'));
+    console.log(chalk.gray('  taskflow status                     # 查看项目状态'));
+    console.log(chalk.gray('  taskflow status next                # 获取推荐任务'));
+    console.log(chalk.gray('  taskflow status update <id> <status> # 更新任务状态'));
+    console.log(chalk.gray('  taskflow visualize gantt            # 生成甘特图'));
+    console.log(chalk.gray('  taskflow visualize dependency       # 生成依赖图'));
+    console.log();
+    console.log(chalk.cyan('🎨 可视化类型:'));
+    console.log(chalk.gray('  • gantt      - 甘特图'));
+    console.log(chalk.gray('  • dependency - 依赖关系图'));
+    console.log(chalk.gray('  • kanban     - 看板视图'));
+    console.log(chalk.gray('  • progress   - 进度图表'));
+    console.log();
+    console.log(chalk.cyan('💡 更多帮助:'));
+    console.log(chalk.gray('  taskflow <command> --help           # 查看命令详细帮助'));
+    console.log(chalk.gray('  https://github.com/taskflow-ai/docs  # 在线文档'));
+});
+// 获取下一个任务命令
+program
+    .command('next-task')
+    .description('获取下一个要处理的任务')
+    .option('-f, --file <path>', '任务计划文件路径', './tasks/tasks.json')
+    .action(async (options) => {
+    try {
+        const spinner = ora('正在查找下一个任务...').start();
+        // 加载任务计划
+        const filePath = path.resolve(process.cwd(), options.file);
+        if (!fs__namespace.existsSync(filePath)) {
+            spinner.fail(`任务文件不存在: ${filePath}`);
+            process.exit(1);
+        }
+        const result = await yasiService.loadTaskPlan(filePath);
+        if (!result.success) {
+            spinner.fail(`加载任务失败: ${result.error}`);
+            process.exit(1);
+        }
+        // 获取下一个任务
+        const nextResult = await yasiService.getNextTasks();
+        if (!nextResult.success) {
+            spinner.fail(`获取下一个任务失败: ${nextResult.error}`);
+            process.exit(1);
+        }
+        spinner.succeed('成功查找下一个任务');
+        const tasks = nextResult.data;
+        if (!tasks || tasks.length === 0) {
+            console.log(chalk.yellow('没有找到可处理的任务'));
+            process.exit(0);
+        }
+        // 输出任务详情
+        const task = tasks[0]; // 获取第一个可处理的任务
+        console.log(chalk.cyan('\n下一个任务:'));
+        console.log(chalk.cyan('-'.repeat(80)));
+        console.log(chalk.cyan(`ID: ${task.id}`));
+        console.log(chalk.cyan(`名称: ${task.name}`));
+        console.log(chalk.cyan(`优先级: ${task.priority}`));
+        console.log(chalk.cyan(`状态: ${task.status}`));
+        console.log(chalk.cyan(`描述: ${task.description}`));
+        if (task.subtasks && task.subtasks.length > 0) {
+            console.log(chalk.cyan('\n子任务:'));
+            task.subtasks.forEach((subtask, index) => {
+                console.log(chalk.white(`  ${index + 1}. [${subtask.status}] ${subtask.name}`));
+            });
+        }
+        console.log(chalk.cyan('-'.repeat(80)));
+        console.log(chalk.green('\n执行此任务:'));
+        console.log(chalk.white(`  yasi-ai update-task --id=${task.id} --status=in_progress`));
+        console.log(chalk.white(`  # 完成任务后:`));
+        console.log(chalk.white(`  yasi-ai update-task --id=${task.id} --status=done`));
+    }
+    catch (error) {
+        console.error(chalk.red(`错误: ${error.message}`));
+        process.exit(1);
+    }
+});
+// 更新任务命令
+program
+    .command('update-task')
+    .description('更新任务状态或信息')
+    .option('-f, --file <path>', '任务计划文件路径', './tasks/tasks.json')
+    .requiredOption('--id <id>', '任务ID')
+    .option('--status <status>', '新状态')
+    .option('--name <name>', '新名称')
+    .option('--description <description>', '新描述')
+    .option('--priority <priority>', '新优先级')
+    .action(async (options) => {
+    try {
+        const spinner = ora('正在更新任务...').start();
+        // 加载任务计划
+        const filePath = path.resolve(process.cwd(), options.file);
+        if (!fs__namespace.existsSync(filePath)) {
+            spinner.fail(`任务文件不存在: ${filePath}`);
+            process.exit(1);
+        }
+        const result = await yasiService.loadTaskPlan(filePath);
+        if (!result.success) {
+            spinner.fail(`加载任务失败: ${result.error}`);
+            process.exit(1);
+        }
+        // 构建更新数据
+        const updateData = {};
+        if (options.status)
+            updateData.status = options.status;
+        if (options.name)
+            updateData.name = options.name;
+        if (options.description)
+            updateData.description = options.description;
+        if (options.priority)
+            updateData.priority = options.priority;
+        // 更新任务
+        const updateResult = await yasiService.updateTask(options.id, updateData);
+        if (!updateResult.success) {
+            spinner.fail(`更新任务失败: ${updateResult.error}`);
+            process.exit(1);
+        }
+        // 保存任务计划
+        const saveResult = await yasiService.saveTaskPlan(result.data, filePath);
+        if (!saveResult.success) {
+            spinner.fail(`保存任务计划失败: ${saveResult.error}`);
+            process.exit(1);
+        }
+        spinner.succeed(`成功更新任务 ${options.id}`);
+        // 输出更新后的任务信息
+        const task = updateResult.data;
+        if (task) {
+            console.log(chalk.cyan('\n更新后的任务:'));
+            console.log(chalk.cyan('-'.repeat(80)));
+            console.log(chalk.cyan(`ID: ${task.id}`));
+            console.log(chalk.cyan(`名称: ${task.name}`));
+            console.log(chalk.cyan(`优先级: ${task.priority}`));
+            console.log(chalk.cyan(`状态: ${task.status}`));
+            console.log(chalk.cyan(`描述: ${task.description}`));
+            console.log(chalk.cyan('-'.repeat(80)));
+        }
+    }
+    catch (error) {
+        console.error(chalk.red(`错误: ${error.message}`));
+        process.exit(1);
+    }
+});
+// 配置命令
+program
+    .command('config')
+    .description('查看或设置配置')
+    .option('--get', '获取当前配置')
+    .option('--set-model <type>', '设置默认模型类型')
+    .option('--set-api-key <key>', '设置API密钥')
+    .option('--model-type <type>', '指定设置API密钥的模型类型', 'baidu')
+    .action(async (options) => {
+    var _a;
+    try {
+        // 获取配置
+        if (options.get) {
+            const result = await yasiService.getConfig();
+            if (!result.success) {
+                console.error(chalk.red(`获取配置失败: ${result.error}`));
+                process.exit(1);
+            }
+            console.log(chalk.cyan('\n当前配置:'));
+            console.log(JSON.stringify(result.data, null, 2));
+            return;
+        }
+        // 设置默认模型
+        if (options.setModel) {
+            const modelType = options.setModel;
+            const result = await yasiService.updateConfig({
+                models: {
+                    default: modelType
+                }
+            });
+            if (!result.success) {
+                console.error(chalk.red(`设置默认模型失败: ${result.error}`));
+                process.exit(1);
+            }
+            console.log(chalk.green(`成功设置默认模型为: ${modelType}`));
+        }
+        // 设置API密钥
+        if (options.setApiKey) {
+            const modelType = options.modelType;
+            const apiKey = options.setApiKey;
+            const config = {
+                models: {
+                    [modelType]: {
+                        apiKey: apiKey
+                    }
+                }
+            };
+            // 百度文心模型需要设置secretKey
+            if (modelType === ModelType.BAIDU && apiKey.includes(':')) {
+                const [key, secret] = apiKey.split(':');
+                if (config.models && typeof config.models === 'object') {
+                    config.models[modelType] = {
+                        apiKey: key,
+                        secretKey: secret
+                    };
+                }
+            }
+            const result = await yasiService.updateConfig(config);
+            if (!result.success) {
+                console.error(chalk.red(`设置API密钥失败: ${result.error}`));
+                process.exit(1);
+            }
+            console.log(chalk.green(`成功设置${modelType}模型的API密钥`));
+            // 验证API密钥
+            const validateResult = await yasiService.validateModelApiKey(modelType);
+            if (!validateResult.success || !((_a = validateResult.data) === null || _a === void 0 ? void 0 : _a.valid)) {
+                console.log(chalk.yellow(`警告: API密钥验证失败，请检查密钥是否正确`));
+            }
+            else {
+                console.log(chalk.green(`API密钥验证成功`));
+            }
+        }
+    }
+    catch (error) {
+        console.error(chalk.red(`错误: ${error.message}`));
+        process.exit(1);
+    }
+});
+// 旧的模型命令已被新的 modelsCommand 替代
+// 解析命令行参数
+program.parse(process.argv);
+// 如果没有提供任何命令，显示帮助信息
+if (!process.argv.slice(2).length) {
+    console.log(chalk.blue('🤖 TaskFlow AI - 智能PRD文档解析与任务管理助手'));
+    console.log();
+    console.log(chalk.cyan('🚀 快速开始:'));
+    console.log(chalk.gray('  taskflow init                    # 初始化项目'));
+    console.log(chalk.gray('  taskflow parse docs/prd.md       # 解析PRD文档'));
+    console.log(chalk.gray('  taskflow status                  # 查看任务状态'));
+    console.log();
+    console.log(chalk.cyan('💡 获取帮助:'));
+    console.log(chalk.gray('  taskflow help                    # 显示详细帮助'));
+    console.log(chalk.gray('  taskflow <command> --help        # 查看命令帮助'));
+}
 //# sourceMappingURL=index.js.map

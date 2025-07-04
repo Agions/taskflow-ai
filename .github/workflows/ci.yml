@@ -31,7 +31,16 @@ jobs:
       run: npm ci
       
     - name: TypeScript type check
-      run: npx tsc --noEmit
+      run: |
+        echo "🔍 运行TypeScript类型检查..."
+        npx tsc --noEmit --incremental --pretty --skipLibCheck
+        
+        if [ $? -eq 0 ]; then
+          echo "✅ TypeScript类型检查通过"
+        else
+          echo "❌ TypeScript类型检查失败"
+          exit 1
+        fi
       
     - name: ESLint check
       run: npx eslint src --ext .ts

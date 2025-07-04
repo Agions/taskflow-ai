@@ -54,11 +54,11 @@ export interface MCPError {
   type: MCPErrorType;
   severity: MCPErrorSeverity;
   message: string;
-  details?: any;
+  details?: unknown;
   timestamp: Date;
   requestId?: string;
   userId?: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   stack?: string;
 }
 
@@ -70,7 +70,7 @@ export interface ErrorRecoveryStrategy {
   retryable: boolean;
   maxRetries?: number;
   retryDelay?: number;
-  fallbackAction?: () => Promise<any>;
+  fallbackAction?: () => Promise<unknown>;
   userAction?: string;
 }
 
@@ -101,7 +101,7 @@ export class MCPErrorHandler {
   /**
    * 处理错误
    */
-  public handleError(error: Error | MCPError, context?: Record<string, any>): MCPError {
+  public handleError(error: Error | MCPError, context?: Record<string, unknown>): MCPError {
     let mcpError: MCPError;
 
     if (this.isMCPError(error)) {
@@ -322,8 +322,13 @@ export class MCPErrorHandler {
   /**
    * 获取错误统计信息
    */
-  public getErrorStats(): Record<string, any> {
-    const stats: Record<string, any> = {};
+  public getErrorStats(): {
+    totalErrors: number;
+    errorsByType: Record<MCPErrorType, number>;
+    recentErrors: MCPError[];
+    errorRate: number;
+  } {
+    const stats: Record<MCPErrorType, number> = {} as Record<MCPErrorType, number>;
     
     this.errorCounts.forEach((count, type) => {
       stats[type] = count;
@@ -348,8 +353,13 @@ export class MCPErrorHandler {
   /**
    * 检查是否为 MCP 错误
    */
-  private isMCPError(error: any): error is MCPError {
-    return error && typeof error === 'object' && 'type' in error && 'severity' in error;
+  private isMCPError(error: unknown): error is MCPError {
+    return (
+      typeof error === 'object' &&
+      error !== null &&
+      'type' in error &&
+      'severity' in error
+    );
   }
 
   /**

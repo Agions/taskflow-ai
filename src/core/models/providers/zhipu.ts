@@ -10,7 +10,8 @@ import {
   ModelConfig,
   ChatRequest,
   ChatResponse,
-  StreamResponse
+  StreamResponse,
+  ModelInfo
 } from '../chinese-llm-provider';
 import { Logger } from '../../../infra/logger';
 
@@ -158,7 +159,7 @@ export class ZhipuProvider extends ChineseLLMProvider {
         }
       };
     } catch (error) {
-      this.logger.error('智谱AI聊天请求失败', error);
+      this.logger.error('智谱AI聊天请求失败', { error: (error as Error).message });
       throw new Error(`智谱AI API调用失败: ${(error as Error).message}`);
     }
   }
@@ -220,7 +221,7 @@ export class ZhipuProvider extends ChineseLLMProvider {
   /**
    * 解析流式响应
    */
-  private async *parseStreamResponse(stream: any): AsyncIterable<StreamResponse> {
+  private async *parseStreamResponse(stream: ReadableStream<Uint8Array> | NodeJS.ReadableStream): AsyncIterable<StreamResponse> {
     let buffer = '';
 
     for await (const chunk of stream) {
@@ -278,7 +279,7 @@ export class ZhipuProvider extends ChineseLLMProvider {
       await this.client.post('', testRequest);
       return true;
     } catch (error) {
-      this.logger.error('智谱AI API密钥验证失败', error);
+      this.logger.error('智谱AI API密钥验证失败', { error: (error as Error).message });
       return false;
     }
   }
@@ -293,20 +294,15 @@ export class ZhipuProvider extends ChineseLLMProvider {
   /**
    * 获取模型信息
    */
-  public async getModelInfo(): Promise<any> {
+  public async getModelInfo(): Promise<ModelInfo> {
     return {
-      provider: '智谱AI',
-      description: '智谱AI GLM系列模型，专注于代码理解、数学推理和多语言处理',
-      features: ['代码理解', '数学推理', '多语言', '函数调用'],
-      models: this.getSupportedModels(),
+      name: '智谱AI',
+      version: 'GLM-4',
+      maxTokens: 128000,
+      supportedFeatures: ['代码理解', '数学推理', '多语言', '函数调用'],
       pricing: {
-        'glm-4': { input: 0.1, output: 0.1 },
-        'glm-3-turbo': { input: 0.005, output: 0.005 }
-      },
-      limits: {
-        maxTokens: 128000,
-        maxRequestsPerMinute: 200,
-        maxRequestsPerDay: 30000
+        inputTokens: 0.1,
+        outputTokens: 0.1
       }
     };
   }
@@ -315,7 +311,13 @@ export class ZhipuProvider extends ChineseLLMProvider {
    * 获取特定模型信息
    */
   public getSpecificModelInfo(model: string) {
-    const modelInfo: Record<string, any> = {
+    const modelInfo: Record<string, {
+      name: string;
+      description: string;
+      maxTokens: number;
+      supportsFunctions?: boolean;
+      supportsVision?: boolean;
+    }> = {
       [ZhipuModel.GLM_4]: {
         name: 'GLM-4',
         description: '智谱AI最新一代大模型',

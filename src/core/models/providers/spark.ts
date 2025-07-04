@@ -12,7 +12,8 @@ import {
   ChineseLLMProvider,
   ChineseLLMType,
   ModelConfig,
-  StreamResponse
+  StreamResponse,
+  ModelInfo
 } from '../chinese-llm-provider';
 
 /**
@@ -169,12 +170,16 @@ export class SparkProvider extends ChineseLLMProvider {
   /**
    * 获取模型信息
    */
-  public async getModelInfo(): Promise<any> {
+  public async getModelInfo(): Promise<ModelInfo> {
     return {
-      provider: 'Spark',
-      models: this.getSupportedModels(),
-      features: ['语音交互', '实时对话', '教育场景'],
-      maxContextLength: 8000
+      name: 'Spark',
+      version: 'v3.5',
+      maxTokens: 8000,
+      supportedFeatures: ['语音交互', '实时对话', '教育场景'],
+      pricing: {
+        inputTokens: 0.018,
+        outputTokens: 0.018
+      }
     };
   }
 

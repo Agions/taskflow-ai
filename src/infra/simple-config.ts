@@ -9,14 +9,14 @@ import { ModelType } from '../types/config';
  */
 export class SimpleConfigManager {
   private configPath: string;
-  private config: any;
+  private config: Record<string, unknown>;
 
   constructor() {
     this.configPath = path.join(os.homedir(), '.taskflow-ai', 'config.json');
     this.config = this.loadConfig();
   }
 
-  private loadConfig(): any {
+  private loadConfig(): Record<string, unknown> {
     try {
       if (fs.existsSync(this.configPath)) {
         const configData = fs.readFileSync(this.configPath, 'utf8');
@@ -59,13 +59,13 @@ export class SimpleConfigManager {
   /**
    * 获取配置值
    */
-  get(key: string, defaultValue?: any): any {
+  get(key: string, defaultValue?: unknown): unknown {
     const keys = key.split('.');
-    let value = this.config;
+    let value: unknown = this.config;
 
     for (const k of keys) {
-      if (value && typeof value === 'object' && k in value) {
-        value = value[k];
+      if (value && typeof value === 'object' && value !== null && k in value) {
+        value = (value as Record<string, unknown>)[k];
       } else {
         return defaultValue;
       }
@@ -77,7 +77,7 @@ export class SimpleConfigManager {
   /**
    * 设置配置值
    */
-  set(key: string, value: any): void {
+  set(key: string, value: unknown): void {
     const keys = key.split('.');
     let current = this.config;
 
@@ -86,7 +86,7 @@ export class SimpleConfigManager {
       if (!current[k] || typeof current[k] !== 'object') {
         current[k] = {};
       }
-      current = current[k];
+      current = current[k] as Record<string, unknown>;
     }
 
     current[keys[keys.length - 1]] = value;
@@ -96,14 +96,14 @@ export class SimpleConfigManager {
   /**
    * 获取所有配置
    */
-  getAll(): any {
+  getAll(): Record<string, unknown> {
     return { ...this.config };
   }
 
   /**
    * 更新配置
    */
-  update(newConfig: any): void {
+  update(newConfig: Record<string, unknown>): void {
     this.config = { ...this.config, ...newConfig };
     this.saveConfig();
   }
@@ -118,14 +118,14 @@ export class SimpleConfigManager {
   /**
    * 获取配置（兼容原ConfigManager接口）
    */
-  getConfig(): any {
+  getConfig(): Record<string, unknown> {
     return this.getAll();
   }
 
   /**
    * 更新配置（兼容原ConfigManager接口）
    */
-  updateConfig(config: any, _isProjectLevel = false): void {
+  updateConfig(config: Record<string, unknown>, _isProjectLevel = false): void {
     this.update(config);
   }
 
@@ -133,6 +133,6 @@ export class SimpleConfigManager {
    * 获取默认模型类型
    */
   getDefaultModelType(): ModelType {
-    return this.get('models.default', ModelType.DEEPSEEK);
+    return this.get('models.default', ModelType.DEEPSEEK) as ModelType;
   }
 }

@@ -11,7 +11,8 @@ import {
   ChineseLLMProvider,
   ChineseLLMType,
   ModelConfig,
-  StreamResponse
+  StreamResponse,
+  ModelInfo
 } from '../chinese-llm-provider';
 
 /**
@@ -197,12 +198,16 @@ export class MoonshotProvider extends ChineseLLMProvider {
   /**
    * 获取模型信息
    */
-  public async getModelInfo(): Promise<any> {
+  public async getModelInfo(): Promise<ModelInfo> {
     return {
-      provider: 'Moonshot',
-      models: this.getSupportedModels(),
-      features: ['长上下文', '文档理解', '知识问答'],
-      maxContextLength: 200000
+      name: 'Moonshot',
+      version: 'v1.0',
+      maxTokens: 200000,
+      supportedFeatures: ['长上下文', '文档理解', '知识问答'],
+      pricing: {
+        inputTokens: 0.012,
+        outputTokens: 0.012
+      }
     };
   }
 
