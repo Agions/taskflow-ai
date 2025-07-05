@@ -200,33 +200,77 @@ jobs:
           echo "⚠️ No build script found"
         fi
         
-    - name: Get version from package.json
+    - name: Get and update version
       id: get_version
       run: |
-        PACKAGE_VERSION=$(node -p "require('./package.json').version")
-        echo "VERSION=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
-        echo "📦 Package version: $PACKAGE_VERSION"
+        CURRENT_VERSION=$(node -p "require('./package.json').version")
+        echo "📦 Current package version: $CURRENT_VERSION"
 
-    - name: Verify version consistency
-      run: |
-        echo "🔍 Verifying version consistency..."
-        PACKAGE_VERSION="${{ steps.get_version.outputs.VERSION }}"
-        echo "Package version: $PACKAGE_VERSION"
-
-        # 如果是标签推送，验证标签与package.json版本一致
+        # 根据触发方式决定版本策略
         if [ "${{ startsWith(github.ref, 'refs/tags/v') }}" = "true" ]; then
+          # 标签推送：使用标签版本
           TAG_VERSION="${GITHUB_REF#refs/tags/v}"
-          echo "Tag version: $TAG_VERSION"
-          if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
-            echo "❌ Version mismatch: package.json ($PACKAGE_VERSION) != tag ($TAG_VERSION)"
-            echo "Please update package.json version to match the tag"
-            exit 1
-          fi
-          echo "✅ Tag and package.json versions match"
+          NEW_VERSION="$TAG_VERSION"
+          echo "🏷️ Using tag version: $NEW_VERSION"
+        elif [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force_npm_publish }}" = "true" ]; then
+          # 手动触发：使用当前版本
+          NEW_VERSION="$CURRENT_VERSION"
+          echo "🔧 Manual publish with current version: $NEW_VERSION"
         else
-          echo "ℹ️ Non-tag push, using package.json version: $PACKAGE_VERSION"
+          # 提交触发：自动递增patch版本
+          NEW_VERSION=$(node -e "
+            const pkg = require('./package.json');
+            const [major, minor, patch] = pkg.version.split('.').map(Number);
+            const newPatch = patch + 1;
+            console.log(\`\${major}.\${minor}.\${newPatch}\`);
+          ")
+          echo "🔄 Auto-incrementing to version: $NEW_VERSION"
+
+          # 更新package.json版本
+          node -e "
+            const fs = require('fs');
+            const pkg = require('./package.json');
+            pkg.version = '$NEW_VERSION';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+          echo "✅ Updated package.json to version: $NEW_VERSION"
         fi
-        echo "✅ Version verification completed"
+
+        echo "VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "📦 Final version for publish: $NEW_VERSION"
+
+    - name: Verify version and commit changes
+      run: |
+        echo "🔍 Verifying version and committing changes..."
+        NEW_VERSION="${{ steps.get_version.outputs.VERSION }}"
+        CURRENT_PKG_VERSION=$(node -p "require('./package.json').version")
+        echo "Target version: $NEW_VERSION"
+        echo "Package.json version: $CURRENT_PKG_VERSION"
+
+        # 如果版本已更新，提交更改
+        if [ "$NEW_VERSION" != "$CURRENT_PKG_VERSION" ]; then
+          echo "❌ Version mismatch detected, this should not happen"
+          exit 1
+        fi
+
+        # 如果是自动版本递增，提交更改
+        if [ "${{ github.event_name }}" = "push" ] && [ "${{ contains(github.event.head_commit.message, '[npm-publish]') }}" = "true" ]; then
+          echo "📝 Committing version update..."
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # 检查是否有更改需要提交
+          if ! git diff --quiet package.json; then
+            git add package.json
+            git commit -m "🔖 Bump version to $NEW_VERSION [skip ci]"
+            git push
+            echo "✅ Version update committed and pushed"
+          else
+            echo "ℹ️ No version changes to commit"
+          fi
+        fi
+
+        echo "✅ Version verification completed: $NEW_VERSION"
         
     - name: Publish to NPM
       run: |
