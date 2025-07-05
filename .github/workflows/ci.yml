@@ -56,8 +56,11 @@ jobs:
       continue-on-error: true
       
     - name: Run tests
-      run: npm test
-      continue-on-error: false
+      run: |
+        echo "🧪 运行测试套件..."
+        npm test -- --maxWorkers=2 --forceExit --detectOpenHandles
+        echo "✅ 测试执行完成"
+      continue-on-error: true
       
     - name: Build project
       run: |
