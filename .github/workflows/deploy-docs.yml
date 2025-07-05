@@ -25,6 +25,8 @@ jobs:
   # 构建作业
   build:
     runs-on: ubuntu-latest
+    outputs:
+      pages_enabled: ${{ steps.pages.outcome == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,29 +41,75 @@ jobs:
           cache-dependency-path: docs/package-lock.json
 
       - name: Setup Pages
+        id: pages
         uses: actions/configure-pages@v4
-        with:
-          # 启用静态站点生成器
-          static_site_generator: custom
+        continue-on-error: true
+
+      - name: Check Pages Setup
+        run: |
+          if [ "${{ steps.pages.outcome }}" = "failure" ]; then
+            echo "⚠️ GitHub Pages未启用，请在仓库设置中启用GitHub Pages"
+            echo "📋 启用步骤:"
+            echo "1. 进入仓库设置 -> Pages"
+            echo "2. 选择Source: GitHub Actions"
+            echo "3. 保存设置"
+            echo ""
+            echo "🔄 继续构建文档以验证配置..."
+          else
+            echo "✅ GitHub Pages配置成功"
+          fi
 
       - name: Install dependencies
         run: |
+          echo "📦 安装VitePress依赖..."
           cd docs
           npm ci
+          echo "✅ 依赖安装完成"
 
       - name: Build with VitePress
         run: |
+          echo "🔨 构建VitePress文档..."
           cd docs
           npm run build
+          echo "✅ 文档构建完成"
+
+          # 验证构建产物
+          if [ -d ".vitepress/dist" ]; then
+            echo "📊 构建产物大小:"
+            du -sh .vitepress/dist
+            echo "📁 构建产物内容:"
+            ls -la .vitepress/dist
+          else
+            echo "❌ 构建产物目录不存在"
+            exit 1
+          fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/.vitepress/dist
+        if: steps.pages.outcome == 'success'
+
+      - name: Create deployment summary
+        run: |
+          echo "## 📚 VitePress文档构建报告" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.pages.outcome }}" = "success" ]; then
+            echo "✅ **GitHub Pages配置**: 成功" >> $GITHUB_STEP_SUMMARY
+            echo "🚀 **部署状态**: 准备部署" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **GitHub Pages配置**: 需要手动启用" >> $GITHUB_STEP_SUMMARY
+            echo "📋 **下一步**: 在仓库设置中启用GitHub Pages" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 **构建信息**:" >> $GITHUB_STEP_SUMMARY
+          echo "- 构建时间: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "- Node.js版本: $(node --version)" >> $GITHUB_STEP_SUMMARY
+          echo "- VitePress版本: $(cd docs && npm list vitepress --depth=0)" >> $GITHUB_STEP_SUMMARY
 
   # 部署作业
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && needs.build.outputs.pages_enabled == 'true'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -72,3 +120,8 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Deployment success notification
+        run: |
+          echo "🎉 文档已成功部署到GitHub Pages!"
+          echo "🔗 访问地址: ${{ steps.deployment.outputs.page_url }}"

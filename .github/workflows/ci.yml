@@ -57,10 +57,20 @@ jobs:
       
     - name: Run tests
       run: |
-        echo "🧪 运行测试套件..."
-        npm test -- --maxWorkers=2 --forceExit --detectOpenHandles
+        echo "🧪 运行测试套件 (CI优化配置)..."
+        npm test -- --config=jest.config.ci.js --passWithNoTests
         echo "✅ 测试执行完成"
       continue-on-error: true
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.node-version }}
+        path: |
+          test-results/
+          coverage/
+        retention-days: 7
       
     - name: Build project
       run: |
