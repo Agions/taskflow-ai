@@ -78,8 +78,9 @@ function checkDocumentation() {
     'README.md',
     'CHANGELOG.md',
     'LICENSE',
-    'docs/getting-started.md',
-    'docs/api-reference.md',
+    'docs/guide/getting-started.md',  // 更新路径
+    'docs/api/index.md',              // 更新路径
+    'docs/index.md',                  // 主文档入口
   ];
 
   const missingDocs = requiredDocs.filter(doc => !fs.existsSync(doc));
