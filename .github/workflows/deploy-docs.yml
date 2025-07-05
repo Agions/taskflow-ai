@@ -45,18 +45,31 @@ jobs:
         uses: actions/configure-pages@v4
         continue-on-error: true
 
-      - name: Check Pages Setup
+      - name: Check Pages Setup and Provide Instructions
         run: |
           if [ "${{ steps.pages.outcome }}" = "failure" ]; then
-            echo "⚠️ GitHub Pages未启用，请在仓库设置中启用GitHub Pages"
-            echo "📋 启用步骤:"
-            echo "1. 进入仓库设置 -> Pages"
-            echo "2. 选择Source: GitHub Actions"
-            echo "3. 保存设置"
+            echo "❌ GitHub Pages未启用或配置错误"
             echo ""
-            echo "🔄 继续构建文档以验证配置..."
+            echo "🚀 **解决方案**: 请按以下步骤启用GitHub Pages"
+            echo ""
+            echo "📋 **详细步骤**:"
+            echo "1. 访问: https://github.com/${{ github.repository }}/settings/pages"
+            echo "2. 在 'Source' 部分选择: 'GitHub Actions'"
+            echo "3. 点击 'Save' 保存设置"
+            echo "4. 等待几分钟后重新运行此工作流程"
+            echo ""
+            echo "🔗 **预期结果**: 文档将部署到 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+            echo ""
+            echo "⚠️ **注意**: 仓库必须是公开的才能使用免费的GitHub Pages"
+            echo ""
+            echo "🔄 继续构建以验证VitePress配置..."
+
+            # 创建状态文件
+            echo "pages_setup_failed" > pages_status.txt
           else
             echo "✅ GitHub Pages配置成功"
+            echo "🎉 准备部署到: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+            echo "pages_setup_success" > pages_status.txt
           fi
 
       - name: Install dependencies
@@ -84,11 +97,19 @@ jobs:
             exit 1
           fi
 
-      - name: Upload artifact
+      - name: Upload artifact for Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/.vitepress/dist
         if: steps.pages.outcome == 'success'
+
+      - name: Upload artifact for manual deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitepress-docs-${{ github.sha }}
+          path: docs/.vitepress/dist
+          retention-days: 30
+        if: steps.pages.outcome == 'failure'
 
       - name: Create deployment summary
         run: |
@@ -96,10 +117,13 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.pages.outcome }}" = "success" ]; then
             echo "✅ **GitHub Pages配置**: 成功" >> $GITHUB_STEP_SUMMARY
-            echo "🚀 **部署状态**: 准备部署" >> $GITHUB_STEP_SUMMARY
+            echo "🚀 **部署状态**: 准备自动部署" >> $GITHUB_STEP_SUMMARY
+            echo "🔗 **预期URL**: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
           else
-            echo "⚠️ **GitHub Pages配置**: 需要手动启用" >> $GITHUB_STEP_SUMMARY
-            echo "📋 **下一步**: 在仓库设置中启用GitHub Pages" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **GitHub Pages配置**: 需要手动启用" >> $GITHUB_STEP_SUMMARY
+            echo "📋 **解决方案**: [启用GitHub Pages](https://github.com/${{ github.repository }}/settings/pages)" >> $GITHUB_STEP_SUMMARY
+            echo "📦 **备用方案**: 构建产物已上传为Artifact，可手动下载部署" >> $GITHUB_STEP_SUMMARY
+            echo "📖 **详细指南**: 查看仓库根目录的 GITHUB_PAGES_SETUP_GUIDE.md" >> $GITHUB_STEP_SUMMARY
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "📊 **构建信息**:" >> $GITHUB_STEP_SUMMARY
