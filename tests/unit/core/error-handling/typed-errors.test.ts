@@ -20,7 +20,11 @@ import {
 describe('TypedErrors Unit Tests', () => {
   describe('TaskFlowError', () => {
     it('应该创建基础错误实例', () => {
-      const error = new TaskFlowError('测试错误', 'TEST_ERROR', { source: 'test-source' });
+      const error = new TaskFlowError('测试错误', 'TEST_ERROR', {
+        timestamp: new Date().toISOString(),
+        source: 'test-source',
+        details: {}
+      });
       
       expect(error.message).toBe('测试错误');
       expect(error.code).toBe('TEST_ERROR');
@@ -31,13 +35,21 @@ describe('TypedErrors Unit Tests', () => {
 
     it('应该包含详细上下文信息', () => {
       const details = { userId: '123', action: 'test' };
-      const error = new TaskFlowError('测试错误', 'TEST_ERROR', 'test-source', details);
+      const error = new TaskFlowError('测试错误', 'TEST_ERROR', {
+        timestamp: new Date().toISOString(),
+        source: 'test-source',
+        details
+      });
       
       expect(error.context.details).toEqual(details);
     });
 
     it('应该正确序列化为JSON', () => {
-      const error = new TaskFlowError('测试错误', 'TEST_ERROR', 'test-source');
+      const error = new TaskFlowError('测试错误', 'TEST_ERROR', {
+        timestamp: new Date().toISOString(),
+        source: 'test-source',
+        details: {}
+      });
       const json = error.toJSON();
       
       expect(json.name).toBe('TaskFlowError');
@@ -180,7 +192,11 @@ describe('TypedErrors Unit Tests', () => {
         const criticalError = new FileSystemError('文件系统错误', 'path', 'read');
         const highError = new NetworkError('网络错误', 'url');
         const mediumError = new ValidationError('验证错误', 'field');
-        const lowError = new TaskFlowError('一般错误', 'GENERAL', 'test');
+        const lowError = new TaskFlowError('一般错误', 'GENERAL', {
+          timestamp: new Date().toISOString(),
+          source: 'test',
+          details: {}
+        });
         
         expect(ErrorHandler.getSeverity(criticalError)).toBe('critical');
         expect(ErrorHandler.getSeverity(highError)).toBe('high');
@@ -199,7 +215,11 @@ describe('TypedErrors Unit Tests', () => {
       });
 
       it('应该处理没有建议的错误', () => {
-        const error = new TaskFlowError('简单错误', 'SIMPLE', 'test');
+        const error = new TaskFlowError('简单错误', 'SIMPLE', {
+          timestamp: new Date().toISOString(),
+          source: 'test',
+          details: {}
+        });
         const message = ErrorHandler.formatUserMessage(error);
         
         expect(message).toBe('简单错误');
@@ -217,7 +237,7 @@ describe('TypedErrors Unit Tests', () => {
         expect(report.retryable).toBe(false);
         expect(report.error).toBeDefined();
         expect(report.environment).toBeDefined();
-        expect(report.environment.nodeVersion).toBeDefined();
+        expect((report.environment as Record<string, unknown>)?.nodeVersion).toBeDefined();
       });
     });
   });
@@ -228,7 +248,7 @@ describe('TypedErrors Unit Tests', () => {
         const result = createSuccess('test-data');
         
         expect(result.success).toBe(true);
-        expect(result.data).toBe('test-data');
+        expect((result as { success: true; data: string }).data).toBe('test-data');
       });
     });
 
@@ -238,7 +258,7 @@ describe('TypedErrors Unit Tests', () => {
         const result = createFailure(error);
         
         expect(result.success).toBe(false);
-        expect(result.error).toBe(error);
+        expect((result as { success: false; error: ValidationError }).error).toBe(error);
       });
     });
   });

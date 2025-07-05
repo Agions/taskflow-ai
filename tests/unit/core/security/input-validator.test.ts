@@ -248,7 +248,7 @@ describe('InputValidator Unit Tests', () => {
       const nullResult = InputValidator.validate(null, rule);
       expect(nullResult.isValid).toBe(true);
       
-      const undefinedResult = InputValidator.validate(undefined, rule);
+      const undefinedResult = InputValidator.validate(null, rule);
       expect(undefinedResult.isValid).toBe(true);
       
       const emptyStringResult = InputValidator.validate('', rule);

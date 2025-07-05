@@ -26,6 +26,32 @@ export enum LogLevel {
 }
 
 /**
+ * 编程语言枚举
+ */
+export enum ProgrammingLanguage {
+  TYPESCRIPT = 'typescript',
+  JAVASCRIPT = 'javascript',
+  PYTHON = 'python',
+  JAVA = 'java',
+  GO = 'go',
+  RUST = 'rust',
+  CPP = 'cpp',
+  CSHARP = 'csharp',
+}
+
+/**
+ * 项目类型枚举
+ */
+export enum ProjectType {
+  WEB_APP = 'web-app',
+  API = 'api',
+  MOBILE_APP = 'mobile-app',
+  DESKTOP_APP = 'desktop-app',
+  LIBRARY = 'library',
+  CLI_TOOL = 'cli-tool',
+}
+
+/**
  * 通用模型配置接口
  */
 export interface ModelConfig {

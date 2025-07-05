@@ -2784,6 +2784,32 @@ var LogLevel;
     LogLevel["DEBUG"] = "debug";
 })(LogLevel || (LogLevel = {}));
 /**
+ * 编程语言枚举
+ */
+var ProgrammingLanguage;
+(function (ProgrammingLanguage) {
+    ProgrammingLanguage["TYPESCRIPT"] = "typescript";
+    ProgrammingLanguage["JAVASCRIPT"] = "javascript";
+    ProgrammingLanguage["PYTHON"] = "python";
+    ProgrammingLanguage["JAVA"] = "java";
+    ProgrammingLanguage["GO"] = "go";
+    ProgrammingLanguage["RUST"] = "rust";
+    ProgrammingLanguage["CPP"] = "cpp";
+    ProgrammingLanguage["CSHARP"] = "csharp";
+})(ProgrammingLanguage || (ProgrammingLanguage = {}));
+/**
+ * 项目类型枚举
+ */
+var ProjectType;
+(function (ProjectType) {
+    ProjectType["WEB_APP"] = "web-app";
+    ProjectType["API"] = "api";
+    ProjectType["MOBILE_APP"] = "mobile-app";
+    ProjectType["DESKTOP_APP"] = "desktop-app";
+    ProjectType["LIBRARY"] = "library";
+    ProjectType["CLI_TOOL"] = "cli-tool";
+})(ProjectType || (ProjectType = {}));
+/**
  * 默认配置
  */
 const DEFAULT_CONFIG = {
