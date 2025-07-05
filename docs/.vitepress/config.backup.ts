@@ -11,16 +11,13 @@ export default defineConfig({
   // 忽略死链接检查
   ignoreDeadLinks: true,
   
-  // 强制更新标记
-  lastUpdated: true,
-  
   // 主题配置
   themeConfig: {
     // 网站标题和Logo
     logo: '/taskflow-ai/assets/logo.svg',
     siteTitle: 'TaskFlow AI',
     
-    // 导航栏 - 确保专业版本
+    // 导航栏
     nav: [
       { text: '首页', link: '/' },
       { 
@@ -72,7 +69,7 @@ export default defineConfig({
       }
     ],
     
-    // 侧边栏 - 确保完整结构
+    // 侧边栏
     sidebar: {
       '/guide/': [
         {
@@ -108,6 +105,15 @@ export default defineConfig({
             { text: '任务管理器', link: '/api/task-manager' },
             { text: 'AI编排器', link: '/api/ai-orchestrator' },
             { text: '项目配置', link: '/api/project-config' }
+          ]
+        },
+        {
+          text: '类型定义',
+          collapsed: true,
+          items: [
+            { text: '核心类型', link: '/api/types/core' },
+            { text: '配置类型', link: '/api/types/config' },
+            { text: '任务类型', link: '/api/types/task' }
           ]
         }
       ],
@@ -246,10 +252,7 @@ export default defineConfig({
     ['meta', { name: 'og:locale', content: 'zh-CN' }],
     ['meta', { name: 'og:site_name', content: 'TaskFlow AI' }],
     ['meta', { name: 'og:image', content: 'https://agions.github.io/taskflow-ai/og-image.png' }],
-    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-    // 强制刷新缓存
-    ['meta', { name: 'cache-control', content: 'no-cache' }],
-    ['meta', { name: 'expires', content: '0' }]
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }]
   ],
   
   // Markdown配置
@@ -258,6 +261,9 @@ export default defineConfig({
     theme: {
       light: 'github-light',
       dark: 'github-dark'
+    },
+    config: (md) => {
+      // 可以在这里添加markdown插件
     }
   },
   

@@ -72,17 +72,56 @@ jobs:
             echo "pages_setup_success" > pages_status.txt
           fi
 
-      - name: Install dependencies
+      - name: Clean cache and install dependencies
         run: |
-          echo "📦 安装VitePress依赖..."
+          echo "🧹 清理缓存和旧文件..."
           cd docs
-          npm ci
+
+          # 清理npm缓存
+          npm cache clean --force
+
+          # 清理VitePress缓存
+          rm -rf .vitepress/cache
+          rm -rf .vitepress/dist
+
+          # 清理node_modules
+          rm -rf node_modules
+
+          echo "📦 重新安装VitePress依赖..."
+          npm install
           echo "✅ 依赖安装完成"
+
+      - name: Verify VitePress configuration
+        run: |
+          echo "🔍 验证VitePress配置..."
+          cd docs
+
+          # 检查配置文件
+          if [ -f ".vitepress/config.ts" ]; then
+            echo "✅ 配置文件存在: .vitepress/config.ts"
+            echo "📋 配置文件内容预览:"
+            head -20 .vitepress/config.ts
+          else
+            echo "❌ 配置文件不存在"
+            exit 1
+          fi
+
+          # 检查必要的资源文件
+          if [ -f "public/assets/logo.svg" ]; then
+            echo "✅ Logo文件存在"
+          else
+            echo "⚠️ Logo文件缺失"
+          fi
 
       - name: Build with VitePress
         run: |
           echo "🔨 构建VitePress文档..."
           cd docs
+
+          # 设置环境变量
+          export NODE_ENV=production
+          export VITEPRESS_BASE=/taskflow-ai/
+
           npm run build
           echo "✅ 文档构建完成"
 
