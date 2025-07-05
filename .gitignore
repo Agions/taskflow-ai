@@ -69,7 +69,7 @@ dev-debug.log
 *.sln
 *.sw?
 # OS specific
-
+.vitepress/cache/
 # Task files
 # tasks.json
 # tasks/
