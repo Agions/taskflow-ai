@@ -15,8 +15,6 @@ export default defineConfig({
   vue: {
     template: {
       compilerOptions: {
-        // 禁用Vue模板插值语法处理
-        delimiters: ['{{', '}}'],
         // 自定义元素处理
         isCustomElement: (tag) => tag.includes('-') || tag.startsWith('v-')
       }
