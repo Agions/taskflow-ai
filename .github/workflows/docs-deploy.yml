@@ -152,6 +152,21 @@ jobs:
             du -sh .vitepress/dist
             echo "📁 构建产物内容:"
             ls -la .vitepress/dist
+
+            echo "🎨 检查CSS文件:"
+            find .vitepress/dist -name "*.css" -type f
+
+            echo "📄 检查HTML文件中的CSS引用:"
+            if [ -f ".vitepress/dist/index.html" ]; then
+              grep -n "\.css" .vitepress/dist/index.html || echo "未找到CSS引用"
+            fi
+
+            echo "🔍 检查assets目录:"
+            if [ -d ".vitepress/dist/assets" ]; then
+              ls -la .vitepress/dist/assets/
+            else
+              echo "❌ assets目录不存在"
+            fi
           else
             echo "❌ 构建产物目录不存在"
             exit 1
