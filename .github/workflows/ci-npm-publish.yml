@@ -1,0 +1,217 @@
+name: CI/CD & NPM Publish
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.x'
+  CI: true
+
+jobs:
+  # 质量门控和测试
+  quality-gate:
+    name: Quality Gate & Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        echo "📦 Installing dependencies for Node.js ${{ matrix.node-version }}..."
+        npm ci --prefer-offline --no-audit --silent
+        
+    - name: TypeScript type check
+      run: |
+        echo "🔍 Running TypeScript type check..."
+        if [ -f "tsconfig.json" ]; then
+          npx tsc --noEmit --incremental --pretty --skipLibCheck
+          echo "✅ TypeScript type check passed"
+        else
+          echo "⚠️ No TypeScript configuration found, skipping"
+        fi
+        
+    - name: ESLint check
+      run: |
+        echo "🔍 Running ESLint check..."
+        if [ -f ".eslintrc.js" ] || [ -f ".eslintrc.json" ] || [ -f "eslint.config.js" ]; then
+          npx eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 0 --format stylish
+          echo "✅ ESLint check passed"
+        else
+          echo "⚠️ No ESLint configuration found, skipping"
+        fi
+        
+    - name: Prettier format check
+      run: |
+        echo "🔍 Running Prettier format check..."
+        if [ -f ".prettierrc" ] || [ -f ".prettierrc.json" ] || [ -f "prettier.config.js" ]; then
+          npx prettier --check . --ignore-unknown
+          echo "✅ Prettier format check passed"
+        else
+          echo "⚠️ No Prettier configuration found, skipping"
+        fi
+        
+    - name: Security audit
+      run: |
+        echo "🔒 Running security audit..."
+        npm audit --audit-level moderate --production
+        echo "✅ Security audit completed"
+        
+    - name: Run tests
+      run: |
+        echo "🧪 Running tests..."
+        if [ -f "package.json" ] && grep -q '"test"' package.json; then
+          npm test
+          echo "✅ Tests completed"
+        else
+          echo "⚠️ No test script found, skipping"
+        fi
+        
+    - name: Build project
+      run: |
+        echo "🔨 Building project..."
+        if [ -f "package.json" ] && grep -q '"build"' package.json; then
+          npm run build
+          echo "✅ Project build completed"
+        else
+          echo "⚠️ No build script found, skipping"
+        fi
+
+  # NPM发布（仅在tag推送时）
+  npm-publish:
+    name: NPM Publish
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    if: startsWith(github.ref, 'refs/tags/v')
+    timeout-minutes: 10
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        registry-url: 'https://registry.npmjs.org'
+        
+    - name: Install dependencies
+      run: |
+        echo "📦 Installing dependencies for publishing..."
+        npm ci --prefer-offline --no-audit --silent
+        
+    - name: Build for production
+      run: |
+        echo "🔨 Building for production..."
+        if [ -f "package.json" ] && grep -q '"build"' package.json; then
+          npm run build
+          echo "✅ Production build completed"
+        else
+          echo "⚠️ No build script found"
+        fi
+        
+    - name: Get version from tag
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+    - name: Verify package version
+      run: |
+        echo "🔍 Verifying package version..."
+        PACKAGE_VERSION=$(node -p "require('./package.json').version")
+        TAG_VERSION="${{ steps.get_version.outputs.VERSION }}"
+        echo "Package version: $PACKAGE_VERSION"
+        echo "Tag version: $TAG_VERSION"
+        if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
+          echo "❌ Version mismatch: package.json ($PACKAGE_VERSION) != tag ($TAG_VERSION)"
+          exit 1
+        fi
+        echo "✅ Version verification passed"
+        
+    - name: Publish to NPM
+      run: |
+        echo "📦 Publishing to NPM..."
+        npm publish --access public
+        echo "✅ Package published to NPM"
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ steps.get_version.outputs.VERSION }}
+        body: |
+          ## TaskFlow AI v${{ steps.get_version.outputs.VERSION }}
+          
+          ### 🚀 新功能
+          - 查看 [CHANGELOG.md](./CHANGELOG.md) 获取详细更新内容
+          
+          ### 📦 安装方式
+          ```bash
+          npm install taskflow-ai@${{ steps.get_version.outputs.VERSION }}
+          ```
+          
+          ### 📚 文档
+          - [在线文档](https://agions.github.io/taskflow-ai/)
+          - [API参考](https://agions.github.io/taskflow-ai/api/)
+          - [用户指南](https://agions.github.io/taskflow-ai/user-guide/)
+        draft: false
+        prerelease: false
+
+  # 状态汇总
+  status-summary:
+    name: Status Summary
+    runs-on: ubuntu-latest
+    needs: [quality-gate, npm-publish]
+    if: always()
+    
+    steps:
+    - name: Summary
+      run: |
+        echo "## 🎯 CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Quality Gate & Testing | ${{ needs.quality-gate.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| NPM Publish | ${{ needs.npm-publish.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ needs.quality-gate.result }}" = "success" ]; then
+          echo "✅ **Quality Gate**: All checks passed"
+        else
+          echo "❌ **Quality Gate**: Some checks failed"
+        fi
+        
+        if [ "${{ startsWith(github.ref, 'refs/tags/v') }}" = "true" ]; then
+          if [ "${{ needs.npm-publish.result }}" = "success" ]; then
+            echo "✅ **NPM Publish**: Package published successfully"
+          else
+            echo "❌ **NPM Publish**: Publishing failed"
+          fi
+        else
+          echo "⏭️ **NPM Publish**: Skipped (not a tag push)"
+        fi

@@ -1,4 +1,4 @@
-name: Deploy VitePress Documentation
+name: Documentation Build & Deploy
 
 on:
   push:
