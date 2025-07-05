@@ -4,19 +4,19 @@ export default defineConfig({
   title: 'TaskFlow AI',
   description: 'TaskFlow AI - 智能PRD文档解析与任务管理助手，专为开发团队设计的AI驱动任务编排工具',
 
-  // 强制更新版本标记
-  cleanUrls: false,
-  
-  // 基础配置
+  // GitHub Pages 优化配置
   base: '/taskflow-ai/',
   lang: 'zh-CN',
-  
-  // 忽略死链接检查
+  cleanUrls: false,
   ignoreDeadLinks: true,
-  
-  // 强制更新标记
   lastUpdated: true,
-  
+
+  // 确保资源正确加载
+  assetsDir: 'assets',
+  cacheDir: '.vitepress/cache',
+
+
+
   // 主题配置
   themeConfig: {
     // 网站标题和Logo
@@ -233,11 +233,19 @@ export default defineConfig({
       port: 5173
     },
     
-    // 构建优化 - 修复terser问题
+    // 构建优化 - 修复terser问题和资源文件
     build: {
       minify: 'esbuild',
       chunkSizeWarningLimit: 1000,
-      target: 'es2015'
+      target: 'es2015',
+      assetsDir: 'assets',
+      rollupOptions: {
+        output: {
+          assetFileNames: 'assets/[name].[hash].[ext]',
+          chunkFileNames: 'assets/[name].[hash].js',
+          entryFileNames: 'assets/[name].[hash].js'
+        }
+      }
     }
   },
   

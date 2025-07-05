@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'docs/**'
-      - '.github/workflows/deploy-docs.yml'
+      - '.github/workflows/docs-deploy.yml'
   workflow_dispatch:
 
 # 设置GITHUB_TOKEN的权限以允许部署到GitHub Pages
