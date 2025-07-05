@@ -233,10 +233,11 @@ export default defineConfig({
       port: 5173
     },
     
-    // 构建优化
+    // 构建优化 - 修复terser问题
     build: {
-      minify: 'terser',
-      chunkSizeWarningLimit: 1000
+      minify: 'esbuild',
+      chunkSizeWarningLimit: 1000,
+      target: 'es2015'
     }
   },
   
