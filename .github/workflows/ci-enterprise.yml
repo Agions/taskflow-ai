@@ -156,6 +156,7 @@ jobs:
         
         # 安装文档依赖
         npm ci --prefer-offline --no-audit --silent
+        npm install --save-dev terser --silent
         
         # 验证配置
         echo "🔍 Verifying VitePress configuration..."
