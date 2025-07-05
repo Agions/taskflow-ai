@@ -57,8 +57,14 @@ jobs:
       
     - name: Run tests
       run: |
-        echo "🧪 运行测试套件 (CI优化配置)..."
-        npm test -- --config=jest.config.ci.js --passWithNoTests
+        echo "🧪 运行测试套件 (简化CI配置)..."
+        if [ -f "jest.config.simple.js" ]; then
+          npm test -- --config=jest.config.simple.js --passWithNoTests
+        elif [ -f "jest.config.ci.js" ]; then
+          npm test -- --config=jest.config.ci.js --passWithNoTests
+        else
+          npm test -- --passWithNoTests
+        fi
         echo "✅ 测试执行完成"
       continue-on-error: true
 
