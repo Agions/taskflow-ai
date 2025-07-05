@@ -122,7 +122,7 @@ export class QwenModelAdapter extends BaseModelAdapter {
               if (parsed.output && parsed.output.text) {
                 onData(parsed.output.text, false);
               }
-            } catch (e) {
+            } catch {
               // 忽略解析错误
             }
           }
@@ -150,7 +150,7 @@ export class QwenModelAdapter extends BaseModelAdapter {
 
       await this.chat(testParams);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

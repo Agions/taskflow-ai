@@ -96,7 +96,7 @@ export class ModelFactory {
     try {
       const adapter = this.createModelAdapter(modelType);
       return await adapter.validateApiKey();
-    } catch (error) {
+    } catch {
       return false;
     }
   }

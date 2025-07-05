@@ -29,9 +29,9 @@ export class TaskFlowService {
     // 初始化基础设施
     this.configManager = new SimpleConfigManager();
     this.logger = Logger.getInstance({
-      level: this.configManager.get('logger.level', LogLevel.INFO),
-      output: this.configManager.get('logger.output', 'console'),
-      file: this.configManager.get('logger.file')
+      level: this.configManager.get('logger.level', LogLevel.INFO) as LogLevel,
+      output: this.configManager.get('logger.output', 'console') as 'console' | 'file' | 'both',
+      file: this.configManager.get('logger.file') as string | undefined
     });
 
     // 初始化核心服务
@@ -253,9 +253,9 @@ export class TaskFlowService {
       // 更新日志配置
       if (config.logger) {
         this.logger.updateConfig({
-          level: this.configManager.get('logger.level', LogLevel.INFO),
-          output: this.configManager.get('logger.output', 'console'),
-          file: this.configManager.get('logger.file')
+          level: this.configManager.get('logger.level', LogLevel.INFO) as LogLevel,
+          output: this.configManager.get('logger.output', 'console') as 'console' | 'file' | 'both',
+          file: this.configManager.get('logger.file') as string | undefined
         });
       }
 
@@ -275,9 +275,10 @@ export class TaskFlowService {
       // 移除敏感信息
       const safeConfig = { ...config };
       if (safeConfig.models) {
-        Object.keys(safeConfig.models).forEach(key => {
-          if (key !== 'default' && safeConfig.models[key as keyof typeof safeConfig.models]) {
-            const modelConfig = safeConfig.models[key as keyof typeof safeConfig.models] as any;
+        const modelsConfig = safeConfig.models as Record<string, unknown>;
+        Object.keys(modelsConfig).forEach(key => {
+          if (key !== 'default' && modelsConfig[key]) {
+            const modelConfig = modelsConfig[key] as Record<string, unknown>;
             if (modelConfig && modelConfig.apiKey) {
               modelConfig.apiKey = '******';
             }

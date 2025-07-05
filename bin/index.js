@@ -1214,7 +1214,7 @@ class PRDParser {
      * @param options 解析选项
      */
     async parseFromFile(filePath, options) {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b;
         try {
             this.logger.info(`开始解析PRD文件：${filePath}`);
             // 检查文件是否存在
@@ -1233,12 +1233,12 @@ class PRDParser {
             const documentStructure = await this.documentProcessor.processDocument(filePath, processingOptions);
             // 使用需求提取器提取需求
             const extractionOptions = {
-                includeUserStories: (_a = options === null || options === void 0 ? void 0 : options.extractUserStories) !== null && _a !== void 0 ? _a : true,
-                detectDependencies: (_b = options === null || options === void 0 ? void 0 : options.detectDependencies) !== null && _b !== void 0 ? _b : true,
-                estimateEffort: (_c = options === null || options === void 0 ? void 0 : options.estimateEffort) !== null && _c !== void 0 ? _c : true,
-                analyzePriority: (_d = options === null || options === void 0 ? void 0 : options.analyzePriority) !== null && _d !== void 0 ? _d : true,
-                extractAcceptanceCriteria: (_e = options === null || options === void 0 ? void 0 : options.extractAcceptanceCriteria) !== null && _e !== void 0 ? _e : true,
-                detectStakeholders: (_f = options === null || options === void 0 ? void 0 : options.detectStakeholders) !== null && _f !== void 0 ? _f : true
+                includeUserStories: (_a = options === null || options === void 0 ? void 0 : options.extractFeatures) !== null && _a !== void 0 ? _a : true,
+                detectDependencies: true,
+                estimateEffort: true,
+                analyzePriority: (_b = options === null || options === void 0 ? void 0 : options.prioritize) !== null && _b !== void 0 ? _b : true,
+                extractAcceptanceCriteria: true,
+                detectStakeholders: true
             };
             const extractionResult = await this.requirementExtractor.extractRequirements(documentStructure, extractionOptions);
             // 转换为ParsedPRD格式
@@ -1375,7 +1375,7 @@ class PRDParser {
             technicalRisk: req.technicalRisk,
             stakeholders: req.stakeholders,
             category: req.category,
-            status: 'not_started',
+            status: TaskStatus.NOT_STARTED,
             createdAt: req.metadata.extractedAt,
             updatedAt: req.metadata.extractedAt
         }));
@@ -1399,7 +1399,7 @@ class PRDParser {
                 suggestions: extractionResult.suggestions,
                 documentStructure: {
                     sectionsCount: documentStructure.sections.length,
-                    maxDepth: this.calculateMaxDepth(documentStructure.sections),
+                    maxDepth: this.calculateMaxDepth(this.convertToPRDSections(documentStructure.sections)),
                     hasTableOfContents: this.hasTableOfContents(documentStructure),
                     primaryLanguage: documentStructure.metadata.language
                 },
@@ -1427,6 +1427,19 @@ class PRDParser {
             return documentStructure.sections[0].content.substring(0, 500).trim();
         }
         return '从PRD文档自动提取的产品需求';
+    }
+    /**
+     * 转换DocumentSection到PRDSection
+     * @param sections 文档章节列表
+     */
+    convertToPRDSections(sections) {
+        return sections.map(section => ({
+            title: section.title,
+            content: section.content,
+            level: section.level,
+            features: [], // 默认为空，实际应该从内容中提取
+            subsections: section.subsections ? this.convertToPRDSections(section.subsections) : undefined
+        }));
     }
     /**
      * 计算最大深度
@@ -2736,7 +2749,7 @@ class TaskVisualizer {
      * @param task 任务
      * @param index 索引
      */
-    calculateTaskStartDate(task, index) {
+    calculateTaskStartDate(_task, index) {
         // 简化实现：基于索引计算开始日期
         const startDate = new Date();
         startDate.setDate(startDate.getDate() + index);
@@ -3151,7 +3164,7 @@ class BaiduModelAdapter extends BaseModelAdapter {
                                 const parsedData = JSON.parse(data);
                                 onData(parsedData.result, parsedData.is_end || false);
                             }
-                            catch (e) {
+                            catch {
                                 // 忽略非JSON数据
                             }
                         }
@@ -3178,7 +3191,7 @@ class BaiduModelAdapter extends BaseModelAdapter {
             await this.ensureAccessToken();
             return !!this.accessToken;
         }
-        catch (error) {
+        catch {
             return false;
         }
     }
@@ -3347,7 +3360,7 @@ class DeepseekModelAdapter extends BaseModelAdapter {
                                     onData(content, done);
                                 }
                             }
-                            catch (e) {
+                            catch {
                                 // 忽略非JSON数据
                             }
                         }
@@ -3378,7 +3391,7 @@ class DeepseekModelAdapter extends BaseModelAdapter {
             }, { temperature: 0.1 });
             return true;
         }
-        catch (error) {
+        catch {
             return false;
         }
     }
@@ -3531,7 +3544,7 @@ class ZhipuModelAdapter extends BaseModelAdapter {
                                     onData(delta, done);
                                 }
                             }
-                            catch (e) {
+                            catch {
                                 // 忽略非JSON数据
                             }
                         }
@@ -3562,7 +3575,7 @@ class ZhipuModelAdapter extends BaseModelAdapter {
             }, { temperature: 0.1 });
             return true;
         }
-        catch (error) {
+        catch {
             return false;
         }
     }
@@ -3748,7 +3761,7 @@ class QwenModelAdapter extends BaseModelAdapter {
                                 onData(parsed.output.text, false);
                             }
                         }
-                        catch (e) {
+                        catch {
                             // 忽略解析错误
                         }
                     }
@@ -3774,7 +3787,7 @@ class QwenModelAdapter extends BaseModelAdapter {
             await this.chat(testParams);
             return true;
         }
-        catch (error) {
+        catch {
             return false;
         }
     }
@@ -3883,7 +3896,7 @@ class ModelFactory {
             const adapter = this.createModelAdapter(modelType);
             return await adapter.validateApiKey();
         }
-        catch (error) {
+        catch {
             return false;
         }
     }
@@ -4315,9 +4328,10 @@ class TaskFlowService {
             // 移除敏感信息
             const safeConfig = { ...config };
             if (safeConfig.models) {
-                Object.keys(safeConfig.models).forEach(key => {
-                    if (key !== 'default' && safeConfig.models[key]) {
-                        const modelConfig = safeConfig.models[key];
+                const modelsConfig = safeConfig.models;
+                Object.keys(modelsConfig).forEach(key => {
+                    if (key !== 'default' && modelsConfig[key]) {
+                        const modelConfig = modelsConfig[key];
                         if (modelConfig && modelConfig.apiKey) {
                             modelConfig.apiKey = '******';
                         }
@@ -4877,7 +4891,7 @@ const yasiService = taskFlowService;
  */
 // 导出核心引擎
 // 版本信息
-const VERSION = '1.2.0';
+const VERSION = '1.3.0';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
@@ -5140,7 +5154,7 @@ class VisualizeCommand {
             // 输出结果
             if (options.output) {
                 const format = options.format || 'mermaid';
-                await this.saveVisualization(result, options.output, format);
+                await this.saveVisualization(JSON.stringify(result), options.output, format);
                 console.log(chalk.green(`✅ 可视化已保存到: ${options.output}`));
             }
             else {
@@ -6086,7 +6100,6 @@ class InteractiveCommand {
      * 处理状态查看
      */
     async handleStatus() {
-        var _a;
         console.log(chalk.blue('\n📊 项目状态'));
         const spinner = ora('正在获取项目状态...').start();
         try {
@@ -6104,11 +6117,12 @@ class InteractiveCommand {
                 console.log(`  ⏳ 待开始: ${pending}`);
                 console.log(`  📊 总计: ${tasks.length}`);
             }
-            if (configResult.success) {
+            if (configResult.success && configResult.data) {
                 const config = configResult.data;
+                const models = config.models;
                 console.log(chalk.blue('\n⚙️  配置状态:'));
-                console.log(`  🎯 默认模型: ${((_a = config.models) === null || _a === void 0 ? void 0 : _a.default) || '未设置'}`);
-                console.log(`  🔑 已配置模型: ${Object.keys(config.models || {}).filter(k => k !== 'default').length}`);
+                console.log(`  🎯 默认模型: ${(models === null || models === void 0 ? void 0 : models.default) || '未设置'}`);
+                console.log(`  🔑 已配置模型: ${Object.keys(models || {}).filter(k => k !== 'default').length}`);
             }
         }
         catch (error) {
@@ -6550,7 +6564,10 @@ class MCPConfigGenerator {
                 ...options.customEnvironment
             }
         };
-        this.logger.debug(`生成 ${editor} MCP配置`, baseConfig);
+        this.logger.debug(`生成 ${editor} MCP配置`, {
+            editor,
+            config: JSON.stringify(baseConfig, null, 2)
+        });
         return baseConfig;
     }
     /**
@@ -6559,6 +6576,7 @@ class MCPConfigGenerator {
      * @returns 验证结果
      */
     validateMCPConfig(config) {
+        var _a, _b;
         const errors = [];
         const warnings = [];
         // 验证编辑器类型
@@ -6588,7 +6606,13 @@ class MCPConfigGenerator {
             errors: errors.length > 0 ? errors : undefined,
             warnings: warnings.length > 0 ? warnings : undefined
         };
-        this.logger.debug('MCP配置验证结果', result);
+        this.logger.debug('MCP配置验证结果', {
+            isValid: result.valid,
+            errorCount: ((_a = result.errors) === null || _a === void 0 ? void 0 : _a.length) || 0,
+            warningCount: ((_b = result.warnings) === null || _b === void 0 ? void 0 : _b.length) || 0,
+            errors: result.errors,
+            warnings: result.warnings
+        });
         return result;
     }
     /**
@@ -7310,7 +7334,7 @@ class ConfigManager {
         try {
             this.loadFromFile();
         }
-        catch (error) {
+        catch {
             this.logger.warn('从文件加载配置失败，使用默认配置');
         }
         // 2. 从环境变量覆盖

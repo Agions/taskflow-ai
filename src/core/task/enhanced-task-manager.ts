@@ -32,8 +32,8 @@ export interface TaskEvent {
   taskId: string;
   userId?: string;
   timestamp: Date;
-  data: any;
-  metadata?: Record<string, any>;
+  data: Task | Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -99,7 +99,7 @@ export class EnhancedTaskManager extends EventEmitter {
   private configManager: ConfigManager;
   private autoSaveInterval: NodeJS.Timeout | null = null;
   private taskHistory: TaskEvent[] = [];
-  private collaborators: Map<string, any> = new Map();
+  private collaborators: Map<string, { id: string; name: string; role: string; lastActive: Date }> = new Map();
 
   constructor(logger: Logger, configManager: ConfigManager) {
     super();
@@ -371,8 +371,8 @@ export class EnhancedTaskManager extends EventEmitter {
     // 排序
     if (sort) {
       filteredTasks.sort((a, b) => {
-        let aValue: any = a[sort.field];
-        let bValue: any = b[sort.field];
+        let aValue: unknown = a[sort.field as keyof Task];
+        let bValue: unknown = b[sort.field as keyof Task];
 
         // 处理日期类型
         if (aValue instanceof Date) aValue = aValue.getTime();
@@ -385,8 +385,19 @@ export class EnhancedTaskManager extends EventEmitter {
           bValue = priorityOrder[bValue as TaskPriority] || 0;
         }
 
-        if (aValue < bValue) return sort.direction === 'asc' ? -1 : 1;
-        if (aValue > bValue) return sort.direction === 'asc' ? 1 : -1;
+        // 类型安全的比较
+        const aNum = typeof aValue === 'number' ? aValue : 0;
+        const bNum = typeof bValue === 'number' ? bValue : 0;
+        const aStr = typeof aValue === 'string' ? aValue : String(aValue);
+        const bStr = typeof bValue === 'string' ? bValue : String(bValue);
+
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          if (aNum < bNum) return sort.direction === 'asc' ? -1 : 1;
+          if (aNum > bNum) return sort.direction === 'asc' ? 1 : -1;
+        } else {
+          if (aStr < bStr) return sort.direction === 'asc' ? -1 : 1;
+          if (aStr > bStr) return sort.direction === 'asc' ? 1 : -1;
+        }
         return 0;
       });
     }

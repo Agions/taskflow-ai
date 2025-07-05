@@ -96,7 +96,10 @@ export class SparkProvider extends ChineseLLMProvider {
         throw new Error('Invalid response format from Spark API');
       }
     } catch (error) {
-      this.logger.error('Spark API调用失败', error);
+      this.logger.error('Spark API调用失败', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       throw error;
     }
   }
@@ -145,7 +148,10 @@ export class SparkProvider extends ChineseLLMProvider {
         }]
       });
     } catch (error) {
-      this.logger.error('Spark流式API调用失败', error);
+      this.logger.error('Spark流式API调用失败', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       throw error;
     }
   }
@@ -162,7 +168,7 @@ export class SparkProvider extends ChineseLLMProvider {
 
       await this.chat(testRequest);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

@@ -84,8 +84,8 @@ export interface ChartData {
   yAxis?: {
     title: string;
     type: 'category' | 'datetime' | 'numeric';
-    min?: any;
-    max?: any;
+    min?: number | string | Date;
+    max?: number | string | Date;
   };
   annotations?: ChartAnnotation[];      // 注释
 }
@@ -95,13 +95,13 @@ export interface ChartData {
  */
 export interface ChartAnnotation {
   type: 'line' | 'area' | 'point' | 'text';
-  x?: any;
-  y?: any;
-  x2?: any;
-  y2?: any;
+  x?: number | string | Date;
+  y?: number | string | Date;
+  x2?: number | string | Date;
+  y2?: number | string | Date;
   text?: string;
   color?: string;
-  style?: Record<string, any>;
+  style?: Record<string, unknown>;
 }
 
 /**
@@ -129,9 +129,22 @@ export interface GeneratedChart {
 export class ChartGenerator {
   private logger: Logger;
   private defaultTheme: 'light' | 'dark' = 'light';
-  private colorPalettes: Record<string, any> = {
+  private colorPalettes: Record<string, string[]> = {
     default: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'],
-    status: {
+    status: ['#6b7280', '#9ca3af', '#3b82f6', '#3b82f6', '#10b981', '#10b981', '#ef4444', '#dc2626', '#9ca3af', '#f59e0b', '#8b5cf6', '#6b7280'],
+    priority: ['#dc2626', '#ea580c', '#3b82f6', '#6b7280'],
+    type: ['#3b82f6', '#ef4444', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#06b6d4', '#84cc16']
+  };
+
+  constructor(logger: Logger) {
+    this.logger = logger;
+  }
+
+  /**
+   * 获取状态对应的颜色
+   */
+  private getStatusColor(status: TaskStatus): string {
+    const statusColors: Record<TaskStatus, string> = {
       [TaskStatus.NOT_STARTED]: '#6b7280',
       [TaskStatus.PENDING]: '#9ca3af',
       [TaskStatus.IN_PROGRESS]: '#3b82f6',
@@ -144,27 +157,8 @@ export class ChartGenerator {
       [TaskStatus.ON_HOLD]: '#f59e0b',
       [TaskStatus.REVIEW]: '#8b5cf6',
       [TaskStatus.TODO]: '#6b7280'
-    },
-    priority: {
-      [TaskPriority.CRITICAL]: '#dc2626',
-      [TaskPriority.HIGH]: '#ea580c',
-      [TaskPriority.MEDIUM]: '#3b82f6',
-      [TaskPriority.LOW]: '#6b7280'
-    },
-    type: {
-      [TaskType.FEATURE]: '#3b82f6',
-      [TaskType.BUG_FIX]: '#ef4444',
-      [TaskType.REFACTOR]: '#8b5cf6',
-      [TaskType.TEST]: '#10b981',
-      [TaskType.DOCUMENT]: '#f59e0b',
-      [TaskType.DESIGN]: '#ec4899',
-      [TaskType.RESEARCH]: '#06b6d4',
-      [TaskType.DEPLOYMENT]: '#84cc16'
-    }
-  };
-
-  constructor(logger: Logger) {
-    this.logger = logger;
+    };
+    return statusColors[status] || '#6b7280';
   }
 
   /**
@@ -501,7 +495,7 @@ export class ChartGenerator {
         x: this.getStatusLabel(status as TaskStatus),
         y: count,
         label: `${this.getStatusLabel(status as TaskStatus)}: ${count}`,
-        color: this.colorPalettes.status[status as TaskStatus],
+        color: this.getStatusColor(status as TaskStatus),
         metadata: { status, count, percentage: (count / taskPlan.tasks.length * 100).toFixed(1) }
       }))
     }];
@@ -595,7 +589,7 @@ export class ChartGenerator {
           x: assignee,
           y: workload.totalTasks,
           label: `${assignee}: ${workload.totalTasks}个任务`,
-          color: this.colorPalettes.default[0],
+          color: this.colorPalettes.default[0] || '#3b82f6',
           metadata: workload
         }))
       },
@@ -605,7 +599,7 @@ export class ChartGenerator {
           x: assignee,
           y: workload.totalHours,
           label: `${assignee}: ${workload.totalHours}小时`,
-          color: this.colorPalettes.default[1],
+          color: this.colorPalettes.default[1] || '#ef4444',
           metadata: workload
         }))
       }
@@ -739,7 +733,7 @@ export class ChartGenerator {
         x: `第${index + 1}周`,
         y: velocity.completedTasks,
         label: `第${index + 1}周: ${velocity.completedTasks}个任务`,
-        color: this.colorPalettes.default[0],
+        color: this.colorPalettes.default[0] || '#3b82f6',
         metadata: {
           week: index + 1,
           completedTasks: velocity.completedTasks,
@@ -863,9 +857,9 @@ export class ChartGenerator {
         x: day.date.getTime(),
         y: day.statusCounts[status] || 0,
         label: `${this.getStatusLabel(status)}: ${day.statusCounts[status] || 0}`,
-        color: this.colorPalettes.status[status]
+        color: this.getStatusColor(status)
       })),
-      color: this.colorPalettes.status[status]
+      color: this.getStatusColor(status)
     }));
 
     const chartData: ChartData = {
@@ -972,7 +966,7 @@ export class ChartGenerator {
    * 生成图表ID
    */
   private generateChartId(): string {
-    return `chart_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `chart_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
   }
 
   /**
@@ -980,7 +974,7 @@ export class ChartGenerator {
    * @param task 任务
    */
   private getTaskColor(task: Task): string {
-    return this.colorPalettes.status[task.status];
+    return this.getStatusColor(task.status);
   }
 
   /**

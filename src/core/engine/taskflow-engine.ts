@@ -10,7 +10,7 @@ import { PRDParser } from '../parser/prd-parser';
 import { TaskPlanner } from '../planner/task-planner';
 import { TaskManager } from '../task/task-manager';
 import { Task, TaskPlan, ParsedPRD, TaskStatus } from '../../types/task';
-import { PlanningOptions } from '../../types/model';
+import { PlanningOptions, ParseOptions } from '../../types/model';
 
 /**
  * 引擎配置接口
@@ -23,15 +23,7 @@ export interface EngineConfig {
   enableOptimization?: boolean;
 }
 
-/**
- * PRD解析选项
- */
-export interface ParseOptions {
-  extractDependencies?: boolean;
-  generateSubtasks?: boolean;
-  estimateEffort?: boolean;
-  detectPriorities?: boolean;
-}
+
 
 
 

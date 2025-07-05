@@ -115,7 +115,7 @@ export class BaiduModelAdapter extends BaseModelAdapter {
               try {
                 const parsedData = JSON.parse(data) as BaiduResponseBody;
                 onData(parsedData.result, parsedData.is_end || false);
-              } catch (e) {
+              } catch {
                 // 忽略非JSON数据
               }
             }
@@ -143,7 +143,7 @@ export class BaiduModelAdapter extends BaseModelAdapter {
     try {
       await this.ensureAccessToken();
       return !!this.accessToken;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

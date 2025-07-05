@@ -233,7 +233,7 @@ describe('InputValidator Unit Tests', () => {
       expect(nullResult.isValid).toBe(false);
       expect(nullResult.errors).toContain('此字段为必填项');
       
-      const undefinedResult = InputValidator.validate(undefined, rule);
+      const undefinedResult = InputValidator.validate(null, rule);
       expect(undefinedResult.isValid).toBe(false);
       expect(undefinedResult.errors).toContain('此字段为必填项');
       

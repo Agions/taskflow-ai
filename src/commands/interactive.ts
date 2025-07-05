@@ -466,11 +466,12 @@ export class InteractiveCommand {
         console.log(`  📊 总计: ${tasks.length}`);
       }
 
-      if (configResult.success) {
-        const config = configResult.data;
+      if (configResult.success && configResult.data) {
+        const config = configResult.data as Record<string, unknown>;
+        const models = config.models as Record<string, unknown> | undefined;
         console.log(chalk.blue('\n⚙️  配置状态:'));
-        console.log(`  🎯 默认模型: ${config.models?.default || '未设置'}`);
-        console.log(`  🔑 已配置模型: ${Object.keys(config.models || {}).filter(k => k !== 'default').length}`);
+        console.log(`  🎯 默认模型: ${models?.default || '未设置'}`);
+        console.log(`  🔑 已配置模型: ${Object.keys(models || {}).filter(k => k !== 'default').length}`);
       }
     } catch (error) {
       spinner.fail('获取状态失败');

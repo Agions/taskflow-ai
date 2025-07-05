@@ -256,10 +256,10 @@ export class InputValidator {
    * 验证装饰器
    */
   public static validateInput(schema: Record<string, ValidationRule>) {
-    return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    return function(target: object, propertyKey: string, descriptor: PropertyDescriptor) {
       const originalMethod = descriptor.value;
 
-      descriptor.value = function(input: JSONObject, ...args: any[]) {
+      descriptor.value = function(input: JSONObject, ...args: unknown[]) {
         const validation = InputValidator.validateObject(input, schema);
         
         if (!validation.isValid) {

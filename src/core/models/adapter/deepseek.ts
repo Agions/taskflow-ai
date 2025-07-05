@@ -117,7 +117,7 @@ export class DeepseekModelAdapter extends BaseModelAdapter {
                   const done = parsedData.choices[0].finish_reason === 'stop';
                   onData(content, done);
                 }
-              } catch (e) {
+              } catch {
                 // 忽略非JSON数据
               }
             }
@@ -149,7 +149,7 @@ export class DeepseekModelAdapter extends BaseModelAdapter {
         maxTokens: 5
       }, { temperature: 0.1 });
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

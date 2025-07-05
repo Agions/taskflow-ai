@@ -55,8 +55,8 @@ export class MemoryManager {
   private configManager: ConfigManager;
   private thresholds: MemoryThresholds;
   private memoryHistory: MemoryStats[] = [];
-  private objectPools: Map<string, ObjectPool<any>> = new Map();
-  private weakRefs: Set<WeakRef<any>> = new Set();
+  private objectPools: Map<string, ObjectPool<unknown>> = new Map();
+  private weakRefs: Set<WeakRef<object>> = new Set();
   private monitoringInterval?: NodeJS.Timeout;
   private gcInterval?: NodeJS.Timeout;
 
@@ -158,7 +158,7 @@ export class MemoryManager {
    * 获取对象池
    */
   public getObjectPool<T>(name: string): ObjectPool<T> | undefined {
-    return this.objectPools.get(name);
+    return this.objectPools.get(name) as ObjectPool<T> | undefined;
   }
 
   /**
@@ -322,7 +322,11 @@ export class MemoryManager {
 
     // 监听未捕获异常
     process.on('uncaughtException', (error) => {
-      this.logger.error('未捕获异常可能导致内存泄漏:', error);
+      this.logger.error('未捕获异常可能导致内存泄漏:', {
+        error: error.message,
+        stack: error.stack,
+        name: error.name
+      });
     });
   }
 
@@ -354,7 +358,7 @@ export class MemoryManager {
     }
     
     // 检查定时器数量
-    const activeHandles = (process as any)._getActiveHandles();
+    const activeHandles = (process as NodeJS.Process & { _getActiveHandles?: () => unknown[] })._getActiveHandles?.();
     if (activeHandles && activeHandles.length > 50) {
       suspicious.push('活跃句柄过多');
     }
@@ -425,7 +429,7 @@ export class MemoryManager {
           try {
             pool.acquire();
             // 不放回池中，让其被垃圾回收
-          } catch (error) {
+          } catch {
             break;
           }
         }

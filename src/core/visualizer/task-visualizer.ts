@@ -106,16 +106,16 @@ export class TaskVisualizer {
    * @param taskPlan 任务计划
    * @param options 可视化选项
    */
-  public generateVisualization(taskPlan: TaskPlan, options: VisualizationOptions): any {
+  public generateVisualization(taskPlan: TaskPlan, options: VisualizationOptions): Record<string, unknown> {
     this.logger.info(`生成 ${options.type} 可视化`);
 
     switch (options.type) {
       case VisualizationType.GANTT:
-        return this.generateGanttChart(taskPlan, options);
+        return this.generateGanttChart(taskPlan, options) as unknown as Record<string, unknown>;
       case VisualizationType.DEPENDENCY:
-        return this.generateDependencyGraph(taskPlan, options);
+        return this.generateDependencyGraph(taskPlan, options) as unknown as Record<string, unknown>;
       case VisualizationType.KANBAN:
-        return this.generateKanbanBoard(taskPlan, options);
+        return this.generateKanbanBoard(taskPlan, options) as unknown as Record<string, unknown>;
       case VisualizationType.TIMELINE:
         return this.generateTimeline(taskPlan, options);
       case VisualizationType.PROGRESS:
@@ -328,7 +328,7 @@ export class TaskVisualizer {
    * @param taskPlan 任务计划
    * @param options 选项
    */
-  private generateTimeline(taskPlan: TaskPlan, _options: VisualizationOptions): any {
+  private generateTimeline(taskPlan: TaskPlan, _options: VisualizationOptions): Record<string, unknown> {
     // 简化的时间线实现
     const timeline = {
       title: taskPlan.name || '项目时间线',
@@ -350,7 +350,7 @@ export class TaskVisualizer {
    * @param taskPlan 任务计划
    * @param options 选项
    */
-  private generateProgressChart(taskPlan: TaskPlan, _options: VisualizationOptions): any {
+  private generateProgressChart(taskPlan: TaskPlan, _options: VisualizationOptions): Record<string, unknown> {
     const stats = {
       total: taskPlan.tasks.length,
       completed: 0,
@@ -403,7 +403,7 @@ export class TaskVisualizer {
    * @param task 任务
    * @param index 索引
    */
-  private calculateTaskStartDate(task: Task, index: number): string {
+  private calculateTaskStartDate(_task: Task, index: number): string {
     // 简化实现：基于索引计算开始日期
     const startDate = new Date();
     startDate.setDate(startDate.getDate() + index);

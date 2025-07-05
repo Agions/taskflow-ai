@@ -393,7 +393,7 @@ export class DocumentProcessor {
    * @param id 章节ID
    * @param level 层级
    */
-  private createSectionFromObject(obj: any, id: string, level: number): DocumentSection {
+  private createSectionFromObject(obj: unknown, id: string, level: number): DocumentSection {
     const title = typeof obj === 'object' && obj !== null ? 
       Object.keys(obj)[0] || id : 
       String(obj);

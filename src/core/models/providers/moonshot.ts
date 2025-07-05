@@ -88,7 +88,10 @@ export class MoonshotProvider extends ChineseLLMProvider {
         throw new Error('Invalid response format from Moonshot API');
       }
     } catch (error) {
-      this.logger.error('Moonshot API调用失败', error);
+      this.logger.error('Moonshot API调用失败', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       throw error;
     }
   }
@@ -151,7 +154,7 @@ export class MoonshotProvider extends ChineseLLMProvider {
                   }]
                 });
               }
-            } catch (e) {
+            } catch {
               // 忽略解析错误
             }
           }
@@ -173,7 +176,10 @@ export class MoonshotProvider extends ChineseLLMProvider {
       });
 
     } catch (error) {
-      this.logger.error('Moonshot流式API调用失败', error);
+      this.logger.error('Moonshot流式API调用失败', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       throw error;
     }
   }
@@ -190,7 +196,7 @@ export class MoonshotProvider extends ChineseLLMProvider {
 
       await this.chat(testRequest);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

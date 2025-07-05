@@ -245,7 +245,7 @@ export function requireOwnership(resourceIdParam: string, resourceType: string) 
       }
 
       next();
-    } catch (error) {
+    } catch {
       return res.status(500).json({
         success: false,
         message: '权限检查失败',
@@ -310,7 +310,7 @@ export function optionalAuth(configManager: ConfigManager) {
       const jwtSecret = configManager.get('security.jwt.secret', 'default-secret-key') as string;
       const decoded = jwt.verify(token, jwtSecret) as jwt.JwtPayload & AuthUser;
       req.user = decoded;
-    } catch (error) {
+    } catch {
       // token无效，但不阻止访问
     }
 
@@ -372,7 +372,7 @@ async function checkResourceAccess(
       default:
         return false;
     }
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -435,7 +435,7 @@ export function refreshToken(token: string, configManager: ConfigManager): strin
 
     // 生成新token
     return generateToken(userInfo, configManager);
-  } catch (error) {
+  } catch {
     throw new Error('Token刷新失败');
   }
 }

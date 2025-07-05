@@ -474,7 +474,7 @@ export class NotificationSystem extends EventEmitter {
     const reminder: Reminder = {
       id: this.generateId(),
       userId: user.id,
-      taskId: notification.data?.id || '',
+      taskId: (notification.data?.id as string) || '',
       type: 'follow_up',
       title: `提醒: ${notification.title}`,
       message: notification.message,

@@ -18,11 +18,14 @@ export class PerformanceMonitor {
 
   private constructor() {
     // 简化Logger初始化，避免构造函数问题
-    this.logger = {
-      info: (message: string, meta?: any) => console.log(`[INFO] ${message}`, meta),
-      warn: (message: string, meta?: any) => console.warn(`[WARN] ${message}`, meta),
-      error: (message: string, meta?: any) => console.error(`[ERROR] ${message}`, meta)
-    } as any;
+    this.logger = ({
+      info: (message: string, meta?: Record<string, unknown>) => console.log(`[INFO] ${message}`, meta),
+      warn: (message: string, meta?: Record<string, unknown>) => console.warn(`[WARN] ${message}`, meta),
+      error: (message: string, meta?: Record<string, unknown>) => console.error(`[ERROR] ${message}`, meta),
+      debug: (message: string, meta?: Record<string, unknown>) => console.debug(`[DEBUG] ${message}`, meta),
+      log: (level: string, message: string, meta?: Record<string, unknown>) => console.log(`[${level.toUpperCase()}] ${message}`, meta),
+      updateConfig: () => { /* no-op */ }
+    } as unknown) as Logger;
   }
 
   public static getInstance(): PerformanceMonitor {
@@ -163,7 +166,7 @@ export class PerformanceMonitor {
  * 性能监控装饰器
  */
 export function performanceMonitor(operationName?: string) {
-  return function(target: any, propertyKey: string, descriptor?: PropertyDescriptor) {
+  return function(target: Record<string, unknown>, propertyKey: string, descriptor?: PropertyDescriptor) {
     if (!descriptor) {
       descriptor = Object.getOwnPropertyDescriptor(target, propertyKey) || {
         value: target[propertyKey],
@@ -176,12 +179,12 @@ export function performanceMonitor(operationName?: string) {
     const operation = operationName || `${target.constructor.name}.${propertyKey}`;
     const monitor = PerformanceMonitor.getInstance();
 
-    descriptor.value = async function(...args: any[]) {
+    descriptor.value = async function(...args: unknown[]) {
       const startTime = performance.now();
       const startMemory = process.memoryUsage().heapUsed / 1024 / 1024; // MB
-      
+
       let success = true;
-      let result: any;
+      let result: unknown;
 
       try {
         result = await originalMethod.apply(this, args);
@@ -337,10 +340,10 @@ export class MemoryCache<T> {
 /**
  * 缓存装饰器
  */
-export function cached(ttl?: number, keyGenerator?: (...args: any[]) => string) {
-  const cache = new MemoryCache<any>();
+export function cached(ttl?: number, keyGenerator?: (...args: unknown[]) => string) {
+  const cache = new MemoryCache<unknown>();
 
-  return function(target: any, propertyKey: string, descriptor?: PropertyDescriptor) {
+  return function(target: Record<string, unknown>, propertyKey: string, descriptor?: PropertyDescriptor) {
     if (!descriptor) {
       descriptor = Object.getOwnPropertyDescriptor(target, propertyKey) || {
         value: target[propertyKey],
@@ -351,7 +354,7 @@ export function cached(ttl?: number, keyGenerator?: (...args: any[]) => string) 
     }
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function(...args: any[]) {
+    descriptor.value = async function(...args: unknown[]) {
       const cacheKey = keyGenerator ? 
         keyGenerator(...args) : 
         `${target.constructor.name}.${propertyKey}:${JSON.stringify(args)}`;
@@ -372,8 +375,9 @@ export function cached(ttl?: number, keyGenerator?: (...args: any[]) => string) 
     };
 
     // 添加缓存管理方法
-    (descriptor.value as any).clearCache = () => cache.clear();
-    (descriptor.value as any).getCacheStats = () => cache.getStats();
+    const methodWithCache = descriptor.value as ((...args: unknown[]) => unknown) & { clearCache?: () => void; getCacheStats?: () => unknown };
+    methodWithCache.clearCache = () => cache.clear();
+    methodWithCache.getCacheStats = () => cache.getStats();
 
     return descriptor;
   };

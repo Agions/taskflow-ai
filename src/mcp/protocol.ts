@@ -281,7 +281,7 @@ export function getMCPTools() {
  */
 export const MCP_SERVER_INFO = {
   name: 'TaskFlow AI',
-  version: '1.2.0',
+  version: '1.3.0',
   description: 'TaskFlow AI - 智能PRD解析和任务管理助手',
   capabilities: {
     tools: true,

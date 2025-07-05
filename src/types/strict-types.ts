@@ -8,7 +8,9 @@ export type JSONValue = string | number | boolean | null | JSONObject | JSONArra
 export interface JSONObject {
   [key: string]: JSONValue;
 }
-export interface JSONArray extends Array<JSONValue> {}
+export interface JSONArray extends Array<JSONValue> {
+  [index: number]: JSONValue;
+}
 
 // HTTP响应类型
 export interface APIResponse<T = JSONValue> {

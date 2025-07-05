@@ -132,7 +132,7 @@ export class StorageService {
    * @param documentPath 文档路径
    * @param parsedContent 解析内容
    */
-  public async saveParsedResult(documentPath: string, parsedContent: any): Promise<string> {
+  public async saveParsedResult(documentPath: string, parsedContent: unknown): Promise<string> {
     const parsedDir = path.join(this.basePath, 'parsed');
     fs.ensureDirSync(parsedDir);
     
@@ -148,7 +148,7 @@ export class StorageService {
    * 获取解析结果
    * @param documentName 文档名称（不包含扩展名）
    */
-  public async getParsedResult(documentName: string): Promise<any | null> {
+  public async getParsedResult(documentName: string): Promise<unknown | null> {
     const filePath = path.join(this.basePath, 'parsed', `${documentName}_parsed.json`);
     
     if (!await fs.pathExists(filePath)) {

@@ -1,5 +1,3 @@
-/* eslint-disable no-case-declarations */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * 协作管理器 - 处理团队协作功能
  * 支持多人协作、实时同步、冲突解决等功能
@@ -95,11 +93,11 @@ export interface Conflict {
   taskId: string;
   users: string[];
   description: string;
-  data: any;
+  data: Record<string, unknown>;
   createdAt: Date;
   resolvedAt?: Date;
   resolvedBy?: string;
-  resolution?: any;
+  resolution?: Record<string, unknown>;
 }
 
 /**
@@ -124,7 +122,7 @@ export interface Notification {
   userId: string;
   title: string;
   message: string;
-  data: any;
+  data: Record<string, unknown>;
   isRead: boolean;
   createdAt: Date;
   readAt?: Date;
@@ -140,7 +138,7 @@ export interface ActivityLog {
   targetType: 'task' | 'project' | 'user';
   targetId: string;
   description: string;
-  metadata: any;
+  metadata: Record<string, unknown>;
   timestamp: Date;
 }
 
@@ -361,10 +359,11 @@ export class CollaborationManager extends EventEmitter {
 
     // 检测状态冲突
     if (event.type === TaskEventType.TASK_STATUS_CHANGED) {
-      const { oldStatus, newStatus } = event.data;
+      const eventData = event.data as Record<string, unknown>;
+      const { oldStatus, newStatus } = eventData;
 
       // 检查状态转换是否合法
-      if (!this.isValidStatusTransition(oldStatus, newStatus)) {
+      if (!this.isValidStatusTransition(oldStatus as TaskStatus, newStatus as TaskStatus)) {
         this.createConflict({
           type: ConflictType.STATUS_CONFLICT,
           taskId: event.taskId,
@@ -396,7 +395,7 @@ export class CollaborationManager extends EventEmitter {
         userId,
         title: '检测到冲突',
         message: conflict.description,
-        data: conflict
+        data: conflict as unknown as Record<string, unknown>
       });
     });
 
@@ -412,7 +411,7 @@ export class CollaborationManager extends EventEmitter {
    * @param resolution 解决方案
    * @param resolvedBy 解决者ID
    */
-  public resolveConflict(conflictId: string, resolution: any, resolvedBy: string): boolean {
+  public resolveConflict(conflictId: string, resolution: Record<string, unknown>, resolvedBy: string): boolean {
     const conflict = this.conflicts.get(conflictId);
     if (!conflict || conflict.resolvedAt) {
       return false;
@@ -435,41 +434,49 @@ export class CollaborationManager extends EventEmitter {
   private sendNotifications(event: TaskEvent): void {
     switch (event.type) {
       case TaskEventType.TASK_ASSIGNED: {
-        const { newAssignee } = event.data||{};
+        const eventData = event.data as Record<string, unknown>;
+        const { newAssignee } = eventData || {};
+        const task = eventData.task as Record<string, unknown>;
         if (newAssignee) {
           this.createNotification({
             type: NotificationType.TASK_ASSIGNED,
-            userId: newAssignee,
+            userId: newAssignee as string,
             title: '任务已分配',
-            message: `您被分配了新任务: ${event.data.task.title}`,
-            data: event.data.task
+            message: `您被分配了新任务: ${task?.title || '未知任务'}`,
+            data: task
           });
         }
         break;
       }
 
-      case TaskEventType.TASK_COMPLETED:
+      case TaskEventType.TASK_COMPLETED: {
+        const eventData = event.data as Record<string, unknown>;
+        const task = eventData.task as Record<string, unknown>;
         // 通知项目相关人员
-        this.notifyProjectMembers(event.data.task, {
+        this.notifyProjectMembers(task as unknown as Task, {
           type: NotificationType.TASK_COMPLETED,
           title: '任务已完成',
-          message: `任务 "${event.data.task.title}" 已完成`,
-          data: event.data.task
+          message: `任务 "${task?.title || '未知任务'}" 已完成`,
+          data: task
         });
         break;
+      }
 
-      case TaskEventType.TASK_BLOCKED:
+      case TaskEventType.TASK_BLOCKED: {
+        const eventData = event.data as Record<string, unknown>;
+        const task = eventData.task as Record<string, unknown>;
         // 通知任务负责人和项目管理员
-        if (event.data.task.assignee) {
+        if (task?.assignee) {
           this.createNotification({
             type: NotificationType.TASK_BLOCKED,
-            userId: event.data.task.assignee,
+            userId: task.assignee as string,
             title: '任务被阻塞',
-            message: `任务 "${event.data.task.title}" 被阻塞`,
-            data: event.data.task
+            message: `任务 "${task?.title || '未知任务'}" 被阻塞`,
+            data: task
           });
         }
         break;
+      }
     }
   }
 
@@ -555,7 +562,7 @@ export class CollaborationManager extends EventEmitter {
       targetType: 'task',
       targetId: event.taskId,
       description: this.generateActivityDescription(event),
-      metadata: event.data,
+      metadata: event.data as unknown as Record<string, unknown>,
       timestamp: event.timestamp
     };
 
@@ -582,10 +589,14 @@ export class CollaborationManager extends EventEmitter {
         return `${userName} 创建了任务`;
       case TaskEventType.TASK_UPDATED:
         return `${userName} 更新了任务`;
-      case TaskEventType.TASK_STATUS_CHANGED:
-        return `${userName} 将任务状态从 ${event.data.oldStatus} 改为 ${event.data.newStatus}`;
-      case TaskEventType.TASK_ASSIGNED:
-        return `${userName} 将任务分配给了 ${event.data.newAssignee}`;
+      case TaskEventType.TASK_STATUS_CHANGED: {
+        const eventData = event.data as Record<string, unknown>;
+        return `${userName} 将任务状态从 ${eventData.oldStatus || '未知'} 改为 ${eventData.newStatus || '未知'}`;
+      }
+      case TaskEventType.TASK_ASSIGNED: {
+        const eventData = event.data as Record<string, unknown>;
+        return `${userName} 将任务分配给了 ${eventData.newAssignee || '未知用户'}`;
+      }
       case TaskEventType.TASK_COMPLETED:
         return `${userName} 完成了任务`;
       default:

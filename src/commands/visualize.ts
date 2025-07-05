@@ -142,7 +142,7 @@ export class VisualizeCommand {
       // 输出结果
       if (options.output) {
         const format = options.format || 'mermaid';
-        await this.saveVisualization(result, options.output, format);
+        await this.saveVisualization(JSON.stringify(result), options.output, format);
         console.log(chalk.green(`✅ 可视化已保存到: ${options.output}`));
       } else {
         // 输出到控制台

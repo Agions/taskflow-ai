@@ -50,7 +50,7 @@ export interface Task {
   startedAt?: Date;
   completedAt?: Date;
   dueDate?: Date;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 /**
@@ -77,7 +77,7 @@ export interface TaskUpdateOptions {
   actualHours?: number;
   assignee?: string;
   dueDate?: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -113,7 +113,10 @@ export class TaskManager extends EventEmitter {
         await fs.writeJson(this.dataFile, { tasks: [] });
       }
     } catch (error) {
-      this.logger.error('初始化任务数据文件失败:', error);
+      this.logger.error('初始化任务数据文件失败:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
     }
   }
 
@@ -140,7 +143,10 @@ export class TaskManager extends EventEmitter {
       }
       this.logger.info(`已加载 ${this.tasks.size} 个任务`);
     } catch (error) {
-      this.logger.error('加载任务数据失败:', error);
+      this.logger.error('加载任务数据失败:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
     }
   }
 
@@ -152,7 +158,10 @@ export class TaskManager extends EventEmitter {
       const tasksArray = Array.from(this.tasks.values());
       await fs.writeJson(this.dataFile, { tasks: tasksArray }, { spaces: 2 });
     } catch (error) {
-      this.logger.error('保存任务数据失败:', error);
+      this.logger.error('保存任务数据失败:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
     }
   }
 

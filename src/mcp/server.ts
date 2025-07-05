@@ -7,12 +7,13 @@
 import { TaskFlowService } from './index';
 import { Logger } from '../infra/logger';
 import { LogLevel } from '../types/config';
+import { FileType } from '../types/model';
 
 // MCP协议相关类型定义
 interface MCPTool {
   name: string;
   description: string;
-  inputSchema: any;
+  inputSchema: Record<string, unknown>;
 }
 
 interface MCPRequest {
@@ -355,9 +356,7 @@ export class TaskFlowMCPServer {
     try {
       this.logger.info('开始解析PRD内容');
       // Convert format string to FileType enum
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { FileType } = require('./index');
-      let fileType: typeof FileType[keyof typeof FileType] | undefined;
+      let fileType: FileType;
       switch (format) {
         case 'markdown':
           fileType = FileType.MARKDOWN;
@@ -371,6 +370,7 @@ export class TaskFlowMCPServer {
         default:
           fileType = FileType.MARKDOWN;
       }
+
       const result = await this.taskFlowService.parsePRD(
         content,
         fileType,
@@ -444,11 +444,11 @@ export class TaskFlowMCPServer {
   /**
    * 处理任务状态更新请求
    */
-  private async handleUpdateTaskStatus(args: any): Promise<MCPResponse> {
+  private async handleUpdateTaskStatus(args: Record<string, unknown>): Promise<MCPResponse> {
     const { taskId, status, progress, notes, autoSync = true } = args;
 
     try {
-      const result = this.taskFlowService.updateTaskStatus(taskId, status, { progress, notes });
+      const result = this.taskFlowService.updateTaskStatus(taskId as string, status as string, { progress, notes });
 
       if (result.success) {
         const syncMessage = autoSync ? '\n✅ 已自动同步到团队' : '';
@@ -480,7 +480,7 @@ export class TaskFlowMCPServer {
   /**
    * 处理项目状态查询请求
    */
-  private async handleGetProjectStatus(args: any): Promise<MCPResponse> {
+  private async handleGetProjectStatus(args: Record<string, unknown>): Promise<MCPResponse> {
     const { projectPath = '.', includeDetails = false, includeMetrics = true } = args;
 
     try {
@@ -524,7 +524,7 @@ export class TaskFlowMCPServer {
   /**
    * 处理多模型协作请求
    */
-  private async handleMultiModelOrchestration(args: any): Promise<MCPResponse> {
+  private async handleMultiModelOrchestration(args: Record<string, unknown>): Promise<MCPResponse> {
     const { task, taskType, context = {}, options = {} } = args;
 
     try {
@@ -556,10 +556,10 @@ export class TaskFlowMCPServer {
         taskType,
         context,
         options: {
-          useMultipleModels: options.useMultipleModels ?? true,
-          qualityCheck: options.qualityCheck ?? true,
-          fallbackEnabled: options.fallbackEnabled ?? true,
-          parallelProcessing: options.parallelProcessing ?? false
+          useMultipleModels: (options as Record<string, unknown>).useMultipleModels ?? true,
+          qualityCheck: (options as Record<string, unknown>).qualityCheck ?? true,
+          fallbackEnabled: (options as Record<string, unknown>).fallbackEnabled ?? true,
+          parallelProcessing: (options as Record<string, unknown>).parallelProcessing ?? false
         },
         modelResults,
         bestResult: modelResults[0],
@@ -587,7 +587,7 @@ export class TaskFlowMCPServer {
   /**
    * 处理智能任务分解请求
    */
-  private async handleSmartTaskBreakdown(args: any): Promise<MCPResponse> {
+  private async handleSmartTaskBreakdown(args: Record<string, unknown>): Promise<MCPResponse> {
     const { complexTask, targetGranularity = 'medium' } = args;
 
     try {
@@ -696,7 +696,7 @@ export class TaskFlowMCPServer {
   /**
    * 处理单个工具调用（公共接口）
    */
-  public async executeToolCall(name: string, args: any): Promise<MCPResponse> {
+  public async executeToolCall(name: string, args: Record<string, unknown>): Promise<MCPResponse> {
     return await this.callTool(name, args);
   }
 }

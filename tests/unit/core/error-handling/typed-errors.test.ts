@@ -20,7 +20,7 @@ import {
 describe('TypedErrors Unit Tests', () => {
   describe('TaskFlowError', () => {
     it('应该创建基础错误实例', () => {
-      const error = new TaskFlowError('测试错误', 'TEST_ERROR', 'test-source');
+      const error = new TaskFlowError('测试错误', 'TEST_ERROR', { source: 'test-source' });
       
       expect(error.message).toBe('测试错误');
       expect(error.code).toBe('TEST_ERROR');

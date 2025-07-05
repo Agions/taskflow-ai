@@ -6,7 +6,7 @@ import { Logger } from '../../infra/logger';
 // ConfigManager 未使用，已移除
 import { DocumentProcessor, DocumentStructure, ProcessingOptions } from './document-processor';
 import { RequirementExtractor, ExtractionOptions, ExtractionResult } from './requirement-extractor';
-import { ParsedPRD, Feature } from '../../types/task';
+import { ParsedPRD, Feature, TaskType, TaskStatus } from '../../types/task';
 
 /**
  * PRD解析结果接口
@@ -25,6 +25,7 @@ export interface PRDSection {
   content: string;
   level: number;
   features: PRDFeature[];
+  subsections?: PRDSection[];
 }
 
 /**
@@ -63,7 +64,7 @@ export class PRDParser {
    * @param filePath PRD文件路径
    * @param options 解析选项
    */
-  public async parseFromFile(filePath: string, options?: any): Promise<ParsedPRD> {
+  public async parseFromFile(filePath: string, options?: ParseOptions): Promise<ParsedPRD> {
     try {
       this.logger.info(`开始解析PRD文件：${filePath}`);
 
@@ -86,12 +87,12 @@ export class PRDParser {
 
       // 使用需求提取器提取需求
       const extractionOptions: ExtractionOptions = {
-        includeUserStories: options?.extractUserStories ?? true,
-        detectDependencies: options?.detectDependencies ?? true,
-        estimateEffort: options?.estimateEffort ?? true,
-        analyzePriority: options?.analyzePriority ?? true,
-        extractAcceptanceCriteria: options?.extractAcceptanceCriteria ?? true,
-        detectStakeholders: options?.detectStakeholders ?? true
+        includeUserStories: options?.extractFeatures ?? true,
+        detectDependencies: true,
+        estimateEffort: true,
+        analyzePriority: options?.prioritize ?? true,
+        extractAcceptanceCriteria: true,
+        detectStakeholders: true
       };
 
       const extractionResult = await this.requirementExtractor.extractRequirements(
@@ -235,7 +236,7 @@ export class PRDParser {
       name: req.title,
       description: req.description,
       priority: req.priority,
-      type: req.type as any,
+      type: (req.type as unknown) as TaskType,
       dependencies: req.dependencies,
       estimatedHours: req.estimatedEffort,
       tags: req.tags,
@@ -245,7 +246,7 @@ export class PRDParser {
       technicalRisk: req.technicalRisk,
       stakeholders: req.stakeholders,
       category: req.category,
-      status: 'not_started' as any,
+      status: TaskStatus.NOT_STARTED,
       createdAt: req.metadata.extractedAt,
       updatedAt: req.metadata.extractedAt
     }));
@@ -270,7 +271,7 @@ export class PRDParser {
         suggestions: extractionResult.suggestions,
         documentStructure: {
           sectionsCount: documentStructure.sections.length,
-          maxDepth: this.calculateMaxDepth(documentStructure.sections),
+          maxDepth: this.calculateMaxDepth(this.convertToPRDSections(documentStructure.sections)),
           hasTableOfContents: this.hasTableOfContents(documentStructure),
           primaryLanguage: documentStructure.metadata.language
         },
@@ -308,13 +309,27 @@ export class PRDParser {
   }
 
   /**
+   * 转换DocumentSection到PRDSection
+   * @param sections 文档章节列表
+   */
+  private convertToPRDSections(sections: DocumentStructure['sections']): PRDSection[] {
+    return sections.map(section => ({
+      title: section.title,
+      content: section.content,
+      level: section.level,
+      features: [], // 默认为空，实际应该从内容中提取
+      subsections: section.subsections ? this.convertToPRDSections(section.subsections) : undefined
+    }));
+  }
+
+  /**
    * 计算最大深度
    * @param sections 章节列表
    */
-  private calculateMaxDepth(sections: any[]): number {
+  private calculateMaxDepth(sections: PRDSection[]): number {
     let maxDepth = 0;
 
-    const calculateDepth = (sectionList: any[], currentDepth: number = 1): void => {
+    const calculateDepth = (sectionList: PRDSection[], currentDepth: number = 1): void => {
       maxDepth = Math.max(maxDepth, currentDepth);
 
       sectionList.forEach(section => {

@@ -258,7 +258,7 @@ export class EditorConfigGenerator {
    * 生成VSCode启动配置
    */
   private async generateVSCodeLaunch(vscodeDir: string, variables: EditorVariables): Promise<void> {
-    const launch = {
+    const launch: { version: string; configurations: Record<string, unknown>[] } = {
       version: '0.2.0',
       configurations: [
         {
@@ -289,7 +289,7 @@ export class EditorConfigGenerator {
           NODE_ENV: 'test'
         },
         outFiles: ['${workspaceFolder}/dist/**/*.js']
-      } as any);
+      });
     }
 
     await fs.writeFile(

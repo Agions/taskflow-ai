@@ -57,7 +57,10 @@ export class MCPConfigGenerator {
       }
     };
 
-    this.logger.debug(`生成 ${editor} MCP配置`, baseConfig);
+    this.logger.debug(`生成 ${editor} MCP配置`, {
+      editor,
+      config: JSON.stringify(baseConfig, null, 2)
+    });
     return baseConfig;
   }
 
@@ -103,7 +106,13 @@ export class MCPConfigGenerator {
       warnings: warnings.length > 0 ? warnings : undefined
     };
 
-    this.logger.debug('MCP配置验证结果', result);
+    this.logger.debug('MCP配置验证结果', {
+      isValid: result.valid,
+      errorCount: result.errors?.length || 0,
+      warningCount: result.warnings?.length || 0,
+      errors: result.errors,
+      warnings: result.warnings
+    });
     return result;
   }
 
@@ -113,7 +122,7 @@ export class MCPConfigGenerator {
    * @returns 编辑器特定格式的配置JSON字符串
    */
   public exportMCPConfig(config: MCPConfig): string {
-    let editorConfig: any;
+    let editorConfig: unknown;
 
     switch (config.editor) {
       case 'cursor':

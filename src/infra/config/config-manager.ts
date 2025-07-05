@@ -569,7 +569,7 @@ export class ConfigManager {
     // 1. 从文件加载
     try {
       this.loadFromFile();
-    } catch (error) {
+    } catch {
       this.logger.warn('从文件加载配置失败，使用默认配置');
     }
 

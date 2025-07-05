@@ -158,7 +158,10 @@ export class DeepSeekProvider extends ChineseLLMProvider {
         }
       };
     } catch (error) {
-      this.logger.error('DeepSeek聊天请求失败', error);
+      this.logger.error('DeepSeek聊天请求失败', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       throw new Error(`DeepSeek API调用失败: ${(error as Error).message}`);
     }
   }
@@ -276,7 +279,10 @@ export class DeepSeekProvider extends ChineseLLMProvider {
       await this.client.post('', testRequest);
       return true;
     } catch (error) {
-      this.logger.error('DeepSeek API密钥验证失败', error);
+      this.logger.error('DeepSeek API密钥验证失败', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       return false;
     }
   }

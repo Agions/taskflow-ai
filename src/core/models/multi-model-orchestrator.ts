@@ -331,7 +331,7 @@ export class MultiModelOrchestrator {
         if (fallbackAdapter) {
           try {
             return await this.executeWithMetrics(fallbackModel, fallbackAdapter, params, options);
-          } catch (fallbackError) {
+          } catch {
             console.warn(`Fallback model ${fallbackModel} also failed`);
             continue;
           }

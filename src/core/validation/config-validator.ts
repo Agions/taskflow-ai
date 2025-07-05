@@ -284,8 +284,8 @@ export class ConfigValidator {
   /**
    * 检查是否为验证规则
    */
-  private isValidationRule(obj: any): obj is ConfigValidationRule {
-    return obj && typeof obj === 'object' && 'type' in obj;
+  private isValidationRule(obj: unknown): obj is ConfigValidationRule {
+    return Boolean(obj && typeof obj === 'object' && 'type' in obj);
   }
 
   /**

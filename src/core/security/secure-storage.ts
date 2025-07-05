@@ -103,7 +103,7 @@ export class SecureStorage {
 
       this.masterKey = derivedKey;
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -189,7 +189,7 @@ export class SecureStorage {
       return files
         .filter(file => file.endsWith('.key'))
         .map(file => file.replace('.key', ''));
-    } catch (error) {
+    } catch {
       return [];
     }
   }
@@ -330,7 +330,7 @@ export class SecureStorage {
         storageSize: totalSize,
         lastModified
       };
-    } catch (error) {
+    } catch {
       return {
         totalKeys: 0,
         storageSize: 0,

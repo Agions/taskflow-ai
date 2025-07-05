@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 /**
  * 增强类型定义
  * 提供更严格和完整的类型定义，消除any类型使用
@@ -341,6 +340,7 @@ export type PartialRequired<T, K extends keyof T> = Partial<T> & Required<Pick<T
  * 可选键类型
  */
 export type OptionalKeys<T> = {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   [K in keyof T]-?: {} extends Pick<T, K> ? K : never;
 }[keyof T];
 
@@ -348,6 +348,7 @@ export type OptionalKeys<T> = {
  * 必需键类型
  */
 export type RequiredKeys<T> = {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
 }[keyof T];
 
