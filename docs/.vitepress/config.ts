@@ -20,7 +20,7 @@ export default defineConfig({
   // 主题配置
   themeConfig: {
     // 网站标题和Logo
-    logo: '/taskflow-ai/assets/logo.svg',
+    logo: '/assets/logo.svg',
     siteTitle: 'TaskFlow AI',
     
     // 导航栏 - 确保专业版本
