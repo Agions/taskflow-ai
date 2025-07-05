@@ -121,9 +121,30 @@ jobs:
           # 设置环境变量
           export NODE_ENV=production
           export VITEPRESS_BASE=/taskflow-ai/
+          export BUILD_TIMESTAMP=$(date +%s)
+
+          # 强制清理所有缓存
+          rm -rf node_modules/.cache
+          rm -rf .vitepress/cache
+          rm -rf .vitepress/dist
+
+          echo "📋 验证配置文件..."
+          if grep -q "指南\|API参考\|用户手册\|技术参考" .vitepress/config.ts; then
+            echo "✅ 配置文件包含完整导航"
+          else
+            echo "❌ 配置文件可能有问题"
+            head -50 .vitepress/config.ts
+          fi
 
           npm run build
           echo "✅ 文档构建完成"
+
+          # 验证构建产物
+          if grep -q "指南\|API参考\|用户手册\|技术参考" .vitepress/dist/index.html; then
+            echo "✅ 构建产物包含完整导航"
+          else
+            echo "❌ 构建产物缺少导航，可能有问题"
+          fi
 
           # 验证构建产物
           if [ -d ".vitepress/dist" ]; then

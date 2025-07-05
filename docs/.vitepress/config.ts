@@ -3,6 +3,9 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'TaskFlow AI',
   description: 'TaskFlow AI - 智能PRD文档解析与任务管理助手，专为开发团队设计的AI驱动任务编排工具',
+
+  // 强制更新版本标记
+  cleanUrls: false,
   
   // 基础配置
   base: '/taskflow-ai/',
@@ -247,9 +250,11 @@ export default defineConfig({
     ['meta', { name: 'og:site_name', content: 'TaskFlow AI' }],
     ['meta', { name: 'og:image', content: 'https://agions.github.io/taskflow-ai/og-image.png' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-    // 强制刷新缓存
-    ['meta', { name: 'cache-control', content: 'no-cache' }],
-    ['meta', { name: 'expires', content: '0' }]
+    // 强制刷新缓存 - 企业级重构版本
+    ['meta', { name: 'cache-control', content: 'no-cache, no-store, must-revalidate' }],
+    ['meta', { name: 'pragma', content: 'no-cache' }],
+    ['meta', { name: 'expires', content: '0' }],
+    ['meta', { name: 'version', content: 'enterprise-refactor-2024' }]
   ],
   
   // Markdown配置
