@@ -1,6 +1,6 @@
 {
   "name": "taskflow-ai",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "TaskFlow AI - 智能PRD文档解析与任务管理助手，支持多模型AI协同、MCP编辑器集成，专为开发团队设计的CLI工具",
   "logo": "assets/logo.svg",
   "main": "dist/index.js",
