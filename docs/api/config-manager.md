@@ -172,7 +172,7 @@ await config.setMultiple({
 
 > **重要说明**: TaskFlow AI 遵循标准 MCP 协议，服务由编辑器自动启动和管理。ConfigManager 专注于配置文件的生成、验证和测试。
 
-### generateMCPConfig(editor: EditorType): Promise<MCPConfig>
+### generateMCPConfig(editor: EditorType): Promise&lt;MCPConfig&gt;
 为指定编辑器生成MCP配置。
 
 ```typescript
@@ -180,7 +180,7 @@ const mcpConfig = await config.generateMCPConfig('cursor')
 console.log('生成的MCP配置:', mcpConfig)
 ```
 
-### validateMCPConfig(config: MCPConfig): Promise<ValidationResult>
+### validateMCPConfig(config: MCPConfig): Promise&lt;ValidationResult&gt;
 验证MCP配置的有效性。
 
 ```typescript
@@ -190,21 +190,21 @@ if (!result.valid) {
 }
 ```
 
-### exportMCPConfig(editor: EditorType): Promise<string>
+### exportMCPConfig(editor: EditorType): Promise&lt;string&gt;
 导出MCP配置为JSON字符串。
 
 ```typescript
 const configJson = await config.exportMCPConfig('windsurf')
 ```
 
-### importMCPConfig(editor: EditorType, config: string): Promise<void>
+### importMCPConfig(editor: EditorType, config: string): Promise&lt;void&gt;
 导入MCP配置。
 
 ```typescript
 await config.importMCPConfig('vscode', configJson)
 ```
 
-### testMCPConfiguration(editor: EditorType): Promise<TestResult>
+### testMCPConfiguration(editor: EditorType): Promise&lt;TestResult&gt;
 测试MCP配置的有效性。
 
 ```typescript
@@ -216,7 +216,7 @@ if (result.valid) {
 }
 ```
 
-### getMCPCapabilities(): Promise<MCPCapabilities>
+### getMCPCapabilities(): Promise&lt;MCPCapabilities&gt;
 获取MCP服务支持的能力。
 
 ```typescript
@@ -271,7 +271,7 @@ interface MCPConfig {
   editor: EditorType
   serverConfig: MCPServerConfig
   capabilities: MCPCapabilities
-  environment: Record<string, string>
+  environment: Record&lt;string, string&gt;
 }
 
 interface MCPServerConfig {

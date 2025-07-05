@@ -10,6 +10,20 @@ export default defineConfig({
 
   // 忽略死链接检查
   ignoreDeadLinks: true,
+
+  // Vue配置 - 处理模板语法冲突
+  vue: {
+    template: {
+      compilerOptions: {
+        // 禁用Vue模板插值语法处理
+        delimiters: ['{{', '}}'],
+        // 自定义元素处理
+        isCustomElement: (tag) => tag.includes('-') || tag.startsWith('v-')
+      }
+    }
+  },
+
+
   
   // 主题配置
   themeConfig: {
@@ -237,7 +251,8 @@ export default defineConfig({
   vite: {
     // 自定义 Vite 配置
     define: {
-      __VUE_OPTIONS_API__: false
+      __VUE_OPTIONS_API__: false,
+      __VUE_PROD_DEVTOOLS__: false
     },
     
     // 服务器配置
