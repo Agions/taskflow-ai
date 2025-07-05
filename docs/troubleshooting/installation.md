@@ -127,52 +127,39 @@ npm install
 npm install -g taskflow-ai --force
 ```
 
-## 🐳 Docker安装问题
+## 🐳 Docker支持 (下个版本)
 
-### 1. Docker镜像拉取失败
+> **重要提示**: Docker支持将在下个版本中提供。当前版本请使用npm安装方式。
 
-#### 问题描述
+### 计划功能
+
+TaskFlow AI 的Docker支持正在开发中，将包括：
+
+- 🐳 官方Docker镜像
+- 📦 Docker Compose配置
+- 🚀 容器化部署方案
+- 🔧 多环境配置管理
+- 📊 容器监控和日志
+
+### 当前替代方案
+
 ```bash
-docker pull taskflow-ai:latest
-# 错误: pull access denied / timeout
+# 推荐: 使用npm全局安装
+npm install -g taskflow-ai
+
+# 或使用npx运行 (无需全局安装)
+npx taskflow-ai init
+
+# 在项目中本地安装
+npm install taskflow-ai
+npx taskflow-ai --help
 ```
 
-#### 解决方案
+### 跟踪进度
 
-**配置Docker镜像源**
-```bash
-# 编辑Docker配置
-sudo vim /etc/docker/daemon.json
-
-# 添加镜像源
-{
-  "registry-mirrors": [
-    "https://docker.mirrors.ustc.edu.cn",
-    "https://hub-mirror.c.163.com"
-  ]
-}
-
-# 重启Docker
-sudo systemctl restart docker
-```
-
-### 2. 容器权限问题
-
-#### 问题描述
-```bash
-docker run taskflow-ai init
-# 错误: permission denied
-```
-
-#### 解决方案
-
-**使用正确的用户权限**
-```bash
-# 映射当前用户
-docker run --user $(id -u):$(id -g) \
-  -v $(pwd):/workspace \
-  taskflow-ai init
-```
+- 📋 **GitHub Issues**: [Docker支持追踪](https://github.com/agions/taskflow-ai/issues)
+- 📅 **预计发布**: v1.3.0
+- 🔔 **通知**: 关注我们的发布说明获取最新进展
 
 **设置工作目录权限**
 ```bash

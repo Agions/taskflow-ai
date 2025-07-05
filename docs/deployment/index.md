@@ -56,19 +56,6 @@ npm link
 taskflow --version
 ```
 
-### 方式3: Docker部署
-
-```bash
-# 拉取镜像
-docker pull agions/taskflow-ai:latest
-
-# 运行容器
-docker run -it --rm \
-  -v $(pwd):/workspace \
-  -w /workspace \
-  agions/taskflow-ai:latest \
-  taskflow --help
-```
 
 ## ⚙️ 配置设置
 
@@ -197,9 +184,11 @@ jobs:
           path: taskflow/tasks.json
 ```
 
-### 场景4: Docker容器化部署
+### 场景4: Docker容器化部署 (下个版本)
 
-#### Dockerfile
+> **注意**: Docker支持将在v1.3.0版本中提供。
+
+#### 计划中的Dockerfile
 
 ```dockerfile
 FROM node:20-alpine
