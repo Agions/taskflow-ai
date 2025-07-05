@@ -14,7 +14,7 @@ const REMOVE_FILES = [
   'docs/COMPLETION_SUMMARY.md',
   'docs/LICENSE', // 根目录已有
   'docs/README.md', // 根目录已有
-  'docs/api-reference.md', // 已有api目录
+  // 注意：docs/api-reference.md 已重新组织为 docs/api/index.md
   'docs/cli-reference.md', // 已有cli目录
   'docs/cli-ux-design.md', // 移动到cli目录
   'docs/getting-started.complex.md', // 保留简化版本
