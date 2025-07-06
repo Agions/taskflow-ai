@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "taskflow-ai": {
+      "command": "npx",
+      "args": [
+        "taskflow-ai",
+        "mcp",
+        "server"
+      ],
+      "env": {
+        "NODE_ENV": "production",
+        "AI_MODEL": "qwen",
+        "LOG_LEVEL": "info",
+        "MCP_TRANSPORT": "stdio"
+      }
+    }
+  }
+}
