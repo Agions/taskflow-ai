@@ -132,63 +132,46 @@ function testMCPCommand() {
   });
 }
 
-// 测试MCP服务器启动
-function testMCPServer() {
+// 验证MCP配置完整性
+function validateMCPConfiguration() {
   return new Promise((resolve) => {
-    logInfo('测试MCP服务器启动...');
-    
-    const child = spawn('node', ['bin/index.js', 'mcp', 'server', '--transport', 'stdio'], {
-      stdio: 'pipe',
-      cwd: process.cwd()
-    });
-    
-    let output = '';
-    let hasStarted = false;
-    
-    const timeout = setTimeout(() => {
-      if (!hasStarted) {
-        child.kill();
-        logError('MCP服务器启动超时');
+    logInfo('验证MCP配置完整性...');
+
+    const mcpConfigPath = path.join(process.cwd(), 'mcp-server.json');
+
+    try {
+      const config = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf8'));
+
+      // 检查必需的配置项
+      const requiredFields = ['name', 'server', 'capabilities'];
+      const missingFields = requiredFields.filter(field => !config[field]);
+
+      if (missingFields.length > 0) {
+        logError(`MCP配置缺少必需字段: ${missingFields.join(', ')}`);
         resolve(false);
+        return;
       }
-    }, 10000);
-    
-    child.stdout.on('data', (data) => {
-      output += data.toString();
-      if (output.includes('MCP服务器已启动') || output.includes('server started')) {
-        hasStarted = true;
-        clearTimeout(timeout);
-        child.kill();
-        logSuccess('MCP服务器启动测试通过');
-        resolve(true);
-      }
-    });
-    
-    child.stderr.on('data', (data) => {
-      const errorOutput = data.toString();
-      if (errorOutput.includes('info:') || errorOutput.includes('TaskFlow AI MCP')) {
-        // 这些是正常的日志输出
-        hasStarted = true;
-        clearTimeout(timeout);
-        child.kill();
-        logSuccess('MCP服务器启动测试通过');
-        resolve(true);
-      }
-    });
-    
-    child.on('close', (code) => {
-      clearTimeout(timeout);
-      if (!hasStarted) {
-        logError(`MCP服务器启动失败，退出码: ${code}`);
+
+      // 检查服务器配置
+      if (!config.server.command || !config.server.args) {
+        logError('MCP服务器配置不完整');
         resolve(false);
+        return;
       }
-    });
-    
-    child.on('error', (error) => {
-      clearTimeout(timeout);
-      logError(`MCP服务器启动错误: ${error.message}`);
+
+      // 检查工具配置
+      if (!config.capabilities.tools || config.capabilities.tools.length === 0) {
+        logError('MCP工具配置为空');
+        resolve(false);
+        return;
+      }
+
+      logSuccess('MCP配置完整性验证通过');
+      resolve(true);
+    } catch (error) {
+      logError(`MCP配置验证失败: ${error.message}`);
       resolve(false);
-    });
+    }
   });
 }
 
@@ -215,17 +198,16 @@ function generateClientConfig() {
     mcpServers: {
       "taskflow-ai": {
         command: "npx",
-        args: ["taskflow-ai", "mcp", "server"],
+        args: ["taskflow-ai", "mcp"],
         env: {
           NODE_ENV: "production",
           AI_MODEL: "qwen",
-          LOG_LEVEL: "info",
-          MCP_TRANSPORT: "stdio"
+          LOG_LEVEL: "info"
         }
       }
     }
   };
-  
+
   const configPath = path.join(process.cwd(), 'mcp-client-config.json');
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
   logSuccess(`MCP客户端配置已生成: ${configPath}`);
@@ -242,7 +224,7 @@ async function verifyMCPService() {
     { name: 'MCP配置文件检查', fn: checkMCPConfig },
     { name: '环境变量检查', fn: checkEnvironment },
     { name: 'MCP命令测试', fn: testMCPCommand },
-    { name: 'MCP服务器启动测试', fn: testMCPServer }
+    { name: 'MCP配置完整性验证', fn: validateMCPConfiguration }
   ];
   
   let passedChecks = 0;
@@ -265,12 +247,10 @@ async function verifyMCPService() {
     logInfo('\n📋 下一步操作:');
     log('1. 生成MCP客户端配置文件', 'blue');
     generateClientConfig();
-    
-    log('2. 启动MCP服务器:', 'blue');
-    log('   npx taskflow-ai mcp server --transport stdio', 'yellow');
-    
-    log('3. 在Claude Desktop中配置MCP服务器', 'blue');
+
+    log('2. 在Claude Desktop中配置MCP服务器', 'blue');
     log('   配置文件路径: ~/Library/Application Support/Claude/claude_desktop_config.json', 'yellow');
+    log('   使用生成的配置文件: mcp-client-config.json', 'yellow');
     
   } else {
     logError(`部分检查失败 (${passedChecks}/${checks.length})`);

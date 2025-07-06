@@ -33,8 +33,8 @@ npx taskflow-ai --version
 # 全局安装TaskFlow AI
 npm install -g taskflow-ai
 
-# 启动MCP服务器
-taskflow-ai mcp server --transport stdio --verbose
+# 验证MCP配置
+taskflow-ai mcp validate
 ```
 
 ### 方式2: 从源码部署
@@ -50,8 +50,8 @@ npm ci
 # 构建项目
 npm run build
 
-# 启动MCP服务器
-node bin/index.js mcp server --transport stdio --verbose
+# 验证MCP配置
+node bin/index.js mcp validate
 ```
 
 ## 🔧 MCP服务器配置
@@ -65,12 +65,11 @@ node bin/index.js mcp server --transport stdio --verbose
   "mcpServers": {
     "taskflow-ai": {
       "command": "npx",
-      "args": ["taskflow-ai", "mcp", "server"],
+      "args": ["taskflow-ai", "mcp"],
       "env": {
         "NODE_ENV": "production",
         "AI_MODEL": "qwen",
-        "LOG_LEVEL": "info",
-        "MCP_TRANSPORT": "stdio"
+        "LOG_LEVEL": "info"
       }
     }
   }
@@ -125,22 +124,9 @@ export TASKFLOW_DATA_DIR="/path/to/data"
 }
 ```
 
-## 🛠️ MCP服务器管理
+## 🛠️ MCP配置管理
 
-### 启动服务器
-
-```bash
-# STDIO传输模式 (推荐)
-taskflow-ai mcp server --transport stdio
-
-# HTTP传输模式
-taskflow-ai mcp server --transport http --port 3001
-
-# 详细日志模式
-taskflow-ai mcp server --transport stdio --verbose
-```
-
-### 验证服务器
+### 验证配置
 
 ```bash
 # 验证MCP配置
@@ -177,7 +163,7 @@ taskflow-ai mcp regenerate --output ./custom-mcp-config.json
   "mcpServers": {
     "taskflow-ai": {
       "command": "npx",
-      "args": ["taskflow-ai", "mcp", "server"],
+      "args": ["taskflow-ai", "mcp"],
       "env": {
         "QWEN_API_KEY": "your-api-key-here"
       }
@@ -347,12 +333,12 @@ tar -czf taskflow-data-backup.tar.gz ~/.taskflow/data/
 
 ## 🎉 部署完成
 
-完成以上步骤后，您的TaskFlow AI MCP服务器将：
+完成以上步骤后，您的TaskFlow AI MCP配置将：
 
-1. ✅ 在本地环境正常运行
+1. ✅ 正确配置MCP服务器元数据
 2. ✅ 支持所有MCP客户端连接
 3. ✅ 提供完整的任务管理功能
 4. ✅ 支持智能项目编排
 5. ✅ 具备企业级稳定性和性能
 
-现在您可以通过任何MCP客户端使用TaskFlow AI的强大功能！
+现在您可以通过Claude Desktop等MCP客户端使用TaskFlow AI的强大功能！
