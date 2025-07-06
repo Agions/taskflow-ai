@@ -12,6 +12,10 @@ export { TaskPlanner } from './core/planner/task-planner';
 export { TaskManager } from './core/task/task-manager';
 export { TaskVisualizer, VisualizationType } from './core/visualizer/task-visualizer';
 
+// 导出编排引擎
+export { TaskOrchestrationEngine } from './orchestration/TaskOrchestrationEngine';
+export { OrchestrationFactory, OrchestrationPreset } from './orchestration/OrchestrationFactory';
+
 // 导出MCP服务接口
 export * from './mcp/service';
 

@@ -1,0 +1,62 @@
+{
+  "id": "project-1751775837048",
+  "name": "示例项目任务计划",
+  "description": "基于PRD文档生成的任务计划",
+  "tasks": [
+    {
+      "id": "task-1",
+      "title": "项目初始化",
+      "description": "创建项目结构，配置开发环境",
+      "status": "not_started",
+      "priority": "high",
+      "type": "setup",
+      "dependencies": [],
+      "estimatedHours": 4,
+      "tags": [
+        "setup",
+        "infrastructure"
+      ],
+      "createdAt": "2025-07-06T04:23:57.048Z",
+      "updatedAt": "2025-07-06T04:23:57.048Z"
+    },
+    {
+      "id": "task-2",
+      "title": "用户管理模块",
+      "description": "实现用户注册、登录、信息管理功能",
+      "status": "not_started",
+      "priority": "high",
+      "type": "feature",
+      "dependencies": [
+        "task-1"
+      ],
+      "estimatedHours": 16,
+      "tags": [
+        "user",
+        "authentication"
+      ],
+      "createdAt": "2025-07-06T04:23:57.048Z",
+      "updatedAt": "2025-07-06T04:23:57.048Z"
+    },
+    {
+      "id": "task-3",
+      "title": "内容管理模块",
+      "description": "实现内容的创建、编辑、删除功能",
+      "status": "not_started",
+      "priority": "medium",
+      "type": "feature",
+      "dependencies": [
+        "task-2"
+      ],
+      "estimatedHours": 20,
+      "tags": [
+        "content",
+        "crud"
+      ],
+      "createdAt": "2025-07-06T04:23:57.048Z",
+      "updatedAt": "2025-07-06T04:23:57.048Z"
+    }
+  ],
+  "createdAt": "2025-07-06T04:23:57.048Z",
+  "updatedAt": "2025-07-06T04:23:57.048Z",
+  "status": "active"
+}
