@@ -13,6 +13,7 @@ import { statusCommand } from './commands/status';
 import { interactiveCommand } from './commands/interactive';
 import modelsCommand from './commands/models';
 import { createMCPCommand } from './cli/commands/mcp';
+import { createOrchestrateCommand } from './commands/orchestrate';
 import ora from 'ora';
 import path from 'path';
 import { ModelType, LogLevel } from './types/config';
@@ -77,6 +78,9 @@ modelsCommand(program);
 
 // 注册MCP命令
 program.addCommand(createMCPCommand());
+
+// 注册任务编排命令
+program.addCommand(createOrchestrateCommand());
 
 // 快速开始命令
 program
@@ -660,6 +664,7 @@ if (!process.argv.slice(2).length) {
   console.log(chalk.cyan('🚀 快速开始:'));
   console.log(chalk.gray('  taskflow init                    # 初始化项目'));
   console.log(chalk.gray('  taskflow parse docs/prd.md       # 解析PRD文档'));
+  console.log(chalk.gray('  taskflow orchestrate             # 智能任务编排'));
   console.log(chalk.gray('  taskflow status                  # 查看任务状态'));
   console.log();
   console.log(chalk.cyan('💡 获取帮助:'));
