@@ -119,6 +119,40 @@ npm run build
 npm link
 ```
 
+### Docker 部署
+
+#### 快速开始
+```bash
+# 使用预构建镜像
+docker run -d \
+  --name taskflow-ai \
+  -p 3000:3000 \
+  -e TASKFLOW_DEEPSEEK_API_KEY="your-api-key" \
+  -v taskflow-data:/app/data \
+  agions/taskflow-ai:latest
+```
+
+#### 使用 Docker Compose
+```bash
+# 克隆项目
+git clone https://github.com/agions/taskflow-ai.git
+cd taskflow-ai
+
+# 配置环境变量
+cp .env.example .env
+# 编辑 .env 文件，添加你的 AI 模型 API 密钥
+
+# 启动服务
+docker-compose up -d taskflow-prod
+```
+
+#### 可用镜像标签
+- `agions/taskflow-ai:latest` - 最新稳定版本
+- `agions/taskflow-ai:dev` - 开发版本
+- `agions/taskflow-ai:v1.3.1` - 特定版本
+
+支持架构：`linux/amd64`, `linux/arm64`
+
 ## 🚀 快速开始
 
 ### 在现有项目中使用TaskFlow AI

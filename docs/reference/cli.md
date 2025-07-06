@@ -9,6 +9,7 @@ TaskFlow AI 命令行界面完整参考手册，包含所有命令、选项、�
 ### 核心命令
 - [`taskflow init`](#taskflow-init) - 项目集成初始化
 - [`taskflow parse`](#taskflow-parse) - PRD文档解析
+- [`taskflow orchestrate`](#taskflow-orchestrate) - 智能任务编排
 - [`taskflow status`](#taskflow-status) - 任务状态管理
 
 ### 配置命令
@@ -518,8 +519,171 @@ taskflow doctor benchmark
 | `TASKFLOW_CACHE_SIZE` | 缓存大小 | 100 |
 | `TASKFLOW_TIMEOUT` | 请求超时时间 | 30000 |
 
+## 🎯 taskflow orchestrate
+
+智能任务编排和优化命令，提供基于依赖关系的任务排序、关键路径分析和并行优化功能。
+
+### 语法
+```bash
+taskflow orchestrate [选项]
+```
+
+### 选项
+| 选项 | 简写 | 类型 | 默认值 | 描述 |
+|------|------|------|--------|------|
+| `--preset` | `-p` | string | - | 使用预设编排策略 |
+| `--strategy` | `-s` | string | critical_path | 调度策略 |
+| `--goal` | `-g` | string | minimize_duration | 优化目标 |
+| `--max-parallel` | | number | 10 | 最大并行任务数 |
+| `--buffer` | | number | 0.1 | 缓冲时间百分比 |
+| `--critical-path` | | boolean | true | 启用关键路径分析 |
+| `--no-critical-path` | | boolean | false | 禁用关键路径分析 |
+| `--parallel-optimization` | | boolean | true | 启用并行优化 |
+| `--no-parallel-optimization` | | boolean | false | 禁用并行优化 |
+| `--resource-leveling` | | boolean | false | 启用资源平衡 |
+| `--risk-analysis` | | boolean | true | 启用风险分析 |
+| `--output` | `-o` | string | table | 输出格式 (table/json/gantt) |
+| `--save` | | boolean | false | 保存编排结果到项目 |
+| `--dry-run` | | boolean | false | 仅显示结果，不保存 |
+
+### 预设策略
+| 预设 | 描述 | 适用场景 |
+|------|------|----------|
+| `agile_sprint` | 敏捷冲刺 | 敏捷开发、迭代项目 |
+| `waterfall` | 瀑布模型 | 传统项目、需求明确 |
+| `critical_chain` | 关键链 | 资源约束、多项目管理 |
+| `lean_startup` | 精益创业 | 创业项目、快速验证 |
+| `rapid_prototype` | 快速原型 | 原型开发、概念验证 |
+| `enterprise` | 企业级 | 大型项目、多团队协作 |
+| `research` | 研究项目 | 科研项目、技术探索 |
+| `maintenance` | 维护项目 | 系统维护、运营支持 |
+
+### 调度策略
+| 策略 | 描述 |
+|------|------|
+| `critical_path` | 关键路径优先 |
+| `priority_first` | 优先级优先 |
+| `shortest_first` | 最短任务优先 |
+| `longest_first` | 最长任务优先 |
+| `resource_leveling` | 资源平衡 |
+| `early_start` | 最早开始 |
+
+### 优化目标
+| 目标 | 描述 |
+|------|------|
+| `minimize_duration` | 最小化项目持续时间 |
+| `minimize_cost` | 最小化项目成本 |
+| `maximize_quality` | 最大化项目质量 |
+| `balance_resources` | 平衡资源使用 |
+| `minimize_risk` | 最小化项目风险 |
+
+### 子命令
+
+#### taskflow orchestrate presets
+查看可用的编排预设。
+
+```bash
+taskflow orchestrate presets
+```
+
+#### taskflow orchestrate analyze
+分析当前任务结构。
+
+```bash
+taskflow orchestrate analyze
+```
+
+#### taskflow orchestrate recommend
+推荐编排策略。
+
+```bash
+taskflow orchestrate recommend [选项]
+```
+
+**选项**:
+| 选项 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `--team-size` | number | 5 | 团队规模 |
+| `--duration` | number | 30 | 项目持续时间（天） |
+| `--uncertainty` | number | 5 | 不确定性等级 (1-10) |
+| `--quality` | number | 7 | 质量要求 (1-10) |
+| `--time-constraint` | number | 5 | 时间约束 (1-10) |
+| `--budget-constraint` | number | 5 | 预算约束 (1-10) |
+| `--agile` | boolean | false | 敏捷项目 |
+| `--research` | boolean | false | 研究项目 |
+| `--enterprise` | boolean | false | 企业级项目 |
+
+### 示例
+
+```bash
+# 基本编排
+taskflow orchestrate
+
+# 使用敏捷冲刺预设
+taskflow orchestrate --preset agile_sprint
+
+# 自定义编排配置
+taskflow orchestrate --strategy priority_first --goal minimize_duration --max-parallel 15
+
+# 生成甘特图
+taskflow orchestrate --output gantt
+
+# 保存编排结果
+taskflow orchestrate --save
+
+# 仅预览，不保存
+taskflow orchestrate --dry-run
+
+# 查看可用预设
+taskflow orchestrate presets
+
+# 分析任务结构
+taskflow orchestrate analyze
+
+# 获取策略推荐
+taskflow orchestrate recommend --team-size 8 --agile --duration 60
+```
+
+### 输出格式
+
+#### 表格格式 (默认)
+```
+📊 任务编排结果
+═══════════════════════════════════════════════════════════
+✅ 总任务数: 15
+⏱️  项目持续时间: 240 小时
+🎯 关键路径任务: 8
+🔄 并行任务组: 3
+⚠️  整体风险等级: 6.2/10
+```
+
+#### JSON格式
+```json
+{
+  "tasks": [...],
+  "criticalPath": ["task-1", "task-3", "task-5"],
+  "totalDuration": 240,
+  "parallelGroups": [["task-2", "task-4"], ["task-6", "task-7"]],
+  "riskAssessment": {...},
+  "recommendations": [...]
+}
+```
+
+#### 甘特图格式
+```
+任务甘特图
+═══════════════════════════════════════════════════════════
+需求分析    ████████
+系统设计            ████████████
+前端开发                    ████████████████
+后端开发                    ████████████████
+测试                                        ████████
+部署                                                ████
+```
+
 ## 📚 相关文档
 
 - [用户指南](../user-guide/) - 详细使用指南
 - [配置参考](./configuration.md) - 配置选项说明
 - [环境变量](./environment.md) - 环境变量说明
+- [任务编排API](../api/task-orchestration.md) - 编排引擎API文档
