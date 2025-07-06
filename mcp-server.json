@@ -1,0 +1,284 @@
+{
+  "name": "taskflow-ai",
+  "version": "1.0.0",
+  "description": "Intelligent PRD parsing, task management, and project orchestration MCP server",
+  "author": "TaskFlow AI Team",
+  "license": "MIT",
+  "homepage": "https://github.com/Agions/taskflow-ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Agions/taskflow-ai.git"
+  },
+  "keywords": [
+    "mcp",
+    "task-management",
+    "project-management",
+    "prd-parsing",
+    "ai-orchestration",
+    "productivity",
+    "planning",
+    "requirements",
+    "agile",
+    "automation"
+  ],
+  "categories": [
+    "productivity",
+    "project-management",
+    "ai-tools"
+  ],
+  "server": {
+    "command": "npx",
+    "args": ["taskflow-ai", "mcp"],
+    "env": {}
+  },
+  "capabilities": {
+    "tools": [
+      {
+        "name": "parse_prd",
+        "description": "Parse Product Requirements Documents (PRD) and extract structured information including features, requirements, and tasks using advanced AI models",
+        "parameters": {
+          "content": {
+            "type": "string",
+            "description": "PRD content in markdown or text format",
+            "required": true
+          },
+          "options": {
+            "type": "object",
+            "description": "Parsing options including AI model selection and extraction preferences",
+            "properties": {
+              "extractTasks": {
+                "type": "boolean",
+                "description": "Extract actionable tasks from the PRD",
+                "default": true
+              },
+              "generateAcceptanceCriteria": {
+                "type": "boolean",
+                "description": "Generate acceptance criteria for features",
+                "default": true
+              },
+              "aiModel": {
+                "type": "string",
+                "enum": ["qwen", "deepseek", "zhipu", "baichuan", "moonshot", "yi"],
+                "description": "AI model to use for parsing",
+                "default": "qwen"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "create_task",
+        "description": "Create new tasks with comprehensive metadata including dependencies, priorities, and time estimates",
+        "parameters": {
+          "title": {
+            "type": "string",
+            "description": "Task title",
+            "required": true
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed task description",
+            "required": true
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"],
+            "description": "Task priority level",
+            "default": "medium"
+          },
+          "estimatedHours": {
+            "type": "number",
+            "description": "Estimated completion time in hours",
+            "minimum": 0
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "List of dependent task IDs"
+          },
+          "tags": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Task categorization tags"
+          }
+        }
+      },
+      {
+        "name": "list_tasks",
+        "description": "List and filter project tasks with advanced filtering and sorting options",
+        "parameters": {
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "completed", "blocked", "cancelled"],
+            "description": "Filter by task status"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"],
+            "description": "Filter by priority level"
+          },
+          "assignee": {
+            "type": "string",
+            "description": "Filter by assigned person"
+          },
+          "tags": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Filter by tags"
+          }
+        }
+      },
+      {
+        "name": "update_task",
+        "description": "Update existing tasks with partial updates support",
+        "parameters": {
+          "taskId": {
+            "type": "string",
+            "description": "Task ID to update",
+            "required": true
+          },
+          "updates": {
+            "type": "object",
+            "description": "Task fields to update",
+            "required": true
+          }
+        }
+      },
+      {
+        "name": "orchestrate_tasks",
+        "description": "Perform intelligent task orchestration with critical path analysis, parallel optimization, and risk assessment",
+        "parameters": {
+          "preset": {
+            "type": "string",
+            "enum": ["agile_sprint", "waterfall", "critical_chain", "lean_startup", "rapid_prototype", "enterprise", "research", "maintenance"],
+            "description": "Orchestration strategy preset"
+          },
+          "config": {
+            "type": "object",
+            "description": "Custom orchestration configuration",
+            "properties": {
+              "enableCriticalPath": {"type": "boolean", "default": true},
+              "enableParallelOptimization": {"type": "boolean", "default": true},
+              "enableResourceLeveling": {"type": "boolean", "default": false},
+              "enableRiskAnalysis": {"type": "boolean", "default": true}
+            }
+          }
+        }
+      },
+      {
+        "name": "get_project_status",
+        "description": "Get comprehensive project analytics including progress metrics, risk assessment, and performance indicators",
+        "parameters": {
+          "includeAnalytics": {
+            "type": "boolean",
+            "description": "Include detailed analytics",
+            "default": true
+          },
+          "timeframe": {
+            "type": "string",
+            "enum": ["week", "month", "quarter", "all"],
+            "description": "Analytics timeframe",
+            "default": "month"
+          }
+        }
+      },
+      {
+        "name": "generate_report",
+        "description": "Generate various project reports including status, progress, Gantt charts, and risk assessments",
+        "parameters": {
+          "type": {
+            "type": "string",
+            "enum": ["status", "progress", "gantt", "risk", "resource"],
+            "description": "Report type",
+            "required": true
+          },
+          "format": {
+            "type": "string",
+            "enum": ["markdown", "json", "csv"],
+            "description": "Output format",
+            "default": "markdown"
+          }
+        }
+      }
+    ],
+    "resources": [
+      {
+        "name": "project_overview",
+        "description": "Complete project overview with tasks, metrics, and status",
+        "uri": "taskflow://project/overview"
+      },
+      {
+        "name": "all_tasks",
+        "description": "Complete list of all project tasks",
+        "uri": "taskflow://tasks/all"
+      },
+      {
+        "name": "analytics_dashboard",
+        "description": "Project analytics and performance dashboard",
+        "uri": "taskflow://analytics/dashboard"
+      },
+      {
+        "name": "orchestration_status",
+        "description": "Current orchestration status and recommendations",
+        "uri": "taskflow://orchestration/status"
+      }
+    ]
+  },
+  "installation": {
+    "npm": "taskflow-ai",
+    "requirements": {
+      "node": ">=18.0.0"
+    }
+  },
+  "configuration": {
+    "required": [],
+    "optional": [
+      {
+        "name": "AI_MODEL",
+        "description": "Default AI model for PRD parsing",
+        "type": "string",
+        "default": "qwen",
+        "enum": ["qwen", "deepseek", "zhipu", "baichuan", "moonshot", "yi"]
+      },
+      {
+        "name": "TASKFLOW_CONFIG_PATH",
+        "description": "Path to TaskFlow AI configuration file",
+        "type": "string"
+      },
+      {
+        "name": "LOG_LEVEL",
+        "description": "Logging level",
+        "type": "string",
+        "default": "info",
+        "enum": ["debug", "info", "warn", "error"]
+      }
+    ]
+  },
+  "examples": [
+    {
+      "name": "Parse PRD and create tasks",
+      "description": "Parse a Product Requirements Document and automatically create structured tasks",
+      "code": "parse_prd({\"content\": \"# Feature: User Authentication\\n\\n## Requirements\\n- User login with email/password\\n- Password reset functionality\\n- Session management\", \"options\": {\"extractTasks\": true}})"
+    },
+    {
+      "name": "Orchestrate project tasks",
+      "description": "Perform intelligent task orchestration using agile methodology",
+      "code": "orchestrate_tasks({\"preset\": \"agile_sprint\", \"config\": {\"enableCriticalPath\": true, \"enableParallelOptimization\": true}})"
+    },
+    {
+      "name": "Generate project status report",
+      "description": "Generate a comprehensive project status report",
+      "code": "generate_report({\"type\": \"status\", \"format\": \"markdown\"})"
+    }
+  ],
+  "tags": [
+    "productivity",
+    "project-management",
+    "task-automation",
+    "prd-parsing",
+    "ai-orchestration",
+    "agile",
+    "planning",
+    "requirements-analysis"
+  ]
+}

@@ -9,7 +9,7 @@
   "bin": {
     "taskflow": "bin/index.js",
     "taskflow-ai": "bin/index.js",
-    "taskflow-mcp": "bin/taskflow-mcp"
+    "taskflow-mcp": "scripts/mcp-server.js"
   },
   "scripts": {
     "dev": "rollup -c -w",
@@ -42,7 +42,13 @@
     "docs:deploy": "bash scripts/deploy-docs.sh",
     "size": "npm run build && ls -la dist/ | grep -E '\\.(js|map)$'",
     "clean": "rm -rf dist bin coverage .nyc_output",
-    "postinstall": "node -e \"console.log('\\n🎉 TaskFlow AI 安装成功！\\n运行 taskflow --help 开始使用\\n')\""
+    "mcp": "node scripts/mcp-server.js",
+    "mcp:dev": "node scripts/mcp-server.js --verbose",
+    "mcp:test": "node scripts/test-mcp-server.js",
+    "mcp:docker": "docker run -it taskflow-ai:latest",
+    "mcp:docker:build": "docker build -f Dockerfile.mcp -t taskflow-ai:latest .",
+    "mcp:submit": "bash scripts/submit-to-docker-mcp-registry.sh",
+    "postinstall": "node -e \"console.log('\\n🎉 TaskFlow AI 安装成功！\\n运行 taskflow --help 开始使用\\n运行 taskflow-mcp 启动MCP服务器\\n')\""
   },
   "keywords": [
     "ai",
@@ -50,16 +56,29 @@
     "prd-parser",
     "project-planning",
     "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "docker-mcp-registry",
+    "ai-orchestration",
+    "project-orchestration",
+    "critical-path-analysis",
     "cursor",
     "windsurf",
     "trae",
     "vscode",
+    "claude-desktop",
     "deepseek",
     "zhipu",
     "qwen",
     "baidu",
     "moonshot",
     "spark",
+    "productivity",
+    "automation",
+    "agile",
+    "waterfall",
+    "lean-startup",
+    "enterprise",
     "国产大模型",
     "任务管理",
     "开发助手",

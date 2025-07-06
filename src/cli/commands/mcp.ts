@@ -10,6 +10,8 @@ import { Logger } from '../../infra/logger';
 import { ConfigManager } from '../../infra/config/config-manager';
 import { EditorType } from '../../types/mcp';
 import { LogLevel } from '../../types/config';
+import { spawn } from 'child_process';
+import path from 'path';
 
 /**
  * 创建 MCP 命令
@@ -279,6 +281,38 @@ export function createMCPCommand(): Command {
       console.log(chalk.gray('  2. 设置环境变量中的 API 密钥'));
       console.log(chalk.gray('  3. 打开编辑器，服务将自动启动'));
       console.log(chalk.gray('  4. 开始使用 AI 驱动的开发功能'));
+    });
+
+  // mcp server 命令 - 启动MCP服务器
+  mcpCommand
+    .command('server')
+    .description('启动 TaskFlow AI MCP 服务器')
+    .option('--transport <type>', '传输类型 (stdio|http)', 'stdio')
+    .option('--port <port>', 'HTTP端口号', '3000')
+    .option('--verbose', '详细日志输出')
+    .action(async (options) => {
+      console.log(chalk.blue('🚀 启动 TaskFlow AI MCP 服务器...'));
+      console.log(chalk.gray(`📍 传输类型: ${options.transport}`));
+
+      if (options.transport === 'http') {
+        console.log(chalk.gray(`📍 端口: ${options.port}`));
+      }
+
+      try {
+        // 动态导入MCP服务器
+        const { startMCPServer } = await import('../../mcp/server');
+
+        // 启动MCP服务器
+        await startMCPServer({
+          transport: options.transport,
+          port: parseInt(options.port),
+          verbose: options.verbose
+        });
+
+      } catch (error) {
+        console.error(chalk.red('❌ 启动MCP服务器失败:'), error instanceof Error ? error.message : String(error));
+        process.exit(1);
+      }
     });
 
   return mcpCommand;

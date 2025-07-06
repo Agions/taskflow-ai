@@ -1,0 +1,98 @@
+# TaskFlow AI - MCP Server Docker Image
+# Multi-stage build for optimized production deployment
+
+# Build stage
+FROM node:20-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    git
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy source code
+COPY src/ ./src/
+COPY scripts/ ./scripts/
+
+# Build the application
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine AS production
+
+# Set working directory
+WORKDIR /app
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S taskflow && \
+    adduser -S taskflow -u 1001
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    dumb-init \
+    tini
+
+# Copy built application from builder stage
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/bin ./bin
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+
+# Copy MCP server configuration
+COPY mcp-server.json ./
+
+# Create necessary directories
+RUN mkdir -p /app/data /app/logs /app/config && \
+    chown -R taskflow:taskflow /app
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV TASKFLOW_ENV=production
+ENV TASKFLOW_DATA_DIR=/app/data
+ENV TASKFLOW_LOG_DIR=/app/logs
+ENV TASKFLOW_CONFIG_DIR=/app/config
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD node -e "console.log('TaskFlow AI MCP Server is healthy')" || exit 1
+
+# Switch to non-root user
+USER taskflow
+
+# Expose MCP server port (if using HTTP transport)
+EXPOSE 3000
+
+# Use tini as init system
+ENTRYPOINT ["/sbin/tini", "--"]
+
+# Default command to start MCP server
+CMD ["node", "bin/index.js", "mcp"]
+
+# Labels for Docker Hub and registry
+LABEL org.opencontainers.image.title="TaskFlow AI MCP Server"
+LABEL org.opencontainers.image.description="Intelligent PRD parsing, task management, and project orchestration MCP server"
+LABEL org.opencontainers.image.version="1.0.0"
+LABEL org.opencontainers.image.authors="TaskFlow AI Team"
+LABEL org.opencontainers.image.url="https://github.com/Agions/taskflow-ai"
+LABEL org.opencontainers.image.source="https://github.com/Agions/taskflow-ai"
+LABEL org.opencontainers.image.vendor="TaskFlow AI"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.documentation="https://github.com/Agions/taskflow-ai/blob/main/README.md"
+
+# MCP-specific labels
+LABEL mcp.server.name="taskflow-ai"
+LABEL mcp.server.version="1.0.0"
+LABEL mcp.server.capabilities="tools,resources"
+LABEL mcp.server.transport="stdio"
+LABEL mcp.server.category="productivity,project-management"
