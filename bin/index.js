@@ -15,6 +15,7 @@ var os = require('os');
 var axios = require('axios');
 var crypto = require('crypto');
 var MarkdownIt = require('markdown-it');
+var events = require('events');
 
 function _interopNamespaceDefault(e) {
     var n = Object.create(null);
@@ -545,7 +546,7 @@ class DocumentProcessor {
 /**
  * 任务状态枚举
  */
-var TaskStatus;
+var TaskStatus$1;
 (function (TaskStatus) {
     TaskStatus["NOT_STARTED"] = "not_started";
     TaskStatus["PENDING"] = "pending";
@@ -559,17 +560,52 @@ var TaskStatus;
     TaskStatus["ON_HOLD"] = "on_hold";
     TaskStatus["REVIEW"] = "review";
     TaskStatus["TODO"] = "todo";
-})(TaskStatus || (TaskStatus = {}));
+})(TaskStatus$1 || (TaskStatus$1 = {}));
 /**
  * 任务优先级
  */
-var TaskPriority;
+var TaskPriority$1;
 (function (TaskPriority) {
     TaskPriority["LOW"] = "low";
     TaskPriority["MEDIUM"] = "medium";
     TaskPriority["HIGH"] = "high";
     TaskPriority["CRITICAL"] = "critical";
-})(TaskPriority || (TaskPriority = {}));
+})(TaskPriority$1 || (TaskPriority$1 = {}));
+/**
+ * 依赖关系类型
+ */
+var DependencyType;
+(function (DependencyType) {
+    DependencyType["FINISH_TO_START"] = "finish_to_start";
+    DependencyType["START_TO_START"] = "start_to_start";
+    DependencyType["FINISH_TO_FINISH"] = "finish_to_finish";
+    DependencyType["START_TO_FINISH"] = "start_to_finish";
+})(DependencyType || (DependencyType = {}));
+/**
+ * 任务约束类型
+ */
+var TaskConstraint;
+(function (TaskConstraint) {
+    TaskConstraint["AS_SOON_AS_POSSIBLE"] = "asap";
+    TaskConstraint["AS_LATE_AS_POSSIBLE"] = "alap";
+    TaskConstraint["MUST_START_ON"] = "must_start_on";
+    TaskConstraint["MUST_FINISH_ON"] = "must_finish_on";
+    TaskConstraint["START_NO_EARLIER_THAN"] = "snet";
+    TaskConstraint["START_NO_LATER_THAN"] = "snlt";
+    TaskConstraint["FINISH_NO_EARLIER_THAN"] = "fnet";
+    TaskConstraint["FINISH_NO_LATER_THAN"] = "fnlt";
+})(TaskConstraint || (TaskConstraint = {}));
+/**
+ * 资源类型
+ */
+var ResourceType;
+(function (ResourceType) {
+    ResourceType["HUMAN"] = "human";
+    ResourceType["EQUIPMENT"] = "equipment";
+    ResourceType["MATERIAL"] = "material";
+    ResourceType["SOFTWARE"] = "software";
+    ResourceType["BUDGET"] = "budget";
+})(ResourceType || (ResourceType = {}));
 /**
  * 任务类型
  */
@@ -585,6 +621,42 @@ var TaskType;
     TaskType["DEPLOYMENT"] = "deployment";
     TaskType["RESEARCH"] = "research";
 })(TaskType || (TaskType = {}));
+/**
+ * 调度策略
+ */
+var SchedulingStrategy;
+(function (SchedulingStrategy) {
+    SchedulingStrategy["CRITICAL_PATH"] = "critical_path";
+    SchedulingStrategy["PRIORITY_FIRST"] = "priority_first";
+    SchedulingStrategy["SHORTEST_FIRST"] = "shortest_first";
+    SchedulingStrategy["LONGEST_FIRST"] = "longest_first";
+    SchedulingStrategy["RESOURCE_LEVELING"] = "resource_leveling";
+    SchedulingStrategy["EARLY_START"] = "early_start";
+    SchedulingStrategy["LATE_START"] = "late_start";
+})(SchedulingStrategy || (SchedulingStrategy = {}));
+/**
+ * 优化目标
+ */
+var OptimizationGoal;
+(function (OptimizationGoal) {
+    OptimizationGoal["MINIMIZE_DURATION"] = "minimize_duration";
+    OptimizationGoal["MINIMIZE_COST"] = "minimize_cost";
+    OptimizationGoal["MAXIMIZE_QUALITY"] = "maximize_quality";
+    OptimizationGoal["BALANCE_RESOURCES"] = "balance_resources";
+    OptimizationGoal["MINIMIZE_RISK"] = "minimize_risk";
+})(OptimizationGoal || (OptimizationGoal = {}));
+/**
+ * 风险类别
+ */
+var RiskCategory;
+(function (RiskCategory) {
+    RiskCategory["TECHNICAL"] = "technical";
+    RiskCategory["RESOURCE"] = "resource";
+    RiskCategory["SCHEDULE"] = "schedule";
+    RiskCategory["QUALITY"] = "quality";
+    RiskCategory["EXTERNAL"] = "external";
+    RiskCategory["COMMUNICATION"] = "communication";
+})(RiskCategory || (RiskCategory = {}));
 
 /**
  * 需求提取器 - 从文档中智能提取和分析需求
@@ -881,7 +953,7 @@ class RequirementExtractor {
                 return priority;
             }
         }
-        return TaskPriority.MEDIUM;
+        return TaskPriority$1.MEDIUM;
     }
     /**
      * 分析复杂度
@@ -1087,7 +1159,7 @@ class RequirementExtractor {
         const functionalCount = requirements.filter(r => r.type === RequirementType.FUNCTIONAL).length;
         const nonFunctionalCount = requirements.filter(r => r.type === RequirementType.NON_FUNCTIONAL).length;
         const userStoryCount = requirements.filter(r => r.type === RequirementType.USER_STORY).length;
-        const highPriorityCount = requirements.filter(r => r.priority === TaskPriority.HIGH || r.priority === TaskPriority.CRITICAL).length;
+        const highPriorityCount = requirements.filter(r => r.priority === TaskPriority$1.HIGH || r.priority === TaskPriority$1.CRITICAL).length;
         const totalEffort = requirements.reduce((sum, req) => sum + req.estimatedEffort, 0);
         const complexityScores = requirements.map(r => {
             switch (r.complexity) {
@@ -1375,7 +1447,7 @@ class PRDParser {
             technicalRisk: req.technicalRisk,
             stakeholders: req.stakeholders,
             category: req.category,
-            status: TaskStatus.NOT_STARTED,
+            status: TaskStatus$1.NOT_STARTED,
             createdAt: req.metadata.extractedAt,
             updatedAt: req.metadata.extractedAt
         }));
@@ -1580,7 +1652,7 @@ class TaskPlanner {
             }
             if (!task.priority) {
                 this.logger.warn(`任务 ${task.id} 缺少优先级，设置为默认值'medium'`);
-                task.priority = TaskPriority.MEDIUM;
+                task.priority = TaskPriority$1.MEDIUM;
             }
             if (!task.type) {
                 this.logger.warn(`任务 ${task.id} 缺少类型，设置为默认值'feature'`);
@@ -1592,7 +1664,7 @@ class TaskPlanner {
             }
             // 设置默认状态
             if (!task.status) {
-                task.status = TaskStatus.NOT_STARTED;
+                task.status = TaskStatus$1.NOT_STARTED;
             }
         });
     }
@@ -1775,14 +1847,14 @@ class TaskPlanner {
             // 如果任务有很多依赖者，提高其优先级
             const dependents = this.findDependentTasks(task.id, taskPlan);
             if (dependents.length >= 3) {
-                task.priority = TaskPriority.HIGH;
+                task.priority = TaskPriority$1.HIGH;
             }
             else if (dependents.length >= 2) {
-                task.priority = TaskPriority.MEDIUM;
+                task.priority = TaskPriority$1.MEDIUM;
             }
             // 关键路径上的任务提高优先级
             if (this.isOnCriticalPath(task.id, taskPlan)) {
-                task.priority = TaskPriority.CRITICAL;
+                task.priority = TaskPriority$1.CRITICAL;
             }
         });
     }
@@ -1960,7 +2032,7 @@ class TaskPlanner {
  * 任务管理器类
  * 负责管理任务计划中的任务
  */
-class TaskManager {
+let TaskManager$1 = class TaskManager {
     /**
      * 创建任务管理器实例
      * @param logger 日志记录器
@@ -2076,7 +2148,7 @@ class TaskManager {
                     title: subtask.name,
                     description: subtask.description,
                     status: subtask.status,
-                    priority: TaskPriority.MEDIUM, // 子任务默认继承父任务的优先级
+                    priority: TaskPriority$1.MEDIUM, // 子任务默认继承父任务的优先级
                     type: TaskType.FEATURE, // 子任务默认类型
                     dependencies: [],
                     createdAt: new Date(),
@@ -2196,7 +2268,7 @@ class TaskManager {
                 title: subtask.name,
                 description: subtask.description,
                 status: subtask.status,
-                priority: TaskPriority.MEDIUM,
+                priority: TaskPriority$1.MEDIUM,
                 type: TaskType.FEATURE,
                 dependencies: [],
                 subtasks: [],
@@ -2289,7 +2361,7 @@ class TaskManager {
         }
         // 设置默认状态
         if (!subtask.status) {
-            subtask.status = TaskStatus.TODO;
+            subtask.status = TaskStatus$1.TODO;
         }
         // 添加子任务
         parentTask.subtasks.push(subtask);
@@ -2304,7 +2376,7 @@ class TaskManager {
             throw new Error('没有加载任务计划');
         }
         // 查找所有未完成的任务
-        const pendingTasks = this.taskPlan.tasks.filter(task => task.status !== TaskStatus.DONE && task.status !== TaskStatus.REVIEW);
+        const pendingTasks = this.taskPlan.tasks.filter(task => task.status !== TaskStatus$1.DONE && task.status !== TaskStatus$1.REVIEW);
         // 筛选出可以开始的任务（没有未完成的依赖项）
         return pendingTasks.filter(task => {
             // 检查依赖
@@ -2314,7 +2386,7 @@ class TaskManager {
             // 检查所有依赖任务是否已完成
             return task.dependencies.every(depId => {
                 const depTask = this.getTaskById(depId);
-                return depTask && depTask.status === TaskStatus.DONE;
+                return depTask && depTask.status === TaskStatus$1.DONE;
             });
         });
     }
@@ -2460,7 +2532,7 @@ class TaskManager {
     destroy() {
         this.stopAutoSave();
     }
-}
+};
 
 /**
  * TaskFlow AI 任务可视化模块
@@ -2620,11 +2692,11 @@ class TaskVisualizer {
      */
     getNodeShape(status) {
         switch (status) {
-            case TaskStatus.COMPLETED:
+            case TaskStatus$1.COMPLETED:
                 return '(())';
-            case TaskStatus.IN_PROGRESS:
+            case TaskStatus$1.IN_PROGRESS:
                 return '([])';
-            case TaskStatus.BLOCKED:
+            case TaskStatus$1.BLOCKED:
                 return '{[]}';
             default:
                 return '[]';
@@ -2711,16 +2783,16 @@ class TaskVisualizer {
         };
         taskPlan.tasks.forEach(task => {
             switch (task.status) {
-                case TaskStatus.COMPLETED:
+                case TaskStatus$1.COMPLETED:
                     stats.completed++;
                     break;
-                case TaskStatus.IN_PROGRESS:
+                case TaskStatus$1.IN_PROGRESS:
                     stats.inProgress++;
                     break;
-                case TaskStatus.NOT_STARTED:
+                case TaskStatus$1.NOT_STARTED:
                     stats.notStarted++;
                     break;
-                case TaskStatus.BLOCKED:
+                case TaskStatus$1.BLOCKED:
                     stats.blocked++;
                     break;
             }
@@ -4121,7 +4193,7 @@ class TaskFlowService {
         this.modelCoordinator = new ModelCoordinator(this.configManager);
         this.prdParser = new PRDParser(this.modelCoordinator, this.logger);
         this.taskPlanner = new TaskPlanner(this.modelCoordinator, this.logger);
-        this.taskManager = new TaskManager(this.logger, this.configManager);
+        this.taskManager = new TaskManager$1(this.logger, this.configManager);
         this.logger.info('TaskFlow AI MCP服务初始化完成');
     }
     /**
@@ -5085,7 +5157,7 @@ class VisualizeCommand {
     constructor() {
         this.logger = Logger.getInstance({ level: LogLevel.INFO, output: 'console' });
         this.configManager = new ConfigManager$1();
-        this.taskManager = new TaskManager(this.logger, this.configManager);
+        this.taskManager = new TaskManager$1(this.logger, this.configManager);
         this.visualizer = new TaskVisualizer(this.logger);
     }
     /**
@@ -5307,7 +5379,7 @@ class StatusCommand {
     constructor() {
         this.logger = Logger.getInstance({ level: LogLevel.INFO, output: 'console' });
         this.configManager = new ConfigManager$1();
-        this.taskManager = new TaskManager(this.logger, this.configManager);
+        this.taskManager = new TaskManager$1(this.logger, this.configManager);
     }
     /**
      * 注册状态命令
@@ -5404,7 +5476,7 @@ class StatusCommand {
             console.log(chalk.blue('🔄 TaskFlow AI - 更新任务状态'));
             console.log();
             // 验证状态值
-            const validStatuses = Object.values(TaskStatus);
+            const validStatuses = Object.values(TaskStatus$1);
             if (!validStatuses.includes(status)) {
                 console.error(chalk.red(`❌ 无效的状态值: ${status}`));
                 console.log(chalk.gray(`支持的状态: ${validStatuses.join(', ')}`));
@@ -5428,7 +5500,7 @@ class StatusCommand {
             console.log(chalk.gray(`   任务: ${task.title}`));
             console.log(chalk.gray(`   状态: ${this.getStatusDisplay(task.status)} → ${this.getStatusDisplay(status)}`));
             // 显示相关信息
-            if (status === TaskStatus.COMPLETED) {
+            if (status === TaskStatus$1.COMPLETED) {
                 const nextTasks = this.taskManager.getNextTasks();
                 if (nextTasks.length > 0) {
                     console.log();
@@ -5591,16 +5663,16 @@ class StatusCommand {
         };
         taskPlan.tasks.forEach((task) => {
             switch (task.status) {
-                case TaskStatus.COMPLETED:
+                case TaskStatus$1.COMPLETED:
                     stats.completed++;
                     break;
-                case TaskStatus.IN_PROGRESS:
+                case TaskStatus$1.IN_PROGRESS:
                     stats.inProgress++;
                     break;
-                case TaskStatus.NOT_STARTED:
+                case TaskStatus$1.NOT_STARTED:
                     stats.notStarted++;
                     break;
-                case TaskStatus.BLOCKED:
+                case TaskStatus$1.BLOCKED:
                     stats.blocked++;
                     break;
             }
@@ -5650,13 +5722,13 @@ class StatusCommand {
      */
     getStatusIcon(status) {
         switch (status) {
-            case TaskStatus.COMPLETED:
+            case TaskStatus$1.COMPLETED:
                 return '✅';
-            case TaskStatus.IN_PROGRESS:
+            case TaskStatus$1.IN_PROGRESS:
                 return '🔄';
-            case TaskStatus.BLOCKED:
+            case TaskStatus$1.BLOCKED:
                 return '🚫';
-            case TaskStatus.CANCELLED:
+            case TaskStatus$1.CANCELLED:
                 return '❌';
             default:
                 return '⏳';
@@ -5668,15 +5740,15 @@ class StatusCommand {
      */
     getStatusDisplay(status) {
         switch (status) {
-            case TaskStatus.NOT_STARTED:
+            case TaskStatus$1.NOT_STARTED:
                 return '未开始';
-            case TaskStatus.IN_PROGRESS:
+            case TaskStatus$1.IN_PROGRESS:
                 return '进行中';
-            case TaskStatus.COMPLETED:
+            case TaskStatus$1.COMPLETED:
                 return '已完成';
-            case TaskStatus.BLOCKED:
+            case TaskStatus$1.BLOCKED:
                 return '被阻塞';
-            case TaskStatus.CANCELLED:
+            case TaskStatus$1.CANCELLED:
                 return '已取消';
             default:
                 return status;
@@ -5688,13 +5760,13 @@ class StatusCommand {
      */
     getPriorityDisplay(priority) {
         switch (priority) {
-            case TaskPriority.CRITICAL:
+            case TaskPriority$1.CRITICAL:
                 return '紧急';
-            case TaskPriority.HIGH:
+            case TaskPriority$1.HIGH:
                 return '高';
-            case TaskPriority.MEDIUM:
+            case TaskPriority$1.MEDIUM:
                 return '中';
-            case TaskPriority.LOW:
+            case TaskPriority$1.LOW:
                 return '低';
             default:
                 return priority;
@@ -5706,13 +5778,13 @@ class StatusCommand {
      */
     getPriorityColor(priority) {
         switch (priority) {
-            case TaskPriority.CRITICAL:
+            case TaskPriority$1.CRITICAL:
                 return chalk.red;
-            case TaskPriority.HIGH:
+            case TaskPriority$1.HIGH:
                 return chalk.yellow;
-            case TaskPriority.MEDIUM:
+            case TaskPriority$1.MEDIUM:
                 return chalk.blue;
-            case TaskPriority.LOW:
+            case TaskPriority$1.LOW:
                 return chalk.gray;
             default:
                 return chalk.white;
@@ -6134,9 +6206,9 @@ class InteractiveCommand {
             spinner.succeed('状态获取完成');
             if (tasksResult.success && tasksResult.data) {
                 const tasks = tasksResult.data;
-                const completed = tasks.filter((t) => t.status === TaskStatus.COMPLETED || t.status === TaskStatus.DONE).length;
-                const inProgress = tasks.filter((t) => t.status === TaskStatus.IN_PROGRESS || t.status === TaskStatus.RUNNING).length;
-                const pending = tasks.filter((t) => t.status === TaskStatus.PENDING || t.status === TaskStatus.NOT_STARTED).length;
+                const completed = tasks.filter((t) => t.status === TaskStatus$1.COMPLETED || t.status === TaskStatus$1.DONE).length;
+                const inProgress = tasks.filter((t) => t.status === TaskStatus$1.IN_PROGRESS || t.status === TaskStatus$1.RUNNING).length;
+                const pending = tasks.filter((t) => t.status === TaskStatus$1.PENDING || t.status === TaskStatus$1.NOT_STARTED).length;
                 console.log(chalk.green('\n📈 任务统计:'));
                 console.log(`  ✅ 已完成: ${completed}`);
                 console.log(`  🔄 进行中: ${inProgress}`);
@@ -7898,6 +7970,2051 @@ function createMCPCommand() {
 }
 
 /**
+ * TaskFlow AI 任务管理器
+ * 提供任务状态管理、进度跟踪和依赖关系管理功能
+ */
+/**
+ * 任务状态枚举
+ */
+var TaskStatus;
+(function (TaskStatus) {
+    TaskStatus["PENDING"] = "pending";
+    TaskStatus["IN_PROGRESS"] = "in_progress";
+    TaskStatus["COMPLETED"] = "completed";
+    TaskStatus["BLOCKED"] = "blocked";
+    TaskStatus["CANCELLED"] = "cancelled";
+})(TaskStatus || (TaskStatus = {}));
+/**
+ * 任务优先级
+ */
+var TaskPriority;
+(function (TaskPriority) {
+    TaskPriority["LOW"] = "low";
+    TaskPriority["MEDIUM"] = "medium";
+    TaskPriority["HIGH"] = "high";
+    TaskPriority["CRITICAL"] = "critical";
+})(TaskPriority || (TaskPriority = {}));
+/**
+ * 任务管理器类
+ */
+class TaskManager extends events.EventEmitter {
+    constructor(dataDir = '.taskflow') {
+        super();
+        this.autoSaveInterval = null;
+        this.tasks = new Map();
+        this.logger = Logger.getInstance({
+            level: LogLevel.INFO,
+            output: 'console'
+        });
+        this.dataFile = path.join(dataDir, 'tasks.json');
+        this.initializeDataFile();
+        this.loadTasks();
+        this.startAutoSave();
+    }
+    /**
+     * 初始化数据文件
+     */
+    async initializeDataFile() {
+        try {
+            await fs.ensureDir(path.dirname(this.dataFile));
+            if (!await fs.pathExists(this.dataFile)) {
+                await fs.writeJson(this.dataFile, { tasks: [] });
+            }
+        }
+        catch (error) {
+            this.logger.error('初始化任务数据文件失败:', {
+                error: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : undefined
+            });
+        }
+    }
+    /**
+     * 加载任务数据
+     */
+    async loadTasks() {
+        try {
+            if (await fs.pathExists(this.dataFile)) {
+                const data = await fs.readJson(this.dataFile);
+                if (data.tasks && Array.isArray(data.tasks)) {
+                    for (const taskData of data.tasks) {
+                        const task = {
+                            ...taskData,
+                            createdAt: new Date(taskData.createdAt),
+                            updatedAt: new Date(taskData.updatedAt),
+                            startedAt: taskData.startedAt ? new Date(taskData.startedAt) : undefined,
+                            completedAt: taskData.completedAt ? new Date(taskData.completedAt) : undefined,
+                            dueDate: taskData.dueDate ? new Date(taskData.dueDate) : undefined
+                        };
+                        this.tasks.set(task.id, task);
+                    }
+                }
+            }
+            this.logger.info(`已加载 ${this.tasks.size} 个任务`);
+        }
+        catch (error) {
+            this.logger.error('加载任务数据失败:', {
+                error: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : undefined
+            });
+        }
+    }
+    /**
+     * 保存任务数据
+     */
+    async saveTasks() {
+        try {
+            const tasksArray = Array.from(this.tasks.values());
+            await fs.writeJson(this.dataFile, { tasks: tasksArray }, { spaces: 2 });
+        }
+        catch (error) {
+            this.logger.error('保存任务数据失败:', {
+                error: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : undefined
+            });
+        }
+    }
+    /**
+     * 启动自动保存
+     */
+    startAutoSave() {
+        if (this.autoSaveInterval) {
+            clearInterval(this.autoSaveInterval);
+        }
+        this.autoSaveInterval = setInterval(() => {
+            this.saveTasks();
+        }, 30000); // 每30秒自动保存
+    }
+    /**
+     * 停止自动保存
+     */
+    stopAutoSave() {
+        if (this.autoSaveInterval) {
+            clearInterval(this.autoSaveInterval);
+            this.autoSaveInterval = null;
+        }
+    }
+    /**
+     * 创建新任务
+     */
+    createTask(taskData) {
+        const task = {
+            id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            progress: 0,
+            ...taskData
+        };
+        this.tasks.set(task.id, task);
+        this.emit('taskCreated', task);
+        this.logger.info(`创建任务: ${task.title} (${task.id})`);
+        return task;
+    }
+    /**
+     * 获取任务
+     */
+    getTask(taskId) {
+        return this.tasks.get(taskId);
+    }
+    /**
+     * 获取所有任务
+     */
+    getAllTasks() {
+        return Array.from(this.tasks.values());
+    }
+    /**
+     * 更新任务
+     */
+    updateTask(taskId, updates) {
+        const task = this.tasks.get(taskId);
+        if (!task) {
+            this.logger.warn(`任务不存在: ${taskId}`);
+            return false;
+        }
+        // 更新任务属性
+        Object.assign(task, updates, {
+            updatedAt: new Date()
+        });
+        this.tasks.set(taskId, task);
+        this.emit('taskUpdated', { taskId, task, updates });
+        // 触发自动保存
+        this.saveTasks();
+        this.logger.info(`任务已更新: ${taskId}`);
+        return true;
+    }
+    /**
+     * 更新任务状态
+     */
+    updateTaskStatus(taskId, status, options = {}) {
+        const task = this.tasks.get(taskId);
+        if (!task) {
+            this.logger.warn(`任务不存在: ${taskId}`);
+            return false;
+        }
+        const oldStatus = task.status;
+        task.status = status;
+        task.updatedAt = new Date();
+        // 更新进度
+        if (options.progress !== undefined) {
+            task.progress = Math.max(0, Math.min(100, options.progress));
+        }
+        // 更新其他字段
+        if (options.actualHours !== undefined) {
+            task.actualHours = options.actualHours;
+        }
+        if (options.assignee !== undefined) {
+            task.assignee = options.assignee;
+        }
+        if (options.dueDate !== undefined) {
+            task.dueDate = options.dueDate;
+        }
+        if (options.metadata) {
+            task.metadata = { ...task.metadata, ...options.metadata };
+        }
+        // 设置状态相关的时间戳
+        if (status === TaskStatus.IN_PROGRESS && oldStatus !== TaskStatus.IN_PROGRESS) {
+            task.startedAt = new Date();
+        }
+        else if (status === TaskStatus.COMPLETED && oldStatus !== TaskStatus.COMPLETED) {
+            task.completedAt = new Date();
+            task.progress = 100;
+        }
+        this.emit('taskUpdated', task, oldStatus);
+        this.logger.info(`更新任务状态: ${task.title} (${oldStatus} -> ${status})`);
+        return true;
+    }
+    /**
+     * 删除任务
+     */
+    deleteTask(taskId) {
+        const task = this.tasks.get(taskId);
+        if (!task) {
+            return false;
+        }
+        this.tasks.delete(taskId);
+        this.emit('taskDeleted', task);
+        this.logger.info(`删除任务: ${task.title} (${taskId})`);
+        return true;
+    }
+    /**
+     * 获取任务统计信息
+     */
+    getTaskStats() {
+        const tasks = Array.from(this.tasks.values());
+        const stats = {
+            total: tasks.length,
+            pending: 0,
+            in_progress: 0,
+            completed: 0,
+            blocked: 0,
+            cancelled: 0,
+            overallProgress: 0,
+            estimatedTotalHours: 0,
+            actualTotalHours: 0
+        };
+        for (const task of tasks) {
+            // 统计状态
+            switch (task.status) {
+                case TaskStatus.PENDING:
+                    stats.pending++;
+                    break;
+                case TaskStatus.IN_PROGRESS:
+                    stats.in_progress++;
+                    break;
+                case TaskStatus.COMPLETED:
+                    stats.completed++;
+                    break;
+                case TaskStatus.BLOCKED:
+                    stats.blocked++;
+                    break;
+                case TaskStatus.CANCELLED:
+                    stats.cancelled++;
+                    break;
+            }
+            // 统计工时
+            stats.estimatedTotalHours += task.estimatedHours;
+            if (task.actualHours) {
+                stats.actualTotalHours += task.actualHours;
+            }
+        }
+        // 计算整体进度
+        if (tasks.length > 0) {
+            const totalProgress = tasks.reduce((sum, task) => sum + task.progress, 0);
+            stats.overallProgress = Math.round(totalProgress / tasks.length);
+        }
+        return stats;
+    }
+    /**
+     * 根据状态筛选任务
+     */
+    getTasksByStatus(status) {
+        return Array.from(this.tasks.values()).filter(task => task.status === status);
+    }
+    /**
+     * 根据优先级筛选任务
+     */
+    getTasksByPriority(priority) {
+        return Array.from(this.tasks.values()).filter(task => task.priority === priority);
+    }
+    /**
+     * 根据分配人筛选任务
+     */
+    getTasksByAssignee(assignee) {
+        return Array.from(this.tasks.values()).filter(task => task.assignee === assignee);
+    }
+    /**
+     * 检查任务依赖关系
+     */
+    checkTaskDependencies(taskId) {
+        const task = this.tasks.get(taskId);
+        if (!task) {
+            return { canStart: false, blockedBy: [] };
+        }
+        const blockedBy = [];
+        for (const depId of task.dependencies) {
+            const depTask = this.tasks.get(depId);
+            if (!depTask || depTask.status !== TaskStatus.COMPLETED) {
+                blockedBy.push(depId);
+            }
+        }
+        return {
+            canStart: blockedBy.length === 0,
+            blockedBy
+        };
+    }
+    /**
+     * 获取可以开始的任务
+     */
+    getReadyTasks() {
+        return Array.from(this.tasks.values()).filter(task => {
+            if (task.status !== TaskStatus.PENDING)
+                return false;
+            const { canStart } = this.checkTaskDependencies(task.id);
+            return canStart;
+        });
+    }
+    /**
+     * 手动保存
+     */
+    async save() {
+        await this.saveTasks();
+    }
+    /**
+     * 清理资源
+     */
+    destroy() {
+        this.stopAutoSave();
+        this.saveTasks();
+        this.removeAllListeners();
+    }
+}
+
+/**
+ * TaskFlow AI - 智能任务编排引擎
+ *
+ * 实现基于依赖关系的智能任务排序、关键路径分析和并行任务优化
+ *
+ * @author TaskFlow AI Team
+ * @version 1.0.0
+ */
+/**
+ * 智能任务编排引擎
+ */
+class TaskOrchestrationEngine {
+    constructor(config = {}) {
+        this.config = {
+            enableCriticalPath: true,
+            enableParallelOptimization: true,
+            enableResourceLeveling: false,
+            enableRiskAnalysis: true,
+            schedulingStrategy: SchedulingStrategy.CRITICAL_PATH,
+            optimizationGoal: OptimizationGoal.MINIMIZE_DURATION,
+            maxParallelTasks: 10,
+            workingHoursPerDay: 8,
+            workingDaysPerWeek: 5,
+            bufferPercentage: 0.1,
+            ...config,
+        };
+        this.tasks = new Map();
+        this.dependencies = new Map();
+        this.graph = new Map();
+    }
+    /**
+     * 执行任务编排
+     */
+    async orchestrate(tasks) {
+        console.log(`🎯 开始任务编排，共 ${tasks.length} 个任务`);
+        // 1. 初始化数据结构
+        this.initializeDataStructures(tasks);
+        // 2. 构建依赖关系图
+        this.buildDependencyGraph();
+        // 3. 验证依赖关系
+        this.validateDependencies();
+        // 4. 计算关键路径
+        const criticalPath = this.config.enableCriticalPath
+            ? this.calculateCriticalPath()
+            : [];
+        // 5. 优化任务排序
+        const optimizedTasks = this.optimizeTaskOrder();
+        // 6. 识别并行任务组
+        const parallelGroups = this.config.enableParallelOptimization
+            ? this.identifyParallelGroups()
+            : [];
+        // 7. 计算资源利用率
+        const resourceUtilization = this.config.enableResourceLeveling
+            ? this.calculateResourceUtilization(optimizedTasks)
+            : [];
+        // 8. 风险评估
+        const riskAssessment = this.config.enableRiskAnalysis
+            ? this.performRiskAssessment(optimizedTasks)
+            : this.createEmptyRiskAssessment();
+        // 9. 生成优化建议
+        const recommendations = this.generateRecommendations(optimizedTasks, criticalPath, parallelGroups, resourceUtilization, riskAssessment);
+        // 10. 计算项目总持续时间
+        const totalDuration = this.calculateTotalDuration(optimizedTasks);
+        console.log(`✅ 任务编排完成，项目预计持续时间: ${totalDuration} 小时`);
+        return {
+            tasks: optimizedTasks,
+            criticalPath,
+            totalDuration,
+            parallelGroups,
+            resourceUtilization,
+            riskAssessment,
+            recommendations,
+            metadata: {
+                orchestrationTime: new Date(),
+                strategy: this.config.schedulingStrategy,
+                goal: this.config.optimizationGoal,
+                version: '1.0.0',
+            },
+        };
+    }
+    /**
+     * 初始化数据结构
+     */
+    initializeDataStructures(tasks) {
+        this.tasks.clear();
+        this.dependencies.clear();
+        this.graph.clear();
+        // 初始化任务映射
+        for (const task of tasks) {
+            this.tasks.set(task.id, task);
+            // 初始化图节点
+            this.graph.set(task.id, {
+                taskId: task.id,
+                task,
+                inDegree: 0,
+                outDegree: 0,
+                predecessors: new Set(),
+                successors: new Set(),
+                earliestStart: 0,
+                latestStart: 0,
+                earliestFinish: 0,
+                latestFinish: 0,
+                totalFloat: 0,
+                freeFloat: 0,
+                isCritical: false,
+            });
+        }
+        // 初始化依赖关系
+        for (const task of tasks) {
+            // 处理传统的依赖关系（向后兼容）
+            if (task.dependencies && task.dependencies.length > 0) {
+                for (const depId of task.dependencies) {
+                    const dependency = {
+                        id: `${depId}-${task.id}`,
+                        predecessorId: depId,
+                        successorId: task.id,
+                        type: DependencyType.FINISH_TO_START,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    };
+                    this.dependencies.set(dependency.id, dependency);
+                }
+            }
+            // 处理新的详细依赖关系
+            if (task.dependencyRelations && task.dependencyRelations.length > 0) {
+                for (const dep of task.dependencyRelations) {
+                    this.dependencies.set(dep.id, dep);
+                }
+            }
+        }
+    }
+    /**
+     * 构建依赖关系图
+     */
+    buildDependencyGraph() {
+        for (const dependency of this.dependencies.values()) {
+            const predecessorNode = this.graph.get(dependency.predecessorId);
+            const successorNode = this.graph.get(dependency.successorId);
+            if (!predecessorNode || !successorNode) {
+                console.warn(`⚠️ 发现无效依赖关系: ${dependency.id}`);
+                continue;
+            }
+            // 更新图结构
+            predecessorNode.successors.add(dependency.successorId);
+            predecessorNode.outDegree++;
+            successorNode.predecessors.add(dependency.predecessorId);
+            successorNode.inDegree++;
+        }
+    }
+    /**
+     * 验证依赖关系（检测循环依赖）
+     */
+    validateDependencies() {
+        const visited = new Set();
+        const recursionStack = new Set();
+        const hasCycle = (nodeId) => {
+            if (recursionStack.has(nodeId)) {
+                return true; // 发现循环
+            }
+            if (visited.has(nodeId)) {
+                return false; // 已访问过，无循环
+            }
+            visited.add(nodeId);
+            recursionStack.add(nodeId);
+            const node = this.graph.get(nodeId);
+            if (node) {
+                for (const successorId of node.successors) {
+                    if (hasCycle(successorId)) {
+                        return true;
+                    }
+                }
+            }
+            recursionStack.delete(nodeId);
+            return false;
+        };
+        for (const nodeId of this.graph.keys()) {
+            if (!visited.has(nodeId) && hasCycle(nodeId)) {
+                throw new Error(`检测到循环依赖，涉及任务: ${nodeId}`);
+            }
+        }
+    }
+    /**
+     * 计算关键路径（CPM算法）
+     */
+    calculateCriticalPath() {
+        // 前向计算（计算最早开始和完成时间）
+        this.forwardPass();
+        // 反向计算（计算最晚开始和完成时间）
+        this.backwardPass();
+        // 计算浮动时间
+        this.calculateFloat();
+        // 识别关键路径
+        const criticalTasks = [];
+        for (const node of this.graph.values()) {
+            if (node.totalFloat === 0) {
+                node.isCritical = true;
+                criticalTasks.push(node.taskId);
+            }
+        }
+        console.log(`🎯 识别到关键路径，包含 ${criticalTasks.length} 个关键任务`);
+        return criticalTasks;
+    }
+    /**
+     * 前向计算
+     */
+    forwardPass() {
+        const queue = [];
+        const inDegreeCount = new Map();
+        // 初始化入度计数
+        for (const [nodeId, node] of this.graph) {
+            inDegreeCount.set(nodeId, node.inDegree);
+            if (node.inDegree === 0) {
+                queue.push(nodeId);
+                node.earliestStart = 0;
+                node.earliestFinish = this.getTaskDuration(node.task);
+            }
+        }
+        // 拓扑排序并计算最早时间
+        while (queue.length > 0) {
+            const currentId = queue.shift();
+            const currentNode = this.graph.get(currentId);
+            for (const successorId of currentNode.successors) {
+                const successorNode = this.graph.get(successorId);
+                const dependency = this.findDependency(currentId, successorId);
+                // 计算基于依赖类型的最早开始时间
+                let earliestStart = 0;
+                if (dependency) {
+                    switch (dependency.type) {
+                        case DependencyType.FINISH_TO_START:
+                            earliestStart = currentNode.earliestFinish + (dependency.lag || 0);
+                            break;
+                        case DependencyType.START_TO_START:
+                            earliestStart = currentNode.earliestStart + (dependency.lag || 0);
+                            break;
+                        case DependencyType.FINISH_TO_FINISH:
+                            earliestStart = currentNode.earliestFinish - this.getTaskDuration(successorNode.task) + (dependency.lag || 0);
+                            break;
+                        case DependencyType.START_TO_FINISH:
+                            earliestStart = currentNode.earliestStart - this.getTaskDuration(successorNode.task) + (dependency.lag || 0);
+                            break;
+                    }
+                }
+                successorNode.earliestStart = Math.max(successorNode.earliestStart, earliestStart);
+                successorNode.earliestFinish = successorNode.earliestStart + this.getTaskDuration(successorNode.task);
+                const newInDegree = inDegreeCount.get(successorId) - 1;
+                inDegreeCount.set(successorId, newInDegree);
+                if (newInDegree === 0) {
+                    queue.push(successorId);
+                }
+            }
+        }
+    }
+    /**
+     * 反向计算
+     */
+    backwardPass() {
+        // 找到项目结束时间
+        let projectFinish = 0;
+        for (const node of this.graph.values()) {
+            if (node.outDegree === 0) {
+                projectFinish = Math.max(projectFinish, node.earliestFinish);
+            }
+        }
+        // 初始化最晚时间
+        for (const node of this.graph.values()) {
+            if (node.outDegree === 0) {
+                node.latestFinish = projectFinish;
+                node.latestStart = node.latestFinish - this.getTaskDuration(node.task);
+            }
+            else {
+                node.latestFinish = Infinity;
+                node.latestStart = Infinity;
+            }
+        }
+        // 反向拓扑排序
+        const queue = [];
+        const outDegreeCount = new Map();
+        for (const [nodeId, node] of this.graph) {
+            outDegreeCount.set(nodeId, node.outDegree);
+            if (node.outDegree === 0) {
+                queue.push(nodeId);
+            }
+        }
+        while (queue.length > 0) {
+            const currentId = queue.shift();
+            const currentNode = this.graph.get(currentId);
+            for (const predecessorId of currentNode.predecessors) {
+                const predecessorNode = this.graph.get(predecessorId);
+                const dependency = this.findDependency(predecessorId, currentId);
+                // 计算基于依赖类型的最晚完成时间
+                let latestFinish = Infinity;
+                if (dependency) {
+                    switch (dependency.type) {
+                        case DependencyType.FINISH_TO_START:
+                            latestFinish = currentNode.latestStart - (dependency.lag || 0);
+                            break;
+                        case DependencyType.START_TO_START:
+                            latestFinish = currentNode.latestStart + this.getTaskDuration(predecessorNode.task) - (dependency.lag || 0);
+                            break;
+                        case DependencyType.FINISH_TO_FINISH:
+                            latestFinish = currentNode.latestFinish - (dependency.lag || 0);
+                            break;
+                        case DependencyType.START_TO_FINISH:
+                            latestFinish = currentNode.latestFinish + this.getTaskDuration(predecessorNode.task) - (dependency.lag || 0);
+                            break;
+                    }
+                }
+                predecessorNode.latestFinish = Math.min(predecessorNode.latestFinish, latestFinish);
+                predecessorNode.latestStart = predecessorNode.latestFinish - this.getTaskDuration(predecessorNode.task);
+                const newOutDegree = outDegreeCount.get(predecessorId) - 1;
+                outDegreeCount.set(predecessorId, newOutDegree);
+                if (newOutDegree === 0) {
+                    queue.push(predecessorId);
+                }
+            }
+        }
+    }
+    /**
+     * 计算浮动时间
+     */
+    calculateFloat() {
+        for (const node of this.graph.values()) {
+            node.totalFloat = node.latestStart - node.earliestStart;
+            // 计算自由浮动时间
+            let minSuccessorEarliestStart = Infinity;
+            for (const successorId of node.successors) {
+                const successorNode = this.graph.get(successorId);
+                minSuccessorEarliestStart = Math.min(minSuccessorEarliestStart, successorNode.earliestStart);
+            }
+            if (minSuccessorEarliestStart === Infinity) {
+                node.freeFloat = node.totalFloat;
+            }
+            else {
+                node.freeFloat = minSuccessorEarliestStart - node.earliestFinish;
+            }
+        }
+    }
+    /**
+     * 优化任务排序
+     */
+    optimizeTaskOrder() {
+        switch (this.config.schedulingStrategy) {
+            case SchedulingStrategy.CRITICAL_PATH:
+                return this.sortByCriticalPath();
+            case SchedulingStrategy.PRIORITY_FIRST:
+                return this.sortByPriority();
+            case SchedulingStrategy.SHORTEST_FIRST:
+                return this.sortByDuration(true);
+            case SchedulingStrategy.LONGEST_FIRST:
+                return this.sortByDuration(false);
+            case SchedulingStrategy.EARLY_START:
+                return this.sortByEarlyStart();
+            default:
+                return Array.from(this.tasks.values());
+        }
+    }
+    /**
+     * 按关键路径排序
+     */
+    sortByCriticalPath() {
+        const tasks = Array.from(this.tasks.values());
+        return tasks.sort((a, b) => {
+            const nodeA = this.graph.get(a.id);
+            const nodeB = this.graph.get(b.id);
+            // 关键任务优先
+            if (nodeA.isCritical && !nodeB.isCritical)
+                return -1;
+            if (!nodeA.isCritical && nodeB.isCritical)
+                return 1;
+            // 按最早开始时间排序
+            if (nodeA.earliestStart !== nodeB.earliestStart) {
+                return nodeA.earliestStart - nodeB.earliestStart;
+            }
+            // 按总浮动时间排序（浮动时间少的优先）
+            return nodeA.totalFloat - nodeB.totalFloat;
+        });
+    }
+    /**
+     * 按优先级排序
+     */
+    sortByPriority() {
+        const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
+        const tasks = Array.from(this.tasks.values());
+        return tasks.sort((a, b) => {
+            const priorityA = priorityOrder[a.priority] || 0;
+            const priorityB = priorityOrder[b.priority] || 0;
+            if (priorityA !== priorityB) {
+                return priorityB - priorityA; // 高优先级在前
+            }
+            // 优先级相同时按最早开始时间排序
+            const nodeA = this.graph.get(a.id);
+            const nodeB = this.graph.get(b.id);
+            return nodeA.earliestStart - nodeB.earliestStart;
+        });
+    }
+    /**
+     * 按持续时间排序
+     */
+    sortByDuration(shortestFirst) {
+        const tasks = Array.from(this.tasks.values());
+        return tasks.sort((a, b) => {
+            const durationA = this.getTaskDuration(a);
+            const durationB = this.getTaskDuration(b);
+            return shortestFirst ? durationA - durationB : durationB - durationA;
+        });
+    }
+    /**
+     * 按最早开始时间排序
+     */
+    sortByEarlyStart() {
+        const tasks = Array.from(this.tasks.values());
+        return tasks.sort((a, b) => {
+            const nodeA = this.graph.get(a.id);
+            const nodeB = this.graph.get(b.id);
+            return nodeA.earliestStart - nodeB.earliestStart;
+        });
+    }
+    /**
+     * 识别并行任务组
+     */
+    identifyParallelGroups() {
+        const parallelGroups = [];
+        const processed = new Set();
+        // 按最早开始时间分组
+        const timeGroups = new Map();
+        for (const [taskId, node] of this.graph) {
+            if (!processed.has(taskId)) {
+                const startTime = node.earliestStart;
+                if (!timeGroups.has(startTime)) {
+                    timeGroups.set(startTime, []);
+                }
+                timeGroups.get(startTime).push(taskId);
+            }
+        }
+        // 检查每个时间组内的任务是否可以并行
+        for (const [startTime, taskIds] of timeGroups) {
+            if (taskIds.length > 1) {
+                const parallelGroup = this.findParallelTasks(taskIds);
+                if (parallelGroup.length > 1) {
+                    parallelGroups.push(parallelGroup);
+                }
+            }
+        }
+        console.log(`🔄 识别到 ${parallelGroups.length} 个并行任务组`);
+        return parallelGroups;
+    }
+    /**
+     * 在给定任务列表中找到可并行执行的任务
+     */
+    findParallelTasks(taskIds) {
+        var _a;
+        const parallelTasks = [];
+        for (const taskId of taskIds) {
+            const task = this.tasks.get(taskId);
+            this.graph.get(taskId);
+            // 检查是否可并行化
+            const canParallelize = ((_a = task.orchestrationMetadata) === null || _a === void 0 ? void 0 : _a.parallelizable) !== false;
+            // 检查资源冲突
+            const hasResourceConflict = this.checkResourceConflict(taskId, parallelTasks);
+            if (canParallelize && !hasResourceConflict) {
+                parallelTasks.push(taskId);
+            }
+        }
+        return parallelTasks;
+    }
+    /**
+     * 检查资源冲突
+     */
+    checkResourceConflict(taskId, existingTasks) {
+        const task = this.tasks.get(taskId);
+        const taskResources = task.resourceRequirements || [];
+        for (const existingTaskId of existingTasks) {
+            const existingTask = this.tasks.get(existingTaskId);
+            const existingResources = existingTask.resourceRequirements || [];
+            // 检查是否有相同的人力资源冲突
+            for (const resource of taskResources) {
+                for (const existingResource of existingResources) {
+                    if (resource.type === 'human' &&
+                        existingResource.type === 'human' &&
+                        resource.name === existingResource.name) {
+                        return true; // 发现资源冲突
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    /**
+     * 计算资源利用率
+     */
+    calculateResourceUtilization(tasks) {
+        const resourceMap = new Map();
+        // 收集所有资源
+        for (const task of tasks) {
+            if (task.resourceRequirements) {
+                for (const resource of task.resourceRequirements) {
+                    if (!resourceMap.has(resource.id)) {
+                        resourceMap.set(resource.id, {
+                            resourceId: resource.id,
+                            resourceName: resource.name,
+                            totalCapacity: resource.availability || 1,
+                            allocatedCapacity: 0,
+                            utilizationRate: 0,
+                            overallocation: 0,
+                            timeline: [],
+                        });
+                    }
+                }
+            }
+        }
+        // 计算资源分配
+        for (const task of tasks) {
+            const node = this.graph.get(task.id);
+            if (task.resourceRequirements && node) {
+                for (const resource of task.resourceRequirements) {
+                    const utilization = resourceMap.get(resource.id);
+                    if (utilization) {
+                        utilization.allocatedCapacity += resource.quantity;
+                    }
+                }
+            }
+        }
+        // 计算利用率
+        for (const utilization of resourceMap.values()) {
+            utilization.utilizationRate = utilization.allocatedCapacity / utilization.totalCapacity;
+            utilization.overallocation = Math.max(0, utilization.allocatedCapacity - utilization.totalCapacity);
+        }
+        return Array.from(resourceMap.values());
+    }
+    /**
+     * 执行风险评估
+     */
+    performRiskAssessment(tasks) {
+        const riskFactors = [];
+        let overallRiskLevel = 0;
+        // 分析各种风险因素
+        riskFactors.push(...this.analyzeScheduleRisks(tasks));
+        riskFactors.push(...this.analyzeResourceRisks(tasks));
+        riskFactors.push(...this.analyzeTechnicalRisks(tasks));
+        riskFactors.push(...this.analyzeQualityRisks(tasks));
+        // 计算整体风险等级
+        if (riskFactors.length > 0) {
+            overallRiskLevel = riskFactors.reduce((sum, risk) => sum + risk.riskScore, 0) / riskFactors.length;
+        }
+        // 生成缓解建议
+        const mitigationSuggestions = this.generateMitigationSuggestions(riskFactors);
+        // 生成应急计划
+        const contingencyPlans = this.generateContingencyPlans(riskFactors);
+        return {
+            overallRiskLevel,
+            riskFactors,
+            mitigationSuggestions,
+            contingencyPlans,
+        };
+    }
+    /**
+     * 分析进度风险
+     */
+    analyzeScheduleRisks(tasks) {
+        const risks = [];
+        // 检查关键路径风险
+        const criticalTasks = tasks.filter(task => { var _a; return (_a = this.graph.get(task.id)) === null || _a === void 0 ? void 0 : _a.isCritical; });
+        if (criticalTasks.length > tasks.length * 0.3) {
+            risks.push({
+                id: 'critical-path-risk',
+                name: '关键路径风险',
+                description: '关键路径上的任务过多，项目延期风险较高',
+                probability: 0.7,
+                impact: 8,
+                riskScore: 5.6,
+                affectedTaskIds: criticalTasks.map(t => t.id),
+                category: RiskCategory.SCHEDULE,
+            });
+        }
+        // 检查任务持续时间风险
+        const longTasks = tasks.filter(task => this.getTaskDuration(task) > 40); // 超过5天
+        if (longTasks.length > 0) {
+            risks.push({
+                id: 'long-duration-risk',
+                name: '长持续时间任务风险',
+                description: '存在持续时间过长的任务，可能影响项目进度',
+                probability: 0.5,
+                impact: 6,
+                riskScore: 3.0,
+                affectedTaskIds: longTasks.map(t => t.id),
+                category: RiskCategory.SCHEDULE,
+            });
+        }
+        return risks;
+    }
+    /**
+     * 分析资源风险
+     */
+    analyzeResourceRisks(tasks) {
+        const risks = [];
+        // 检查资源过度分配
+        const resourceUtilization = this.calculateResourceUtilization(tasks);
+        const overallocatedResources = resourceUtilization.filter(r => r.overallocation > 0);
+        if (overallocatedResources.length > 0) {
+            risks.push({
+                id: 'resource-overallocation-risk',
+                name: '资源过度分配风险',
+                description: '部分资源分配超出可用容量',
+                probability: 0.8,
+                impact: 7,
+                riskScore: 5.6,
+                affectedTaskIds: tasks.map(t => t.id), // 简化处理
+                category: RiskCategory.RESOURCE,
+            });
+        }
+        return risks;
+    }
+    /**
+     * 分析技术风险
+     */
+    analyzeTechnicalRisks(tasks) {
+        const risks = [];
+        // 检查高复杂度任务
+        const complexTasks = tasks.filter(task => { var _a; return (((_a = task.orchestrationMetadata) === null || _a === void 0 ? void 0 : _a.complexity) || 0) > 7; });
+        if (complexTasks.length > 0) {
+            risks.push({
+                id: 'technical-complexity-risk',
+                name: '技术复杂度风险',
+                description: '存在高复杂度的技术任务',
+                probability: 0.6,
+                impact: 7,
+                riskScore: 4.2,
+                affectedTaskIds: complexTasks.map(t => t.id),
+                category: RiskCategory.TECHNICAL,
+            });
+        }
+        return risks;
+    }
+    /**
+     * 分析质量风险
+     */
+    analyzeQualityRisks(tasks) {
+        const risks = [];
+        // 检查缺少评审的任务
+        const noReviewTasks = tasks.filter(task => { var _a; return ((_a = task.orchestrationMetadata) === null || _a === void 0 ? void 0 : _a.requiresReview) === false; });
+        if (noReviewTasks.length > tasks.length * 0.5) {
+            risks.push({
+                id: 'quality-review-risk',
+                name: '质量评审风险',
+                description: '过多任务缺少质量评审环节',
+                probability: 0.4,
+                impact: 6,
+                riskScore: 2.4,
+                affectedTaskIds: noReviewTasks.map(t => t.id),
+                category: RiskCategory.QUALITY,
+            });
+        }
+        return risks;
+    }
+    /**
+     * 生成缓解建议
+     */
+    generateMitigationSuggestions(riskFactors) {
+        const suggestions = [];
+        for (const risk of riskFactors) {
+            switch (risk.category) {
+                case RiskCategory.SCHEDULE:
+                    if (risk.id === 'critical-path-risk') {
+                        suggestions.push('考虑增加关键路径上的资源投入');
+                        suggestions.push('寻找可以并行化的关键任务');
+                        suggestions.push('评估是否可以缩短关键任务的持续时间');
+                    }
+                    if (risk.id === 'long-duration-risk') {
+                        suggestions.push('将长持续时间任务分解为更小的子任务');
+                        suggestions.push('增加里程碑检查点');
+                    }
+                    break;
+                case RiskCategory.RESOURCE:
+                    if (risk.id === 'resource-overallocation-risk') {
+                        suggestions.push('重新平衡资源分配');
+                        suggestions.push('考虑增加额外资源或外包');
+                        suggestions.push('调整任务时间安排以避免资源冲突');
+                    }
+                    break;
+                case RiskCategory.TECHNICAL:
+                    if (risk.id === 'technical-complexity-risk') {
+                        suggestions.push('为高复杂度任务分配经验丰富的团队成员');
+                        suggestions.push('增加技术评审和原型验证');
+                        suggestions.push('考虑技术培训或外部咨询');
+                    }
+                    break;
+                case RiskCategory.QUALITY:
+                    if (risk.id === 'quality-review-risk') {
+                        suggestions.push('为关键任务增加质量评审环节');
+                        suggestions.push('建立代码审查和测试标准');
+                        suggestions.push('实施持续集成和自动化测试');
+                    }
+                    break;
+            }
+        }
+        return suggestions;
+    }
+    /**
+     * 生成应急计划
+     */
+    generateContingencyPlans(riskFactors) {
+        const plans = [];
+        for (const risk of riskFactors) {
+            if (risk.riskScore > 4.0) { // 高风险才生成应急计划
+                plans.push({
+                    id: `contingency-${risk.id}`,
+                    name: `${risk.name}应急计划`,
+                    description: `针对${risk.name}的应急响应计划`,
+                    triggerConditions: [
+                        `${risk.name}发生概率超过阈值`,
+                        '项目进度出现明显延迟',
+                        '相关任务状态异常',
+                    ],
+                    actions: [
+                        '立即评估影响范围',
+                        '启动风险响应流程',
+                        '调整项目计划和资源分配',
+                        '通知相关利益相关者',
+                    ],
+                    estimatedCost: risk.impact * 1000, // 简化计算
+                    estimatedTime: risk.impact * 2, // 简化计算
+                });
+            }
+        }
+        return plans;
+    }
+    /**
+     * 生成优化建议
+     */
+    generateRecommendations(tasks, criticalPath, parallelGroups, resourceUtilization, riskAssessment) {
+        const recommendations = [];
+        // 关键路径建议
+        if (criticalPath.length > 0) {
+            recommendations.push(`项目关键路径包含 ${criticalPath.length} 个任务，建议重点关注这些任务的执行`);
+            if (criticalPath.length > tasks.length * 0.4) {
+                recommendations.push('关键路径任务比例较高，建议寻找优化机会以减少项目风险');
+            }
+        }
+        // 并行化建议
+        if (parallelGroups.length > 0) {
+            const totalParallelTasks = parallelGroups.reduce((sum, group) => sum + group.length, 0);
+            recommendations.push(`识别到 ${parallelGroups.length} 个并行任务组，共 ${totalParallelTasks} 个任务可并行执行`);
+            recommendations.push('合理安排并行任务可以显著缩短项目周期');
+        }
+        // 资源利用率建议
+        const overutilizedResources = resourceUtilization.filter(r => r.utilizationRate > 1.0);
+        if (overutilizedResources.length > 0) {
+            recommendations.push(`发现 ${overutilizedResources.length} 个资源过度分配，建议调整资源计划`);
+        }
+        const underutilizedResources = resourceUtilization.filter(r => r.utilizationRate < 0.5);
+        if (underutilizedResources.length > 0) {
+            recommendations.push(`发现 ${underutilizedResources.length} 个资源利用率较低，可考虑重新分配`);
+        }
+        // 风险建议
+        if (riskAssessment.overallRiskLevel > 6.0) {
+            recommendations.push('项目整体风险等级较高，建议制定详细的风险应对计划');
+        }
+        // 优化建议
+        const longTasks = tasks.filter(task => this.getTaskDuration(task) > 40);
+        if (longTasks.length > 0) {
+            recommendations.push(`发现 ${longTasks.length} 个长持续时间任务，建议考虑任务分解`);
+        }
+        return recommendations;
+    }
+    /**
+     * 计算项目总持续时间
+     */
+    calculateTotalDuration(tasks) {
+        let maxFinishTime = 0;
+        for (const task of tasks) {
+            const node = this.graph.get(task.id);
+            if (node && node.outDegree === 0) { // 项目结束任务
+                maxFinishTime = Math.max(maxFinishTime, node.earliestFinish);
+            }
+        }
+        return maxFinishTime;
+    }
+    /**
+     * 创建空的风险评估
+     */
+    createEmptyRiskAssessment() {
+        return {
+            overallRiskLevel: 0,
+            riskFactors: [],
+            mitigationSuggestions: [],
+            contingencyPlans: [],
+        };
+    }
+    /**
+     * 获取任务持续时间
+     */
+    getTaskDuration(task) {
+        var _a;
+        return ((_a = task.timeInfo) === null || _a === void 0 ? void 0 : _a.estimatedDuration) || task.estimatedHours || 8; // 默认8小时
+    }
+    /**
+     * 查找依赖关系
+     */
+    findDependency(predecessorId, successorId) {
+        for (const dependency of this.dependencies.values()) {
+            if (dependency.predecessorId === predecessorId && dependency.successorId === successorId) {
+                return dependency;
+            }
+        }
+        return undefined;
+    }
+    /**
+     * 更新任务时间信息
+     */
+    updateTaskTimeInfo(tasks) {
+        const updatedTasks = [...tasks];
+        for (const task of updatedTasks) {
+            const node = this.graph.get(task.id);
+            if (node) {
+                task.timeInfo = {
+                    estimatedDuration: this.getTaskDuration(task),
+                    earliestStart: new Date(Date.now() + node.earliestStart * 60 * 60 * 1000),
+                    latestStart: new Date(Date.now() + node.latestStart * 60 * 60 * 1000),
+                    earliestFinish: new Date(Date.now() + node.earliestFinish * 60 * 60 * 1000),
+                    latestFinish: new Date(Date.now() + node.latestFinish * 60 * 60 * 1000),
+                    totalFloat: node.totalFloat,
+                    freeFloat: node.freeFloat,
+                    isCritical: node.isCritical,
+                };
+            }
+        }
+        return updatedTasks;
+    }
+    /**
+     * 获取编排统计信息
+     */
+    getOrchestrationStats() {
+        const totalTasks = this.tasks.size;
+        const criticalTasks = Array.from(this.graph.values()).filter(node => node.isCritical).length;
+        const parallelGroups = this.identifyParallelGroups().length;
+        const totalFloat = Array.from(this.graph.values()).reduce((sum, node) => sum + node.totalFloat, 0);
+        const averageFloat = totalTasks > 0 ? totalFloat / totalTasks : 0;
+        const longestPath = Math.max(...Array.from(this.graph.values()).map(node => node.earliestFinish));
+        return {
+            totalTasks,
+            criticalTasks,
+            parallelGroups,
+            averageFloat,
+            longestPath,
+        };
+    }
+}
+
+/**
+ * TaskFlow AI - 任务编排工厂类
+ *
+ * 提供不同编排策略的工厂方法和预设配置
+ *
+ * @author TaskFlow AI Team
+ * @version 1.0.0
+ */
+/**
+ * 编排策略预设
+ */
+var OrchestrationPreset;
+(function (OrchestrationPreset) {
+    OrchestrationPreset["AGILE_SPRINT"] = "agile_sprint";
+    OrchestrationPreset["WATERFALL"] = "waterfall";
+    OrchestrationPreset["CRITICAL_CHAIN"] = "critical_chain";
+    OrchestrationPreset["LEAN_STARTUP"] = "lean_startup";
+    OrchestrationPreset["RAPID_PROTOTYPE"] = "rapid_prototype";
+    OrchestrationPreset["ENTERPRISE"] = "enterprise";
+    OrchestrationPreset["RESEARCH"] = "research";
+    OrchestrationPreset["MAINTENANCE"] = "maintenance";
+})(OrchestrationPreset || (OrchestrationPreset = {}));
+/**
+ * 任务编排工厂类
+ */
+class OrchestrationFactory {
+    /**
+     * 创建编排引擎
+     */
+    static createEngine(preset, customConfig) {
+        const baseConfig = preset ? this.getPresetConfig(preset) : this.getDefaultConfig();
+        const finalConfig = { ...baseConfig, ...customConfig };
+        return new TaskOrchestrationEngine(finalConfig);
+    }
+    /**
+     * 获取预设配置
+     */
+    static getPresetConfig(preset) {
+        switch (preset) {
+            case OrchestrationPreset.AGILE_SPRINT:
+                return this.getAgileSprintConfig();
+            case OrchestrationPreset.WATERFALL:
+                return this.getWaterfallConfig();
+            case OrchestrationPreset.CRITICAL_CHAIN:
+                return this.getCriticalChainConfig();
+            case OrchestrationPreset.LEAN_STARTUP:
+                return this.getLeanStartupConfig();
+            case OrchestrationPreset.RAPID_PROTOTYPE:
+                return this.getRapidPrototypeConfig();
+            case OrchestrationPreset.ENTERPRISE:
+                return this.getEnterpriseConfig();
+            case OrchestrationPreset.RESEARCH:
+                return this.getResearchConfig();
+            case OrchestrationPreset.MAINTENANCE:
+                return this.getMaintenanceConfig();
+            default:
+                return this.getDefaultConfig();
+        }
+    }
+    /**
+     * 默认配置
+     */
+    static getDefaultConfig() {
+        return {
+            enableCriticalPath: true,
+            enableParallelOptimization: true,
+            enableResourceLeveling: false,
+            enableRiskAnalysis: true,
+            schedulingStrategy: SchedulingStrategy.CRITICAL_PATH,
+            optimizationGoal: OptimizationGoal.MINIMIZE_DURATION,
+            maxParallelTasks: 5,
+            workingHoursPerDay: 8,
+            workingDaysPerWeek: 5,
+            bufferPercentage: 0.1,
+        };
+    }
+    /**
+     * 敏捷冲刺配置
+     */
+    static getAgileSprintConfig() {
+        return {
+            enableCriticalPath: true,
+            enableParallelOptimization: true,
+            enableResourceLeveling: true,
+            enableRiskAnalysis: true,
+            schedulingStrategy: SchedulingStrategy.PRIORITY_FIRST,
+            optimizationGoal: OptimizationGoal.MAXIMIZE_QUALITY,
+            maxParallelTasks: 8,
+            workingHoursPerDay: 8,
+            workingDaysPerWeek: 5,
+            bufferPercentage: 0.15, // 敏捷项目需要更多缓冲
+        };
+    }
+    /**
+     * 瀑布模型配置
+     */
+    static getWaterfallConfig() {
+        return {
+            enableCriticalPath: true,
+            enableParallelOptimization: false, // 瀑布模型强调顺序执行
+            enableResourceLeveling: true,
+            enableRiskAnalysis: true,
+            schedulingStrategy: SchedulingStrategy.CRITICAL_PATH,
+            optimizationGoal: OptimizationGoal.MINIMIZE_RISK,
+            maxParallelTasks: 3,
+            workingHoursPerDay: 8,
+            workingDaysPerWeek: 5,
+            bufferPercentage: 0.2, // 瀑布模型需要更多缓冲时间
+        };
+    }
+    /**
+     * 关键链配置
+     */
+    static getCriticalChainConfig() {
+        return {
+            enableCriticalPath: true,
+            enableParallelOptimization: true,
+            enableResourceLeveling: true,
+            enableRiskAnalysis: true,
+            schedulingStrategy: SchedulingStrategy.CRITICAL_PATH,
+            optimizationGoal: OptimizationGoal.BALANCE_RESOURCES,
+            maxParallelTasks: 6,
+            workingHoursPerDay: 8,
+            workingDaysPerWeek: 5,
+            bufferPercentage: 0.25, // 关键链方法使用缓冲区管理
+        };
+    }
+    /**
+     * 精益创业配置
+     */
+    static getLeanStartupConfig() {
+        return {
+            enableCriticalPath: false, // 精益创业更注重快速迭代
+            enableParallelOptimization: true,
+            enableResourceLeveling: false,
+            enableRiskAnalysis: false, // 快速试错，不过度分析风险
+            schedulingStrategy: SchedulingStrategy.SHORTEST_FIRST,
+            optimizationGoal: OptimizationGoal.MINIMIZE_DURATION,
+            maxParallelTasks: 10,
+            workingHoursPerDay: 10, // 创业团队工作时间更长
+            workingDaysPerWeek: 6,
+            bufferPercentage: 0.05, // 最小缓冲，快速迭代
+        };
+    }
+    /**
+     * 快速原型配置
+     */
+    static getRapidPrototypeConfig() {
+        return {
+            enableCriticalPath: false,
+            enableParallelOptimization: true,
+            enableResourceLeveling: false,
+            enableRiskAnalysis: false,
+            schedulingStrategy: SchedulingStrategy.SHORTEST_FIRST,
+            optimizationGoal: OptimizationGoal.MINIMIZE_DURATION,
+            maxParallelTasks: 12,
+            workingHoursPerDay: 8,
+            workingDaysPerWeek: 5,
+            bufferPercentage: 0.05,
+        };
+    }
+    /**
+     * 企业级配置
+     */
+    static getEnterpriseConfig() {
+        return {
+            enableCriticalPath: true,
+            enableParallelOptimization: true,
+            enableResourceLeveling: true,
+            enableRiskAnalysis: true,
+            schedulingStrategy: SchedulingStrategy.RESOURCE_LEVELING,
+            optimizationGoal: OptimizationGoal.BALANCE_RESOURCES,
+            maxParallelTasks: 15,
+            workingHoursPerDay: 8,
+            workingDaysPerWeek: 5,
+            bufferPercentage: 0.2,
+        };
+    }
+    /**
+     * 研究项目配置
+     */
+    static getResearchConfig() {
+        return {
+            enableCriticalPath: false, // 研究项目路径不确定
+            enableParallelOptimization: false, // 研究任务通常需要顺序进行
+            enableResourceLeveling: false,
+            enableRiskAnalysis: true,
+            schedulingStrategy: SchedulingStrategy.LONGEST_FIRST, // 先做复杂的研究
+            optimizationGoal: OptimizationGoal.MAXIMIZE_QUALITY,
+            maxParallelTasks: 3,
+            workingHoursPerDay: 6, // 研究需要深度思考时间
+            workingDaysPerWeek: 5,
+            bufferPercentage: 0.3, // 研究项目不确定性高
+        };
+    }
+    /**
+     * 维护项目配置
+     */
+    static getMaintenanceConfig() {
+        return {
+            enableCriticalPath: false,
+            enableParallelOptimization: true,
+            enableResourceLeveling: true,
+            enableRiskAnalysis: false, // 维护任务风险相对较低
+            schedulingStrategy: SchedulingStrategy.PRIORITY_FIRST,
+            optimizationGoal: OptimizationGoal.MINIMIZE_COST,
+            maxParallelTasks: 6,
+            workingHoursPerDay: 8,
+            workingDaysPerWeek: 5,
+            bufferPercentage: 0.1,
+        };
+    }
+    /**
+     * 获取所有可用预设
+     */
+    static getAvailablePresets() {
+        return [
+            {
+                preset: OrchestrationPreset.AGILE_SPRINT,
+                name: '敏捷冲刺',
+                description: '适用于敏捷开发的迭代式项目管理',
+                suitableFor: ['敏捷开发', 'Scrum', '迭代开发', '快速交付'],
+            },
+            {
+                preset: OrchestrationPreset.WATERFALL,
+                name: '瀑布模型',
+                description: '传统的顺序式项目管理方法',
+                suitableFor: ['传统项目', '需求明确', '风险控制', '合规要求'],
+            },
+            {
+                preset: OrchestrationPreset.CRITICAL_CHAIN,
+                name: '关键链',
+                description: '基于约束理论的项目管理方法',
+                suitableFor: ['资源约束', '多项目管理', '缓冲区管理'],
+            },
+            {
+                preset: OrchestrationPreset.LEAN_STARTUP,
+                name: '精益创业',
+                description: '快速迭代和验证的创业项目管理',
+                suitableFor: ['创业项目', '快速验证', 'MVP开发', '市场试错'],
+            },
+            {
+                preset: OrchestrationPreset.RAPID_PROTOTYPE,
+                name: '快速原型',
+                description: '专注于快速构建原型的项目管理',
+                suitableFor: ['原型开发', '概念验证', '快速演示'],
+            },
+            {
+                preset: OrchestrationPreset.ENTERPRISE,
+                name: '企业级',
+                description: '适用于大型企业的复杂项目管理',
+                suitableFor: ['大型项目', '多团队协作', '企业治理', '合规管理'],
+            },
+            {
+                preset: OrchestrationPreset.RESEARCH,
+                name: '研究项目',
+                description: '适用于研究和探索性项目',
+                suitableFor: ['科研项目', '技术探索', '不确定性高', '创新研发'],
+            },
+            {
+                preset: OrchestrationPreset.MAINTENANCE,
+                name: '维护项目',
+                description: '适用于系统维护和运营项目',
+                suitableFor: ['系统维护', '运营支持', '缺陷修复', '性能优化'],
+            },
+        ];
+    }
+    /**
+     * 根据项目特征推荐预设
+     */
+    static recommendPreset(projectCharacteristics) {
+        const { teamSize = 5, projectDuration = 30, uncertaintyLevel = 5, qualityRequirement = 7, timeConstraint = 5, budgetConstraint = 5, isAgile = false, isResearch = false, isEnterprise = false, } = projectCharacteristics;
+        // 企业级项目
+        if (isEnterprise || teamSize > 20) {
+            return OrchestrationPreset.ENTERPRISE;
+        }
+        // 研究项目
+        if (isResearch || uncertaintyLevel > 8) {
+            return OrchestrationPreset.RESEARCH;
+        }
+        // 敏捷项目
+        if (isAgile || (timeConstraint > 7 && projectDuration < 90)) {
+            return OrchestrationPreset.AGILE_SPRINT;
+        }
+        // 快速原型
+        if (projectDuration < 14 && timeConstraint > 8) {
+            return OrchestrationPreset.RAPID_PROTOTYPE;
+        }
+        // 精益创业
+        if (uncertaintyLevel > 6 && timeConstraint > 6 && teamSize < 10) {
+            return OrchestrationPreset.LEAN_STARTUP;
+        }
+        // 维护项目
+        if (qualityRequirement < 6 && uncertaintyLevel < 4) {
+            return OrchestrationPreset.MAINTENANCE;
+        }
+        // 瀑布模型
+        if (uncertaintyLevel < 4 && qualityRequirement > 8) {
+            return OrchestrationPreset.WATERFALL;
+        }
+        // 关键链
+        if (budgetConstraint > 7 || teamSize > 10) {
+            return OrchestrationPreset.CRITICAL_CHAIN;
+        }
+        // 默认敏捷冲刺
+        return OrchestrationPreset.AGILE_SPRINT;
+    }
+}
+
+/**
+ * TaskFlow AI - 显示工具
+ *
+ * 提供各种数据显示和可视化功能
+ *
+ * @author TaskFlow AI Team
+ * @version 1.0.0
+ */
+/**
+ * 显示表格数据
+ */
+function displayTable(data) {
+    if (data.length === 0) {
+        console.log(chalk.yellow('📋 没有数据可显示'));
+        return;
+    }
+    // 获取所有列名
+    const columns = Object.keys(data[0]);
+    const columnWidths = new Map();
+    // 计算每列的最大宽度
+    columns.forEach(col => {
+        const maxWidth = Math.max(col.length, ...data.map(row => String(row[col] || '').length));
+        columnWidths.set(col, Math.min(maxWidth, 30)); // 限制最大宽度
+    });
+    // 显示表头
+    const headerRow = columns.map(col => chalk.bold.blue(col.padEnd(columnWidths.get(col)))).join(' │ ');
+    console.log('┌' + '─'.repeat(headerRow.length - 10) + '┐');
+    console.log('│ ' + headerRow + ' │');
+    console.log('├' + '─'.repeat(headerRow.length - 10) + '┤');
+    // 显示数据行
+    data.forEach(row => {
+        const dataRow = columns.map(col => {
+            const value = String(row[col] || '');
+            const width = columnWidths.get(col);
+            // 根据内容类型着色
+            let coloredValue = value;
+            if (col.includes('状态') || col.includes('Status')) {
+                coloredValue = getStatusColor(value);
+            }
+            else if (col.includes('优先级') || col.includes('Priority')) {
+                coloredValue = getPriorityColor(value);
+            }
+            else if (col.includes('关键') || col.includes('Critical')) {
+                coloredValue = value === '✅' ? chalk.green(value) : chalk.gray(value);
+            }
+            return coloredValue.padEnd(width);
+        }).join(' │ ');
+        console.log('│ ' + dataRow + ' │');
+    });
+    console.log('└' + '─'.repeat(headerRow.length - 10) + '┘');
+}
+/**
+ * 显示任务列表
+ */
+function displayTaskList(tasks, options = {}) {
+    if (tasks.length === 0) {
+        console.log(chalk.yellow('📋 没有任务可显示'));
+        return;
+    }
+    tasks.forEach((task, index) => {
+        const statusIcon = getStatusIcon(task.status);
+        const priorityColor = getPriorityColor(task.priority);
+        console.log(`${index + 1}. ${statusIcon} ${chalk.bold(task.name)}`);
+        console.log(`   ${chalk.gray('ID:')} ${task.id.substring(0, 8)}`);
+        console.log(`   ${chalk.gray('优先级:')} ${priorityColor}`);
+        console.log(`   ${chalk.gray('类型:')} ${task.type}`);
+        if (task.estimatedHours) {
+            console.log(`   ${chalk.gray('预计时长:')} ${task.estimatedHours}小时`);
+        }
+        if (options.showTimeInfo && task.timeInfo) {
+            console.log(`   ${chalk.gray('最早开始:')} ${task.timeInfo.earliestStart ? new Date(task.timeInfo.earliestStart).toLocaleDateString() : '未设置'}`);
+            console.log(`   ${chalk.gray('浮动时间:')} ${task.timeInfo.totalFloat ? task.timeInfo.totalFloat.toFixed(1) + '小时' : '未计算'}`);
+            console.log(`   ${chalk.gray('关键任务:')} ${task.timeInfo.isCritical ? chalk.red('是') : chalk.green('否')}`);
+        }
+        if (task.dependencies && task.dependencies.length > 0) {
+            console.log(`   ${chalk.gray('依赖:')} ${task.dependencies.join(', ')}`);
+        }
+        console.log(`   ${chalk.gray('描述:')} ${task.description}`);
+        console.log('');
+    });
+}
+/**
+ * 显示甘特图（简化版）
+ */
+function displayGanttChart(tasks) {
+    console.log(chalk.bold.blue('📊 项目甘特图'));
+    console.log('═'.repeat(60));
+    if (tasks.length === 0) {
+        console.log(chalk.yellow('没有任务数据'));
+        return;
+    }
+    // 计算时间范围
+    let minStart = Infinity;
+    let maxEnd = 0;
+    tasks.forEach(task => {
+        if (task.timeInfo) {
+            const start = task.timeInfo.earliestStart ? new Date(task.timeInfo.earliestStart).getTime() : 0;
+            const duration = (task.timeInfo.estimatedDuration || task.estimatedHours || 8) * 60 * 60 * 1000;
+            const end = start + duration;
+            minStart = Math.min(minStart, start);
+            maxEnd = Math.max(maxEnd, end);
+        }
+    });
+    if (minStart === Infinity) {
+        console.log(chalk.yellow('任务缺少时间信息，无法生成甘特图'));
+        return;
+    }
+    const totalDuration = maxEnd - minStart;
+    const chartWidth = 40; // 图表宽度
+    tasks.forEach(task => {
+        const name = task.name.substring(0, 15).padEnd(15);
+        if (task.timeInfo && task.timeInfo.earliestStart) {
+            const start = new Date(task.timeInfo.earliestStart).getTime();
+            const duration = (task.timeInfo.estimatedDuration || task.estimatedHours || 8) * 60 * 60 * 1000;
+            const startPos = Math.floor(((start - minStart) / totalDuration) * chartWidth);
+            const taskWidth = Math.max(1, Math.floor((duration / totalDuration) * chartWidth));
+            const chart = ' '.repeat(startPos) +
+                (task.timeInfo.isCritical ? chalk.red('█'.repeat(taskWidth)) : chalk.blue('█'.repeat(taskWidth))) +
+                ' '.repeat(Math.max(0, chartWidth - startPos - taskWidth));
+            console.log(`${name} │${chart}│`);
+        }
+        else {
+            console.log(`${name} │${chalk.gray('─'.repeat(chartWidth))}│`);
+        }
+    });
+    // 显示时间轴
+    console.log(' '.repeat(15) + '│' + '─'.repeat(chartWidth) + '│');
+    console.log(' '.repeat(15) + '│' +
+        new Date(minStart).toLocaleDateString().padEnd(chartWidth - 10) +
+        new Date(maxEnd).toLocaleDateString().padStart(10) + '│');
+}
+/**
+ * 获取状态图标
+ */
+function getStatusIcon(status) {
+    switch (status.toLowerCase()) {
+        case 'completed':
+        case 'done':
+            return chalk.green('✅');
+        case 'in_progress':
+        case 'in-progress':
+            return chalk.yellow('🔄');
+        case 'blocked':
+            return chalk.red('🚫');
+        case 'cancelled':
+            return chalk.gray('❌');
+        default:
+            return chalk.blue('📋');
+    }
+}
+/**
+ * 获取状态颜色
+ */
+function getStatusColor(status) {
+    switch (status.toLowerCase()) {
+        case 'completed':
+        case 'done':
+            return chalk.green(status);
+        case 'in_progress':
+        case 'in-progress':
+            return chalk.yellow(status);
+        case 'blocked':
+            return chalk.red(status);
+        case 'cancelled':
+            return chalk.gray(status);
+        default:
+            return chalk.blue(status);
+    }
+}
+/**
+ * 获取优先级颜色
+ */
+function getPriorityColor(priority) {
+    switch (priority.toLowerCase()) {
+        case 'critical':
+            return chalk.red.bold(priority);
+        case 'high':
+            return chalk.red(priority);
+        case 'medium':
+            return chalk.yellow(priority);
+        case 'low':
+            return chalk.green(priority);
+        default:
+            return chalk.gray(priority);
+    }
+}
+
+/**
+ * TaskFlow AI - 任务编排命令
+ *
+ * 提供智能任务编排功能的CLI命令
+ *
+ * @author TaskFlow AI Team
+ * @version 1.0.0
+ */
+/**
+ * 转换TaskManager的Task为编排引擎的Task
+ */
+function convertToOrchestrationTask(tmTask) {
+    return {
+        id: tmTask.id,
+        name: tmTask.title,
+        title: tmTask.title,
+        description: tmTask.description,
+        status: convertStatus(tmTask.status),
+        priority: convertPriority(tmTask.priority),
+        type: 'feature', // 默认类型
+        dependencies: tmTask.dependencies,
+        estimatedHours: tmTask.estimatedHours,
+        actualHours: tmTask.actualHours,
+        createdAt: tmTask.createdAt,
+        updatedAt: tmTask.updatedAt,
+        startedAt: tmTask.startedAt,
+        completedAt: tmTask.completedAt,
+        dueDate: tmTask.dueDate,
+        assignee: tmTask.assignee,
+        tags: tmTask.tags,
+        progress: tmTask.progress,
+        metadata: tmTask.metadata,
+    };
+}
+/**
+ * 转换状态
+ */
+function convertStatus(status) {
+    const statusMap = {
+        'pending': 'not_started',
+        'in_progress': 'in_progress',
+        'completed': 'completed',
+        'blocked': 'blocked',
+        'cancelled': 'cancelled'
+    };
+    return statusMap[status] || status;
+}
+/**
+ * 转换优先级
+ */
+function convertPriority(priority) {
+    return priority; // 优先级枚举相同
+}
+/**
+ * 创建编排命令
+ */
+function createOrchestrateCommand() {
+    const command = new commander.Command('orchestrate');
+    command
+        .description('智能任务编排和优化')
+        .option('-p, --preset <preset>', '使用预设编排策略')
+        .option('-s, --strategy <strategy>', '调度策略')
+        .option('-g, --goal <goal>', '优化目标')
+        .option('--max-parallel <number>', '最大并行任务数', '10')
+        .option('--buffer <percentage>', '缓冲时间百分比', '0.1')
+        .option('--critical-path', '启用关键路径分析', true)
+        .option('--no-critical-path', '禁用关键路径分析')
+        .option('--parallel-optimization', '启用并行优化', true)
+        .option('--no-parallel-optimization', '禁用并行优化')
+        .option('--resource-leveling', '启用资源平衡')
+        .option('--no-resource-leveling', '禁用资源平衡')
+        .option('--risk-analysis', '启用风险分析', true)
+        .option('--no-risk-analysis', '禁用风险分析')
+        .option('--output <format>', '输出格式 (table|json|gantt)', 'table')
+        .option('--save', '保存编排结果到项目')
+        .option('--dry-run', '仅显示编排结果，不保存')
+        .action(async (options) => {
+        await handleOrchestrateCommand(options);
+    });
+    // 添加子命令
+    command.addCommand(createPresetsCommand());
+    command.addCommand(createAnalyzeCommand());
+    command.addCommand(createOptimizeCommand());
+    command.addCommand(createRecommendCommand());
+    return command;
+}
+/**
+ * 处理编排命令
+ */
+async function handleOrchestrateCommand(options) {
+    const spinner = ora('正在加载任务数据...').start();
+    try {
+        // 加载任务管理器
+        const taskManager = new TaskManager();
+        const tmTasks = taskManager.getAllTasks();
+        const tasks = tmTasks.map(convertToOrchestrationTask);
+        if (tasks.length === 0) {
+            spinner.fail('没有找到任务，请先创建任务');
+            return;
+        }
+        spinner.text = '正在配置编排引擎...';
+        // 构建编排配置
+        const config = buildOrchestrationConfig(options);
+        // 创建编排引擎
+        const engine = options.preset
+            ? OrchestrationFactory.createEngine(options.preset, config)
+            : new TaskOrchestrationEngine(config);
+        spinner.text = `正在编排 ${tasks.length} 个任务...`;
+        // 执行编排
+        const result = await engine.orchestrate(tasks);
+        spinner.succeed('任务编排完成');
+        // 显示结果
+        await displayOrchestrationResult(result, options.output);
+        // 保存结果
+        if (options.save && !options.dryRun) {
+            const saveSpinner = ora('正在保存编排结果...').start();
+            try {
+                // 更新任务时间信息
+                const updatedTasks = engine.updateTaskTimeInfo(result.tasks);
+                // 保存到任务管理器
+                for (const task of updatedTasks) {
+                    // 转换回TaskManager格式并更新
+                    const tmTaskUpdate = {
+                        title: task.name,
+                        description: task.description,
+                        estimatedHours: task.estimatedHours || 0,
+                        metadata: {
+                            ...task.metadata,
+                            timeInfo: task.timeInfo,
+                            orchestrationMetadata: task.orchestrationMetadata
+                        }
+                    };
+                    taskManager.updateTask(task.id, tmTaskUpdate);
+                }
+                saveSpinner.succeed('编排结果已保存');
+            }
+            catch (error) {
+                saveSpinner.fail(`保存失败: ${error instanceof Error ? error.message : '未知错误'}`);
+            }
+        }
+    }
+    catch (error) {
+        spinner.fail(`编排失败: ${error instanceof Error ? error.message : '未知错误'}`);
+        process.exit(1);
+    }
+}
+/**
+ * 构建编排配置
+ */
+function buildOrchestrationConfig(options) {
+    const config = {};
+    if (options.strategy) {
+        config.schedulingStrategy = options.strategy;
+    }
+    if (options.goal) {
+        config.optimizationGoal = options.goal;
+    }
+    if (options.maxParallel) {
+        config.maxParallelTasks = parseInt(options.maxParallel);
+    }
+    if (options.buffer) {
+        config.bufferPercentage = parseFloat(options.buffer);
+    }
+    config.enableCriticalPath = options.criticalPath;
+    config.enableParallelOptimization = options.parallelOptimization;
+    config.enableResourceLeveling = options.resourceLeveling;
+    config.enableRiskAnalysis = options.riskAnalysis;
+    return config;
+}
+/**
+ * 显示编排结果
+ */
+async function displayOrchestrationResult(result, format) {
+    console.log('\n' + chalk.bold.blue('📊 任务编排结果'));
+    console.log('═'.repeat(60));
+    // 显示基本统计
+    console.log(chalk.green(`✅ 总任务数: ${result.tasks.length}`));
+    console.log(chalk.yellow(`⏱️  项目持续时间: ${result.totalDuration} 小时`));
+    console.log(chalk.red(`🎯 关键路径任务: ${result.criticalPath.length}`));
+    console.log(chalk.blue(`🔄 并行任务组: ${result.parallelGroups.length}`));
+    console.log(chalk.magenta(`⚠️  整体风险等级: ${result.riskAssessment.overallRiskLevel.toFixed(1)}/10`));
+    console.log('\n' + chalk.bold('📋 编排策略'));
+    console.log(`策略: ${result.metadata.strategy}`);
+    console.log(`目标: ${result.metadata.goal}`);
+    console.log(`编排时间: ${result.metadata.orchestrationTime.toLocaleString()}`);
+    // 根据格式显示详细结果
+    switch (format) {
+        case 'json':
+            console.log('\n' + chalk.bold('📄 详细结果 (JSON)'));
+            console.log(JSON.stringify(result, null, 2));
+            break;
+        case 'gantt':
+            console.log('\n' + chalk.bold('📊 甘特图'));
+            displayGanttChart(result.tasks);
+            break;
+        case 'table':
+        default:
+            await displayTableResult(result);
+            break;
+    }
+    // 显示关键路径
+    if (result.criticalPath.length > 0) {
+        console.log('\n' + chalk.bold.red('🎯 关键路径'));
+        const criticalTasks = result.tasks.filter((task) => result.criticalPath.includes(task.id));
+        displayTaskList(criticalTasks, { showTimeInfo: true });
+    }
+    // 显示并行任务组
+    if (result.parallelGroups.length > 0) {
+        console.log('\n' + chalk.bold.blue('🔄 并行任务组'));
+        result.parallelGroups.forEach((group, index) => {
+            console.log(chalk.cyan(`组 ${index + 1}: ${group.join(', ')}`));
+        });
+    }
+    // 显示优化建议
+    if (result.recommendations.length > 0) {
+        console.log('\n' + chalk.bold.green('💡 优化建议'));
+        result.recommendations.forEach((recommendation, index) => {
+            console.log(chalk.green(`${index + 1}. ${recommendation}`));
+        });
+    }
+    // 显示风险评估
+    if (result.riskAssessment.riskFactors.length > 0) {
+        console.log('\n' + chalk.bold.yellow('⚠️  风险评估'));
+        result.riskAssessment.riskFactors.forEach((risk) => {
+            console.log(chalk.yellow(`• ${risk.name}: ${risk.riskScore.toFixed(1)} (${risk.category})`));
+        });
+    }
+}
+/**
+ * 显示表格结果
+ */
+async function displayTableResult(result) {
+    console.log('\n' + chalk.bold('📋 任务详情'));
+    const tableData = result.tasks.map((task) => {
+        const timeInfo = task.timeInfo || {};
+        return {
+            'ID': task.id.substring(0, 8),
+            '任务名称': task.name,
+            '状态': task.status,
+            '优先级': task.priority,
+            '预计时长': `${task.estimatedHours || 0}h`,
+            '最早开始': timeInfo.earliestStart ? new Date(timeInfo.earliestStart).toLocaleDateString() : '-',
+            '最晚开始': timeInfo.latestStart ? new Date(timeInfo.latestStart).toLocaleDateString() : '-',
+            '浮动时间': timeInfo.totalFloat ? `${timeInfo.totalFloat.toFixed(1)}h` : '-',
+            '关键任务': timeInfo.isCritical ? '✅' : '❌',
+        };
+    });
+    displayTable(tableData);
+}
+/**
+ * 创建预设命令
+ */
+function createPresetsCommand() {
+    const command = new commander.Command('presets');
+    command
+        .description('查看可用的编排预设')
+        .action(() => {
+        console.log('\n' + chalk.bold.blue('📋 可用编排预设'));
+        console.log('═'.repeat(60));
+        const presets = OrchestrationFactory.getAvailablePresets();
+        presets.forEach(preset => {
+            console.log(chalk.bold.green(`\n${preset.name} (${preset.preset})`));
+            console.log(chalk.gray(preset.description));
+            console.log(chalk.blue('适用场景: ') + preset.suitableFor.join(', '));
+        });
+        console.log('\n' + chalk.yellow('使用方法:'));
+        console.log(chalk.cyan('taskflow orchestrate --preset agile_sprint'));
+    });
+    return command;
+}
+/**
+ * 创建分析命令
+ */
+function createAnalyzeCommand() {
+    const command = new commander.Command('analyze');
+    command
+        .description('分析当前任务结构')
+        .action(async () => {
+        const spinner = ora('正在分析任务结构...').start();
+        try {
+            const taskManager = new TaskManager();
+            await taskManager.loadTasks();
+            const tasks = taskManager.getAllTasks();
+            if (tasks.length === 0) {
+                spinner.fail('没有找到任务');
+                return;
+            }
+            const engine = new TaskOrchestrationEngine();
+            const stats = engine.getOrchestrationStats();
+            spinner.succeed('任务分析完成');
+            console.log('\n' + chalk.bold.blue('📊 任务结构分析'));
+            console.log('═'.repeat(40));
+            console.log(chalk.green(`总任务数: ${stats.totalTasks}`));
+            console.log(chalk.red(`关键任务数: ${stats.criticalTasks}`));
+            console.log(chalk.blue(`并行任务组: ${stats.parallelGroups}`));
+            console.log(chalk.yellow(`平均浮动时间: ${stats.averageFloat.toFixed(1)}h`));
+            console.log(chalk.magenta(`最长路径: ${stats.longestPath.toFixed(1)}h`));
+        }
+        catch (error) {
+            spinner.fail(`分析失败: ${error instanceof Error ? error.message : '未知错误'}`);
+        }
+    });
+    return command;
+}
+/**
+ * 创建优化命令
+ */
+function createOptimizeCommand() {
+    const command = new commander.Command('optimize');
+    command
+        .description('优化任务安排')
+        .option('--goal <goal>', '优化目标', 'minimize_duration')
+        .action(async (options) => {
+        console.log(chalk.blue('🔧 任务优化功能开发中...'));
+        console.log(chalk.gray('将在下个版本中提供更多优化选项'));
+    });
+    return command;
+}
+/**
+ * 创建推荐命令
+ */
+function createRecommendCommand() {
+    const command = new commander.Command('recommend');
+    command
+        .description('推荐编排策略')
+        .option('--team-size <number>', '团队规模', '5')
+        .option('--duration <days>', '项目持续时间（天）', '30')
+        .option('--uncertainty <level>', '不确定性等级 (1-10)', '5')
+        .option('--quality <level>', '质量要求 (1-10)', '7')
+        .option('--time-constraint <level>', '时间约束 (1-10)', '5')
+        .option('--budget-constraint <level>', '预算约束 (1-10)', '5')
+        .option('--agile', '敏捷项目')
+        .option('--research', '研究项目')
+        .option('--enterprise', '企业级项目')
+        .action((options) => {
+        const characteristics = {
+            teamSize: parseInt(options.teamSize),
+            projectDuration: parseInt(options.duration),
+            uncertaintyLevel: parseInt(options.uncertainty),
+            qualityRequirement: parseInt(options.quality),
+            timeConstraint: parseInt(options.timeConstraint),
+            budgetConstraint: parseInt(options.budgetConstraint),
+            isAgile: options.agile,
+            isResearch: options.research,
+            isEnterprise: options.enterprise,
+        };
+        const recommendedPreset = OrchestrationFactory.recommendPreset(characteristics);
+        const presets = OrchestrationFactory.getAvailablePresets();
+        const presetInfo = presets.find(p => p.preset === recommendedPreset);
+        console.log('\n' + chalk.bold.blue('🎯 推荐编排策略'));
+        console.log('═'.repeat(40));
+        if (presetInfo) {
+            console.log(chalk.bold.green(`推荐策略: ${presetInfo.name}`));
+            console.log(chalk.gray(presetInfo.description));
+            console.log(chalk.blue('适用场景: ') + presetInfo.suitableFor.join(', '));
+            console.log('\n' + chalk.yellow('使用方法:'));
+            console.log(chalk.cyan(`taskflow orchestrate --preset ${recommendedPreset}`));
+        }
+    });
+    return command;
+}
+
+/**
  * 类型安全的错误处理系统
  */
 /**
@@ -8079,6 +10196,8 @@ interactiveCommand.register(program);
 modelsCommand(program);
 // 注册MCP命令
 program.addCommand(createMCPCommand());
+// 注册任务编排命令
+program.addCommand(createOrchestrateCommand());
 // 快速开始命令
 program
     .command('init')
@@ -8591,6 +10710,7 @@ if (!process.argv.slice(2).length) {
     console.log(chalk.cyan('🚀 快速开始:'));
     console.log(chalk.gray('  taskflow init                    # 初始化项目'));
     console.log(chalk.gray('  taskflow parse docs/prd.md       # 解析PRD文档'));
+    console.log(chalk.gray('  taskflow orchestrate             # 智能任务编排'));
     console.log(chalk.gray('  taskflow status                  # 查看任务状态'));
     console.log();
     console.log(chalk.cyan('💡 获取帮助:'));

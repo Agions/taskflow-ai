@@ -41,7 +41,7 @@ export enum ProgrammingLanguage {
 export enum ProjectType {
   WEB_APP = 'web-app',
   API = 'api',
-  MOBILE = 'mobile',
+  DESKTOP = 'desktop',
   AI_ML = 'ai-ml'
 }
 
@@ -498,8 +498,8 @@ export class AIRulesGenerator {
         return this.getWebAppRules(config);
       case ProjectType.API:
         return this.getAPIRules(config);
-      case ProjectType.MOBILE:
-        return this.getMobileRules(config);
+      case ProjectType.DESKTOP:
+        return this.getDesktopRules(config);
       case ProjectType.AI_ML:
         return this.getAIMLRules(config);
       default:
