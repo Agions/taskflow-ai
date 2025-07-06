@@ -49,13 +49,7 @@
     "mcp:server": "node bin/index.js mcp server --transport stdio",
     "mcp:server:http": "node bin/index.js mcp server --transport http --port 3001",
     "mcp:deploy": "npm run mcp:verify && npm run mcp:server",
-    "docker:build": "bash scripts/docker-build-publish.sh --build-only",
-    "docker:push": "bash scripts/docker-build-publish.sh --push-only",
-    "docker:publish": "bash scripts/docker-build-publish.sh",
-    "docker:publish:cleanup": "bash scripts/docker-build-publish.sh --cleanup",
-    "mcp:docker": "docker run -it agions/taskflow-ai-mcp:latest",
-    "mcp:docker:build": "docker build -f Dockerfile.mcp -t agions/taskflow-ai-mcp:latest .",
-    "mcp:submit": "bash scripts/submit-to-docker-mcp-registry.sh",
+
     "postinstall": "node -e \"console.log('\\n🎉 TaskFlow AI 安装成功！\\n运行 taskflow --help 开始使用\\n运行 taskflow-mcp 启动MCP服务器\\n')\""
   },
   "keywords": [

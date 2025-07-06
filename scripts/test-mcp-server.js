@@ -207,72 +207,7 @@ async function testMCPProtocol() {
   });
 }
 
-/**
- * Test Docker image build
- */
-async function testDockerBuild() {
-  return new Promise((resolve, reject) => {
-    logInfo('Testing Docker image build...');
-    
-    const dockerfilePath = path.resolve(__dirname, '..', 'Dockerfile.mcp');
-    
-    if (!fs.existsSync(dockerfilePath)) {
-      logError('Dockerfile.mcp not found');
-      resolve(false);
-      return;
-    }
-    
-    const buildProcess = spawn('docker', ['build', '-f', 'Dockerfile.mcp', '-t', 'taskflow-ai-test:latest', '.'], {
-      cwd: path.resolve(__dirname, '..'),
-      stdio: ['pipe', 'pipe', 'pipe']
-    });
-    
-    let output = '';
-    let errorOutput = '';
-    
-    buildProcess.stdout.on('data', (data) => {
-      output += data.toString();
-    });
-    
-    buildProcess.stderr.on('data', (data) => {
-      errorOutput += data.toString();
-    });
-    
-    buildProcess.on('exit', (code) => {
-      if (code === 0) {
-        logSuccess('Docker image build test passed');
-        
-        // Clean up test image
-        spawn('docker', ['rmi', 'taskflow-ai-test:latest'], { stdio: 'ignore' });
-        
-        resolve(true);
-      } else {
-        logError(`Docker image build test failed (exit code: ${code})`);
-        if (errorOutput) {
-          console.log('Build error:', errorOutput.slice(-500)); // Last 500 chars
-        }
-        resolve(false);
-      }
-    });
-    
-    buildProcess.on('error', (error) => {
-      if (error.code === 'ENOENT') {
-        logWarning('Docker not found - skipping Docker build test');
-        resolve(true);
-      } else {
-        logError(`Docker build test failed: ${error.message}`);
-        resolve(false);
-      }
-    });
-    
-    // Timeout
-    setTimeout(() => {
-      buildProcess.kill();
-      logError('Docker build test timed out');
-      resolve(false);
-    }, 120000); // 2 minutes
-  });
-}
+
 
 /**
  * Test configuration files
@@ -282,8 +217,6 @@ function testConfigFiles() {
   
   const requiredFiles = [
     'mcp-server.json',
-    'docker-mcp-registry.yaml',
-    'Dockerfile.mcp',
     'MCP-README.md'
   ];
   

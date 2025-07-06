@@ -279,7 +279,7 @@ async function verifyMCPService() {
   
   log('\n📚 更多信息请参考:', 'blue');
   log('- 本地MCP部署指南: docs/local-mcp-deployment.md', 'yellow');
-  log('- Docker MCP Registry指南: docs/mcp-docker-registry-guide.md', 'yellow');
+  log('- MCP服务器文档: MCP-README.md', 'yellow');
   log('- 项目文档: https://agions.github.io/taskflow-ai', 'yellow');
 }
 

@@ -9,7 +9,6 @@
 [![npm version](https://badge.fury.io/js/taskflow-ai.svg)](https://badge.fury.io/js/taskflow-ai)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Docker](https://img.shields.io/badge/Docker-Supported-blue)](https://hub.docker.com/r/agions/taskflow-ai)
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-green)](https://modelcontextprotocol.io/)
 
 
@@ -121,73 +120,7 @@ npm run build
 npm link
 ```
 
-### Docker 部署
 
-#### 快速开始
-```bash
-# 使用预构建镜像
-docker run -d \
-  --name taskflow-ai \
-  -p 3000:3000 \
-  -e TASKFLOW_DEEPSEEK_API_KEY="your-api-key" \
-  -v taskflow-data:/app/data \
-  agions/taskflow-ai:latest
-```
-
-#### 使用 Docker Compose
-```bash
-# 克隆项目
-git clone https://github.com/agions/taskflow-ai.git
-cd taskflow-ai
-
-# 配置环境变量
-cp .env.example .env
-# 编辑 .env 文件，添加你的 AI 模型 API 密钥
-
-# 启动服务
-docker-compose up -d taskflow-prod
-```
-
-#### MCP 服务器部署
-```bash
-# 运行TaskFlow AI MCP服务器
-docker run -d \
-  --name taskflow-mcp \
-  -p 3001:3001 \
-  -e AI_MODEL=qwen \
-  -e MCP_TRANSPORT=http \
-  -e TASKFLOW_QWEN_API_KEY="your-api-key" \
-  -v taskflow-mcp-data:/app/data \
-  agions/taskflow-ai-mcp:latest
-
-# 启动MCP服务器 (使用Docker Compose)
-docker-compose --profile mcp up -d taskflow-mcp
-```
-
-#### 可用镜像标签
-
-**主应用镜像**:
-- `agions/taskflow-ai:latest` - 最新稳定版本
-- `agions/taskflow-ai:dev` - 开发版本
-- `agions/taskflow-ai:v1.3.1` - 特定版本
-
-**MCP服务器镜像** (🆕 Docker MCP Registry):
-- `agions/taskflow-ai-mcp:latest` - MCP服务器最新版本
-- `agions/taskflow-ai-mcp:v1.3.1` - MCP服务器特定版本
-
-支持架构：`linux/amd64`, `linux/arm64`
-
-#### 本地构建和发布
-```bash
-# 构建所有Docker镜像
-npm run docker:build
-
-# 构建并发布到Docker Hub
-npm run docker:publish
-
-# 提交到Docker MCP Registry
-bash scripts/submit-to-docker-mcp-registry.sh
-```
 
 ## 🚀 快速开始
 
@@ -307,10 +240,9 @@ taskflow config set team.members '["张三", "李四", "王五"]'
 - **[🔌 API文档](https://agions.github.io/taskflow-ai/api/)** - 详细的API接口文档
 - **[❓ 常见问题](https://agions.github.io/taskflow-ai/faq)** - 常见问题解答
 
-### 🐳 Docker & MCP 文档
-- **[🐳 Docker部署指南](docs/docker-deployment.md)** - 完整的Docker构建和部署说明
-- **[🔌 MCP服务器文档](MCP-README.md)** - Model Context Protocol服务器使用指南
-- **[📦 Docker MCP Registry发布指南](docs/mcp-docker-registry-guide.md)** - 发布到Docker MCP Registry的详细步骤
+### � MCP 文档
+- **[ MCP服务器文档](MCP-README.md)** - Model Context Protocol服务器使用指南
+- **[📦 本地MCP部署指南](docs/local-mcp-deployment.md)** - 本地MCP服务器部署说明
 
 ## 🛠️ 开发
 

@@ -184,24 +184,7 @@ jobs:
           path: taskflow/tasks.json
 ```
 
-### 场景4: Docker容器化部署 (下个版本)
 
-> **注意**: Docker支持将在v1.3.0版本中提供。
-
-#### 计划中的Dockerfile
-
-```dockerfile
-FROM node:20-alpine
-
-# 设置工作目录
-WORKDIR /app
-
-# 安装TaskFlow AI
-RUN npm install -g taskflow-ai
-
-# 创建非root用户
-RUN addgroup -g 1001 -S taskflow && \
-    adduser -S taskflow -u 1001
 
 # 切换用户
 USER taskflow
