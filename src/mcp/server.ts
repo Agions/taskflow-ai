@@ -701,10 +701,39 @@ export class TaskFlowMCPServer {
   }
 }
 
+/**
+ * 启动MCP服务器的导出函数
+ */
+export async function startMCPServer(options: {
+  transport?: string;
+  port?: number;
+  verbose?: boolean;
+} = {}) {
+  const server = new TaskFlowMCPServer();
+
+  if (options.verbose) {
+    console.log('🔧 MCP服务器配置:', options);
+  }
+
+  try {
+    await server.start();
+    console.log('✅ TaskFlow AI MCP服务器已启动');
+
+    if (options.transport === 'http') {
+      console.log(`🌐 HTTP服务器运行在端口: ${options.port || 3000}`);
+    } else {
+      console.log('📡 使用STDIO传输协议');
+    }
+
+  } catch (error) {
+    console.error('❌ MCP服务器启动失败:', error);
+    throw error;
+  }
+}
+
 // 如果直接运行此文件，启动MCP服务器
 if (require.main === module) {
-  const server = new TaskFlowMCPServer();
-  server.start().catch((error) => {
+  startMCPServer().catch((error) => {
     console.error('MCP服务器启动失败:', error);
     process.exit(1);
   });

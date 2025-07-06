@@ -245,7 +245,7 @@ function mapProjectType(template: string): ProjectType {
     const typeMap: Record<string, ProjectType> = {
       'web-app': ProjectType.WEB_APP,
       'api': ProjectType.API,
-      'mobile': ProjectType.MOBILE,
+      'desktop': ProjectType.DESKTOP,
       'ai-ml': ProjectType.AI_ML
     };
 
