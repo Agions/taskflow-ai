@@ -358,21 +358,7 @@ taskflow parse api-spec.md --focus "endpoints,data-models,authentication"
 taskflow tasks create --template "database-migration"
 ```
 
-### 移动应用工作流
 
-**特点**: 跨平台考虑，性能优化重点
-
-```bash
-# 移动应用配置
-taskflow config set project.type "mobile"
-taskflow config set project.platform "react-native"
-
-# 移动端特定解析
-taskflow parse mobile-requirements.md --focus "screens,navigation,performance"
-
-# 平台特定任务
-taskflow tasks filter --platform "ios,android"
-```
 
 ## 🔧 工作流优化
 

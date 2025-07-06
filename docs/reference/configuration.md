@@ -238,7 +238,6 @@ DeepSeek 模型配置
 #### type 选项
 - `"web-app"`: 前端Web应用
 - `"api"`: 后端API服务
-- `"mobile"`: 移动应用
 - `"desktop"`: 桌面应用
 - `"ai-ml"`: AI/ML项目
 - `"general"`: 通用项目

@@ -145,64 +145,7 @@ taskflow-ai plan ecommerce-platform.md \
 taskflow-ai tasks list --priority critical,high --format table
 ```
 
-## 移动应用开发
 
-### 示例3：健身追踪应用
-
-**PRD文档** (`fitness-app.md`):
-
-```markdown
-# 智能健身追踪应用
-
-## 产品概述
-开发一款智能健身追踪应用，帮助用户制定和执行个性化的健身计划。
-
-## 核心功能
-
-### 运动追踪
-- GPS跑步追踪
-- 步数统计
-- 卡路里计算
-- 运动时长记录
-
-### 健身计划
-- 个性化训练计划
-- 视频教学指导
-- 进度跟踪
-- 成就系统
-
-### 社交功能
-- 好友添加
-- 运动数据分享
-- 挑战赛
-- 排行榜
-
-### 健康数据
-- 体重记录
-- 身体指标
-- 睡眠监测
-- 心率监测
-
-## 技术栈
-- 移动端：React Native
-- 后端：Node.js + Express
-- 数据库：MongoDB
-- 实时通信：Socket.io
-- 地图服务：高德地图API
-```
-
-**使用命令**:
-```bash
-# 移动应用特定解析
-taskflow-ai parse fitness-app.md --template mobile-app
-
-# 生成移动开发任务
-taskflow-ai plan fitness-app.md \
-  --team-size 5 \
-  --platform mobile \
-  --include-testing \
-  --include-deployment
-```
 
 ## API服务开发
 
