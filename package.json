@@ -13,7 +13,8 @@
   },
   "scripts": {
     "dev": "rollup -c -w",
-    "build": "rollup -c",
+    "build": "node scripts/build-fix.js",
+    "build:rollup": "rollup -c",
     "build:esbuild": "node esbuild.config.js",
     "build:fallback": "npm run build:esbuild",
     "build:release": "node scripts/build-release.js",
@@ -23,6 +24,7 @@
     "test:coverage": "jest --coverage",
     "test:performance": "jest --config tests/performance/jest.config.js --runInBand",
     "test:benchmark": "npm run test:performance -- --verbose",
+    "test:build": "node scripts/test-build.js",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",

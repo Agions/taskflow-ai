@@ -1,11 +1,22 @@
-const typescript = require('@rollup/plugin-typescript');
-const resolve = require('@rollup/plugin-node-resolve');
-const commonjs = require('@rollup/plugin-commonjs');
-const json = require('@rollup/plugin-json');
-const terser = require('@rollup/plugin-terser');
-const dts = require('rollup-plugin-dts').default;
-const analyzer = require('rollup-plugin-analyzer');
 const pkg = require('./package.json');
+
+// 动态加载插件，避免缺失依赖导致构建失败
+function loadPlugin(name, fallback = null) {
+  try {
+    return require(name);
+  } catch (error) {
+    console.warn(`⚠️ 插件 ${name} 未找到，使用备用方案`);
+    return fallback;
+  }
+}
+
+const typescript = loadPlugin('@rollup/plugin-typescript');
+const resolve = loadPlugin('@rollup/plugin-node-resolve');
+const commonjs = loadPlugin('@rollup/plugin-commonjs');
+const json = loadPlugin('@rollup/plugin-json');
+const terser = loadPlugin('@rollup/plugin-terser');
+const dts = loadPlugin('rollup-plugin-dts')?.default;
+const analyzer = loadPlugin('rollup-plugin-analyzer');
 
 // 优化的terser配置
 const terserConfig = {
@@ -72,7 +83,7 @@ module.exports = [
         format: 'cjs',
         sourcemap: true,
         exports: 'named',
-        plugins: [terser(terserConfig)],
+        plugins: terser ? [terser(terserConfig)] : [],
       },
       {
         file: pkg.module || pkg.main.replace('.js', '.mjs'),
@@ -83,19 +94,18 @@ module.exports = [
     ],
     external,
     plugins: [
-      resolve(resolveConfig),
-      commonjs(commonjsConfig),
-      json(),
-      typescript({
+      resolve && resolve(resolveConfig),
+      commonjs && commonjs(commonjsConfig),
+      json && json(),
+      typescript && typescript({
         tsconfig: './tsconfig.json',
         sourceMap: true,
         inlineSources: false,
       }),
-      process.env.ANALYZE &&
-        analyzer({
-          summaryOnly: true,
-          limit: 10,
-        }),
+      process.env.ANALYZE && analyzer && analyzer({
+        summaryOnly: true,
+        limit: 10,
+      }),
     ].filter(Boolean),
     treeshake: {
       moduleSideEffects: false,
@@ -114,23 +124,23 @@ module.exports = [
     },
     external,
     plugins: [
-      resolve(resolveConfig),
-      commonjs(commonjsConfig),
-      json(),
-      typescript({
+      resolve && resolve(resolveConfig),
+      commonjs && commonjs(commonjsConfig),
+      json && json(),
+      typescript && typescript({
         tsconfig: './tsconfig.json',
         sourceMap: true,
         inlineSources: false,
       }),
-    ],
+    ].filter(Boolean),
     treeshake: {
       moduleSideEffects: false,
       propertyReadSideEffects: false,
       unknownGlobalSideEffects: false,
     },
   },
-  // 类型声明文件打包配置
-  {
+  // 类型声明文件打包配置（仅在dts插件可用时）
+  ...(dts ? [{
     input: 'src/index.ts',
     output: {
       file: pkg.types || pkg.main.replace('.js', '.d.ts'),
@@ -138,5 +148,5 @@ module.exports = [
     },
     external,
     plugins: [dts()],
-  },
+  }] : []),
 ];

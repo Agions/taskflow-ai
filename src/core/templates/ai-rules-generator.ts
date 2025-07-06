@@ -524,7 +524,6 @@ export class AIRulesGenerator {
 ### 用户体验
 - 提供良好的用户反馈
 - 实现加载状态和错误处理
-- 优化移动端体验
 - 确保跨浏览器兼容性
 
 ### 安全性
@@ -567,10 +566,10 @@ export class AIRulesGenerator {
   }
 
   /**
-   * 获取移动应用特定规则
+   * 获取桌面应用特定规则
    */
-  private getMobileRules(_config: AIRulesConfig): string {
-    return `## 移动应用特定规则
+  private getDesktopRules(_config: AIRulesConfig): string {
+    return `## 桌面应用特定规则
 
 ### 性能优化
 - 优化应用启动时间

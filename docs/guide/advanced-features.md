@@ -382,33 +382,7 @@ taskflow health check --all
 taskflow disaster-recovery test --scenario "model-failure"
 ```
 
-## 📱 移动端和远程访问
 
-### 移动端支持
-
-```bash
-# 启用移动端API
-taskflow mobile enable --qr-code
-
-# 生成移动端配置
-taskflow mobile config --output mobile-config.json
-
-# 移动端同步
-taskflow mobile sync --device "iPhone-张三"
-```
-
-### 远程团队协作
-
-```bash
-# 配置远程协作
-taskflow remote configure --server "https://taskflow.company.com"
-
-# 实时同步
-taskflow remote sync --real-time true
-
-# 离线模式
-taskflow offline enable --cache-duration "24h"
-```
 
 ## 🔍 调试和诊断
 
