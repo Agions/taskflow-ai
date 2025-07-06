@@ -1,5 +1,5 @@
 # TaskFlow AI - Docker Compose 配置
-# 支持本地开发和生产部署
+# 支持本地开发、生产部署和MCP服务器
 
 version: '3.8'
 
@@ -222,3 +222,72 @@ services:
     # 仅在需要监控时启用
     profiles:
       - monitoring
+
+  # ============================================================================
+  # TaskFlow AI MCP 服务器
+  # ============================================================================
+  taskflow-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+      args:
+        - NODE_ENV=production
+        - BUILD_DATE=${BUILD_DATE:-}
+        - VCS_REF=${VCS_REF:-}
+    image: agions/taskflow-ai-mcp:latest
+    container_name: taskflow-ai-mcp
+    restart: unless-stopped
+
+    # 环境变量
+    environment:
+      - NODE_ENV=production
+      - TASKFLOW_ENV=production
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - AI_MODEL=${AI_MODEL:-qwen}
+      - MCP_TRANSPORT=${MCP_TRANSPORT:-stdio}
+      - MCP_PORT=${MCP_PORT:-3001}
+      - TASKFLOW_DATA_DIR=/app/data
+      - TASKFLOW_LOG_DIR=/app/logs
+      - TASKFLOW_CONFIG_DIR=/app/config
+
+      # AI模型配置
+      - TASKFLOW_DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - TASKFLOW_ZHIPU_API_KEY=${ZHIPU_API_KEY:-}
+      - TASKFLOW_QWEN_API_KEY=${QWEN_API_KEY:-}
+      - TASKFLOW_BAIDU_API_KEY=${BAIDU_API_KEY:-}
+      - TASKFLOW_MOONSHOT_API_KEY=${MOONSHOT_API_KEY:-}
+
+    # 端口映射 (仅HTTP模式需要)
+    ports:
+      - "3001:3001"
+
+    # 卷挂载
+    volumes:
+      - taskflow-data:/app/data
+      - taskflow-config:/app/config
+      - taskflow-logs:/app/logs
+      - taskflow-cache:/app/.cache
+      - ./config:/app/config/host:ro  # 主机配置只读挂载
+
+    # 网络
+    networks:
+      - taskflow-network
+
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('TaskFlow AI MCP Server is healthy')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # 标签
+    labels:
+      - "com.taskflow.service=mcp"
+      - "com.taskflow.version=${VERSION:-latest}"
+      - "com.taskflow.description=TaskFlow AI MCP Server"
+
+    # 默认启用MCP服务器
+    profiles:
+      - mcp
+      - default
