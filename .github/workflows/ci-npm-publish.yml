@@ -29,8 +29,6 @@ on:
 env:
   NODE_VERSION: '20.x'
   CI: true
-  DOCKER_REGISTRY: docker.io
-  DOCKER_IMAGE_NAME: agions/taskflow-ai
 
 jobs:
   # 质量门控和测试
@@ -140,100 +138,13 @@ jobs:
 
 
 
-  # Docker构建和发布
-  docker-build-push:
-    name: Docker Build & Push
-    runs-on: ubuntu-latest
-    needs: [quality-gate]
-    # Docker构建继续进行，即使质量门控有问题
-    if: >
-      always() &&
-      ((github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
-      (github.event_name == 'workflow_dispatch') ||
-      (github.event_name == 'push' && github.ref == 'refs/heads/main'))
-    timeout-minutes: 30
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      with:
-        platforms: linux/amd64,linux/arm64
-
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        registry: ${{ env.DOCKER_REGISTRY }}
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Extract metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{major}}
-          type=raw,value=latest,enable={{is_default_branch}}
-        labels: |
-          org.opencontainers.image.title=TaskFlow AI
-          org.opencontainers.image.description=智能PRD文档解析与任务管理助手
-          org.opencontainers.image.vendor=Agions
-          org.opencontainers.image.licenses=MIT
-
-    - name: Build and push production Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        file: ./Dockerfile
-        platforms: linux/amd64,linux/arm64
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        target: production
-        build-args: |
-          NODE_ENV=production
-          BUILD_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
-          VCS_REF=${{ github.sha }}
-
-    - name: Build and push development Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        file: ./Dockerfile
-        platforms: linux/amd64,linux/arm64
-        push: true
-        tags: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:dev
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        target: development
-        build-args: |
-          NODE_ENV=development
-
-    - name: Update Docker Hub description
-      uses: peter-evans/dockerhub-description@v4
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        repository: ${{ env.DOCKER_IMAGE_NAME }}
-        readme-filepath: ./README.md
 
   # NPM发布
   npm-publish:
     name: NPM Publish
     runs-on: ubuntu-latest
-    needs: [quality-gate, docker-build-push]
+    needs: [quality-gate]
     # NPM发布继续进行，即使前面的步骤有问题
     if: >
       always() &&
@@ -357,7 +268,7 @@ jobs:
   status-summary:
     name: Status Summary
     runs-on: ubuntu-latest
-    needs: [quality-gate, docker-build-push, npm-publish]
+    needs: [quality-gate, npm-publish]
     if: always()
 
     steps:
@@ -368,7 +279,6 @@ jobs:
         echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
         echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
         echo "| Quality Gate & Testing | ${{ needs.quality-gate.result }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| Docker Build & Push | ${{ needs.docker-build-push.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
         echo "| NPM Publish | ${{ needs.npm-publish.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
 
