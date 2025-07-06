@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "taskflow-ai": {
+      "command": "node",
+      "args": ["bin/index.js", "mcp"],
+      "cwd": "/Users/agions/Desktop/web/taskflow-ai",
+      "env": {
+        "NODE_ENV": "production",
+        "AI_MODEL": "qwen",
+        "LOG_LEVEL": "info",
+        "MCP_TRANSPORT": "stdio"
+      }
+    }
+  }
+}
