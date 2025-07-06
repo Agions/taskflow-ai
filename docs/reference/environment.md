@@ -2,7 +2,7 @@
 
 ## 概述
 
-TaskFlow AI 支持通过环境变量进行配置，这对于CI/CD环境、Docker部署和安全管理特别有用。
+TaskFlow AI 支持通过环境变量进行配置，这对于CI/CD环境和安全管理特别有用。
 
 ## 🔑 AI模型配置
 
@@ -139,35 +139,26 @@ export TASKFLOW_JIRA_URL="https://company.atlassian.net"
 export TASKFLOW_JIRA_TOKEN="your-jira-token"
 ```
 
-## 🐳 Docker环境
+## 📄 配置文件示例
 
-### Docker Compose示例
-```yaml
-# docker-compose.yml
-version: '3.8'
-services:
-  taskflow:
-    image: taskflow-ai:latest
-    environment:
-      # AI模型配置
-      - TASKFLOW_DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
-      - TASKFLOW_ZHIPU_API_KEY=${ZHIPU_API_KEY}
-      
-      # 系统配置
-      - TASKFLOW_LOG_LEVEL=info
-      - TASKFLOW_CACHE_SIZE=200
-      
-      # 网络配置
-      - TASKFLOW_HTTP_PROXY=${HTTP_PROXY}
-      - TASKFLOW_HTTPS_PROXY=${HTTPS_PROXY}
-      
-      # 安全配置
-      - TASKFLOW_ENCRYPT_API_KEYS=true
-      - TASKFLOW_ENCRYPTION_KEY=${ENCRYPTION_KEY}
-    volumes:
-      - ./project:/workspace
-      - taskflow-cache:/app/.taskflow/cache
-    working_dir: /workspace
+### 环境变量文件示例
+```bash
+# .env
+# AI模型配置
+TASKFLOW_DEEPSEEK_API_KEY=your-deepseek-api-key
+TASKFLOW_ZHIPU_API_KEY=your-zhipu-api-key
+
+# 系统配置
+TASKFLOW_LOG_LEVEL=info
+TASKFLOW_CACHE_SIZE=200
+
+# 网络配置
+TASKFLOW_HTTP_PROXY=http://proxy.company.com:8080
+TASKFLOW_HTTPS_PROXY=https://proxy.company.com:8080
+
+# 安全配置
+TASKFLOW_ENCRYPT_API_KEYS=true
+TASKFLOW_ENCRYPTION_KEY=your-encryption-key
 ```
 
 ### .env文件示例
@@ -312,8 +303,8 @@ taskflow models test --use-env-config
 # 生成环境变量模板
 taskflow config export --format env > .env.template
 
-# 生成Docker环境变量
-taskflow config export --format docker-env > docker.env
+# 生成环境变量配置
+taskflow config export --format bash > env-config.sh
 ```
 
 ## 🔐 安全最佳实践

@@ -1217,7 +1217,7 @@ export class DocumentGenerator {
       'JavaScript', 'TypeScript', 'React', 'Vue', 'Angular',
       'Node.js', 'Python', 'Java', 'Go', 'PHP',
       'MySQL', 'PostgreSQL', 'MongoDB', 'Redis',
-      'Docker', 'Kubernetes', 'AWS', 'Azure',
+      'Kubernetes', 'AWS', 'Azure', 'CI/CD',
       'UI设计', 'UX设计', '测试', '项目管理'
     ];
 

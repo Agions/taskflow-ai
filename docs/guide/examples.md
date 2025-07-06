@@ -120,7 +120,7 @@ taskflow-ai tasks list --format json > blog-tasks.json
 - 后端：Spring Boot + Java
 - 数据库：PostgreSQL + Redis
 - 支付：支付宝、微信支付
-- 部署：Docker + Kubernetes
+- 部署：云服务器 + CI/CD
 
 ## 性能要求
 - 支持10000+并发用户
@@ -186,7 +186,7 @@ taskflow-ai tasks list --priority critical,high --format table
 - 服务发现：Eureka
 - 网关：Spring Cloud Gateway
 - 监控：Prometheus + Grafana
-- 部署：Docker + Kubernetes
+- 部署：云服务器 + Kubernetes
 
 ## 非功能需求
 - 高可用性：99.9%

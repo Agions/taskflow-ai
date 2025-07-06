@@ -206,42 +206,7 @@ Create a `taskflow.config.json` file:
 }
 ```
 
-## 🐳 Docker Deployment
 
-### Build Image
-```bash
-docker build -f Dockerfile.mcp -t taskflow-ai:latest .
-```
-
-### Run Container
-```bash
-docker run -d \
-  --name taskflow-mcp \
-  -e AI_MODEL=qwen \
-  -e LOG_LEVEL=info \
-  -v $(pwd)/data:/app/data \
-  -v $(pwd)/logs:/app/logs \
-  taskflow-ai:latest
-```
-
-### Docker Compose
-```yaml
-version: '3.8'
-services:
-  taskflow-mcp:
-    build:
-      context: .
-      dockerfile: Dockerfile.mcp
-    environment:
-      - AI_MODEL=qwen
-      - LOG_LEVEL=info
-      - TASKFLOW_DATA_DIR=/app/data
-    volumes:
-      - ./data:/app/data
-      - ./logs:/app/logs
-      - ./config:/app/config
-    restart: unless-stopped
-```
 
 ## 🔍 Usage Examples
 
