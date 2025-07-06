@@ -10,15 +10,64 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
-import { TaskManager } from '../core/TaskManager.js';
+import { TaskManager, Task as TaskManagerTask } from '../core/tasks/task-manager.js';
 import { TaskOrchestrationEngine } from '../orchestration/TaskOrchestrationEngine.js';
 import { OrchestrationFactory, OrchestrationPreset } from '../orchestration/OrchestrationFactory.js';
 import {
+  Task,
   TaskOrchestrationConfig,
   SchedulingStrategy,
   OptimizationGoal,
 } from '../types/task.js';
 import { displayTable, displayTaskList, displayGanttChart } from '../utils/display.js';
+
+/**
+ * 转换TaskManager的Task为编排引擎的Task
+ */
+function convertToOrchestrationTask(tmTask: TaskManagerTask): Task {
+  return {
+    id: tmTask.id,
+    name: tmTask.title,
+    title: tmTask.title,
+    description: tmTask.description,
+    status: convertStatus(tmTask.status),
+    priority: convertPriority(tmTask.priority),
+    type: 'feature' as any, // 默认类型
+    dependencies: tmTask.dependencies,
+    estimatedHours: tmTask.estimatedHours,
+    actualHours: tmTask.actualHours,
+    createdAt: tmTask.createdAt,
+    updatedAt: tmTask.updatedAt,
+    startedAt: tmTask.startedAt,
+    completedAt: tmTask.completedAt,
+    dueDate: tmTask.dueDate,
+    assignee: tmTask.assignee,
+    tags: tmTask.tags,
+    progress: tmTask.progress,
+    metadata: tmTask.metadata,
+  };
+}
+
+/**
+ * 转换状态
+ */
+function convertStatus(status: any): any {
+  const statusMap: Record<string, string> = {
+    'pending': 'not_started',
+    'in_progress': 'in_progress',
+    'completed': 'completed',
+    'blocked': 'blocked',
+    'cancelled': 'cancelled'
+  };
+  return statusMap[status] || status;
+}
+
+/**
+ * 转换优先级
+ */
+function convertPriority(priority: any): any {
+  return priority; // 优先级枚举相同
+}
 
 /**
  * 创建编排命令
@@ -66,8 +115,8 @@ async function handleOrchestrateCommand(options: any): Promise<void> {
   try {
     // 加载任务管理器
     const taskManager = new TaskManager();
-    await taskManager.loadTasks();
-    const tasks = taskManager.getAllTasks();
+    const tmTasks = taskManager.getAllTasks();
+    const tasks = tmTasks.map(convertToOrchestrationTask);
     
     if (tasks.length === 0) {
       spinner.fail('没有找到任务，请先创建任务');
@@ -101,10 +150,21 @@ async function handleOrchestrateCommand(options: any): Promise<void> {
       try {
         // 更新任务时间信息
         const updatedTasks = engine.updateTaskTimeInfo(result.tasks);
-        
+
         // 保存到任务管理器
         for (const task of updatedTasks) {
-          await taskManager.updateTask(task.id, task);
+          // 转换回TaskManager格式并更新
+          const tmTaskUpdate = {
+            title: task.name,
+            description: task.description,
+            estimatedHours: task.estimatedHours || 0,
+            metadata: {
+              ...task.metadata,
+              timeInfo: task.timeInfo,
+              orchestrationMetadata: task.orchestrationMetadata
+            }
+          };
+          taskManager.updateTask(task.id, tmTaskUpdate);
         }
         
         saveSpinner.succeed('编排结果已保存');
@@ -282,7 +342,6 @@ function createAnalyzeCommand(): Command {
       
       try {
         const taskManager = new TaskManager();
-        await taskManager.loadTasks();
         const tasks = taskManager.getAllTasks();
         
         if (tasks.length === 0) {

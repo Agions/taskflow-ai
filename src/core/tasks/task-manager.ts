@@ -222,6 +222,31 @@ export class TaskManager extends EventEmitter {
   }
 
   /**
+   * 更新任务
+   */
+  public updateTask(taskId: string, updates: Partial<Task>): boolean {
+    const task = this.tasks.get(taskId);
+    if (!task) {
+      this.logger.warn(`任务不存在: ${taskId}`);
+      return false;
+    }
+
+    // 更新任务属性
+    Object.assign(task, updates, {
+      updatedAt: new Date()
+    });
+
+    this.tasks.set(taskId, task);
+    this.emit('taskUpdated', { taskId, task, updates });
+
+    // 触发自动保存
+    this.saveTasks();
+
+    this.logger.info(`任务已更新: ${taskId}`);
+    return true;
+  }
+
+  /**
    * 更新任务状态
    */
   public updateTaskStatus(taskId: string, status: TaskStatus, options: TaskUpdateOptions = {}): boolean {

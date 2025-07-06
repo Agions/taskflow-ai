@@ -298,6 +298,48 @@ export class TaskOrchestrationEngine {
         node.earliestStart = 0;
         node.earliestFinish = this.getTaskDuration(node.task);
       }
+    }
+
+    // 拓扑排序并计算最早时间
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+      const currentNode = this.graph.get(currentId)!;
+
+      for (const successorId of currentNode.successors) {
+        const successorNode = this.graph.get(successorId)!;
+        const dependency = this.findDependency(currentId, successorId);
+
+        // 计算基于依赖类型的最早开始时间
+        let earliestStart = 0;
+        if (dependency) {
+          switch (dependency.type) {
+            case DependencyType.FINISH_TO_START:
+              earliestStart = currentNode.earliestFinish + (dependency.lag || 0);
+              break;
+            case DependencyType.START_TO_START:
+              earliestStart = currentNode.earliestStart + (dependency.lag || 0);
+              break;
+            case DependencyType.FINISH_TO_FINISH:
+              earliestStart = currentNode.earliestFinish - this.getTaskDuration(successorNode.task) + (dependency.lag || 0);
+              break;
+            case DependencyType.START_TO_FINISH:
+              earliestStart = currentNode.earliestStart - this.getTaskDuration(successorNode.task) + (dependency.lag || 0);
+              break;
+          }
+        }
+
+        successorNode.earliestStart = Math.max(successorNode.earliestStart, earliestStart);
+        successorNode.earliestFinish = successorNode.earliestStart + this.getTaskDuration(successorNode.task);
+
+        const newInDegree = inDegreeCount.get(successorId)! - 1;
+        inDegreeCount.set(successorId, newInDegree);
+
+        if (newInDegree === 0) {
+          queue.push(successorId);
+        }
+      }
+    }
+  }
 
   /**
    * 反向计算
@@ -1006,45 +1048,3 @@ export class TaskOrchestrationEngine {
     };
   }
 }
-    }
-    
-    // 拓扑排序并计算最早时间
-    while (queue.length > 0) {
-      const currentId = queue.shift()!;
-      const currentNode = this.graph.get(currentId)!;
-      
-      for (const successorId of currentNode.successors) {
-        const successorNode = this.graph.get(successorId)!;
-        const dependency = this.findDependency(currentId, successorId);
-        
-        // 计算基于依赖类型的最早开始时间
-        let earliestStart = 0;
-        if (dependency) {
-          switch (dependency.type) {
-            case DependencyType.FINISH_TO_START:
-              earliestStart = currentNode.earliestFinish + (dependency.lag || 0);
-              break;
-            case DependencyType.START_TO_START:
-              earliestStart = currentNode.earliestStart + (dependency.lag || 0);
-              break;
-            case DependencyType.FINISH_TO_FINISH:
-              earliestStart = currentNode.earliestFinish - this.getTaskDuration(successorNode.task) + (dependency.lag || 0);
-              break;
-            case DependencyType.START_TO_FINISH:
-              earliestStart = currentNode.earliestStart - this.getTaskDuration(successorNode.task) + (dependency.lag || 0);
-              break;
-          }
-        }
-        
-        successorNode.earliestStart = Math.max(successorNode.earliestStart, earliestStart);
-        successorNode.earliestFinish = successorNode.earliestStart + this.getTaskDuration(successorNode.task);
-        
-        const newInDegree = inDegreeCount.get(successorId)! - 1;
-        inDegreeCount.set(successorId, newInDegree);
-        
-        if (newInDegree === 0) {
-          queue.push(successorId);
-        }
-      }
-    }
-  }
