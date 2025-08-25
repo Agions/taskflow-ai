@@ -1,321 +1,430 @@
 /**
  * TaskManager 单元测试
- * 测试任务管理器的核心功能
  */
 
-import { TaskManager } from '../../../src/core/task/task-manager';
-import { MockLogger, MockConfigManager, TestDataFactory } from '../../setup';
-import { TaskStatus, TaskPriority, TaskType } from '../../../src/types/task';
+import { TaskManager, TaskType, TaskStatus, TaskPriority } from '../../../src-new/core/task/manager';
+import { ConfigManager } from '../../../src-new/infrastructure/config/manager';
+import { CacheManager } from '../../../src-new/infrastructure/storage/cache';
 
 describe('TaskManager', () => {
   let taskManager: TaskManager;
-  let mockLogger: MockLogger;
-  let mockConfigManager: MockConfigManager;
+  let configManager: ConfigManager;
+  let cacheManager: CacheManager;
 
-  beforeEach(() => {
-    mockLogger = new MockLogger();
-    mockConfigManager = new MockConfigManager();
-    taskManager = new TaskManager(mockLogger as any, mockConfigManager as any);
+  beforeEach(async () => {
+    // 创建测试依赖
+    configManager = new ConfigManager({
+      models: {},
+      storage: { type: 'memory' },
+      security: {},
+      cache: {},
+      memory: {},
+      sandbox: {},
+    });
+
+    cacheManager = new CacheManager({
+      type: 'memory',
+      maxSize: 10 * 1024 * 1024,
+      ttl: 3600,
+      cleanupInterval: 300,
+      persistToDisk: false,
+      compression: false,
+      maxFileSize: 1024 * 1024,
+    });
+
+    await configManager.initialize();
+    await cacheManager.initialize();
+
+    taskManager = new TaskManager(configManager, cacheManager);
+    await taskManager.initialize();
+  });
+
+  afterEach(async () => {
+    if (taskManager) {
+      await taskManager.shutdown();
+    }
+    if (cacheManager) {
+      await cacheManager.shutdown();
+    }
+  });
+
+  describe('初始化', () => {
+    test('应该成功初始化任务管理器', async () => {
+      const newTaskManager = new TaskManager(configManager, cacheManager);
+      await expect(newTaskManager.initialize()).resolves.not.toThrow();
+      await newTaskManager.shutdown();
+    });
+
+    test('应该加载内置任务模板', async () => {
+      const status = taskManager.getStatus();
+      expect(status.availableTemplates).toBeGreaterThan(0);
+    });
   });
 
   describe('任务创建', () => {
-    it('应该能够创建新任务', () => {
-      const taskData = TestDataFactory.addTask({
-        title: '新任务',
-        description: '任务描述'
-      });
+    test('应该成功创建基本任务', async () => {
+      const taskData = {
+        title: '测试任务',
+        description: '这是一个测试任务',
+        type: TaskType.ANALYSIS,
+        priority: TaskPriority.HIGH,
+        estimatedHours: 2,
+      };
 
-      const task = taskManager.addTask(taskData);
+      const task = await taskManager.createTask(taskData);
 
-      expect(task).toBeValidTask();
-      expect(task.title).toBe('新任务');
-      expect(task.description).toBe('任务描述');
-      expect(task.status).toBe(TaskStatus.NOT_STARTED);
+      expect(task).toBeDefined();
+      expect(task.id).toBeDefined();
+      expect(task.title).toBe(taskData.title);
+      expect(task.description).toBe(taskData.description);
+      expect(task.type).toBe(taskData.type);
+      expect(task.priority).toBe(taskData.priority);
+      expect(task.status).toBe(TaskStatus.DRAFT);
+      expect(task.progress).toBe(0);
+      expect(task.createdAt).toBeInstanceOf(Date);
+      expect(task.updatedAt).toBeInstanceOf(Date);
     });
 
-    it('应该为新任务生成唯一ID', () => {
-      const task1 = taskManager.addTask(TestDataFactory.addTask());
-      const task2 = taskManager.addTask(TestDataFactory.addTask());
+    test('应该为任务分配唯一ID', async () => {
+      const task1 = await taskManager.createTask({ title: '任务1' });
+      const task2 = await taskManager.createTask({ title: '任务2' });
 
       expect(task1.id).not.toBe(task2.id);
-      expect(task1.id).toMatch(/^task-/);
-      expect(task2.id).toMatch(/^task-/);
     });
 
-    it('应该设置任务的默认值', () => {
-      const task = taskManager.addTask({
-        title: '测试任务',
-        description: '测试描述'
+    test('应该设置默认值', async () => {
+      const task = await taskManager.createTask({});
+
+      expect(task.title).toBe('新任务');
+      expect(task.description).toBe('');
+      expect(task.type).toBe(TaskType.ANALYSIS);
+      expect(task.priority).toBe(TaskPriority.MEDIUM);
+      expect(task.estimatedHours).toBe(1);
+    });
+
+    test('应该从模板创建任务', async () => {
+      const task = await taskManager.createFromTemplate('analysis', {
+        title: '自定义分析任务'
       });
 
-      expect(task.status).toBe(TaskStatus.NOT_STARTED);
-      expect(task.priority).toBe(TaskPriority.MEDIUM);
-      expect(task.type).toBe(TaskType.FEATURE);
-      expect(task.dependencies).toEqual([]);
-      expect(task.tags).toEqual([]);
-      expect(task.progress).toBe(0);
+      expect(task).toBeDefined();
+      expect(task.title).toBe('自定义分析任务');
+      expect(task.type).toBe(TaskType.ANALYSIS);
+    });
+
+    test('使用不存在的模板应该抛出错误', async () => {
+      await expect(
+        taskManager.createFromTemplate('不存在的模板')
+      ).rejects.toThrow('任务模板不存在');
     });
   });
 
   describe('任务查询', () => {
-    beforeEach(() => {
+    let testTasks: any[] = [];
+
+    beforeEach(async () => {
       // 创建测试任务
-      taskManager.addTask(TestDataFactory.addTask({
-        id: 'task-1',
-        title: '任务1',
-        status: TaskStatus.NOT_STARTED,
-        priority: TaskPriority.HIGH
-      }));
+      testTasks = [
+        await taskManager.createTask({
+          title: '高优先级任务',
+          type: TaskType.ANALYSIS,
+          priority: TaskPriority.HIGH,
+          tags: ['urgent', 'analysis']
+        }),
+        await taskManager.createTask({
+          title: '低优先级任务',
+          type: TaskType.GENERATION,
+          priority: TaskPriority.LOW,
+          tags: ['simple']
+        }),
+        await taskManager.createTask({
+          title: '已完成任务',
+          type: TaskType.REVIEW,
+          priority: TaskPriority.MEDIUM,
+          tags: ['done']
+        })
+      ];
 
-      taskManager.addTask(TestDataFactory.addTask({
-        id: 'task-2',
-        title: '任务2',
-        status: TaskStatus.IN_PROGRESS,
-        priority: TaskPriority.MEDIUM
-      }));
-
-      taskManager.addTask(TestDataFactory.addTask({
-        id: 'task-3',
-        title: '任务3',
+      // 更新第三个任务为已完成
+      await taskManager.updateTask(testTasks[2].id, {
         status: TaskStatus.COMPLETED,
-        priority: TaskPriority.LOW
-      }));
+        progress: 100
+      });
     });
 
-    it('应该能够获取所有任务', () => {
-      const tasks = taskManager.getAllTasks();
-
-      expect(tasks).toHaveLength(3);
-      expect(tasks[0].id).toBe('task-1');
-      expect(tasks[1].id).toBe('task-2');
-      expect(tasks[2].id).toBe('task-3');
+    test('应该获取所有任务', () => {
+      const allTasks = taskManager.getAllTasks();
+      expect(allTasks.length).toBe(3);
     });
 
-    it('应该能够根据ID获取任务', () => {
-      const task = taskManager.getTaskById('task-2');
-
-      expect(task).toBeDefined();
-      expect(task?.id).toBe('task-2');
-      expect(task?.title).toBe('任务2');
-    });
-
-    it('应该在任务不存在时返回undefined', () => {
-      const task = taskManager.getTaskById('non-existent');
-
-      expect(task).toBeUndefined();
-    });
-
-    it('应该能够按状态过滤任务', () => {
-      const inProgressTasks = taskManager.filterTasks({
-        status: TaskStatus.IN_PROGRESS
+    test('应该根据状态过滤任务', () => {
+      const completedTasks = taskManager.queryTasks({
+        status: [TaskStatus.COMPLETED]
       });
 
-      expect(inProgressTasks).toHaveLength(1);
-      expect(inProgressTasks[0].id).toBe('task-2');
+      expect(completedTasks.length).toBe(1);
+      expect(completedTasks[0].status).toBe(TaskStatus.COMPLETED);
     });
 
-    it('应该能够按优先级过滤任务', () => {
-      const highPriorityTasks = taskManager.filterTasks({
-        priority: TaskPriority.HIGH
+    test('应该根据类型过滤任务', () => {
+      const analysisTasks = taskManager.queryTasks({
+        type: [TaskType.ANALYSIS]
       });
 
-      expect(highPriorityTasks).toHaveLength(1);
-      expect(highPriorityTasks[0].id).toBe('task-1');
+      expect(analysisTasks.length).toBe(1);
+      expect(analysisTasks[0].type).toBe(TaskType.ANALYSIS);
     });
 
-    it('应该能够组合多个过滤条件', () => {
-      const filteredTasks = taskManager.filterTasks({
-        status: TaskStatus.NOT_STARTED,
-        priority: TaskPriority.HIGH
+    test('应该根据优先级过滤任务', () => {
+      const highPriorityTasks = taskManager.queryTasks({
+        priority: [TaskPriority.HIGH]
       });
 
-      expect(filteredTasks).toHaveLength(1);
-      expect(filteredTasks[0].id).toBe('task-1');
+      expect(highPriorityTasks.length).toBe(1);
+      expect(highPriorityTasks[0].priority).toBe(TaskPriority.HIGH);
+    });
+
+    test('应该根据标签过滤任务', () => {
+      const urgentTasks = taskManager.queryTasks({
+        tags: ['urgent']
+      });
+
+      expect(urgentTasks.length).toBe(1);
+      expect(urgentTasks[0].tags).toContain('urgent');
+    });
+
+    test('应该组合多个过滤条件', () => {
+      const filteredTasks = taskManager.queryTasks({
+        type: [TaskType.ANALYSIS, TaskType.GENERATION],
+        priority: [TaskPriority.HIGH, TaskPriority.LOW]
+      });
+
+      expect(filteredTasks.length).toBe(2);
     });
   });
 
   describe('任务更新', () => {
-    let taskId: string;
+    let testTask: any;
 
-    beforeEach(() => {
-      const task = taskManager.addTask(TestDataFactory.addTask({
-        title: '原始任务',
-        status: TaskStatus.NOT_STARTED
-      }));
-      taskId = task.id;
+    beforeEach(async () => {
+      testTask = await taskManager.createTask({
+        title: '测试任务',
+        description: '原始描述'
+      });
     });
 
-    it('应该能够更新任务状态', () => {
-      const updatedTask = taskManager.updateTask(taskId, {
-        status: TaskStatus.IN_PROGRESS
+    test('应该成功更新任务', async () => {
+      const updatedTask = await taskManager.updateTask(testTask.id, {
+        title: '更新后的标题',
+        description: '更新后的描述',
+        priority: TaskPriority.HIGH
       });
 
-      expect(updatedTask).toBeDefined();
-      expect(updatedTask?.status).toBe(TaskStatus.IN_PROGRESS);
-      expect(updatedTask?.updatedAt).toBeInstanceOf(Date);
+      expect(updatedTask.title).toBe('更新后的标题');
+      expect(updatedTask.description).toBe('更新后的描述');
+      expect(updatedTask.priority).toBe(TaskPriority.HIGH);
+      expect(updatedTask.updatedAt.getTime()).toBeGreaterThan(testTask.updatedAt.getTime());
     });
 
-    it('应该能够更新任务标题', () => {
-      const updatedTask = taskManager.updateTask(taskId, {
-        title: '更新后的任务'
+    test('更新不存在的任务应该抛出错误', async () => {
+      await expect(
+        taskManager.updateTask('不存在的ID', { title: '新标题' })
+      ).rejects.toThrow('任务不存在');
+    });
+
+    test('应该阻止修改任务ID', async () => {
+      const originalId = testTask.id;
+      await taskManager.updateTask(testTask.id, {
+        id: '新的ID' as any
       });
 
-      expect(updatedTask?.title).toBe('更新后的任务');
+      const updatedTask = taskManager.getTask(originalId);
+      expect(updatedTask?.id).toBe(originalId);
     });
+  });
 
-    it('应该能够更新任务进度', () => {
-      const updatedTask = taskManager.updateTask(taskId, {
-        progress: 50
+  describe('任务状态管理', () => {
+    let testTask: any;
+
+    beforeEach(async () => {
+      testTask = await taskManager.createTask({
+        title: '状态测试任务'
       });
-
-      expect(updatedTask?.progress).toBe(50);
     });
 
-    it('应该在任务不存在时返回null', () => {
-      const result = taskManager.updateTask('non-existent', {
-        status: TaskStatus.COMPLETED
-      });
+    test('应该启动任务', async () => {
+      const startedTask = await taskManager.startTask(testTask.id);
 
-      expect(result).toBeNull();
+      expect(startedTask.status).toBe(TaskStatus.IN_PROGRESS);
+      expect(startedTask.startedAt).toBeInstanceOf(Date);
     });
 
-    it('应该更新任务的updatedAt时间戳', () => {
-      const originalTask = taskManager.getTaskById(taskId);
-      const originalUpdatedAt = originalTask?.updatedAt;
+    test('应该完成任务', async () => {
+      const result = {
+        success: true,
+        output: '任务结果',
+        artifacts: [],
+        metrics: {
+          executionTime: 1000,
+          memoryUsage: 1024,
+          cpuUsage: 50,
+          apiCalls: 5,
+          cost: 0.01
+        },
+        logs: ['执行日志']
+      };
 
-      // 等待一毫秒确保时间戳不同
-      setTimeout(() => {
-        const updatedTask = taskManager.updateTask(taskId, {
-          title: '新标题'
-        });
+      const completedTask = await taskManager.completeTask(testTask.id, result);
 
-        expect(updatedTask?.updatedAt).not.toEqual(originalUpdatedAt);
-      }, 1);
+      expect(completedTask.status).toBe(TaskStatus.COMPLETED);
+      expect(completedTask.progress).toBe(100);
+      expect(completedTask.completedAt).toBeInstanceOf(Date);
+      expect(completedTask.result).toEqual(result);
+    });
+
+    test('应该暂停任务', async () => {
+      await taskManager.startTask(testTask.id);
+      const pausedTask = await taskManager.pauseTask(testTask.id);
+
+      expect(pausedTask.status).toBe(TaskStatus.PAUSED);
+    });
+
+    test('应该取消任务', async () => {
+      const cancelledTask = await taskManager.cancelTask(testTask.id, '测试取消');
+
+      expect(cancelledTask.status).toBe(TaskStatus.CANCELLED);
+      expect(cancelledTask.errorMessage).toBe('测试取消');
+      expect(cancelledTask.completedAt).toBeInstanceOf(Date);
+    });
+
+    test('应该标记任务失败', async () => {
+      const failedTask = await taskManager.failTask(testTask.id, '执行失败');
+
+      expect(failedTask.status).toBe(TaskStatus.FAILED);
+      expect(failedTask.errorMessage).toBe('执行失败');
+      expect(failedTask.completedAt).toBeInstanceOf(Date);
     });
   });
 
   describe('任务删除', () => {
-    let taskId: string;
-
-    beforeEach(() => {
-      const task = taskManager.addTask(TestDataFactory.addTask());
-      taskId = task.id;
-    });
-
-    it('应该能够删除任务', () => {
-      const result = taskManager.deleteTask(taskId);
-
-      expect(result).toBe(true);
-      expect(taskManager.getTaskById(taskId)).toBeUndefined();
-    });
-
-    it('应该在删除不存在的任务时返回false', () => {
-      const result = taskManager.deleteTask('non-existent');
-
-      expect(result).toBe(false);
-    });
-  });
-
-  describe('任务依赖管理', () => {
-    let task1Id: string;
-    let task2Id: string;
-    let task3Id: string;
-
-    beforeEach(() => {
-      const task1 = taskManager.addTask(TestDataFactory.addTask({ title: '任务1' }));
-      const task2 = taskManager.addTask(TestDataFactory.addTask({ title: '任务2' }));
-      const task3 = taskManager.addTask(TestDataFactory.addTask({ title: '任务3' }));
-
-      task1Id = task1.id;
-      task2Id = task2.id;
-      task3Id = task3.id;
-    });
-
-    it('应该能够添加任务依赖', () => {
-      taskManager.addDependency(task2Id, task1Id);
-
-      const task2 = taskManager.getTaskById(task2Id);
-      expect(task2?.dependencies).toContain(task1Id);
-    });
-
-    it('应该能够移除任务依赖', () => {
-      taskManager.addDependency(task2Id, task1Id);
-      taskManager.removeDependency(task2Id, task1Id);
-
-      const task2 = taskManager.getTaskById(task2Id);
-      expect(task2?.dependencies).not.toContain(task1Id);
-    });
-
-    it('应该能够检测循环依赖', () => {
-      taskManager.addDependency(task2Id, task1Id);
-      taskManager.addDependency(task3Id, task2Id);
-
-      expect(() => {
-        taskManager.addDependency(task1Id, task3Id);
-      }).toThrow('检测到循环依赖');
-    });
-
-    it('应该能够获取下一个可执行的任务', () => {
-      // 设置依赖关系：task2 依赖 task1
-      taskManager.addDependency(task2Id, task1Id);
+    test('应该删除单个任务', async () => {
+      const task = await taskManager.createTask({ title: '待删除任务' });
       
-      // 完成 task1
-      taskManager.updateTask(task1Id, { status: TaskStatus.COMPLETED });
-
-      const nextTasks = taskManager.getNextTasks();
+      await taskManager.deleteTask(task.id);
       
-      expect(nextTasks).toContain(
-        expect.objectContaining({ id: task2Id })
-      );
+      const deletedTask = taskManager.getTask(task.id);
+      expect(deletedTask).toBeUndefined();
+    });
+
+    test('应该删除任务及其子任务', async () => {
+      const parentTask = await taskManager.createTask({ title: '父任务' });
+      const childTask = await taskManager.createTask({
+        title: '子任务',
+        parentId: parentTask.id
+      });
+
+      await taskManager.deleteTask(parentTask.id);
+
+      expect(taskManager.getTask(parentTask.id)).toBeUndefined();
+      expect(taskManager.getTask(childTask.id)).toBeUndefined();
+    });
+
+    test('删除不存在的任务应该抛出错误', async () => {
+      await expect(
+        taskManager.deleteTask('不存在的ID')
+      ).rejects.toThrow('任务不存在');
     });
   });
 
   describe('任务统计', () => {
-    beforeEach(() => {
-      taskManager.addTask(TestDataFactory.addTask({ status: TaskStatus.NOT_STARTED }));
-      taskManager.addTask(TestDataFactory.addTask({ status: TaskStatus.IN_PROGRESS }));
-      taskManager.addTask(TestDataFactory.addTask({ status: TaskStatus.COMPLETED }));
-      taskManager.addTask(TestDataFactory.addTask({ status: TaskStatus.COMPLETED }));
+    beforeEach(async () => {
+      // 创建不同状态的任务
+      await taskManager.createTask({
+        title: '任务1',
+        type: TaskType.ANALYSIS,
+        priority: TaskPriority.HIGH
+      });
+
+      const task2 = await taskManager.createTask({
+        title: '任务2',
+        type: TaskType.GENERATION,
+        priority: TaskPriority.MEDIUM
+      });
+
+      await taskManager.completeTask(task2.id);
+
+      await taskManager.createTask({
+        title: '任务3',
+        type: TaskType.ANALYSIS,
+        priority: TaskPriority.LOW
+      });
     });
 
-    it('应该能够获取任务统计信息', () => {
+    test('应该获取正确的统计信息', () => {
       const stats = taskManager.getTaskStats();
 
-      expect(stats.total).toBe(4);
-      expect(stats.notStarted).toBe(1);
-      expect(stats.inProgress).toBe(1);
-      expect(stats.completed).toBe(2);
-      expect(stats.completionRate).toBe(0.5);
+      expect(stats.total).toBe(3);
+      expect(stats.byStatus[TaskStatus.DRAFT]).toBe(2);
+      expect(stats.byStatus[TaskStatus.COMPLETED]).toBe(1);
+      expect(stats.byType[TaskType.ANALYSIS]).toBe(2);
+      expect(stats.byType[TaskType.GENERATION]).toBe(1);
+      expect(stats.byPriority[TaskPriority.HIGH]).toBe(1);
+      expect(stats.byPriority[TaskPriority.MEDIUM]).toBe(1);
+      expect(stats.byPriority[TaskPriority.LOW]).toBe(1);
+      expect(stats.completionRate).toBe(1/3);
     });
   });
 
-  describe('任务计划管理', () => {
-    it('应该能够设置任务计划', () => {
-      const taskPlan = TestDataFactory.addTaskPlan();
+  describe('任务依赖', () => {
+    test('应该检查任务依赖', async () => {
+      const task1 = await taskManager.createTask({ title: '依赖任务' });
+      const task2 = await taskManager.createTask({
+        title: '主任务',
+        dependencies: [task1.id]
+      });
 
-      taskManager.setTaskPlan(taskPlan);
+      // 依赖任务未完成时，主任务不能开始
+      expect(taskManager.canStartTask(task2.id)).toBe(false);
 
-      expect(taskManager.getAllTasks()).toHaveLength(3);
+      // 完成依赖任务后，主任务可以开始
+      await taskManager.completeTask(task1.id);
+      expect(taskManager.canStartTask(task2.id)).toBe(true);
     });
 
-    it('应该能够获取任务计划', () => {
-      const taskPlan = TestDataFactory.addTaskPlan();
-      taskManager.setTaskPlan(taskPlan);
+    test('应该生成任务依赖图', async () => {
+      const parent = await taskManager.createTask({ title: '父任务' });
+      const child = await taskManager.createTask({
+        title: '子任务',
+        parentId: parent.id
+      });
+      const dependent = await taskManager.createTask({
+        title: '依赖任务',
+        dependencies: [child.id]
+      });
 
-      const retrievedPlan = taskManager.getTaskPlan();
+      const graph = taskManager.getDependencyGraph();
 
-      expect(retrievedPlan).toBeValidTaskPlan();
-      expect(retrievedPlan?.name).toBe(taskPlan.name);
+      expect(graph.nodes.length).toBe(3);
+      expect(graph.edges.length).toBe(2);
+      
+      const parentEdge = graph.edges.find(e => e.type === 'parent');
+      const dependencyEdge = graph.edges.find(e => e.type === 'dependency');
+      
+      expect(parentEdge).toBeDefined();
+      expect(dependencyEdge).toBeDefined();
     });
+  });
 
-    it('应该能够清空任务计划', () => {
-      const taskPlan = TestDataFactory.addTaskPlan();
-      taskManager.setTaskPlan(taskPlan);
+  describe('任务管理器状态', () => {
+    test('应该获取管理器状态', () => {
+      const status = taskManager.getStatus();
 
-      taskManager.clearTaskPlan();
-
-      expect(taskManager.getAllTasks()).toHaveLength(0);
-      expect(taskManager.getTaskPlan()).toBeNull();
+      expect(status.initialized).toBe(true);
+      expect(status.totalTasks).toBeDefined();
+      expect(status.activeTasks).toBeDefined();
+      expect(status.completedTasks).toBeDefined();
+      expect(status.availableTemplates).toBeDefined();
+      expect(status.lastActivity).toBeInstanceOf(Date);
     });
   });
 });

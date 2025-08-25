@@ -1,25 +1,61 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
-    "module": "ESNext",
+    "target": "ES2022",
+    "module": "CommonJS",
+    "lib": ["ES2022", "DOM"],
     "moduleResolution": "node",
-    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "strict": true,
-    "declaration": true,
-    "outDir": "dist",
-    "rootDir": "src",
-    "sourceMap": true,
-    "resolveJsonModule": true,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": false,
-    "baseUrl": ".",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src-new",
+    "baseUrl": "./src-new",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "jsx": "react-jsx",
+    
     "paths": {
-      "*": ["node_modules/*", "src/types/*"]
+      "@core/*": ["core/*"],
+      "@infrastructure/*": ["infrastructure/*"],
+      "@integrations/*": ["integrations/*"],
+      "@interfaces/*": ["interfaces/*"],
+      "@config/*": ["config/*"],
+      "@assets/*": ["assets/*"]
     },
-    "typeRoots": ["node_modules/@types", "src/types"],
-    "types": ["node", "jest"]
+    
+    "types": [
+      "node"
+    ],
+    
+    "typeRoots": [
+      "node_modules/@types",
+      "src-new/types"
+    ]
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.test.ts", "dist"]
+  
+  "include": [
+    "src-new/**/*",
+    "src-new/**/*.json"
+  ],
+  
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src",
+    "build",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ],
+  
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "experimentalSpecifierResolution": "node"
+  }
 }
