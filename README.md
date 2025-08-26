@@ -390,4 +390,4 @@ MIT License
 
 **TaskFlow AI** - 让PRD解析和任务管理变得简单高效！
 
-🔗 [GitHub](https://github.com/Agions/taskflow-ai) | 📚 [文档](https://taskflow-ai.com/docs) | 💬 [讨论](https://github.com/Agions/taskflow-ai/discussions)
+🔗 [GitHub](https://github.com/Agions/taskflow-ai) | 📚 [文档](https://agions.github.io/taskflow-ai/) | 💬 [讨论](https://github.com/Agions/taskflow-ai/discussions)
