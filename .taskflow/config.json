@@ -1,0 +1,36 @@
+{
+  "projectName": "demo",
+  "version": "1.0.0",
+  "aiModels": [],
+  "mcpSettings": {
+    "enabled": true,
+    "port": 3000,
+    "host": "localhost",
+    "serverName": "taskflow-ai",
+    "version": "2024-11-05",
+    "capabilities": [],
+    "security": {
+      "authRequired": false,
+      "allowedOrigins": [
+        "*"
+      ],
+      "rateLimit": {
+        "enabled": true,
+        "maxRequests": 100,
+        "windowMs": 60000
+      },
+      "sandbox": {
+        "enabled": true,
+        "timeout": 30000,
+        "memoryLimit": 536870912
+      }
+    },
+    "tools": [],
+    "resources": []
+  },
+  "outputFormats": [
+    "json",
+    "markdown"
+  ],
+  "plugins": []
+}
