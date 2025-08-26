@@ -23,17 +23,20 @@
 ### 环境搭建步骤
 
 1. **克隆项目**
+
    ```bash
    git clone https://github.com/Agions/taskflow-ai.git
    cd taskflow-ai
    ```
 
 2. **安装依赖**
+
    ```bash
    npm install
    ```
 
 3. **构建项目**
+
    ```bash
    npm run build
    ```
@@ -48,6 +51,7 @@
 #### 编辑器配置
 
 **VSCode** (推荐)
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -62,6 +66,7 @@
 ```
 
 **必备插件:**
+
 - TypeScript Hero
 - ESLint
 - Prettier
@@ -71,11 +76,13 @@
 #### 终端配置
 
 **推荐使用:**
+
 - iTerm2 (macOS)
 - Windows Terminal (Windows)
 - GNOME Terminal (Linux)
 
 **Zsh配置:**
+
 ```bash
 # 安装oh-my-zsh
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -163,11 +170,13 @@ src/
 #### CLI模块 (`src/cli/`)
 
 负责命令行界面的实现，包括：
+
 - 命令解析和路由
 - 用户交互界面
 - 错误处理和用户反馈
 
 **关键文件:**
+
 - `index.ts`: CLI主入口，设置命令和全局配置
 - `commands/*.ts`: 各个命令的具体实现
 - `ui/*.ts`: 用户界面组件
@@ -175,12 +184,14 @@ src/
 #### Core模块 (`src/core/`)
 
 核心业务逻辑实现，包括：
+
 - PRD文档解析
 - 任务生成和管理
 - AI模型集成
 - 配置管理
 
 **关键文件:**
+
 - `parser/index.ts`: PRD解析的主要逻辑
 - `tasks/index.ts`: 任务生成算法
 - `ai/index.ts`: AI模型调用接口
@@ -188,12 +199,14 @@ src/
 #### MCP模块 (`src/mcp/`)
 
 Model Context Protocol服务器实现，包括：
+
 - MCP协议处理
 - 工具注册和调用
 - 资源管理
 - 安全控制
 
 **关键文件:**
+
 - `server.ts`: MCP服务器主体
 - `tools/index.ts`: 工具注册系统
 - `security/auth.ts`: 认证和安全
@@ -229,6 +242,7 @@ graph TB
 ### 开发流程
 
 1. **创建功能分支**
+
    ```bash
    git checkout develop
    git pull origin develop
@@ -236,23 +250,25 @@ graph TB
    ```
 
 2. **开发和测试**
+
    ```bash
    # 实时编译
    npm run dev
-   
+
    # 运行测试
    npm test
-   
+
    # 检查代码质量
    npm run lint
    npm run type-check
    ```
 
 3. **提交代码**
+
    ```bash
    # 格式化代码
    npm run format
-   
+
    # 提交变更
    git add .
    git commit -m "feat: add new feature"
@@ -277,6 +293,7 @@ graph TB
 ```
 
 **类型说明:**
+
 - `feat`: 新功能
 - `fix`: 修复bug
 - `docs`: 文档更新
@@ -286,6 +303,7 @@ graph TB
 - `chore`: 构建或工具变更
 
 **示例:**
+
 ```
 feat(cli): add interactive mode for parse command
 
@@ -313,7 +331,7 @@ interface TaskConfig {
 // ❌ 避免
 const taskConfig: any = {
   id: 'task-1',
-  title: 'Task 1'
+  title: 'Task 1',
 };
 ```
 
@@ -321,10 +339,7 @@ const taskConfig: any = {
 
 ```typescript
 // ✅ 好的实践
-async function parseDocument(
-  filePath: string,
-  options: ParseOptions = {}
-): Promise<PRDDocument> {
+async function parseDocument(filePath: string, options: ParseOptions = {}): Promise<PRDDocument> {
   // 实现
 }
 
@@ -346,11 +361,11 @@ interface TaskManager {
 // ✅ 类实现
 class DefaultTaskManager implements TaskManager {
   private tasks: Map<string, Task> = new Map();
-  
+
   async createTask(config: TaskConfig): Promise<Task> {
     // 实现
   }
-  
+
   async updateTask(id: string, updates: Partial<TaskConfig>): Promise<Task> {
     // 实现
   }
@@ -383,12 +398,12 @@ import { DEFAULT_CONFIG } from '../constants';
 
 ```typescript
 // ✅ 命名导出（推荐）
-export class TaskGenerator { }
-export interface TaskConfig { }
+export class TaskGenerator {}
+export interface TaskConfig {}
 export const DEFAULT_TIMEOUT = 30000;
 
 // ✅ 默认导出（适用于主要功能）
-export default class ConfigManager { }
+export default class ConfigManager {}
 
 // ❌ 混合导出（避免）
 export default TaskGenerator;
@@ -422,13 +437,15 @@ export class ConfigValidationError extends TaskFlowError {
 
 ```typescript
 // ✅ 使用Result模式
-type Result<T, E = Error> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  error: E;
-};
+type Result<T, E = Error> =
+  | {
+      success: true;
+      data: T;
+    }
+  | {
+      success: false;
+      error: E;
+    };
 
 async function parseDocument(path: string): Promise<Result<PRDDocument>> {
   try {
@@ -444,14 +461,14 @@ async function parseDocument(path: string): Promise<Result<PRDDocument>> {
 
 #### JSDoc注释
 
-```typescript
+````typescript
 /**
  * 解析PRD文档并生成任务列表
- * 
+ *
  * @param filePath - PRD文档文件路径
  * @param options - 解析选项
  * @returns Promise解析结果，包含文档信息和生成的任务
- * 
+ *
  * @example
  * ```typescript
  * const result = await parseDocument('./prd.md', {
@@ -460,13 +477,10 @@ async function parseDocument(path: string): Promise<Result<PRDDocument>> {
  * });
  * ```
  */
-async function parseDocument(
-  filePath: string,
-  options: ParseOptions = {}
-): Promise<ParseResult> {
+async function parseDocument(filePath: string, options: ParseOptions = {}): Promise<ParseResult> {
   // 实现
 }
-```
+````
 
 #### 代码注释
 
@@ -476,7 +490,7 @@ const modelConfig = {
   // 使用更低的temperature确保输出稳定性
   temperature: 0.3,
   // 限制token数量避免超出限制
-  maxTokens: 2000
+  maxTokens: 2000,
 };
 
 // TODO: 添加缓存机制优化性能
@@ -532,17 +546,17 @@ jest.mock('@/utils/logger');
 
 describe('PRDParser', () => {
   let parser: PRDParser;
-  
+
   beforeEach(() => {
     parser = new PRDParser({
-      aiModel: 'mock-model'
+      aiModel: 'mock-model',
     });
   });
-  
+
   afterEach(() => {
     jest.clearAllMocks();
   });
-  
+
   describe('parseMarkdown', () => {
     it('should parse basic markdown structure', async () => {
       const markdown = `
@@ -552,28 +566,26 @@ Content for section 1
 ## Section 2
 Content for section 2
       `;
-      
+
       const result = await parser.parseMarkdown(markdown);
-      
+
       expect(result).toMatchObject({
         title: 'Project Title',
         sections: [
           { title: 'Section 1', level: 2 },
-          { title: 'Section 2', level: 2 }
-        ]
+          { title: 'Section 2', level: 2 },
+        ],
       });
     });
-    
+
     it('should handle empty markdown', async () => {
       const result = await parser.parseMarkdown('');
-      
+
       expect(result.sections).toHaveLength(0);
     });
-    
+
     it('should throw error for invalid input', async () => {
-      await expect(parser.parseMarkdown(null as any))
-        .rejects
-        .toThrow('Invalid markdown content');
+      await expect(parser.parseMarkdown(null as any)).rejects.toThrow('Invalid markdown content');
     });
   });
 });
@@ -591,9 +603,9 @@ export function createMockConfig(overrides: Partial<TaskFlowConfig> = {}): TaskF
     mcpSettings: {
       enabled: false,
       port: 3000,
-      host: 'localhost'
+      host: 'localhost',
     },
-    ...overrides
+    ...overrides,
   };
 }
 
@@ -613,7 +625,7 @@ export function createMockTask(overrides: Partial<Task> = {}): Task {
     progress: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
-    ...overrides
+    ...overrides,
   };
 }
 ```
@@ -629,24 +641,24 @@ import { join } from 'path';
 
 describe('CLI Integration Tests', () => {
   let testDir: string;
-  
+
   beforeEach(() => {
     testDir = join(tmpdir(), `taskflow-test-${Date.now()}`);
     execSync(`mkdir -p ${testDir}`);
     process.chdir(testDir);
   });
-  
+
   afterEach(() => {
     execSync(`rm -rf ${testDir}`);
   });
-  
+
   it('should initialize project successfully', () => {
     const output = execSync('taskflow init --skip-ai', { encoding: 'utf8' });
-    
+
     expect(output).toContain('项目初始化成功');
     expect(readFileSync('.taskflow/config.json', 'utf8')).toBeTruthy();
   });
-  
+
   it('should parse PRD document', () => {
     // 创建测试PRD文件
     const prdContent = `
@@ -655,13 +667,13 @@ describe('CLI Integration Tests', () => {
 Description of feature 1
     `;
     writeFileSync('test-prd.md', prdContent);
-    
+
     // 初始化项目
     execSync('taskflow init --skip-ai');
-    
+
     // 解析PRD
     const output = execSync('taskflow parse test-prd.md', { encoding: 'utf8' });
-    
+
     expect(output).toContain('解析完成');
     expect(readFileSync('output/tasks.json', 'utf8')).toBeTruthy();
   });
@@ -740,17 +752,17 @@ const logger = Logger.getInstance('Parser');
 export class PRDParser {
   async parseDocument(filePath: string): Promise<PRDDocument> {
     logger.info('开始解析文档', { filePath });
-    
+
     try {
       const content = await readFile(filePath, 'utf8');
       logger.debug('文件内容读取成功', { contentLength: content.length });
-      
+
       const result = await this.processContent(content);
-      logger.info('文档解析完成', { 
+      logger.info('文档解析完成', {
         sectionsCount: result.sections.length,
-        estimatedTime: result.estimatedHours 
+        estimatedTime: result.estimatedHours,
       });
-      
+
       return result;
     } catch (error) {
       logger.error('文档解析失败', error);
@@ -766,20 +778,20 @@ export class PRDParser {
 // utils/performance.ts
 export class PerformanceMonitor {
   private static timers: Map<string, number> = new Map();
-  
+
   static start(label: string): void {
     this.timers.set(label, performance.now());
   }
-  
+
   static end(label: string): number {
     const startTime = this.timers.get(label);
     if (!startTime) {
       throw new Error(`Timer ${label} not found`);
     }
-    
+
     const duration = performance.now() - startTime;
     this.timers.delete(label);
-    
+
     Logger.getInstance('Performance').info(`${label} took ${duration.toFixed(2)}ms`);
     return duration;
   }
@@ -804,9 +816,9 @@ async function processLargeFile(filePath: string): Promise<void> {
   const fileStream = createReadStream(filePath);
   const rl = createInterface({
     input: fileStream,
-    crlfDelay: Infinity
+    crlfDelay: Infinity,
   });
-  
+
   for await (const line of rl) {
     // 逐行处理，避免将整个文件加载到内存
     await processLine(line);
@@ -816,11 +828,11 @@ async function processLargeFile(filePath: string): Promise<void> {
 // ✅ 及时清理资源
 class ResourceManager {
   private resources: Set<Disposable> = new Set();
-  
+
   register(resource: Disposable): void {
     this.resources.add(resource);
   }
-  
+
   dispose(): void {
     for (const resource of this.resources) {
       resource.dispose();
@@ -837,15 +849,13 @@ class ResourceManager {
 async function processTasks(tasks: Task[]): Promise<TaskResult[]> {
   const BATCH_SIZE = 5; // 限制并发数量
   const results: TaskResult[] = [];
-  
+
   for (let i = 0; i < tasks.length; i += BATCH_SIZE) {
     const batch = tasks.slice(i, i + BATCH_SIZE);
-    const batchResults = await Promise.all(
-      batch.map(task => processTask(task))
-    );
+    const batchResults = await Promise.all(batch.map(task => processTask(task)));
     results.push(...batchResults);
   }
-  
+
   return results;
 }
 ```
@@ -856,9 +866,9 @@ async function processTasks(tasks: Task[]): Promise<TaskResult[]> {
 // 实现简单的LRU缓存
 class LRUCache<T> {
   private cache = new Map<string, T>();
-  
+
   constructor(private maxSize: number) {}
-  
+
   get(key: string): T | undefined {
     const value = this.cache.get(key);
     if (value) {
@@ -868,7 +878,7 @@ class LRUCache<T> {
     }
     return value;
   }
-  
+
   set(key: string, value: T): void {
     if (this.cache.has(key)) {
       this.cache.delete(key);
@@ -906,21 +916,25 @@ class LRUCache<T> {
 ### 代码审查标准
 
 #### 功能性
+
 - 功能是否按预期工作
 - 边界条件是否处理正确
 - 错误处理是否完善
 
 #### 代码质量
+
 - 代码是否易读易维护
 - 是否遵循SOLID原则
 - 是否有重复代码
 
 #### 性能
+
 - 是否有性能问题
 - 内存使用是否合理
 - 是否需要优化
 
 #### 安全性
+
 - 是否有安全漏洞
 - 输入验证是否充分
 - 敏感信息是否安全处理
