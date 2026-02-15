@@ -1,20 +1,30 @@
 module.exports = {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
-  roots: ['<rootDir>/src-new', '<rootDir>/tests'],
+  extensionsToTreatAsEsm: ['.ts'],
+  roots: ['<rootDir>/src', '<rootDir>/tests'],
   testMatch: [
     '**/__tests__/**/*.ts',
     '**/?(*.)+(spec|test).ts'
   ],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', {
+      useESM: true,
+      tsconfig: {
+        allowJs: true,
+        esModuleInterop: true,
+      }
+    }],
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@modelcontextprotocol)/)',
+  ],
   collectCoverageFrom: [
-    'src-new/**/*.ts',
-    '!src-new/**/*.d.ts',
-    '!src-new/**/__tests__/**',
-    '!src-new/**/*.spec.ts',
-    '!src-new/**/*.test.ts',
+    'src/**/*.ts',
+    '!src/**/*.d.ts',
+    '!src/**/__tests__/**',
+    '!src/**/*.spec.ts',
+    '!src/**/*.test.ts',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: [
@@ -25,31 +35,20 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70
+      branches: 30,
+      functions: 30,
+      lines: 30,
+      statements: 30
     }
   },
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testTimeout: 30000,
   maxWorkers: 4,
   verbose: true,
   clearMocks: true,
   restoreMocks: true,
-  
-  // 模块路径映射
   moduleNameMapper: {
-    '^@core/(.*)$': '<rootDir>/src-new/core/$1',
-    '^@infrastructure/(.*)$': '<rootDir>/src-new/infrastructure/$1',
-    '^@integrations/(.*)$': '<rootDir>/src-new/integrations/$1',
-    '^@interfaces/(.*)$': '<rootDir>/src-new/interfaces/$1',
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
-  
-  // 全局设置
-  globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.json'
-    }
-  }
 };

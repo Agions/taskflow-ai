@@ -1,6 +1,6 @@
 {
   "name": "taskflow-ai",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "TaskFlow AI - 智能PRD文档解析与任务管理助手，支持多模型AI协同、MCP编辑器集成，专为开发团队设计的CLI工具",
   "logo": "assets/logo.svg",
   "main": "dist/cli/index.js",
@@ -8,7 +8,7 @@
   "bin": {
     "taskflow": "dist/cli/index.js",
     "taskflow-ai": "dist/cli/index.js",
-    "taskflow-mcp": "dist/mcp/server.js"
+    "taskflow-mcp": "dist/mcp/stdio-server.js"
   },
   "scripts": {
     "dev": "tsc --watch",
@@ -38,10 +38,11 @@
     "docs:deploy": "bash scripts/deploy-docs.sh",
     "size": "npm run build && ls -la dist/ | grep -E '\\.(js|map)$'",
     "clean": "rm -rf dist coverage .nyc_output",
-    "mcp": "node dist/mcp/server.js",
-    "mcp:dev": "npm run build && node dist/mcp/server.js --verbose",
+    "mcp": "node dist/mcp/stdio-server.js",
+    "mcp:dev": "npm run build && node dist/mcp/stdio-server.js",
     "mcp:test": "npm run build && node scripts/test-mcp-server.js",
     "mcp:verify": "npm run build && node scripts/verify-mcp-service.js",
+    "mcp:legacy": "node dist/mcp/server.js",
     "postinstall": "node -e \"console.log('\\n🎉 TaskFlow AI 安装成功！\\n运行 taskflow --help 开始使用\\n运行 taskflow-mcp 启动MCP服务器\\n')\""
   },
   "keywords": [

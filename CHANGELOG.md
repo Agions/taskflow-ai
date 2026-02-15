@@ -4,6 +4,32 @@
 
 本项目遵循[语义化版本](https://semver.org/lang/zh-CN/)规范。
 
+## [2.1.0] - 2026-02-16
+
+### 🚀 重大更新 - MCP 服务器重构
+
+#### 🔌 修复 MCP 连接问题 (Issue #1)
+
+- **支持 stdio 传输模式** - 完全重写 MCP 服务器，支持标准输入输出传输
+- **兼容主流编辑器** - 支持 Trae、Cursor、Claude Desktop、Windsurf
+- **安全沙箱机制** - 添加文件访问限制和命令白名单
+- **真实工具执行** - 实现 file_read、file_write、shell_exec、project_analyze、task_create 等工具
+
+#### 🔧 CI/CD 优化
+
+- **替换弃用 Action** - 使用 `softprops/action-gh-release@v1` 替代 `actions/create-release@v1`
+- **添加多平台测试** - 支持 Ubuntu、Windows、macOS
+- **添加安全扫描** - 集成 npm audit 安全检查
+- **添加 PR 检查** - 新增 PR 代码质量检查工作流
+- **添加 Codecov 集成** - 自动上传测试覆盖率报告
+
+#### 📚 文档更新
+
+- 新增 `MCP-SETUP.md` - 完整的 MCP 配置指南
+- 更新 `TRAE-MCP-SETUP.md` - 添加更多编辑器支持
+
+---
+
 ## [2.0.1] - 2026-02-15
 
 ### 🐛 Bug修复

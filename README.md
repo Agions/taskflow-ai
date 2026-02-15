@@ -1,6 +1,6 @@
 # TaskFlow AI
 
-![TaskFlow AI Logo](https://img.shields.io/badge/TaskFlow%20AI-v2.0.0-blue)
+![TaskFlow AI Logo](https://img.shields.io/badge/TaskFlow%20AI-v2.1.0-blue)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue)
 ![MCP](https://img.shields.io/badge/MCP-Enabled-purple)
@@ -247,19 +247,26 @@ taskflow mcp config
 
 ## 🔌 MCP集成
 
-### 编辑器配置
+TaskFlow AI 支持 **Model Context Protocol (MCP)**，可以与主流 AI 编辑器无缝集成。
 
-#### Cursor/VSCode
+### 支持的编辑器
 
-在设置中添加MCP配置:
+- ✅ [Trae](https://trae.ai/)
+- ✅ [Cursor](https://cursor.sh/)
+- ✅ [Claude Desktop](https://claude.ai/download)
+- ✅ [Windsurf](https://codeium.com/windsurf)
+- ✅ [VS Code](https://code.visualstudio.com/)
+
+### 快速配置
+
+#### Trae / Cursor / Windsurf
 
 ```json
 {
   "mcpServers": {
     "taskflow-ai": {
-      "url": "http://localhost:3000",
-      "name": "TaskFlow AI",
-      "description": "智能PRD文档解析与任务管理"
+      "command": "npx",
+      "args": ["-y", "taskflow-ai@latest", "mcp", "start"]
     }
   }
 }
@@ -267,22 +274,22 @@ taskflow mcp config
 
 #### Claude Desktop
 
-在 `claude_desktop_config.json` 中添加:
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+**Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "taskflow-ai": {
-      "command": "node",
-      "args": ["./dist/mcp/server.js"],
-      "env": {
-        "MCP_PORT": "3000",
-        "MCP_HOST": "localhost"
-      }
+      "command": "npx",
+      "args": ["-y", "taskflow-ai@latest", "mcp", "start"]
     }
   }
 }
 ```
+
+📖 **详细配置指南**: [MCP-SETUP.md](./MCP-SETUP.md)
 
 ### 可用工具
 

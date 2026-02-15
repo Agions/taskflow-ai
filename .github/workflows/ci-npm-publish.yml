@@ -34,31 +34,32 @@ jobs:
   # 质量门控和测试
   quality-gate:
     name: Quality Gate & Testing
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 15
-    continue-on-error: false  # 只有严重错误才会阻止流程
+    continue-on-error: false
 
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [18.x, 20.x]
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        
+
     - name: Setup Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        
+
     - name: Install dependencies
       run: |
-        echo "📦 Installing dependencies for Node.js ${{ matrix.node-version }}..."
+        echo "📦 Installing dependencies for Node.js ${{ matrix.node-version }} on ${{ matrix.os }}..."
         npm ci --prefer-offline --no-audit --silent
-        
+
     - name: TypeScript type check
       run: |
         echo "🔍 Running TypeScript type check..."
@@ -71,12 +72,12 @@ jobs:
         else
           echo "⚠️ No TypeScript configuration found, skipping"
         fi
-        
+      shell: bash
+
     - name: ESLint check
       run: |
         echo "🔍 Running ESLint check..."
         if [ -f ".eslintrc.js" ] || [ -f ".eslintrc.json" ] || [ -f "eslint.config.js" ]; then
-          # 运行ESLint但不因警告而失败，只在有错误时失败
           npx eslint . --ext .js,.jsx,.ts,.tsx --format stylish || {
             echo "⚠️ ESLint found issues, but continuing with build..."
             echo "ESLint issues detected but not blocking the pipeline"
@@ -85,7 +86,8 @@ jobs:
         else
           echo "⚠️ No ESLint configuration found, skipping"
         fi
-        
+      shell: bash
+
     - name: Prettier format check
       run: |
         echo "🔍 Running Prettier format check..."
@@ -98,7 +100,8 @@ jobs:
         else
           echo "⚠️ No Prettier configuration found, skipping"
         fi
-        
+      shell: bash
+
     - name: Security audit
       run: |
         echo "🔒 Running security audit..."
@@ -107,21 +110,34 @@ jobs:
           echo "Security issues detected but not blocking the pipeline"
         }
         echo "✅ Security audit completed"
-        
-    - name: Run tests
+      shell: bash
+
+    - name: Run tests with coverage
       run: |
-        echo "🧪 Running tests..."
+        echo "🧪 Running tests with coverage..."
         if [ -f "package.json" ] && grep -q '"test"' package.json; then
-          npm test || {
+          npm run test:coverage || {
             echo "⚠️ Tests failed, but continuing with build..."
             echo "Test failures detected but not blocking the pipeline"
-            echo "Please review and fix test issues in the next release"
           }
           echo "✅ Test execution completed"
         else
           echo "⚠️ No test script found, skipping"
         fi
-        
+      shell: bash
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '20.x'
+      with:
+        files: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        verbose: true
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
     - name: Build project
       run: |
         echo "🔨 Building project..."
@@ -135,22 +151,73 @@ jobs:
         else
           echo "⚠️ No build script found, skipping"
         fi
+      shell: bash
 
+    - name: Test CLI binary
+      run: |
+        echo "🧪 Testing CLI binary..."
+        if [ -f "dist/cli/index.js" ]; then
+          node dist/cli/index.js --help || {
+            echo "❌ CLI binary test failed"
+            exit 1
+          }
+          echo "✅ CLI binary test passed"
+        else
+          echo "⚠️ CLI binary not found"
+        fi
+      shell: bash
 
+  # 依赖安全扫描
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
 
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci --prefer-offline --no-audit
+
+    - name: Run npm audit
+      run: |
+        npm audit --audit-level high --json > audit-report.json || true
+        cat audit-report.json
+
+    - name: Check for critical vulnerabilities
+      run: |
+        critical_count=$(cat audit-report.json | jq '.metadata.vulnerabilities.critical // 0')
+        if [ "$critical_count" -gt 0 ]; then
+          echo "❌ Found $critical_count critical vulnerabilities"
+          exit 1
+        fi
+        echo "✅ No critical vulnerabilities found"
+
+    - name: Upload audit report
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: npm-audit-report
+        path: audit-report.json
 
   # NPM发布
   npm-publish:
     name: NPM Publish
     runs-on: ubuntu-latest
-    needs: [quality-gate]
-    # NPM发布继续进行，即使前面的步骤有问题
+    needs: [quality-gate, security-scan]
     if: >
       always() &&
+      needs.quality-gate.result == 'success' &&
       ((github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.force_npm_publish == 'true') ||
-      (github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[skip-publish]')))
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.force_npm_publish == 'true'))
     timeout-minutes: 10
 
     steps:
@@ -174,26 +241,21 @@ jobs:
     - name: Build for production
       run: |
         echo "🔨 Building for production..."
-        if [ -f "package.json" ] && grep -q '"build"' package.json; then
-          npm run build
-          echo "✅ Production build completed"
-        else
-          echo "⚠️ No build script found"
-        fi
+        npm run build
+        echo "✅ Production build completed"
 
     - name: Get version for publishing
       id: get_version
       run: |
         if [ "${{ startsWith(github.ref, 'refs/tags/v') }}" = "true" ]; then
-          # 标签推送：使用标签版本
           VERSION="${GITHUB_REF#refs/tags/v}"
           echo "🏷️ Using tag version: $VERSION"
         else
-          # 其他情况：使用package.json中的版本
           VERSION=$(node -p "require('./package.json').version")
           echo "📦 Using package.json version: $VERSION"
         fi
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+      shell: bash
 
     - name: Publish to NPM
       run: |
@@ -227,15 +289,16 @@ jobs:
         npm view taskflow-ai@$PACKAGE_VERSION || echo "⚠️ Package verification failed, but publish likely succeeded"
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        
+
     - name: Create GitHub Release
       if: startsWith(github.ref, 'refs/tags/v')
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.ref_name }}
-        release_name: Release ${{ steps.get_version.outputs.VERSION }}
+        files: |
+          dist/**
+          LICENSE
+          README.md
+        name: Release ${{ steps.get_version.outputs.VERSION }}
         body: |
           ## TaskFlow AI v${{ steps.get_version.outputs.VERSION }}
 
@@ -247,12 +310,26 @@ jobs:
           npm install taskflow-ai@${{ steps.get_version.outputs.VERSION }}
           ```
 
+          ### 🔧 MCP 配置
+          ```json
+          {
+            "mcpServers": {
+              "taskflow-ai": {
+                "command": "npx",
+                "args": ["-y", "taskflow-ai@latest", "mcp", "start"]
+              }
+            }
+          }
+          ```
+
           ### 📚 文档
           - [在线文档](https://agions.github.io/taskflow-ai/)
           - [API参考](https://agions.github.io/taskflow-ai/api/)
           - [用户指南](https://agions.github.io/taskflow-ai/user-guide/)
         draft: false
-        prerelease: false
+        prerelease: ${{ contains(github.ref, '-alpha') || contains(github.ref, '-beta') || contains(github.ref, '-rc') }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Manual Release Note
       if: github.event_name == 'workflow_dispatch' && github.event.inputs.force_npm_publish == 'true'
@@ -268,7 +345,7 @@ jobs:
   status-summary:
     name: Status Summary
     runs-on: ubuntu-latest
-    needs: [quality-gate, npm-publish]
+    needs: [quality-gate, security-scan, npm-publish]
     if: always()
 
     steps:
@@ -279,6 +356,7 @@ jobs:
         echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
         echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
         echo "| Quality Gate & Testing | ${{ needs.quality-gate.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Security Scan | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
         echo "| NPM Publish | ${{ needs.npm-publish.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
 
@@ -286,39 +364,29 @@ jobs:
         if [ "${{ needs.quality-gate.result }}" = "success" ]; then
           echo "✅ **Quality Gate**: All checks passed" >> $GITHUB_STEP_SUMMARY
         else
-          echo "⚠️ **Quality Gate**: Some checks failed (non-blocking)" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ **Quality Gate**: Some checks failed" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        # Security Scan Status
+        if [ "${{ needs.security-scan.result }}" = "success" ]; then
+          echo "✅ **Security Scan**: No critical vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+        elif [ "${{ needs.security-scan.result }}" = "failure" ]; then
+          echo "❌ **Security Scan**: Critical vulnerabilities detected" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⏭️ **Security Scan**: Skipped" >> $GITHUB_STEP_SUMMARY
         fi
 
         # NPM Publish Status
-        if [ "${{ startsWith(github.ref, 'refs/tags/v') }}" = "true" ] || [ "${{ github.event.inputs.force_npm_publish }}" = "true" ] || [ "${{ contains(github.event.head_commit.message, '[npm-publish]') }}" = "true" ]; then
+        if [ "${{ startsWith(github.ref, 'refs/tags/v') }}" = "true" ] || [ "${{ github.event.inputs.force_npm_publish }}" = "true" ]; then
           if [ "${{ needs.npm-publish.result }}" = "success" ]; then
             echo "✅ **NPM Publish**: Package published successfully to NPM" >> $GITHUB_STEP_SUMMARY
-            if [ "${{ startsWith(github.ref, 'refs/tags/v') }}" = "true" ]; then
-              echo "📦 **Package**: taskflow-ai@${GITHUB_REF#refs/tags/v}" >> $GITHUB_STEP_SUMMARY
-              echo "🏷️ **NPM Tag**: latest" >> $GITHUB_STEP_SUMMARY
-              echo "🎯 **Release Type**: Tag-based release" >> $GITHUB_STEP_SUMMARY
-            elif [ "${{ github.event.inputs.force_npm_publish }}" = "true" ]; then
-              echo "📦 **Package**: taskflow-ai@$(node -p "require('./package.json').version" 2>/dev/null || echo "unknown")" >> $GITHUB_STEP_SUMMARY
-              echo "🏷️ **NPM Tag**: ${{ github.event.inputs.npm_tag || 'beta' }}" >> $GITHUB_STEP_SUMMARY
-              echo "🎯 **Release Type**: Manual publish" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "📦 **Package**: taskflow-ai@$(node -p "require('./package.json').version" 2>/dev/null || echo "unknown")" >> $GITHUB_STEP_SUMMARY
-              echo "🏷️ **NPM Tag**: beta" >> $GITHUB_STEP_SUMMARY
-              echo "🎯 **Release Type**: Commit-triggered publish" >> $GITHUB_STEP_SUMMARY
-            fi
+            echo "📦 **Package**: taskflow-ai@${{ steps.get_version.outputs.VERSION }}" >> $GITHUB_STEP_SUMMARY
             echo "🔗 **NPM Link**: https://www.npmjs.com/package/taskflow-ai" >> $GITHUB_STEP_SUMMARY
           elif [ "${{ needs.npm-publish.result }}" = "failure" ]; then
             echo "❌ **NPM Publish**: Publishing failed - check logs for details" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⏸️ **NPM Publish**: Status unknown - ${{ needs.npm-publish.result }}" >> $GITHUB_STEP_SUMMARY
           fi
         else
-          echo "⏭️ **NPM Publish**: Skipped (条件不满足)" >> $GITHUB_STEP_SUMMARY
-          echo "ℹ️ **发布方式**:" >> $GITHUB_STEP_SUMMARY
-          PACKAGE_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "unknown")
-          echo "  • 推送标签: \`git tag v$PACKAGE_VERSION && git push origin v$PACKAGE_VERSION\`" >> $GITHUB_STEP_SUMMARY
-          echo "  • 手动触发: 在Actions页面选择'Run workflow'并启用'Force NPM publish'" >> $GITHUB_STEP_SUMMARY
-          echo "  • 提交触发: 在提交信息中包含 \`[npm-publish]\`" >> $GITHUB_STEP_SUMMARY
+          echo "⏭️ **NPM Publish**: Skipped (no tag or manual trigger)" >> $GITHUB_STEP_SUMMARY
         fi
 
         echo "" >> $GITHUB_STEP_SUMMARY
