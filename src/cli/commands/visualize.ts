@@ -162,7 +162,12 @@ async function findDataFiles(): Promise<string[]> {
 }
 
 async function loadProjectData(dataFiles: string[]): Promise<any> {
-  const allData = {
+  const allData: {
+    projects: any[];
+    tasks: any[];
+    documents: any[];
+    summary: Record<string, any>;
+  } = {
     projects: [],
     tasks: [],
     documents: [],

@@ -53,7 +53,7 @@ export class ConfigManager {
       }
 
       return config;
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 'ENOENT') {
         return null;
       }
