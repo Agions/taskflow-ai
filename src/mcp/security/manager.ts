@@ -300,7 +300,7 @@ export class SecurityManager {
           return vm.runInNewContext(code, sandbox, {
             timeout: this.settings.sandbox.timeout,
           });
-        } catch (error) {
+        } catch (error: any) {
           throw new Error(`沙箱执行失败: ${error.message}`);
         }
       },

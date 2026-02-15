@@ -381,7 +381,7 @@ export class MCPToolRegistry extends EventEmitter {
         const handlerModule = require(handler);
         const handlerFunc = handlerModule.default || handlerModule;
         return await handlerFunc(args);
-      } catch (error) {
+      } catch (error: any) {
         throw new Error(`工具处理器执行失败: ${error.message}`);
       }
     }
@@ -423,7 +423,13 @@ export class MCPToolRegistry extends EventEmitter {
    * 分析项目结构
    */
   private async analyzeProject(projectPath: string, maxDepth: number): Promise<any> {
-    const analysis = {
+    const analysis: {
+      path: string;
+      files: number;
+      directories: number;
+      languages: Record<string, number>;
+      structure: Record<string, any>;
+    } = {
       path: projectPath,
       files: 0,
       directories: 0,

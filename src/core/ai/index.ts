@@ -255,8 +255,10 @@ export class AIModelManager {
     
     // 限制缓存大小
     if (this.cache.size > 100) {
-      const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      const firstKey = this.cache.keys().next().value as string | undefined;
+      if (firstKey) {
+        this.cache.delete(firstKey);
+      }
     }
   }
 
@@ -269,8 +271,10 @@ export class AIModelManager {
   }
 }
 
-// 导出类型
+// 导出 DeepSeek 服务
 export * from './providers/deepseek';
-export * from './providers/zhipu';
-export * from './providers/qwen';
-export * from './providers/moonshot';
+
+// 其他提供商将在后续实现
+// export * from './providers/zhipu';
+// export * from './providers/qwen';
+// export * from './providers/moonshot';
