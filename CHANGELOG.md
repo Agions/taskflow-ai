@@ -4,6 +4,27 @@
 
 本项目遵循[语义化版本](https://semver.org/lang/zh-CN/)规范。
 
+## [2.0.1] - 2026-02-15
+
+### 🐛 Bug修复
+
+#### 🔌 MCP服务器连接问题修复 (Issue #1)
+
+- **添加CORS支持** - 启用跨域资源共享，解决编辑器连接问题
+- **完善MCP协议实现** - 实现完整的JSON-RPC 2.0协议端点
+- **新增MCP端点**:
+  - `POST /mcp` - MCP协议主端点
+  - `GET /mcp` - 服务器信息查询
+  - `GET /mcp/tools` - 工具列表
+  - `GET /mcp/resources` - 资源列表
+- **支持的工具**: file_read, file_write, project_analyze, task_create
+- **新增文档**: TRAE-MCP-SETUP.md - Trae编辑器配置指南
+
+### 📚 文档更新
+
+- 添加 Trae 编辑器 MCP 配置详细指南
+- 更新 README 中的 MCP 配置说明
+
 ## [2.0.0] - 2025-08-26
 
 ### 🚀 重大重构 - 架构全面升级
