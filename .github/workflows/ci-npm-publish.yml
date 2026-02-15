@@ -128,7 +128,7 @@ jobs:
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
-      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '20.x'
+      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '20.x' && env.CODECOV_TOKEN != ''
       with:
         files: ./coverage/lcov.info
         flags: unittests
@@ -189,16 +189,28 @@ jobs:
 
     - name: Run npm audit
       run: |
-        npm audit --audit-level high --json > audit-report.json || true
-        cat audit-report.json
+        echo "🔒 Running security audit..."
+        npm audit --audit-level high || true
 
     - name: Check for critical vulnerabilities
       run: |
-        critical_count=$(cat audit-report.json | jq '.metadata.vulnerabilities.critical // 0')
-        if [ "$critical_count" -gt 0 ]; then
-          echo "❌ Found $critical_count critical vulnerabilities"
-          exit 1
+        echo "🔍 Checking for critical vulnerabilities..."
+        # Run audit and capture output
+        AUDIT_OUTPUT=$(npm audit --audit-level critical --json 2>/dev/null || true)
+
+        # Check if there are any vulnerabilities
+        if echo "$AUDIT_OUTPUT" | grep -q '"vulnerabilities"'; then
+          # Try to extract critical count
+          CRITICAL_COUNT=$(echo "$AUDIT_OUTPUT" | grep -o '"critical":[0-9]*' | grep -o '[0-9]*' | head -1)
+          CRITICAL_COUNT=${CRITICAL_COUNT:-0}
+
+          if [ "$CRITICAL_COUNT" -gt 0 ]; then
+            echo "❌ Found $CRITICAL_COUNT critical vulnerabilities"
+            echo "$AUDIT_OUTPUT" | head -100
+            exit 1
+          fi
         fi
+
         echo "✅ No critical vulnerabilities found"
 
     - name: Upload audit report
