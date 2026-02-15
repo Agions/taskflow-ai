@@ -26,31 +26,35 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      pages_enabled: ${{ steps.pages.outcome == 'success' }}
+      pages_enabled: ${{ steps.check_pages.outputs.pages_enabled }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 如果未启用lastUpdated，则不需要
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
           cache-dependency-path: docs/package-lock.json
 
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v4
-        continue-on-error: true
-
-      - name: Check Pages Setup and Provide Instructions
+      - name: Check GitHub Pages Setup
+        id: check_pages
         run: |
-          if [ "${{ steps.pages.outcome }}" = "failure" ]; then
-            echo "❌ GitHub Pages未启用或配置错误"
+          # 检查是否启用了 GitHub Pages
+          PAGES_URL="https://api.github.com/repos/${{ github.repository }}/pages"
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$PAGES_URL" || echo "404")
+
+          if [ "$STATUS_CODE" = "200" ]; then
+            echo "pages_enabled=true" >> $GITHUB_OUTPUT
+            echo "✅ GitHub Pages 已启用"
+          else
+            echo "pages_enabled=false" >> $GITHUB_OUTPUT
+            echo "⚠️ GitHub Pages 未启用或配置错误"
             echo ""
-            echo "🚀 **解决方案**: 请按以下步骤启用GitHub Pages"
+            echo "🚀 **解决方案**: 请按以下步骤启用 GitHub Pages"
             echo ""
             echo "📋 **详细步骤**:"
             echo "1. 访问: https://github.com/${{ github.repository }}/settings/pages"
@@ -60,91 +64,48 @@ jobs:
             echo ""
             echo "🔗 **预期结果**: 文档将部署到 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
             echo ""
-            echo "⚠️ **注意**: 仓库必须是公开的才能使用免费的GitHub Pages"
-            echo ""
-            echo "🔄 继续构建以验证VitePress配置..."
-
-            # 创建状态文件
-            echo "pages_setup_failed" > pages_status.txt
-          else
-            echo "✅ GitHub Pages配置成功"
-            echo "🎉 准备部署到: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-            echo "pages_setup_success" > pages_status.txt
+            echo "⚠️ **注意**: 仓库必须是公开的才能使用免费的 GitHub Pages"
           fi
 
-      - name: Clean cache and install dependencies
+      - name: Install dependencies
         run: |
-          echo "🧹 清理缓存和旧文件..."
+          echo "📦 安装依赖..."
           cd docs
-
-          # 清理npm缓存
-          npm cache clean --force
-
-          # 清理VitePress缓存
-          rm -rf .vitepress/cache
-          rm -rf .vitepress/dist
-
-          # 清理node_modules
-          rm -rf node_modules
-
-          echo "📦 重新安装VitePress依赖..."
-          npm install
+          npm ci --prefer-offline --no-audit
           echo "✅ 依赖安装完成"
 
       - name: Verify VitePress configuration
         run: |
-          echo "🔍 验证VitePress配置..."
+          echo "🔍 验证 VitePress 配置..."
           cd docs
 
           # 检查配置文件
           if [ -f ".vitepress/config.ts" ]; then
             echo "✅ 配置文件存在: .vitepress/config.ts"
-            echo "📋 配置文件内容预览:"
-            head -20 .vitepress/config.ts
           else
             echo "❌ 配置文件不存在"
             exit 1
           fi
 
-          # 检查必要的资源文件
-          if [ -f "public/assets/logo.svg" ]; then
-            echo "✅ Logo文件存在"
+          # 检查 package.json
+          if [ -f "package.json" ]; then
+            echo "✅ package.json 存在"
           else
-            echo "⚠️ Logo文件缺失"
+            echo "❌ package.json 不存在"
+            exit 1
           fi
 
       - name: Build with VitePress
         run: |
-          echo "🔨 构建VitePress文档..."
+          echo "🔨 构建 VitePress 文档..."
           cd docs
 
           # 设置环境变量
           export NODE_ENV=production
           export VITEPRESS_BASE=/taskflow-ai/
-          export BUILD_TIMESTAMP=$(date +%s)
-
-          # 强制清理所有缓存
-          rm -rf node_modules/.cache
-          rm -rf .vitepress/cache
-          rm -rf .vitepress/dist
-
-          echo "📋 验证配置文件..."
-          if grep -q "指南\|API参考\|用户手册\|技术参考" .vitepress/config.ts; then
-            echo "✅ 配置文件包含完整导航"
-          else
-            echo "❌ 配置文件可能有问题"
-            head -50 .vitepress/config.ts
-          fi
 
           npm run build
           echo "✅ 文档构建完成"
-
-          # 验证构建产物
-          if grep -q "指南\|API参考\|用户手册\|技术参考" .vitepress/dist/index.html; then
-            echo "✅ 构建产物包含完整导航"
-          else
-            echo "❌ 构建产物缺少导航，可能有问题"
-          fi
 
           # 验证构建产物
           if [ -d ".vitepress/dist" ]; then
@@ -152,59 +113,42 @@ jobs:
             du -sh .vitepress/dist
             echo "📁 构建产物内容:"
             ls -la .vitepress/dist
-
-            echo "🎨 检查CSS文件:"
-            find .vitepress/dist -name "*.css" -type f
-
-            echo "📄 检查HTML文件中的CSS引用:"
-            if [ -f ".vitepress/dist/index.html" ]; then
-              grep -n "\.css" .vitepress/dist/index.html || echo "未找到CSS引用"
-            fi
-
-            echo "🔍 检查assets目录:"
-            if [ -d ".vitepress/dist/assets" ]; then
-              ls -la .vitepress/dist/assets/
-            else
-              echo "❌ assets目录不存在"
-            fi
           else
             echo "❌ 构建产物目录不存在"
             exit 1
           fi
 
       - name: Upload artifact for Pages
+        if: steps.check_pages.outputs.pages_enabled == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/.vitepress/dist
-        if: steps.pages.outcome == 'success'
 
       - name: Upload artifact for manual deployment
+        if: steps.check_pages.outputs.pages_enabled == 'false'
         uses: actions/upload-artifact@v4
         with:
           name: vitepress-docs-${{ github.sha }}
           path: docs/.vitepress/dist
           retention-days: 30
-        if: steps.pages.outcome == 'failure'
 
       - name: Create deployment summary
         run: |
-          echo "## 📚 VitePress文档构建报告" >> $GITHUB_STEP_SUMMARY
+          echo "## 📚 VitePress 文档构建报告" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.pages.outcome }}" = "success" ]; then
-            echo "✅ **GitHub Pages配置**: 成功" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check_pages.outputs.pages_enabled }}" = "true" ]; then
+            echo "✅ **GitHub Pages 配置**: 成功" >> $GITHUB_STEP_SUMMARY
             echo "🚀 **部署状态**: 准备自动部署" >> $GITHUB_STEP_SUMMARY
-            echo "🔗 **预期URL**: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
+            echo "🔗 **预期 URL**: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ **GitHub Pages配置**: 需要手动启用" >> $GITHUB_STEP_SUMMARY
-            echo "📋 **解决方案**: [启用GitHub Pages](https://github.com/${{ github.repository }}/settings/pages)" >> $GITHUB_STEP_SUMMARY
-            echo "📦 **备用方案**: 构建产物已上传为Artifact，可手动下载部署" >> $GITHUB_STEP_SUMMARY
-            echo "📖 **详细指南**: 查看仓库根目录的 GITHUB_PAGES_SETUP_GUIDE.md" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **GitHub Pages 配置**: 需要手动启用" >> $GITHUB_STEP_SUMMARY
+            echo "📋 **解决方案**: [启用 GitHub Pages](https://github.com/${{ github.repository }}/settings/pages)" >> $GITHUB_STEP_SUMMARY
+            echo "📦 **备用方案**: 构建产物已上传为 Artifact，可手动下载部署" >> $GITHUB_STEP_SUMMARY
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "📊 **构建信息**:" >> $GITHUB_STEP_SUMMARY
           echo "- 构建时间: $(date)" >> $GITHUB_STEP_SUMMARY
-          echo "- Node.js版本: $(node --version)" >> $GITHUB_STEP_SUMMARY
-          echo "- VitePress版本: $(cd docs && npm list vitepress --depth=0)" >> $GITHUB_STEP_SUMMARY
+          echo "- Node.js 版本: $(node --version)" >> $GITHUB_STEP_SUMMARY
 
   # 部署作业
   deploy:
@@ -222,5 +166,5 @@ jobs:
 
       - name: Deployment success notification
         run: |
-          echo "🎉 文档已成功部署到GitHub Pages!"
+          echo "🎉 文档已成功部署到 GitHub Pages!"
           echo "🔗 访问地址: ${{ steps.deployment.outputs.page_url }}"
