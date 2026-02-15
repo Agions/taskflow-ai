@@ -54,6 +54,13 @@ try {
     console.log('✅ CLI入口权限设置完成');
   }
 
+  // 设置MCP stdio服务器入口权限
+  const mcpPath = path.join(__dirname, 'dist', 'mcp', 'stdio-server.js');
+  if (require('fs').existsSync(mcpPath)) {
+    require('fs').chmodSync(mcpPath, 0o755);
+    console.log('✅ MCP stdio服务器入口权限设置完成');
+  }
+
 } catch (error) {
   console.error('❌ 构建失败:', error.message);
   process.exit(1);

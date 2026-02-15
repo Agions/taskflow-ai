@@ -1,54 +1,36 @@
 /**
- * MCP服务器核心实现 - 支持MCP协议标准
+ * MCP服务器核心实现 - 支持MCP协议标准 (stdio 传输方式)
+ * 兼容 Trae, Cursor, Claude Desktop 等编辑器
  */
 
-import express, { Application, Request, Response } from 'express';
-import { createServer, Server as HttpServer } from 'http';
-import cors from 'cors';
-
-// MCP协议类型定义
-interface MCPRequest {
-  jsonrpc: '2.0';
-  id: string | number;
-  method: string;
-  params?: any;
-}
-
-interface MCPResponse {
-  jsonrpc: '2.0';
-  id: string | number;
-  result?: any;
-  error?: {
-    code: number;
-    message: string;
-    data?: any;
-  };
-}
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
+} from '@modelcontextprotocol/sdk/types.js';
+import path from 'path';
+import fs from 'fs-extra';
+import { execSync } from 'child_process';
+import { MCPToolRegistry } from './tools/registry';
+import { Logger } from '../utils/logger';
 
 export class MCPServer {
-  private app?: Application;
-  private httpServer?: HttpServer;
+  private server?: Server;
+  private transport?: StdioServerTransport;
   private isRunning = false;
-  private tools: Map<string, any> = new Map();
-  private resources: Map<string, any> = new Map();
+  private toolRegistry?: MCPToolRegistry;
+  private logger: Logger;
 
   constructor(
     private settings: any,
     private config: any
-  ) {}
-
-  /**
-   * 注册工具
-   */
-  registerTool(name: string, tool: any): void {
-    this.tools.set(name, tool);
-  }
-
-  /**
-   * 注册资源
-   */
-  registerResource(name: string, resource: any): void {
-    this.resources.set(name, resource);
+  ) {
+    this.logger = Logger.getInstance('MCPServer');
   }
 
   /**
@@ -56,43 +38,56 @@ export class MCPServer {
    */
   async start(): Promise<void> {
     try {
-      console.log('正在启动MCP服务器...');
+      this.logger.info('正在启动MCP服务器...');
 
-      // 设置Express应用
-      this.app = express();
-      this.httpServer = createServer(this.app);
+      // 初始化工具注册表
+      this.toolRegistry = new MCPToolRegistry(this.config, this.logger);
+      await this.toolRegistry.initialize();
 
-      // 启用CORS - 允许所有来源访问（开发环境）
-      this.app.use(cors({
-        origin: '*',
-        methods: ['GET', 'POST', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials: true
-      }));
+      // 创建MCP服务器实例
+      this.server = new Server(
+        {
+          name: this.settings.serverName || 'taskflow-ai',
+          version: this.settings.version || '1.0.0',
+        },
+        {
+          capabilities: {
+            tools: {},
+            resources: {},
+            prompts: {},
+          },
+        }
+      );
 
-      // 基本中间件
-      this.app.use(express.json());
+      // 设置请求处理器
+      this.setupRequestHandlers();
 
-      // 注册内置工具
-      this.registerBuiltinTools();
+      // 创建stdio传输层
+      this.transport = new StdioServerTransport();
 
-      // 设置MCP协议路由
-      this.setupMCPRoutes();
-
-      // 设置基本路由
-      this.setupRoutes();
-
-      // 启动HTTP服务器
-      await new Promise<void>((resolve, reject) => {
-        this.httpServer!.listen(this.settings.port, this.settings.host, () => {
-          console.log(`MCP服务器已启动 - http://${this.settings.host}:${this.settings.port}`);
-          resolve();
-        }).on('error', reject);
-      });
+      // 连接服务器到传输层
+      await this.server.connect(this.transport);
 
       this.isRunning = true;
+      this.logger.info('MCP服务器已启动 (stdio模式)');
+
+      // 保持进程运行
+      process.stdin.on('end', () => {
+        this.logger.info('stdin ended, shutting down...');
+        this.stop();
+      });
+
+      process.on('SIGINT', () => {
+        this.logger.info('SIGINT received, shutting down...');
+        this.stop();
+      });
+
+      process.on('SIGTERM', () => {
+        this.logger.info('SIGTERM received, shutting down...');
+        this.stop();
+      });
     } catch (error) {
-      console.error('MCP服务器启动失败:', error);
+      this.logger.error('MCP服务器启动失败:', error);
       throw error;
     }
   }
@@ -102,367 +97,410 @@ export class MCPServer {
    */
   async stop(): Promise<void> {
     try {
-      console.log('正在停止MCP服务器...');
+      this.logger.info('正在停止MCP服务器...');
       this.isRunning = false;
 
-      if (this.httpServer) {
-        await new Promise<void>(resolve => {
-          this.httpServer!.close(() => resolve());
-        });
+      if (this.toolRegistry) {
+        await this.toolRegistry.cleanup();
       }
 
-      console.log('MCP服务器已停止');
+      if (this.server) {
+        await this.server.close();
+      }
+
+      this.logger.info('MCP服务器已停止');
     } catch (error) {
-      console.error('停止MCP服务器时出错:', error);
+      this.logger.error('停止MCP服务器时出错:', error);
       throw error;
     }
   }
 
   /**
-   * 注册内置工具
+   * 设置请求处理器
    */
-  private registerBuiltinTools(): void {
-    // 文件读取工具
-    this.registerTool('file_read', {
-      description: '读取文件内容',
-      parameters: {
-        type: 'object',
-        properties: {
-          path: { type: 'string', description: '文件路径' }
-        },
-        required: ['path']
+  private setupRequestHandlers(): void {
+    if (!this.server) return;
+
+    // 工具列表处理器
+    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+      const tools = this.toolRegistry?.getAllTools() || [];
+      return {
+        tools: tools.map(tool => ({
+          name: tool.name,
+          description: tool.description,
+          inputSchema: tool.inputSchema,
+        })),
+      };
+    });
+
+    // 工具调用处理器
+    this.server.setRequestHandler(CallToolRequestSchema, async request => {
+      const { name, arguments: args } = request.params;
+
+      try {
+        const result = await this.executeTool(name, args);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: typeof result === 'string' ? result : JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      } catch (error: any) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Error: ${error.message}`,
+            },
+          ],
+          isError: true,
+        };
       }
     });
 
-    // 文件写入工具
-    this.registerTool('file_write', {
-      description: '写入文件内容',
-      parameters: {
-        type: 'object',
-        properties: {
-          path: { type: 'string', description: '文件路径' },
-          content: { type: 'string', description: '文件内容' }
-        },
-        required: ['path', 'content']
-      }
-    });
-
-    // 项目分析工具
-    this.registerTool('project_analyze', {
-      description: '分析项目结构',
-      parameters: {
-        type: 'object',
-        properties: {
-          path: { type: 'string', description: '项目路径' }
-        },
-        required: ['path']
-      }
-    });
-
-    // 任务创建工具
-    this.registerTool('task_create', {
-      description: '创建新任务',
-      parameters: {
-        type: 'object',
-        properties: {
-          title: { type: 'string', description: '任务标题' },
-          description: { type: 'string', description: '任务描述' },
-          priority: { type: 'string', enum: ['low', 'medium', 'high'], description: '优先级' }
-        },
-        required: ['title', 'description']
-      }
-    });
-  }
-
-  /**
-   * 设置MCP协议路由
-   */
-  private setupMCPRoutes(): void {
-    if (!this.app) return;
-
-    // MCP协议主端点 - 支持POST请求
-    this.app.post('/mcp', (req: Request, res: Response) => {
-      this.handleMCPRequest(req, res);
-    });
-
-    // MCP协议 - 支持GET请求（用于SSE）
-    this.app.get('/mcp', (req: Request, res: Response) => {
-      res.json({
-        jsonrpc: '2.0',
-        result: {
-          protocolVersion: '2024-11-05',
-          capabilities: {
-            tools: {},
-            resources: {},
-            prompts: {}
+    // 资源列表处理器
+    this.server.setRequestHandler(ListResourcesRequestSchema, async () => {
+      return {
+        resources: [
+          {
+            uri: 'taskflow://config',
+            name: 'TaskFlow Configuration',
+            mimeType: 'application/json',
+            description: 'Current TaskFlow AI configuration',
           },
-          serverInfo: {
-            name: this.settings.serverName || 'taskflow-ai',
-            version: this.settings.version || '1.0.0'
-          }
-        }
-      });
+          {
+            uri: 'taskflow://tools',
+            name: 'Available Tools',
+            mimeType: 'application/json',
+            description: 'List of all available MCP tools',
+          },
+        ],
+      };
     });
 
-    // 工具列表端点
-    this.app.get('/mcp/tools', (req: Request, res: Response) => {
-      const toolsList = Array.from(this.tools.entries()).map(([name, tool]) => ({
-        name,
-        description: tool.description,
-        parameters: tool.parameters
-      }));
+    // 资源读取处理器
+    this.server.setRequestHandler(ReadResourceRequestSchema, async request => {
+      const { uri } = request.params;
 
-      res.json({
-        jsonrpc: '2.0',
-        result: { tools: toolsList }
-      });
+      if (uri === 'taskflow://config') {
+        return {
+          contents: [
+            {
+              uri,
+              mimeType: 'application/json',
+              text: JSON.stringify(this.sanitizeConfig(this.config), null, 2),
+            },
+          ],
+        };
+      }
+
+      if (uri === 'taskflow://tools') {
+        const tools = this.toolRegistry?.getAllTools() || [];
+        return {
+          contents: [
+            {
+              uri,
+              mimeType: 'application/json',
+              text: JSON.stringify(tools, null, 2),
+            },
+          ],
+        };
+      }
+
+      throw new Error(`Unknown resource: ${uri}`);
     });
 
-    // 资源列表端点
-    this.app.get('/mcp/resources', (req: Request, res: Response) => {
-      const resourcesList = Array.from(this.resources.entries()).map(([name, resource]) => ({
-        name,
-        ...resource
-      }));
+    // Prompt列表处理器
+    this.server.setRequestHandler(ListPromptsRequestSchema, async () => {
+      return {
+        prompts: [
+          {
+            name: 'analyze-project',
+            description: 'Analyze a project structure and provide insights',
+          },
+          {
+            name: 'create-task',
+            description: 'Create a new task with proper structure',
+          },
+        ],
+      };
+    });
 
-      res.json({
-        jsonrpc: '2.0',
-        result: { resources: resourcesList }
-      });
+    // Prompt获取处理器
+    this.server.setRequestHandler(GetPromptRequestSchema, async request => {
+      const { name, arguments: args } = request.params;
+
+      if (name === 'analyze-project') {
+        return {
+          description: 'Analyze project structure',
+          messages: [
+            {
+              role: 'user',
+              content: {
+                type: 'text',
+                text: `Please analyze the project at ${args?.path || process.cwd()} and provide insights about its structure, technologies used, and potential improvements.`,
+              },
+            },
+          ],
+        };
+      }
+
+      if (name === 'create-task') {
+        return {
+          description: 'Create a new task',
+          messages: [
+            {
+              role: 'user',
+              content: {
+                type: 'text',
+                text: `Create a new task with title: "${args?.title || 'New Task'}"${args?.description ? ` and description: "${args.description}"` : ''}`,
+              },
+            },
+          ],
+        };
+      }
+
+      throw new Error(`Unknown prompt: ${name}`);
     });
   }
 
   /**
-   * 处理MCP请求
+   * 执行工具
    */
-  private handleMCPRequest(req: Request, res: Response): void {
-    const request: MCPRequest = req.body;
-
-    // 验证JSON-RPC格式
-    if (request.jsonrpc !== '2.0') {
-      res.status(400).json({
-        jsonrpc: '2.0',
-        id: request.id,
-        error: {
-          code: -32600,
-          message: 'Invalid Request: jsonrpc must be "2.0"'
-        }
-      });
-      return;
-    }
-
-    // 处理不同的MCP方法
-    switch (request.method) {
-      case 'initialize':
-        this.handleInitialize(request, res);
-        break;
-
-      case 'tools/list':
-        this.handleToolsList(request, res);
-        break;
-
-      case 'tools/call':
-        this.handleToolCall(request, res);
-        break;
-
-      case 'resources/list':
-        this.handleResourcesList(request, res);
-        break;
-
-      case 'resources/read':
-        this.handleResourceRead(request, res);
-        break;
-
-      default:
-        res.status(400).json({
-          jsonrpc: '2.0',
-          id: request.id,
-          error: {
-            code: -32601,
-            message: `Method not found: ${request.method}`
-          }
-        });
-    }
-  }
-
-  /**
-   * 处理初始化请求
-   */
-  private handleInitialize(request: MCPRequest, res: Response): void {
-    const response: MCPResponse = {
-      jsonrpc: '2.0',
-      id: request.id,
-      result: {
-        protocolVersion: '2024-11-05',
-        capabilities: {
-          tools: {},
-          resources: {},
-          prompts: {}
-        },
-        serverInfo: {
-          name: this.settings.serverName || 'taskflow-ai',
-          version: this.settings.version || '1.0.0'
+  private async executeTool(name: string, args: any): Promise<any> {
+    // 首先尝试从注册表执行
+    if (this.toolRegistry) {
+      try {
+        return await this.toolRegistry.callTool(name, args);
+      } catch (error: any) {
+        // 如果注册表中没有，尝试内置执行
+        if (!error.message?.includes('工具不存在')) {
+          throw error;
         }
       }
+    }
+
+    // 内置工具执行
+    switch (name) {
+      case 'file_read':
+        return await this.executeFileRead(args);
+      case 'file_write':
+        return await this.executeFileWrite(args);
+      case 'shell_exec':
+        return await this.executeShellExec(args);
+      case 'project_analyze':
+        return await this.executeProjectAnalyze(args);
+      case 'task_create':
+        return await this.executeTaskCreate(args);
+      default:
+        throw new Error(`Tool not found: ${name}`);
+    }
+  }
+
+  /**
+   * 执行文件读取
+   */
+  private async executeFileRead(args: any): Promise<string> {
+    const { path: filePath } = args;
+
+    if (!filePath) {
+      throw new Error('Path is required');
+    }
+
+    // 安全检查：确保路径在允许范围内
+    const resolvedPath = path.resolve(filePath);
+    const cwd = process.cwd();
+
+    // 只允许访问当前工作目录及其子目录
+    if (!resolvedPath.startsWith(cwd)) {
+      throw new Error('Access denied: path outside of working directory');
+    }
+
+    try {
+      const content = await fs.readFile(resolvedPath, 'utf-8');
+      return content;
+    } catch (error: any) {
+      throw new Error(`Failed to read file: ${error.message}`);
+    }
+  }
+
+  /**
+   * 执行文件写入
+   */
+  private async executeFileWrite(args: any): Promise<any> {
+    const { path: filePath, content } = args;
+
+    if (!filePath || content === undefined) {
+      throw new Error('Path and content are required');
+    }
+
+    // 安全检查
+    const resolvedPath = path.resolve(filePath);
+    const cwd = process.cwd();
+
+    if (!resolvedPath.startsWith(cwd)) {
+      throw new Error('Access denied: path outside of working directory');
+    }
+
+    try {
+      await fs.ensureDir(path.dirname(resolvedPath));
+      await fs.writeFile(resolvedPath, content, 'utf-8');
+      return { success: true, path: resolvedPath };
+    } catch (error: any) {
+      throw new Error(`Failed to write file: ${error.message}`);
+    }
+  }
+
+  /**
+   * 执行Shell命令
+   */
+  private async executeShellExec(args: any): Promise<any> {
+    const { command, cwd, timeout = 30 } = args;
+
+    if (!command) {
+      throw new Error('Command is required');
+    }
+
+    // 命令白名单检查
+    const allowedCommands = [
+      'ls', 'cat', 'grep', 'find', 'head', 'tail', 'wc',
+      'git', 'npm', 'node', 'npx', 'tsc', 'eslint', 'prettier',
+      'mkdir', 'touch', 'rm', 'cp', 'mv', 'echo',
+      'pwd', 'whoami', 'date', 'which',
+    ];
+
+    const cmdBase = command.trim().split(' ')[0];
+    if (!allowedCommands.includes(cmdBase)) {
+      throw new Error(`Command not allowed: ${cmdBase}. Allowed commands: ${allowedCommands.join(', ')}`);
+    }
+
+    try {
+      const result = execSync(command, {
+        cwd: cwd || process.cwd(),
+        timeout: timeout * 1000,
+        encoding: 'utf-8',
+        maxBuffer: 1024 * 1024, // 1MB buffer
+      });
+      return { output: result, command };
+    } catch (error: any) {
+      throw new Error(`Command failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * 执行项目分析
+   */
+  private async executeProjectAnalyze(args: any): Promise<any> {
+    const { path: projectPath = process.cwd(), depth = 3 } = args;
+
+    const analysis: {
+      path: string;
+      files: number;
+      directories: number;
+      languages: Record<string, number>;
+      structure: any[];
+    } = {
+      path: projectPath,
+      files: 0,
+      directories: 0,
+      languages: {},
+      structure: [],
     };
 
-    res.json(response);
-  }
+    const scanDirectory = async (dirPath: string, currentDepth: number): Promise<any[]> => {
+      if (currentDepth > depth) return [];
 
-  /**
-   * 处理工具列表请求
-   */
-  private handleToolsList(request: MCPRequest, res: Response): void {
-    const toolsList = Array.from(this.tools.entries()).map(([name, tool]) => ({
-      name,
-      description: tool.description,
-      inputSchema: tool.parameters
-    }));
+      const items: any[] = [];
 
-    res.json({
-      jsonrpc: '2.0',
-      id: request.id,
-      result: { tools: toolsList }
-    });
-  }
+      try {
+        const entries = await fs.readdir(dirPath, { withFileTypes: true });
 
-  /**
-   * 处理工具调用请求
-   */
-  private handleToolCall(request: MCPRequest, res: Response): void {
-    const { name, arguments: args } = request.params || {};
+        for (const entry of entries) {
+          // 跳过隐藏文件和 node_modules
+          if (entry.name.startsWith('.') || entry.name === 'node_modules') {
+            continue;
+          }
 
-    if (!name) {
-      res.status(400).json({
-        jsonrpc: '2.0',
-        id: request.id,
-        error: {
-          code: -32602,
-          message: 'Invalid params: tool name is required'
+          const fullPath = path.join(dirPath, entry.name);
+
+          if (entry.isDirectory()) {
+            analysis.directories++;
+            const children = await scanDirectory(fullPath, currentDepth + 1);
+            items.push({
+              name: entry.name,
+              type: 'directory',
+              children,
+            });
+          } else {
+            analysis.files++;
+            const ext = path.extname(entry.name);
+            if (ext) {
+              analysis.languages[ext] = (analysis.languages[ext] || 0) + 1;
+            }
+            items.push({
+              name: entry.name,
+              type: 'file',
+              extension: ext || null,
+            });
+          }
         }
-      });
-      return;
+      } catch (error) {
+        // 忽略无法访问的目录
+      }
+
+      return items;
+    };
+
+    analysis.structure = await scanDirectory(projectPath, 0);
+    return analysis;
+  }
+
+  /**
+   * 执行任务创建
+   */
+  private async executeTaskCreate(args: any): Promise<any> {
+    const { title, description = '', type = 'general', priority = 'medium' } = args;
+
+    if (!title) {
+      throw new Error('Title is required');
     }
 
-    const tool = this.tools.get(name);
-    if (!tool) {
-      res.status(400).json({
-        jsonrpc: '2.0',
-        id: request.id,
-        error: {
-          code: -32602,
-          message: `Tool not found: ${name}`
-        }
-      });
-      return;
+    const task = {
+      id: `task-${Date.now()}`,
+      title,
+      description,
+      type,
+      priority,
+      status: 'todo',
+      createdAt: new Date().toISOString(),
+    };
+
+    // 保存到任务文件
+    const tasksDir = path.join(process.cwd(), '.taskflow', 'tasks');
+    await fs.ensureDir(tasksDir);
+    await fs.writeJson(path.join(tasksDir, `${task.id}.json`), task, { spaces: 2 });
+
+    return task;
+  }
+
+  /**
+   * 清理配置中的敏感信息
+   */
+  private sanitizeConfig(config: any): any {
+    if (!config) return {};
+
+    const sanitized = { ...config };
+
+    if (sanitized.aiModels) {
+      sanitized.aiModels = sanitized.aiModels.map((model: any) => ({
+        ...model,
+        apiKey: model.apiKey ? '***' : undefined,
+      }));
     }
 
-    // 模拟工具执行
-    res.json({
-      jsonrpc: '2.0',
-      id: request.id,
-      result: {
-        content: [
-          {
-            type: 'text',
-            text: `Tool "${name}" executed successfully with args: ${JSON.stringify(args)}`
-          }
-        ],
-        isError: false
-      }
-    });
-  }
-
-  /**
-   * 处理资源列表请求
-   */
-  private handleResourcesList(request: MCPRequest, res: Response): void {
-    const resourcesList = Array.from(this.resources.entries()).map(([name, resource]) => ({
-      uri: `taskflow://${name}`,
-      name,
-      ...resource
-    }));
-
-    res.json({
-      jsonrpc: '2.0',
-      id: request.id,
-      result: { resources: resourcesList }
-    });
-  }
-
-  /**
-   * 处理资源读取请求
-   */
-  private handleResourceRead(request: MCPRequest, res: Response): void {
-    const { uri } = request.params || {};
-
-    res.json({
-      jsonrpc: '2.0',
-      id: request.id,
-      result: {
-        contents: [
-          {
-            uri: uri || 'unknown',
-            mimeType: 'application/json',
-            text: JSON.stringify({ message: 'Resource content placeholder' })
-          }
-        ]
-      }
-    });
-  }
-
-  /**
-   * 设置基本路由
-   */
-  private setupRoutes(): void {
-    if (!this.app) return;
-
-    // 健康检查
-    this.app.get('/health', (req, res) => {
-      res.json({
-        status: 'healthy',
-        server: this.settings.serverName || 'taskflow-ai',
-        version: this.settings.version || '1.0.0',
-        timestamp: new Date().toISOString(),
-      });
-    });
-
-    // 服务器信息
-    this.app.get('/info', (req, res) => {
-      res.json({
-        name: this.settings.serverName || 'taskflow-ai',
-        version: this.settings.version || '1.0.0',
-        capabilities: ['tools', 'resources', 'prompts'],
-        endpoints: {
-          mcp: '/mcp',
-          tools: '/mcp/tools',
-          resources: '/mcp/resources',
-          health: '/health',
-          info: '/info'
-        }
-      });
-    });
-
-    // 基本API端点
-    this.app.get('/api/status', (req, res) => {
-      res.json({
-        running: this.isRunning,
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        tools: this.tools.size,
-        resources: this.resources.size
-      });
-    });
-
-    // 根路径
-    this.app.get('/', (req, res) => {
-      res.json({
-        name: 'TaskFlow AI MCP Server',
-        version: this.settings.version || '1.0.0',
-        status: 'running',
-        documentation: 'https://github.com/Agions/taskflow-ai'
-      });
-    });
+    return sanitized;
   }
 
   /**
