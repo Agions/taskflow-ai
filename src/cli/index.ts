@@ -17,6 +17,7 @@ import { statusCommand } from './commands/status';
 import { visualizeCommand } from './commands/visualize';
 import { mcpCommand } from './commands/mcp';
 import { configCommand } from './commands/config';
+import { agentCommand } from './commands/agent';
 
 const program = new Command();
 
@@ -59,6 +60,7 @@ statusCommand(program);
 visualizeCommand(program);
 mcpCommand(program);
 configCommand(program);
+program.addCommand(agentCommand);
 
 // 添加帮助信息
 program.on('--help', () => {

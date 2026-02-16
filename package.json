@@ -94,6 +94,7 @@
   "homepage": "https://github.com/Agions/taskflow-ai#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.5.0",
+    "@xstate/fsm": "^2.1.0",
     "axios": "^1.6.7",
     "boxen": "^5.1.2",
     "chalk": "^4.1.2",
@@ -105,12 +106,16 @@
     "express-rate-limit": "^7.4.1",
     "figlet": "^1.7.0",
     "fs-extra": "^11.2.0",
+    "handlebars": "^4.7.8",
     "inquirer": "^8.2.6",
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
     "markdown-it": "^14.1.0",
     "ora": "^5.4.1",
-    "winston": "^3.17.0"
+    "socket.io": "^4.8.3",
+    "winston": "^3.17.0",
+    "xstate": "^5.28.0",
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@types/chalk": "^0.4.31",
@@ -126,6 +131,7 @@
     "@types/markdown-it": "^13.0.9",
     "@types/node": "^20.11.25",
     "@types/winston": "^2.4.4",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^8.35.1",
     "@typescript-eslint/parser": "^8.35.1",
     "esbuild": "^0.25.5",
