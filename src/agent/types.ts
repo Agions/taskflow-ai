@@ -3,7 +3,7 @@
  * TaskFlow AI v3.0 - AI Agent 自主执行模式
  */
 
-import { TaskFlowConfig } from '../types/config';
+import { TaskFlowConfig } from '../types';
 
 // Agent 配置
 export interface AgentConfig {

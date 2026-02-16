@@ -111,18 +111,37 @@ export const agentCommand = new Command('agent')
 
       // 2. 加载项目配置
       const configManager = new ConfigManager(process.cwd());
-      const projectConfig = await configManager.loadConfig() || {
-        projectName: 'Untitled Project',
-        version: '1.0.0',
-        aiModels: [],
-        mcpSettings: {
-          enabled: true,
-          serverName: 'taskflow-agent',
-          version: '1.0.0'
-        },
-        outputFormats: ['markdown'],
-        plugins: []
-      };
+      let projectConfig = await configManager.loadConfig();
+
+      if (!projectConfig) {
+        projectConfig = {
+          projectName: 'Untitled Project',
+          version: '1.0.0',
+          aiModels: [],
+          mcpSettings: {
+            enabled: true,
+            serverName: 'taskflow-agent',
+            version: '1.0.0',
+            port: 3000,
+            host: 'localhost',
+            capabilities: [
+              { name: 'tools', version: '1.0', description: 'Tool support', enabled: true },
+              { name: 'resources', version: '1.0', description: 'Resource support', enabled: true },
+              { name: 'prompts', version: '1.0', description: 'Prompt support', enabled: true }
+            ],
+            security: {
+              authRequired: false,
+              allowedOrigins: [],
+              rateLimit: { enabled: true, maxRequests: 100, windowMs: 60000 },
+              sandbox: { enabled: true, timeout: 30000, memoryLimit: 512 }
+            },
+            tools: [],
+            resources: []
+          },
+          outputFormats: ['markdown'],
+          plugins: []
+        };
+      }
 
       // 3. 创建 Agent 配置
       const agentConfig: AgentConfig = {
@@ -151,8 +170,7 @@ export const agentCommand = new Command('agent')
         prd,
         projectConfig,
         availableTools: [], // 从 MCP 服务器获取
-        constraints: options.constraint || [],
-        config: agentConfig
+        constraints: options.constraint || []
       };
 
       // 5. 创建引擎
@@ -172,6 +190,7 @@ export const agentCommand = new Command('agent')
       // 6. 创建 Agent 服务
       const agentService = new AgentService(
         agentContext,
+        agentConfig,
         planningEngine,
         executionEngine,
         verificationEngine
