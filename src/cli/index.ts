@@ -18,6 +18,7 @@ import { visualizeCommand } from './commands/visualize';
 import { mcpCommand } from './commands/mcp';
 import { configCommand } from './commands/config';
 import { agentCommand } from './commands/agent';
+import { marketplaceCommand } from './commands/marketplace';
 
 const program = new Command();
 
@@ -61,6 +62,7 @@ visualizeCommand(program);
 mcpCommand(program);
 configCommand(program);
 program.addCommand(agentCommand);
+program.addCommand(marketplaceCommand);
 
 // 添加帮助信息
 program.on('--help', () => {
