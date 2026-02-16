@@ -509,4 +509,16 @@ export class MCPServer {
   isServerRunning(): boolean {
     return this.isRunning;
   }
+
+  /**
+   * 调用工具（公共方法，供外部使用）
+   */
+  async callTool(name: string, args: any): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const result = await this.executeTool(name, args);
+      return { success: true, data: result };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
 }
