@@ -19,6 +19,8 @@ import { mcpCommand } from './commands/mcp';
 import { configCommand } from './commands/config';
 import { agentCommand } from './commands/agent';
 import { marketplaceCommand } from './commands/marketplace';
+import { knowledgeCommand } from './commands/knowledge';
+import { cicdCommand } from './commands/cicd';
 
 const program = new Command();
 
@@ -63,6 +65,8 @@ mcpCommand(program);
 configCommand(program);
 program.addCommand(agentCommand);
 program.addCommand(marketplaceCommand);
+program.addCommand(knowledgeCommand);
+program.addCommand(cicdCommand);
 
 // 添加帮助信息
 program.on('--help', () => {
