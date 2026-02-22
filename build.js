@@ -1,42 +1,69 @@
 #!/usr/bin/env node
 
 /**
- * 构建脚本 - 使用 Vite
+ * 构建脚本 - 使用 TypeScript Compiler
  */
 
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-console.log('🚀 TaskFlow AI 构建 (Vite)...\n');
+console.log('🚀 TaskFlow AI 构建...\n');
 
 const rootDir = process.cwd();
 const distDir = path.join(rootDir, 'dist');
 
 try {
-  // 使用 Vite 构建
-  console.log('📦 构建中...');
-  execSync('npx vite build', { cwd: rootDir, stdio: 'inherit' });
+  // 清理旧的构建文件
+  if (fs.existsSync(distDir)) {
+    console.log('🧹 清理旧的构建文件...');
+    fs.rmSync(distDir, { recursive: true, force: true });
+  }
 
-  // 创建子目录
-  const cliDir = path.join(distDir, 'cli');
+  // 使用 TypeScript 编译
+  console.log('📦 编译 TypeScript...');
+  execSync('tsc', { cwd: rootDir, stdio: 'inherit' });
+
+  // 创建 bin 目录和入口文件
   const binDir = path.join(rootDir, 'bin');
-  fs.mkdirSync(cliDir, { recursive: true });
   fs.mkdirSync(binDir, { recursive: true });
 
-  const srcFile = path.join(distDir, 'index.js');
-  const cliFile = path.join(cliDir, 'index.js');
-  const binFile = path.join(binDir, 'index.js');
+  const cliIndexPath = path.join(distDir, 'cli', 'index.js');
+  const binIndexPath = path.join(binDir, 'index.js');
+  const distIndexPath = path.join(distDir, 'index.js');
 
-  // 复制文件
-  fs.copyFileSync(srcFile, cliFile);
-  fs.copyFileSync(srcFile, binFile);
-  fs.chmodSync(binFile, 0o755);
+  // 创建主入口文件
+  if (fs.existsSync(cliIndexPath)) {
+    const binContent = `#!/usr/bin/env node
+require('./dist/cli/index.js');
+`;
+    fs.writeFileSync(distIndexPath, binContent);
+    fs.writeFileSync(binIndexPath, binContent);
+    fs.chmodSync(binIndexPath, 0o755);
+    fs.chmodSync(distIndexPath, 0o755);
+  }
 
-  // 输出大小
-  const stats = fs.statSync(srcFile);
+  // 计算构建大小
+  const getDirectorySize = (dirPath) => {
+    let size = 0;
+    if (fs.existsSync(dirPath)) {
+      const files = fs.readdirSync(dirPath, { withFileTypes: true });
+      for (const file of files) {
+        const filePath = path.join(dirPath, file.name);
+        if (file.isDirectory()) {
+          size += getDirectorySize(filePath);
+        } else {
+          size += fs.statSync(filePath).size;
+        }
+      }
+    }
+    return size;
+  };
+
+  const totalSize = getDirectorySize(distDir);
   console.log(`\n✅ 构建完成!`);
-  console.log(`   输出: ${(stats.size / 1024).toFixed(2)} KB`);
+  console.log(`   输出目录: dist/`);
+  console.log(`   总大小: ${(totalSize / 1024).toFixed(2)} KB`);
 
 } catch (error) {
   console.error('\n❌ 构建失败:', error.message);
