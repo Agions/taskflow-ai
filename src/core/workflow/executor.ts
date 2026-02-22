@@ -174,9 +174,8 @@ export class ThoughtExecutor extends BaseExecutor {
  */
 export class TaskExecutor extends BaseExecutor {
   async execute(): Promise<StepResult> {
-    const startTime =    this.logger.info Date.now();
-    
-(`执行任务: ${this.step.id}`);
+    const startTime = Date.now();
+    this.logger.info(`执行任务: ${this.step.id}`);
 
     // 模拟任务执行
     await this.sleep(50);

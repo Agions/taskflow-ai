@@ -126,3 +126,4 @@ program
   });
 
 export default program;
+export const templateCommand = program;

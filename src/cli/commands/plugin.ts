@@ -89,3 +89,4 @@ program
   });
 
 export default program;
+export const pluginCommand = program;

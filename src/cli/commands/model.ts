@@ -259,3 +259,4 @@ program
   });
 
 export default program;
+export const modelCommand = program;

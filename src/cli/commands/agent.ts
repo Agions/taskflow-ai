@@ -162,3 +162,4 @@ program
   });
 
 export default program;
+export const agentCommand = program;
