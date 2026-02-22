@@ -4,7 +4,6 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
-import ora from 'ora';
 import { MCPServer } from '../../mcp/server';
 import { ConfigManager } from '../../core/config';
 
@@ -42,7 +41,7 @@ export function mcpCommand(program: Command) {
     });
 }
 
-async function startMCPServer(options: any) {
+async function startMCPServer(_options: any) {
   try {
     // 加载配置
     const configManager = new ConfigManager();

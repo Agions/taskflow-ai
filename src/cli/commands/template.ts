@@ -6,7 +6,6 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import fs from 'fs-extra';
-import path from 'path';
 import { templateManager } from '../../core/plugin';
 
 const program = new Command('template');

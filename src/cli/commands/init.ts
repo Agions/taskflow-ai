@@ -222,7 +222,7 @@ async function configureAIModels() {
   return aiModels;
 }
 
-async function createProjectStructure(config: TaskFlowConfig) {
+async function createProjectStructure(_config: TaskFlowConfig) {
   const baseDir = process.cwd();
   const dirs = [
     CONFIG_DIR,

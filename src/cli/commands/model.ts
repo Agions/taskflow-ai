@@ -250,7 +250,7 @@ program
         });
         
         console.log(`${chalk.cyan(strategy.padEnd(8))} | ${result.model.id.padEnd(20)} | ${result.latency}ms`);
-      } catch (e) {
+      } catch (_e) {
         console.log(`${chalk.cyan(strategy.padEnd(8))} | ${chalk.red('Failed')}`);
       }
     }
