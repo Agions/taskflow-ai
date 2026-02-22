@@ -1,68 +1,66 @@
-name: Publish to npm
+name: Build and Publish
 
 on:
   push:
     branches: [main]
-    tags:
-      - 'v*'
+    tags: ['v*']
   workflow_dispatch:
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        
+      - uses: actions/checkout@v4
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
           
       - name: Install dependencies
         run: npm ci
         
       - name: Build
         run: npm run build
-        
-      - name: Extract version
-        id: version
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          echo "Found version: $VERSION"
-        
-      - name: Check version tag
-        id: check-tag
-        run: |
-          TAG_VERSION="v${{ steps.version.outputs.VERSION }}"
-          echo "Checking for tag: $TAG_VERSION"
-          if git rev-parse "refs/tags/$TAG_VERSION" > /dev/null 2>&1; then
-            echo "tag_exists=true" >> $GITHUB_OUTPUT
-            echo "Tag exists, will publish"
-          else
-            echo "tag_exists=false" >> $GITHUB_OUTPUT
-            echo "Tag does not exist, skipping publish"
-          fi
+        env:
+          CI: true
           
-      - name: Publish to npm (on tag)
-        if: steps.check-tag.outputs.tag_exists == 'true'
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Publish to npm
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
-      - name: Create Release (on tag)
-        if: steps.check-tag.outputs.tag_exists == 'true'
+      - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.version.outputs.VERSION }}
-          release_name: TaskFlow AI v${{ steps.version.outputs.VERSION }}
+          tag_name: ${{ github.ref }}
+          release_name: TaskFlow AI ${{ github.ref }}
           draft: false
           prerelease: false
