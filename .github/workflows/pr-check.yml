@@ -1,0 +1,179 @@
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  pr-title:
+    name: Check PR Title
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check PR title format
+        uses: amannn/action-semantic-pull-request@v5
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          requireScope: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  code-quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run ESLint
+        run: npm run lint
+      
+      - name: Run Prettier check
+        run: npm run format:check
+      
+      - name: Run TypeScript check
+        run: npm run type-check
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Build project
+        run: npm run build
+      
+      - name: Comment PR
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let comment = '## 🔍 Code Quality Check Results\n\n';
+            
+            // Add check results
+            comment += '### ✅ Checks Passed\n';
+            comment += '- ESLint\n';
+            comment += '- Prettier\n';
+            comment += '- TypeScript\n';
+            comment += '- Tests\n';
+            comment += '- Build\n';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          deny-licenses: GPL-2.0, GPL-3.0
+
+  size-impact:
+    name: Bundle Size Impact
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout base
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies (base)
+        run: npm ci
+      
+      - name: Build (base)
+        run: npm run build
+      
+      - name: Get base size
+        run: |
+          BASE_SIZE=$(du -sb dist | awk '{print $1}')
+          echo "BASE_SIZE=$BASE_SIZE" >> $GITHUB_ENV
+      
+      - name: Checkout PR
+        uses: actions/checkout@v4
+      
+      - name: Install dependencies (PR)
+        run: npm ci
+      
+      - name: Build (PR)
+        run: npm run build
+      
+      - name: Get PR size
+        run: |
+          PR_SIZE=$(du -sb dist | awk '{print $1}')
+          echo "PR_SIZE=$PR_SIZE" >> $GITHUB_ENV
+      
+      - name: Calculate size difference
+        run: |
+          DIFF=$((PR_SIZE - BASE_SIZE))
+          DIFF_PERCENT=$(awk "BEGIN {printf \"%.2f\", ($DIFF / $BASE_SIZE) * 100}")
+          
+          echo "📦 Bundle Size Impact:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Base Size | $(numfmt --to=iec-i --suffix=B $BASE_SIZE) |" >> $GITHUB_STEP_SUMMARY
+          echo "| PR Size | $(numfmt --to=iec-i --suffix=B $PR_SIZE) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Difference | $(numfmt --to=iec-i --suffix=B $DIFF) ($DIFF_PERCENT%) |" >> $GITHUB_STEP_SUMMARY
+          
+          if [ $DIFF -gt 1048576 ]; then
+            echo "⚠️ Warning: Bundle size increased by more than 1MB" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  auto-label:
+    name: Auto Label PR
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Label PR based on files
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

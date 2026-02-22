@@ -22,12 +22,12 @@ export default defineConfig({
     // 网站标题和Logo
     logo: '/assets/logo.svg',
     siteTitle: 'TaskFlow AI',
-    
+
     // 导航栏 - 确保专业版本
     nav: [
       { text: '首页', link: '/' },
-      { 
-        text: '指南', 
+      {
+        text: '指南',
         items: [
           { text: '快速开始', link: '/guide/getting-started' },
           { text: '安装指南', link: '/guide/installation' },
@@ -35,8 +35,8 @@ export default defineConfig({
           { text: '高级功能', link: '/guide/advanced-features' }
         ]
       },
-      { 
-        text: 'API参考', 
+      {
+        text: 'API参考',
         items: [
           { text: 'API概览', link: '/api/' },
           { text: '配置管理', link: '/api/config-manager' },
@@ -45,8 +45,8 @@ export default defineConfig({
           { text: 'AI编排器', link: '/api/ai-orchestrator' }
         ]
       },
-      { 
-        text: '用户手册', 
+      {
+        text: '用户手册',
         items: [
           { text: '用户指南', link: '/user-guide/user-manual' },
           { text: 'CLI命令', link: '/user-guide/cli-commands' },
@@ -54,8 +54,8 @@ export default defineConfig({
           { text: '工作流程', link: '/user-guide/workflows' }
         ]
       },
-      { 
-        text: '技术参考', 
+      {
+        text: '技术参考',
         items: [
           { text: '配置选项', link: '/reference/configuration' },
           { text: 'CLI参考', link: '/reference/cli' },
@@ -63,8 +63,8 @@ export default defineConfig({
           { text: '错误代码', link: '/reference/error-codes' }
         ]
       },
-      { 
-        text: '更多', 
+      {
+        text: '更多',
         items: [
           { text: '常见问题', link: '/faq' },
           { text: '故障排除', link: '/troubleshooting/common-issues' },
@@ -74,76 +74,132 @@ export default defineConfig({
         ]
       }
     ],
-    
-    // 侧边栏 - 确保完整结构
+
+    // 侧边栏 - 专业版结构
     sidebar: {
       '/guide/': [
         {
-          text: '开始使用',
+          text: '🚀 快速入门',
           collapsed: false,
           items: [
-            { text: '快速开始', link: '/guide/getting-started' },
             { text: '安装指南', link: '/guide/installation' },
-            { text: '基本使用', link: '/guide/basic-usage' },
-            { text: '高级功能', link: '/guide/advanced-features' }
+            { text: '快速开始', link: '/guide/getting-started' },
+            { text: '基础使用', link: '/guide/basic-usage' },
+            { text: '项目需求', link: '/guide/project-requirements' }
           ]
         },
         {
-          text: '核心概念',
+          text: '📖 核心功能',
           collapsed: false,
           items: [
-            { text: '系统架构', link: '/guide/architecture' },
-            { text: 'MCP集成', link: '/guide/mcp-integration' },
-            { text: '开发者指南', link: '/guide/developer-guide' },
-            { text: '贡献指南', link: '/guide/contributing' }
+            { text: '高级特性', link: '/guide/advanced-features' },
+            { text: '使用示例', link: '/guide/examples' },
+            { text: '系统架构', link: '/guide/architecture' }
+          ]
+        },
+        {
+          text: '🔌 编辑器集成',
+          collapsed: false,
+          items: [
+            { text: 'MCP 配置指南', link: '/guide/mcp-setup' },
+            { text: 'MCP 集成说明', link: '/guide/mcp-integration' }
           ]
         }
       ],
-      
+
       '/api/': [
         {
-          text: 'API 参考',
+          text: '📚 API 概览',
           collapsed: false,
           items: [
-            { text: 'API概览', link: '/api/' },
+            { text: 'API 总览', link: '/api/' },
+            { text: '完整 API 参考', link: '/api-reference' }
+          ]
+        },
+        {
+          text: '🔧 核心模块',
+          collapsed: false,
+          items: [
+            { text: 'AI 编排器', link: '/api/ai-orchestrator' },
             { text: '配置管理器', link: '/api/config-manager' },
-            { text: 'PRD解析器', link: '/api/prd-parser' },
+            { text: 'PRD 解析器', link: '/api/prd-parser' },
             { text: '任务管理器', link: '/api/task-manager' },
-            { text: 'AI编排器', link: '/api/ai-orchestrator' },
+            { text: '任务编排', link: '/api/task-orchestration' },
             { text: '项目配置', link: '/api/project-config' }
+          ]
+        },
+        {
+          text: '📝 类型定义',
+          collapsed: true,
+          items: [
+            { text: '配置类型', link: '/api/types/config' },
+            { text: '核心类型', link: '/api/types/core' },
+            { text: '模型类型', link: '/api/types/model' },
+            { text: '任务类型', link: '/api/types/task' }
           ]
         }
       ],
-      
+
+      '/editor-config/': [
+        {
+          text: '🔌 编辑器集成',
+          collapsed: false,
+          items: [
+            { text: '编辑器概览', link: '/editor-config/overview' },
+            { text: 'Cursor 配置', link: '/editor-config/cursor' },
+            { text: 'Windsurf/Trae', link: '/editor-config/windsurf-trae-integration' }
+          ]
+        }
+      ],
+
       '/user-guide/': [
         {
-          text: '用户手册',
+          text: '📖 用户手册',
           collapsed: false,
           items: [
             { text: '用户指南', link: '/user-guide/user-manual' },
-            { text: 'CLI命令', link: '/user-guide/cli-commands' },
-            { text: '最佳实践', link: '/user-guide/best-practices' },
-            { text: '工作流程', link: '/user-guide/workflows' }
+            { text: 'CLI 命令', link: '/user-guide/cli-commands' },
+            { text: '工作流程', link: '/user-guide/workflows' },
+            { text: '最佳实践', link: '/user-guide/best-practices' }
           ]
         }
       ],
-      
+
       '/reference/': [
         {
-          text: '技术参考',
+          text: '📙 技术参考',
           collapsed: false,
           items: [
+            { text: 'CLI 参考', link: '/reference/cli' },
             { text: '配置选项', link: '/reference/configuration' },
-            { text: 'CLI参考', link: '/reference/cli' },
             { text: '环境变量', link: '/reference/environment' },
             { text: '错误代码', link: '/reference/error-codes' }
           ]
         }
       ],
-      
+
+      '/development/': [
+        {
+          text: '💻 开发文档',
+          collapsed: false,
+          items: [
+            { text: '开发者指南', link: '/development/developer-guide' },
+            { text: '贡献指南', link: '/development/contributing' }
+          ]
+        },
+        {
+          text: '🧪 测试与部署',
+          collapsed: false,
+          items: [
+            { text: '测试指南', link: '/testing/' },
+            { text: '部署指南', link: '/deployment/' }
+          ]
+        }
+      ],
+
       '/troubleshooting/': [
         {
-          text: '故障排除',
+          text: '🔧 故障排除',
           collapsed: false,
           items: [
             { text: '常见问题', link: '/troubleshooting/common-issues' },
@@ -152,20 +208,30 @@ export default defineConfig({
             { text: '性能问题', link: '/troubleshooting/performance' }
           ]
         }
+      ],
+
+      '/examples/': [
+        {
+          text: '📦 示例文档',
+          collapsed: false,
+          items: [
+            { text: 'PRD 示例', link: '/examples/example-prd' }
+          ]
+        }
       ]
     },
-    
+
     // 社交链接
     socialLinks: [
       { icon: 'github', link: 'https://github.com/agions/taskflow-ai' }
     ],
-    
+
     // 页脚
     footer: {
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2025 Agions'
     },
-    
+
     // 搜索
     search: {
       provider: 'local',
@@ -187,13 +253,13 @@ export default defineConfig({
         }
       }
     },
-    
+
     // 编辑链接
     editLink: {
       pattern: 'https://github.com/agions/taskflow-ai/edit/main/docs/:path',
       text: '在 GitHub 上编辑此页'
     },
-    
+
     // 最后更新时间
     lastUpdated: {
       text: '最后更新于',
@@ -202,23 +268,23 @@ export default defineConfig({
         timeStyle: 'medium'
       }
     },
-    
+
     // 文档页脚导航
     docFooter: {
       prev: '上一页',
       next: '下一页'
     },
-    
+
     // 大纲配置
     outline: {
       level: [2, 3],
       label: '页面导航'
     },
-    
+
     // 返回顶部
     returnToTopLabel: '返回顶部'
   },
-  
+
   // 构建配置
   vite: {
     // 自定义 Vite 配置
@@ -240,7 +306,7 @@ export default defineConfig({
       target: 'es2015'
     }
   },
-  
+
   // 头部配置
   head: [
     ['link', { rel: 'icon', href: '/taskflow-ai/favicon.ico' }],
@@ -257,7 +323,7 @@ export default defineConfig({
     ['meta', { name: 'expires', content: '0' }],
     ['meta', { name: 'version', content: 'enterprise-refactor-2024' }]
   ],
-  
+
   // Markdown配置
   markdown: {
     lineNumbers: true,
@@ -266,7 +332,7 @@ export default defineConfig({
       dark: 'github-dark'
     }
   },
-  
+
   // 站点地图
   sitemap: {
     hostname: 'https://agions.github.io/taskflow-ai/'

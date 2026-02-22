@@ -1,9 +1,13 @@
 # TaskFlow AI
 
-![TaskFlow AI Logo](https://img.shields.io/badge/TaskFlow%20AI-v2.0-blue)
+![TaskFlow AI Logo](https://img.shields.io/badge/TaskFlow%20AI-v2.1-blue)
 ![Node.js](https://img.shields.io/badge/Node.js-20%2B-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue)
 ![MCP](https://img.shields.io/badge/MCP-Enabled-purple)
+![CI](https://github.com/Agions/taskflow-ai/workflows/CI/badge.svg)
+![NPM Version](https://img.shields.io/npm/v/taskflow-ai)
+![License](https://img.shields.io/npm/l/taskflow-ai)
+![Downloads](https://img.shields.io/npm/dm/taskflow-ai)
 
 **AI 思维流编排引擎** - 专为开发团队设计的下一代 AI 开发工具，支持多模型协同、MCP 集成、思维链可视化、工作流编排和自主 Agent。
 
@@ -280,3 +284,12 @@ MIT License
 **TaskFlow AI** - 让 AI 开发工作流从"被动执行"变为"主动思考"！
 
 🔗 [GitHub](https://github.com/Agions/taskflow-ai) | 📚 [文档](https://agions.github.io/taskflow-ai/) | 💬 [讨论](https://github.com/Agions/taskflow-ai/discussions)
+
+## 📖 文档导航
+
+- [API 参考](docs/api-reference.md) - 完整的 API 文档
+- [MCP 配置指南](docs/guide/mcp-setup.md) - MCP 服务器配置
+- [开发者指南](docs/development/developer-guide.md) - 开发环境搭建
+- [贡献指南](docs/development/contributing.md) - 如何贡献代码
+- [安全策略](docs/security.md) - 安全相关信息
+- [示例 PRD](docs/examples/example-prd.md) - PRD 文档示例

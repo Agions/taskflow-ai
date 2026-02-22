@@ -1,0 +1,94 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build project
+        run: npm run build
+      
+      - name: Get version
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
+      - name: Extract changelog
+        id: changelog
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          
+          # Extract changelog for this version
+          CHANGELOG=$(awk "/## \[$VERSION\]/,/## \[/" CHANGELOG.md | sed '1d;$d')
+          
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details."
+          fi
+          
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ steps.version.outputs.tag }}
+          body: |
+            ## 🚀 TaskFlow AI ${{ steps.version.outputs.tag }}
+            
+            ### 📦 Installation
+            
+            ```bash
+            npm install -g taskflow-ai@${{ steps.version.outputs.version }}
+            ```
+            
+            ### 📝 Changes
+            
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ### 📚 Documentation
+            
+            - [Documentation](https://agions.github.io/taskflow-ai/)
+            - [NPM Package](https://www.npmjs.com/package/taskflow-ai)
+            - [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
+            
+            ### 🙏 Contributors
+            
+            Thank you to all contributors who made this release possible!
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Notify release
+        run: |
+          echo "✅ Release ${{ steps.version.outputs.tag }} created successfully"
+          echo "📦 NPM: https://www.npmjs.com/package/taskflow-ai/v/${{ steps.version.outputs.version }}"
+          echo "📚 Docs: https://agions.github.io/taskflow-ai/"

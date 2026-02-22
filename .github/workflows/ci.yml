@@ -1,0 +1,196 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lint:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run ESLint
+        run: npm run lint
+      
+      - name: Check code formatting
+        run: npm run format:check
+      
+      - name: Run type check
+        run: npm run type-check
+
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18.x, 20.x]
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Upload coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == '20.x'
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build project
+        run: npm run build
+      
+      - name: Check build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "❌ Error: dist directory not found"
+            exit 1
+          fi
+          if [ ! -f "dist/index.js" ]; then
+            echo "❌ Error: dist/index.js not found"
+            exit 1
+          fi
+          echo "✅ Build output verified"
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+      
+      - name: Check for vulnerabilities
+        run: |
+          npm audit --json > audit-report.json || true
+          critical_count=$(cat audit-report.json | jq '.metadata.vulnerabilities.critical // 0')
+          high_count=$(cat audit-report.json | jq '.metadata.vulnerabilities.high // 0')
+          
+          echo "🔍 Security Scan Results:"
+          echo "Critical: $critical_count"
+          echo "High: $high_count"
+          
+          if [ "$critical_count" -gt 0 ]; then
+            echo "❌ Found $critical_count critical vulnerabilities"
+            exit 1
+          fi
+          
+          if [ "$high_count" -gt 5 ]; then
+            echo "⚠️ Found $high_count high vulnerabilities (threshold: 5)"
+            exit 1
+          fi
+          
+          echo "✅ Security scan passed"
+
+  size-check:
+    name: Package Size Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build project
+        run: npm run build
+      
+      - name: Check package size
+        run: |
+          npm pack --dry-run
+          size=$(npm pack --dry-run 2>&1 | grep "package size" | awk '{print $3}')
+          echo "📦 Package size: $size"
+          
+          # Check if size is reasonable (< 10MB)
+          size_bytes=$(du -sb dist | awk '{print $1}')
+          max_size=$((10 * 1024 * 1024))
+          
+          if [ "$size_bytes" -gt "$max_size" ]; then
+            echo "⚠️ Warning: Package size exceeds 10MB"
+          else
+            echo "✅ Package size is acceptable"
+          fi
