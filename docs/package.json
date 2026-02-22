@@ -11,12 +11,8 @@
     "clean": "rm -rf .vitepress/dist .vitepress/cache"
   },
   "devDependencies": {
-    "terser": "^5.43.1",
-    "vitepress": "^1.0.0-rc.31",
-    "vue": "^3.3.8"
-  },
-  "peerDependencies": {
-    "vue": "^3.3.8"
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.28"
   },
   "engines": {
     "node": ">=18.0.0"
