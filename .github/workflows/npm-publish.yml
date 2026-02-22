@@ -1,0 +1,84 @@
+name: Publish to npm
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # Required for npm publish with OIDC
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run tests
+        run: npm test
+        
+      - name: Build
+        run: npm run build
+        
+      - name: Extract version
+        id: version
+        run: echo "VERSION=$(node -p.json').version\ \"require('./package")" >> $GITHUB_OUTPUT
+        
+      - name: Check version tag
+        id: check-tag
+        run: |
+          TAG_VERSION="v${{ steps.version.outputs.VERSION }}"
+          if git rev-parse "refs/tags/$TAG_VERSION" > /dev/null 2>&1; then
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Publish to npm (on tag)
+        if: steps.check-tag.outputs.tag_exists == 'true'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      - name: Create Release (on tag)
+        if: steps.check-tag.outputs.tag_exists == 'true'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          release_name: TaskFlow AI v${{ steps.version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+
+  # Optional: Publish to npm on every main push (without tag)
+  publish-latest:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm run build
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
