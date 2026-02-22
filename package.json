@@ -6,9 +6,8 @@
   "main": "dist/cli/index.js",
   "types": "dist/cli/index.d.ts",
   "bin": {
-    "taskflow": "dist/cli/index.js",
-    "taskflow-ai": "dist/cli/index.js",
-    "taskflow-mcp": "dist/mcp/stdio-server.js"
+    "taskflow": "dist/index.js",
+    "taskflow-ai": "dist/index.js"
   },
   "scripts": {
     "dev": "tsc --watch",
@@ -27,7 +26,6 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit",
     "quality": "npm run type-check && npm run lint && npm run format:check",
-    "pre-release-check": "node scripts/pre-release-check.js",
     "release:patch": "bash scripts/release.sh patch",
     "release:minor": "bash scripts/release.sh minor",
     "release:major": "bash scripts/release.sh major",
