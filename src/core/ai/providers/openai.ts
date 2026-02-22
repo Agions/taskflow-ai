@@ -1,25 +1,23 @@
 /**
- * DeepSeek 适配器
+ * OpenAI 适配器
  */
 
 import { BaseAdapter, ChatCompletionOptions, ChatCompletionResponse } from '../adapter';
 import { ModelConfig, PROVIDER_ENDPOINTS } from '../types';
 
-export class DeepSeekAdapter extends BaseAdapter {
+export class OpenAIAdapter extends BaseAdapter {
   constructor(config: ModelConfig) {
     super(config);
   }
 
   protected getDefaultEndpoint(): string {
-    return PROVIDER_ENDPOINTS.deepseek;
+    return PROVIDER_ENDPOINTS.openai;
   }
 
   async complete(options: Omit<ChatCompletionOptions, 'model'>): Promise<ChatCompletionResponse> {
     const requestBody = {
       model: this.config.modelName,
       ...options,
-      // DeepSeek 特定的参数
-      stream: false,
     };
 
     const response = await this.request<{
@@ -31,7 +29,15 @@ export class DeepSeekAdapter extends BaseAdapter {
         index: number;
         message: {
           role: string;
-          content: string;
+          content: string | null;
+          tool_calls?: Array<{
+            id: string;
+            type: string;
+            function: {
+              name: string;
+              arguments: string;
+            };
+          }>;
         };
         finish_reason: string;
       }>;
@@ -49,7 +55,8 @@ export class DeepSeekAdapter extends BaseAdapter {
         index: choice.index,
         message: {
           role: choice.message.role as 'assistant',
-          content: choice.message.content,
+          content: choice.message.content || '',
+          ...(choice.message.tool_calls && { tool_calls: choice.message.tool_calls }),
         },
         finish_reason: choice.finish_reason as ChatCompletionResponse['choices'][0]['finish_reason'],
       })),
@@ -99,7 +106,7 @@ export class DeepSeekAdapter extends BaseAdapter {
       for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed || !trimmed.startsWith('data: ')) continue;
-        
+
         if (trimmed === 'data: [DONE]') return;
 
         try {

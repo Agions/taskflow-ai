@@ -1,637 +1,458 @@
 /**
- * MCP工具注册管理器
- * 支持工具的注册、发现、分类和管理
+ * 动态工具注册系统
+ * 支持运行时注册和管理 MCP 工具
  */
 
-import path from 'path';
-import fs from 'fs-extra';
-import { EventEmitter } from 'events';
 import { Logger } from '../../utils/logger';
 
-export interface MCPTool {
+export interface ToolDefinition {
   name: string;
   description: string;
-  category: string;
-  version: string;
-  author?: string;
-  enabled: boolean;
-  handler: string;
-  inputSchema: any;
-  outputSchema?: any;
-  metadata?: {
-    tags: string[];
-    permissions: string[];
-    dependencies: string[];
-  };
+  inputSchema: Record<string, unknown>;
+  handler: ToolHandler;
+  category?: string;
+  tags?: string[];
+  version?: string;
 }
 
-export interface ToolRegistryOptions {
-  toolsDir: string;
-  autoReload: boolean;
-  enableFileWatcher: boolean;
+export type ToolHandler = (input: Record<string, unknown>) => Promise<unknown>;
+
+export interface ToolRegistration {
+  tool: ToolDefinition;
+  registeredAt: number;
+  callCount: number;
+  lastCalled?: number;
 }
 
-export class MCPToolRegistry extends EventEmitter {
-  private tools: Map<string, MCPTool> = new Map();
-  private categories: Map<string, string[]> = new Map();
-  private logger: Logger;
-  private options: ToolRegistryOptions;
-  private fileWatcher?: any;
+export interface ToolCategory {
+  name: string;
+  description: string;
+  tools: string[];
+}
 
-  constructor(
-    private config: any,
-    logger?: Logger
-  ) {
-    super();
-    this.logger = logger || Logger.getInstance('MCPToolRegistry');
-    this.options = {
-      toolsDir: path.join(process.cwd(), '.taskflow', 'tools'),
-      autoReload: true,
-      enableFileWatcher: true,
-    };
+/**
+ * 工具注册表
+ */
+export class ToolRegistry {
+  private logger = Logger.getInstance('ToolRegistry');
+  private tools: Map<string, ToolRegistration> = new Map();
+  private categories: Map<string, ToolCategory> = new Map();
+
+  constructor() {
+    this.initBuiltinCategories();
+    this.registerBuiltinTools();
   }
 
   /**
-   * 初始化工具注册表
+   * 初始化内置分类
    */
-  async initialize(): Promise<void> {
-    this.logger.info('正在初始化MCP工具注册表...');
-
-    try {
-      // 确保工具目录存在
-      await fs.ensureDir(this.options.toolsDir);
-
-      // 注册内置工具
-      await this.registerBuiltinTools();
-
-      // 扫描和加载工具
-      await this.scanAndLoadTools();
-
-      // 启动文件监听
-      if (this.options.enableFileWatcher) {
-        this.startFileWatcher();
-      }
-
-      this.logger.info(`工具注册表初始化完成，共加载 ${this.tools.size} 个工具`);
-    } catch (error) {
-      this.logger.error('工具注册表初始化失败:', error);
-      throw error;
-    }
+  private initBuiltinCategories(): void {
+    this.categories.set('file', {
+      name: 'File Operations',
+      description: '文件读写操作',
+      tools: [],
+    });
+    this.categories.set('shell', {
+      name: 'Shell Commands',
+      description: 'Shell 命令执行',
+      tools: [],
+    });
+    this.categories.set('analysis', {
+      name: 'Analysis',
+      description: '项目分析工具',
+      tools: [],
+    });
+    this.categories.set('task', {
+      name: 'Task Management',
+      description: '任务管理工具',
+      tools: [],
+    });
+    this.categories.set('custom', {
+      name: 'Custom',
+      description: '自定义工具',
+      tools: [],
+    });
   }
 
   /**
    * 注册内置工具
    */
-  private async registerBuiltinTools(): Promise<void> {
-    const builtinTools: MCPTool[] = [
-      {
-        name: 'file_read',
-        description: '读取文件内容',
-        category: 'filesystem',
-        version: '1.0.0',
-        enabled: true,
-        handler: 'builtin:file_read',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            path: { type: 'string', description: '文件路径' },
-          },
-          required: ['path'],
+  private registerBuiltinTools(): void {
+    // 文件读取工具
+    this.register({
+      name: 'file_read',
+      description: '读取文件内容',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: '文件路径' },
+          offset: { type: 'number', description: '起始行' },
+          limit: { type: 'number', description: '读取行数' },
         },
-        metadata: {
-          tags: ['file', 'read', 'io'],
-          permissions: ['read'],
-          dependencies: [],
-        },
+        required: ['path'],
       },
-      {
-        name: 'file_write',
-        description: '写入文件内容',
-        category: 'filesystem',
-        version: '1.0.0',
-        enabled: true,
-        handler: 'builtin:file_write',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            path: { type: 'string', description: '文件路径' },
-            content: { type: 'string', description: '文件内容' },
-          },
-          required: ['path', 'content'],
-        },
-        metadata: {
-          tags: ['file', 'write', 'io'],
-          permissions: ['write'],
-          dependencies: [],
-        },
+      handler: async (input) => {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const content = await fs.readFile(input.path as string, 'utf-8');
+        const lines = content.split('\n');
+        
+        const offset = (input.offset as number) || 0;
+        const limit = (input.limit as number) || lines.length;
+        
+        return {
+          content: lines.slice(offset, offset + limit).join('\n'),
+          totalLines: lines.length,
+          path: path.resolve(input.path as string),
+        };
       },
-      {
-        name: 'shell_exec',
-        description: '执行Shell命令',
-        category: 'system',
-        version: '1.0.0',
-        enabled: true,
-        handler: 'builtin:shell_exec',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            command: { type: 'string', description: '要执行的命令' },
-            cwd: { type: 'string', description: '工作目录' },
-            timeout: { type: 'number', description: '超时时间(秒)' },
-          },
-          required: ['command'],
-        },
-        metadata: {
-          tags: ['shell', 'command', 'system'],
-          permissions: ['execute'],
-          dependencies: [],
-        },
-      },
-      {
-        name: 'project_analyze',
-        description: '分析项目结构',
-        category: 'analysis',
-        version: '1.0.0',
-        enabled: true,
-        handler: 'builtin:project_analyze',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            path: { type: 'string', description: '项目路径' },
-            depth: { type: 'number', description: '扫描深度' },
-          },
-          required: ['path'],
-        },
-        metadata: {
-          tags: ['project', 'analysis', 'structure'],
-          permissions: ['read'],
-          dependencies: [],
-        },
-      },
-      {
-        name: 'task_create',
-        description: '创建新任务',
-        category: 'tasks',
-        version: '1.0.0',
-        enabled: true,
-        handler: 'builtin:task_create',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            title: { type: 'string', description: '任务标题' },
-            description: { type: 'string', description: '任务描述' },
-            type: { type: 'string', description: '任务类型' },
-            priority: { type: 'string', description: '优先级' },
-          },
-          required: ['title'],
-        },
-        metadata: {
-          tags: ['task', 'create', 'management'],
-          permissions: ['write'],
-          dependencies: [],
-        },
-      },
-    ];
+      category: 'file',
+      tags: ['read', 'file'],
+    });
 
-    for (const tool of builtinTools) {
-      await this.registerTool(tool);
-    }
-  }
+    // 文件写入工具
+    this.register({
+      name: 'file_write',
+      description: '写入文件内容',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: '文件路径' },
+          content: { type: 'string', description: '文件内容' },
+          mode: { type: 'string', description: '写入模式: write|append' },
+        },
+        required: ['path', 'content'],
+      },
+      handler: async (input) => {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        
+        const mode = (input.mode as string) || 'write';
+        const fullPath = path.resolve(input.path as string);
+        
+        if (mode === 'append') {
+          await fs.appendFile(fullPath, input.content as string);
+        } else {
+          await fs.writeFile(fullPath, input.content as string);
+        }
+        
+        return { success: true, path: fullPath };
+      },
+      category: 'file',
+      tags: ['write', 'file'],
+    });
 
-  /**
-   * 扫描并加载工具
-   */
-  private async scanAndLoadTools(): Promise<void> {
-    try {
-      const toolFiles = await this.findToolFiles();
+    // 文件编辑工具
+    this.register({
+      name: 'file_edit',
+      description: '编辑文件局部内容',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: '文件路径' },
+          oldText: { type: 'string', description: '要替换的文本' },
+          newText: { type: 'string', description: '替换后的文本' },
+        },
+        required: ['path', 'oldText', 'newText'],
+      },
+      handler: async (input) => {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        
+        const fullPath = path.resolve(input.path as string);
+        let content = await fs.readFile(fullPath, 'utf-8');
+        
+        const oldText = input.oldText as string;
+        const newText = input.newText as string;
+        
+        if (!content.includes(oldText)) {
+          throw new Error('未找到要替换的文本');
+        }
+        
+        content = content.replace(oldText, newText);
+        await fs.writeFile(fullPath, content);
+        
+        return { success: true, path: fullPath };
+      },
+      category: 'file',
+      tags: ['edit', 'file'],
+    });
 
-      for (const toolFile of toolFiles) {
+    // Shell 执行工具
+    this.register({
+      name: 'shell_exec',
+      description: '执行 Shell 命令',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          command: { type: 'string', description: '要执行的命令' },
+          cwd: { type: 'string', description: '工作目录' },
+          timeout: { type: 'number', description: '超时时间(ms)' },
+        },
+        required: ['command'],
+      },
+      handler: async (input) => {
+        const { exec } = await import('child_process');
+        const util = await import('util');
+        
+        const execPromise = util.promisify(exec);
+        const timeout = (input.timeout as number) || 30000;
+        
         try {
-          await this.loadToolFromFile(toolFile);
-        } catch (error) {
-          this.logger.warn(`加载工具失败: ${toolFile}`, error);
+          const { stdout, stderr } = await execPromise(input.command as string, {
+            cwd: input.cwd as string || process.cwd(),
+            timeout,
+          });
+          
+          return { stdout, stderr, success: true };
+        } catch (error: any) {
+          return {
+            stdout: error.stdout || '',
+            stderr: error.message,
+            success: false,
+            code: error.code,
+          };
         }
-      }
-    } catch (error) {
-      this.logger.error('扫描工具目录失败:', error);
-    }
-  }
+      },
+      category: 'shell',
+      tags: ['shell', 'exec'],
+    });
 
-  /**
-   * 查找工具文件
-   */
-  private async findToolFiles(): Promise<string[]> {
-    const toolFiles: string[] = [];
+    // 项目分析工具
+    this.register({
+      name: 'project_analyze',
+      description: '分析项目结构',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: '项目路径' },
+          depth: { type: 'number', description: '分析深度' },
+        },
+        required: ['path'],
+      },
+      handler: async (input) => {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        
+        const projectPath = path.resolve(input.path as string);
+        const depth = (input.depth as number) || 3;
+        
+        const result = await this.analyzeProject(projectPath, depth);
+        return result;
+      },
+      category: 'analysis',
+      tags: ['analyze', 'project'],
+    });
 
-    try {
-      const files = await fs.readdir(this.options.toolsDir);
-
-      for (const file of files) {
-        if (file.endsWith('.json') || file.endsWith('.js') || file.endsWith('.ts')) {
-          toolFiles.push(path.join(this.options.toolsDir, file));
-        }
-      }
-    } catch (error) {
-      // 目录不存在或无法读取
-    }
-
-    return toolFiles;
-  }
-
-  /**
-   * 从文件加载工具
-   */
-  private async loadToolFromFile(filePath: string): Promise<void> {
-    const ext = path.extname(filePath);
-
-    if (ext === '.json') {
-      const toolData = await fs.readJson(filePath);
-      await this.registerTool(toolData);
-    } else if (ext === '.js' || ext === '.ts') {
-      // 动态加载JavaScript/TypeScript工具
-      try {
-        const toolModule = require(filePath);
-        const toolData = toolModule.default || toolModule;
-        await this.registerTool(toolData);
-      } catch (error) {
-        this.logger.warn(`无法加载工具模块: ${filePath}`, error);
-      }
-    }
+    // 任务创建工具
+    this.register({
+      name: 'task_create',
+      description: '创建新任务',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          title: { type: 'string', description: '任务标题' },
+          description: { type: 'string', description: '任务描述' },
+          type: { type: 'string', description: '任务类型' },
+          priority: { type: 'string', description: '优先级' },
+        },
+        required: ['title'],
+      },
+      handler: async (input) => {
+        // 简化的任务创建
+        const task = {
+          id: `task-${Date.now()}`,
+          title: input.title,
+          description: input.description || '',
+          type: input.type || 'development',
+          priority: input.priority || 'medium',
+          status: 'pending',
+          createdAt: new Date().toISOString(),
+        };
+        
+        return task;
+      },
+      category: 'task',
+      tags: ['task', 'create'],
+    });
   }
 
   /**
    * 注册工具
    */
-  async registerTool(tool: MCPTool): Promise<void> {
-    // 验证工具数据
-    if (!this.validateTool(tool)) {
-      throw new Error(`工具验证失败: ${tool.name}`);
+  register(tool: ToolDefinition): void {
+    const registration: ToolRegistration = {
+      tool,
+      registeredAt: Date.now(),
+      callCount: 0,
+    };
+
+    this.tools.set(tool.name, registration);
+
+    // 添加到分类
+    const category = tool.category || 'custom';
+    if (this.categories.has(category)) {
+      this.categories.get(category)!.tools.push(tool.name);
     }
 
-    // 注册工具
-    this.tools.set(tool.name, tool);
-
-    // 更新分类
-    this.updateCategory(tool.category, tool.name);
-
-    // 发出事件
-    this.emit('toolRegistered', tool);
-
-    this.logger.debug(`工具已注册: ${tool.name} (${tool.category})`);
+    this.logger.info(`工具已注册: ${tool.name}`);
   }
 
   /**
-   * 取消注册工具
+   * 注销工具
    */
-  async unregisterTool(name: string): Promise<boolean> {
+  unregister(name: string): boolean {
     const tool = this.tools.get(name);
-    if (!tool) {
-      return false;
+    if (!tool) return false;
+
+    // 从分类中移除
+    const category = tool.tool.category || 'custom';
+    if (this.categories.has(category)) {
+      const tools = this.categories.get(category)!.tools;
+      const index = tools.indexOf(name);
+      if (index > -1) tools.splice(index, 1);
     }
 
     this.tools.delete(name);
-    this.removeFromCategory(tool.category, name);
-    this.emit('toolUnregistered', tool);
-
-    this.logger.debug(`工具已取消注册: ${name}`);
+    this.logger.info(`工具已注销: ${name}`);
     return true;
   }
 
   /**
    * 获取工具
    */
-  getTool(name: string): MCPTool | undefined {
-    return this.tools.get(name);
+  get(name: string): ToolDefinition | undefined {
+    return this.tools.get(name)?.tool;
   }
 
   /**
-   * 获取所有工具
+   * 执行工具
    */
-  getAllTools(): MCPTool[] {
-    return Array.from(this.tools.values());
-  }
-
-  /**
-   * 获取启用的工具
-   */
-  getEnabledTools(): MCPTool[] {
-    return this.getAllTools().filter(tool => tool.enabled);
-  }
-
-  /**
-   * 按分类获取工具
-   */
-  getToolsByCategory(category: string): MCPTool[] {
-    return this.getAllTools().filter(tool => tool.category === category);
-  }
-
-  /**
-   * 搜索工具
-   */
-  searchTools(query: string): MCPTool[] {
-    const lowerQuery = query.toLowerCase();
-    return this.getAllTools().filter(
-      tool =>
-        tool.name.toLowerCase().includes(lowerQuery) ||
-        tool.description.toLowerCase().includes(lowerQuery) ||
-        tool.metadata?.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
-    );
-  }
-
-  /**
-   * 获取工具分类
-   */
-  getCategories(): string[] {
-    return Array.from(this.categories.keys());
-  }
-
-  /**
-   * 调用工具
-   */
-  async callTool(name: string, args: any): Promise<any> {
-    const tool = this.getTool(name);
-    if (!tool) {
+  async execute(name: string, input: Record<string, unknown>): Promise<unknown> {
+    const registration = this.tools.get(name);
+    if (!registration) {
       throw new Error(`工具不存在: ${name}`);
     }
 
-    if (!tool.enabled) {
-      throw new Error(`工具已禁用: ${name}`);
-    }
+    registration.callCount++;
+    registration.lastCalled = Date.now();
 
-    // 验证输入参数
-    if (!this.validateInput(args, tool.inputSchema)) {
-      throw new Error(`工具参数验证失败: ${name}`);
-    }
-
-    // 调用工具处理器
-    return await this.executeToolHandler(tool, args);
-  }
-
-  /**
-   * 执行工具处理器
-   */
-  private async executeToolHandler(tool: MCPTool, args: any): Promise<any> {
-    const handler = tool.handler;
-
-    if (handler.startsWith('builtin:')) {
-      return await this.executeBuiltinHandler(handler.substring(8), args);
-    } else {
-      // 外部处理器
-      try {
-        const handlerModule = require(handler);
-        const handlerFunc = handlerModule.default || handlerModule;
-        return await handlerFunc(args);
-      } catch (error: any) {
-        throw new Error(`工具处理器执行失败: ${error.message}`);
-      }
+    try {
+      const result = await registration.tool.handler(input);
+      return result;
+    } catch (error) {
+      this.logger.error(`工具执行失败: ${name}`, error);
+      throw error;
     }
   }
 
   /**
-   * 执行内置处理器
+   * 列出所有工具
    */
-  private async executeBuiltinHandler(handlerName: string, args: any): Promise<any> {
-    switch (handlerName) {
-      case 'file_read':
-        return await fs.readFile(args.path, 'utf-8');
+  list(): ToolDefinition[] {
+    return Array.from(this.tools.values()).map(r => r.tool);
+  }
 
-      case 'file_write':
-        await fs.writeFile(args.path, args.content, 'utf-8');
-        return { success: true, path: args.path };
+  /**
+   * 按分类列出工具
+   */
+  listByCategory(category: string): ToolDefinition[] {
+    const cat = this.categories.get(category);
+    if (!cat) return [];
+    
+    return cat.tools
+      .map(name => this.tools.get(name)?.tool)
+      .filter((t): t is ToolDefinition => t !== undefined);
+  }
 
-      case 'shell_exec':
-        const { execSync } = require('child_process');
-        const result = execSync(args.command, {
-          cwd: args.cwd || process.cwd(),
-          timeout: (args.timeout || 30) * 1000,
-          encoding: 'utf-8',
-        });
-        return { output: result, command: args.command };
+  /**
+   * 列出所有分类
+   */
+  listCategories(): ToolCategory[] {
+    return Array.from(this.categories.values());
+  }
 
-      case 'project_analyze':
-        return await this.analyzeProject(args.path, args.depth || 3);
+  /**
+   * 获取工具统计
+   */
+  getStats(): {
+    total: number;
+    byCategory: Record<string, number>;
+    mostUsed: Array<{ name: string; calls: number }>;
+  } {
+    const byCategory: Record<string, number> = {};
+    const mostUsed: Array<{ name: string; calls: number }> = [];
 
-      case 'task_create':
-        return await this.createTask(args);
-
-      default:
-        throw new Error(`未知的内置处理器: ${handlerName}`);
+    for (const [name, reg] of this.tools) {
+      const category = reg.tool.category || 'custom';
+      byCategory[category] = (byCategory[category] || 0) + 1;
+      mostUsed.push({ name, calls: reg.callCount });
     }
+
+    mostUsed.sort((a, b) => b.calls - a.calls);
+
+    return {
+      total: this.tools.size,
+      byCategory,
+      mostUsed: mostUsed.slice(0, 10),
+    };
   }
 
   /**
    * 分析项目结构
    */
-  private async analyzeProject(projectPath: string, maxDepth: number): Promise<any> {
-    const analysis: {
-      path: string;
-      files: number;
-      directories: number;
-      languages: Record<string, number>;
-      structure: Record<string, any>;
-    } = {
+  private async analyzeProject(projectPath: string, depth: number): Promise<unknown> {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+
+    const result: any = {
       path: projectPath,
+      name: path.basename(projectPath),
       files: 0,
       directories: 0,
-      languages: {},
-      structure: {},
+      languages: {} as Record<string, number>,
+      size: 0,
     };
 
-    const scanDirectory = async (dirPath: string, depth: number) => {
-      if (depth > maxDepth) return;
+    const scan = async (dir: string, currentDepth: number) => {
+      if (currentDepth > depth) return;
 
       try {
-        const items = await fs.readdir(dirPath);
+        const entries = await fs.readdir(dir, { withFileTypes: true });
 
-        for (const item of items) {
-          const itemPath = path.join(dirPath, item);
-          const stats = await fs.stat(itemPath);
+        for (const entry of entries) {
+          const fullPath = path.join(dir, entry.name);
 
-          if (stats.isDirectory()) {
-            analysis.directories++;
-            await scanDirectory(itemPath, depth + 1);
+          // 跳过隐藏文件和 node_modules
+          if (entry.name.startsWith('.') || entry.name === 'node_modules') {
+            continue;
+          }
+
+          if (entry.isDirectory()) {
+            result.directories++;
+            await scan(fullPath, currentDepth + 1);
           } else {
-            analysis.files++;
-            const ext = path.extname(item);
-            if (ext) {
-              analysis.languages[ext] = (analysis.languages[ext] || 0) + 1;
+            result.files++;
+            const ext = path.extname(entry.name).slice(1);
+            result.languages[ext] = (result.languages[ext] || 0) + 1;
+
+            try {
+              const stat = await fs.stat(fullPath);
+              result.size += stat.size;
+            } catch {
+              // 忽略无法访问的文件
             }
           }
         }
-      } catch (error) {
+      } catch {
         // 忽略无法访问的目录
       }
     };
 
-    await scanDirectory(projectPath, 0);
-    return analysis;
-  }
-
-  /**
-   * 创建任务
-   */
-  private async createTask(taskData: any): Promise<any> {
-    const task = {
-      id: `task-${Date.now()}`,
-      title: taskData.title,
-      description: taskData.description || '',
-      type: taskData.type || 'general',
-      priority: taskData.priority || 'medium',
-      status: 'todo',
-      createdAt: new Date().toISOString(),
-    };
-
-    // 这里可以添加保存任务到数据库的逻辑
-    this.logger.info(`任务已创建: ${task.title}`);
-
-    return task;
-  }
-
-  /**
-   * 验证工具数据
-   */
-  private validateTool(tool: any): boolean {
-    return !!(
-      tool.name &&
-      tool.description &&
-      tool.category &&
-      tool.handler &&
-      typeof tool.enabled === 'boolean'
-    );
-  }
-
-  /**
-   * 验证输入参数
-   */
-  private validateInput(input: any, schema: any): boolean {
-    // 简单的schema验证实现
-    if (!schema || schema.type !== 'object') {
-      return true;
-    }
-
-    if (schema.required) {
-      for (const field of schema.required) {
-        if (!(field in input)) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
-
-  /**
-   * 更新分类
-   */
-  private updateCategory(category: string, toolName: string): void {
-    if (!this.categories.has(category)) {
-      this.categories.set(category, []);
-    }
-
-    const tools = this.categories.get(category)!;
-    if (!tools.includes(toolName)) {
-      tools.push(toolName);
-    }
-  }
-
-  /**
-   * 从分类中移除
-   */
-  private removeFromCategory(category: string, toolName: string): void {
-    const tools = this.categories.get(category);
-    if (tools) {
-      const index = tools.indexOf(toolName);
-      if (index !== -1) {
-        tools.splice(index, 1);
-      }
-
-      if (tools.length === 0) {
-        this.categories.delete(category);
-      }
-    }
-  }
-
-  /**
-   * 启动文件监听
-   */
-  private startFileWatcher(): void {
-    if (this.fileWatcher) {
-      return;
-    }
-
-    try {
-      const chokidar = require('chokidar');
-      this.fileWatcher = chokidar.watch(this.options.toolsDir, {
-        ignored: /(^|[\/\\])\../,
-        persistent: true,
-      });
-
-      this.fileWatcher
-        .on('add', (filePath: string) => this.handleFileChange('add', filePath))
-        .on('change', (filePath: string) => this.handleFileChange('change', filePath))
-        .on('unlink', (filePath: string) => this.handleFileChange('unlink', filePath));
-
-      this.logger.debug('文件监听已启动');
-    } catch (error) {
-      this.logger.warn('无法启动文件监听:', error);
-    }
-  }
-
-  /**
-   * 处理文件变化
-   */
-  private async handleFileChange(event: string, filePath: string): Promise<void> {
-    if (!this.options.autoReload) {
-      return;
-    }
-
-    try {
-      if (event === 'unlink') {
-        // 文件被删除，查找并移除对应的工具
-        const toolName = path.basename(filePath, path.extname(filePath));
-        await this.unregisterTool(toolName);
-      } else {
-        // 文件添加或修改，重新加载工具
-        await this.loadToolFromFile(filePath);
-      }
-    } catch (error) {
-      this.logger.warn(`处理文件变化失败: ${filePath}`, error);
-    }
-  }
-
-  /**
-   * 停止文件监听
-   */
-  private stopFileWatcher(): void {
-    if (this.fileWatcher) {
-      this.fileWatcher.close();
-      this.fileWatcher = null;
-      this.logger.debug('文件监听已停止');
-    }
-  }
-
-  /**
-   * 获取工具数量
-   */
-  getToolsCount(): number {
-    return this.tools.size;
-  }
-
-  /**
-   * 获取工具名称列表
-   */
-  getToolNames(): string[] {
-    return Array.from(this.tools.keys());
-  }
-
-  /**
-   * 清理资源
-   */
-  async cleanup(): Promise<void> {
-    this.stopFileWatcher();
-    this.tools.clear();
-    this.categories.clear();
-    this.removeAllListeners();
-    this.logger.info('工具注册表已清理');
+    await scan(projectPath, 0);
+    return result;
   }
 }
+
+// 导出单例
+export const toolRegistry = new ToolRegistry();

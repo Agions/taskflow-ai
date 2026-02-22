@@ -2,6 +2,10 @@
  * PRD解析器
  */
 
+export * from './enhanced';
+export * from './word';
+export * from './pdf';
+
 import path from 'path';
 import fs from 'fs-extra';
 import MarkdownIt from 'markdown-it';

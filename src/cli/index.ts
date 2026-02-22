@@ -17,6 +17,12 @@ import { statusCommand } from './commands/status';
 import { visualizeCommand } from './commands/visualize';
 import { mcpCommand } from './commands/mcp';
 import { configCommand } from './commands/config';
+import { modelCommand } from './commands/model';
+import { thinkCommand } from './commands/think';
+import { flowCommand } from './commands/flow';
+import { pluginCommand } from './commands/plugin';
+import { templateCommand } from './commands/template';
+import { agentCommand } from './commands/agent';
 
 const program = new Command();
 
@@ -59,6 +65,12 @@ statusCommand(program);
 visualizeCommand(program);
 mcpCommand(program);
 configCommand(program);
+modelCommand(program);
+thinkCommand(program);
+flowCommand(program);
+pluginCommand(program);
+templateCommand(program);
+agentCommand(program);
 
 // 添加帮助信息
 program.on('--help', () => {
@@ -67,6 +79,10 @@ program.on('--help', () => {
   console.log('  $ taskflow status');
   console.log('  $ taskflow parse document.md');
   console.log('  $ taskflow mcp start');
+  console.log('  $ taskflow model list');
+  console.log('  $ taskflow model route "帮我写个函数"');
+  console.log('  $ taskflow think "帮我分析这个需求"');
+  console.log('  $ taskflow think --visualize');
   console.log('\n' + chalk.cyan('更多信息:'));
   console.log('  文档: https://github.com/Agions/taskflow-ai');
   console.log('  问题反馈: https://github.com/Agions/taskflow-ai/issues');
