@@ -1,0 +1,57 @@
+# Auto-labeling configuration for PRs
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file: 
+      - 'docs/**/*'
+      - '*.md'
+      - 'README.md'
+      - 'CHANGELOG.md'
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'package.json'
+      - 'package-lock.json'
+      - 'pnpm-lock.yaml'
+
+ci/cd:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**/*'
+      - 'scripts/**/*'
+
+core:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/core/**/*'
+
+cli:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/cli/**/*'
+
+mcp:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'src/mcp/**/*'
+
+tests:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'tests/**/*'
+      - '**/*.test.ts'
+      - '**/*.spec.ts'
+
+build:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'build.js'
+      - 'tsconfig.json'
+      - 'jest.config.js'
+
+security:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'SECURITY.md'
+      - 'src/mcp/security/**/*'

@@ -12,34 +12,22 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "node build.js",
-    "build:release": "npm run build && npm run optimize",
-    "optimize": "esbuild dist/cli/index.js --bundle --platform=node --outfile=dist/cli/index.min.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:performance": "jest --config tests/performance/jest.config.js --runInBand",
-    "test:benchmark": "npm run test:performance -- --verbose",
-    "test:build": "node scripts/test-build.js",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit",
     "quality": "npm run type-check && npm run lint && npm run format:check",
-    "release:patch": "bash scripts/release.sh patch",
-    "release:minor": "bash scripts/release.sh minor",
-    "release:major": "bash scripts/release.sh major",
-    "docs:dev": "cd docs && npm run dev",
-    "docs:build": "cd docs && npm run build",
+    "docs:dev": "cd docs && pnpm dev",
+    "docs:build": "cd docs && pnpm build",
     "docs:deploy": "bash scripts/deploy-docs.sh",
-    "size": "npm run build && ls -la dist/ | grep -E '\\.(js|map)$'",
     "clean": "rm -rf dist coverage .nyc_output",
     "mcp": "node dist/mcp/stdio-server.js",
     "mcp:dev": "npm run build && node dist/mcp/stdio-server.js",
-    "mcp:test": "npm run build && node scripts/test-mcp-server.js",
-    "mcp:verify": "npm run build && node scripts/verify-mcp-service.js",
-    "mcp:legacy": "node dist/mcp/server.js",
-    "postinstall": "node -e \"console.log('\\n🎉 TaskFlow AI 安装成功！\\n运行 taskflow --help 开始使用\\n运行 taskflow-mcp 启动MCP服务器\\n')\""
+    "postinstall": "node -e \"console.log('\\n🎉 TaskFlow AI 安装成功！\\n运行 taskflow --help 开始使用\\n')\""
   },
   "keywords": [
     "ai",
@@ -124,12 +112,9 @@
     "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^8.35.1",
     "@typescript-eslint/parser": "^8.35.1",
-    "esbuild": "^0.25.5",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
-    "terser": "^5.46.0",
-    "typescript": "^5.4.2",
-    "vite": "^6.2.0"
+    "typescript": "^5.4.2"
   },
   "engines": {
     "node": ">=18.0.0"
