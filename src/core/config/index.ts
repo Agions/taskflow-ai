@@ -380,3 +380,14 @@ export class ConfigManager {
     };
   }
 }
+
+// 便捷函数
+export async function loadConfig(basePath?: string): Promise<any> {
+  const manager = new ConfigManager(basePath);
+  return manager.loadConfig();
+}
+
+export async function saveConfig(config: any, basePath?: string): Promise<void> {
+  const manager = new ConfigManager(basePath);
+  await manager.saveConfig(config);
+}

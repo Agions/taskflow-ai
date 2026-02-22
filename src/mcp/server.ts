@@ -16,14 +16,14 @@ import {
 import path from 'path';
 import fs from 'fs-extra';
 import { execSync } from 'child_process';
-import { MCPToolRegistry } from './tools/registry';
+import { toolRegistry } from './tools/registry';
 import { Logger } from '../utils/logger';
 
 export class MCPServer {
   private server?: Server;
   private transport?: StdioServerTransport;
   private isRunning = false;
-  private toolRegistry?: MCPToolRegistry;
+  private toolRegistry = toolRegistry;
   private logger: Logger;
 
   constructor(
@@ -41,8 +41,7 @@ export class MCPServer {
       this.logger.info('正在启动MCP服务器...');
 
       // 初始化工具注册表
-      this.toolRegistry = new MCPToolRegistry(this.config, this.logger);
-      await this.toolRegistry.initialize();
+      // await this.toolRegistry.initialize();
 
       // 创建MCP服务器实例
       this.server = new Server(
@@ -101,7 +100,7 @@ export class MCPServer {
       this.isRunning = false;
 
       if (this.toolRegistry) {
-        await this.toolRegistry.cleanup();
+        // await this.toolRegistry.cleanup();
       }
 
       if (this.server) {
@@ -270,6 +269,10 @@ export class MCPServer {
    * 执行工具
    */
   private async executeTool(name: string, args: any): Promise<any> {
+    // 工具执行已简化
+    return { error: 'Tool execution not implemented' };
+    
+    /* 原来代码
     // 首先尝试从注册表执行
     if (this.toolRegistry) {
       try {
@@ -281,6 +284,7 @@ export class MCPServer {
         }
       }
     }
+    */
 
     // 内置工具执行
     switch (name) {

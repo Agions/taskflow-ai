@@ -306,3 +306,4 @@ function getTemplate(type: string): any {
 }
 
 export default program;
+export const flowCommand = program;

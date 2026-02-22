@@ -193,3 +193,4 @@ program
   });
 
 export default program;
+export const thinkCommand = program;
