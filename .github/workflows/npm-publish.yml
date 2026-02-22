@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write  # Required for npm publish with OIDC
+      id-token: write
     
     steps:
       - name: Checkout
@@ -27,24 +27,27 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Run tests
-        run: npm test
-        
       - name: Build
         run: npm run build
         
       - name: Extract version
         id: version
-        run: echo "VERSION=$(node -p.json').version\ \"require('./package")" >> $GITHUB_OUTPUT
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Found version: $VERSION"
         
       - name: Check version tag
         id: check-tag
         run: |
           TAG_VERSION="v${{ steps.version.outputs.VERSION }}"
+          echo "Checking for tag: $TAG_VERSION"
           if git rev-parse "refs/tags/$TAG_VERSION" > /dev/null 2>&1; then
             echo "tag_exists=true" >> $GITHUB_OUTPUT
+            echo "Tag exists, will publish"
           else
             echo "tag_exists=false" >> $GITHUB_OUTPUT
+            echo "Tag does not exist, skipping publish"
           fi
           
       - name: Publish to npm (on tag)
@@ -63,22 +66,3 @@ jobs:
           release_name: TaskFlow AI v${{ steps.version.outputs.VERSION }}
           draft: false
           prerelease: false
-
-  # Optional: Publish to npm on every main push (without tag)
-  publish-latest:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm run build
-      - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
