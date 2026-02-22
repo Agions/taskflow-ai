@@ -1,170 +1,46 @@
-name: Documentation Build & Deploy
+name: Documentation Deploy
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'docs/**'
       - '.github/workflows/docs-deploy.yml'
   workflow_dispatch:
 
-# 设置GITHUB_TOKEN的权限以允许部署到GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# 只允许一个并发部署，跳过正在运行和最新队列之间的运行队列
-# 但是，不要取消正在进行的运行，因为我们希望允许这些生产部署完成
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  # 构建作业
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    outputs:
-      pages_enabled: ${{ steps.check_pages.outputs.pages_enabled }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-
+          ref: main
+          
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: docs/package-lock.json
-
-      - name: Check GitHub Pages Setup
-        id: check_pages
-        run: |
-          # 检查是否启用了 GitHub Pages
-          PAGES_URL="https://api.github.com/repos/${{ github.repository }}/pages"
-          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$PAGES_URL" || echo "404")
-
-          if [ "$STATUS_CODE" = "200" ]; then
-            echo "pages_enabled=true" >> $GITHUB_OUTPUT
-            echo "✅ GitHub Pages 已启用"
-          else
-            echo "pages_enabled=false" >> $GITHUB_OUTPUT
-            echo "⚠️ GitHub Pages 未启用或配置错误"
-            echo ""
-            echo "🚀 **解决方案**: 请按以下步骤启用 GitHub Pages"
-            echo ""
-            echo "📋 **详细步骤**:"
-            echo "1. 访问: https://github.com/${{ github.repository }}/settings/pages"
-            echo "2. 在 'Source' 部分选择: 'GitHub Actions'"
-            echo "3. 点击 'Save' 保存设置"
-            echo "4. 等待几分钟后重新运行此工作流程"
-            echo ""
-            echo "🔗 **预期结果**: 文档将部署到 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-            echo ""
-            echo "⚠️ **注意**: 仓库必须是公开的才能使用免费的 GitHub Pages"
-          fi
-
+          node-version: '20'
+          
       - name: Install dependencies
-        run: |
-          echo "📦 安装依赖..."
-          cd docs
-          npm ci --prefer-offline --no-audit
-          echo "✅ 依赖安装完成"
-
-      - name: Verify VitePress configuration
-        run: |
-          echo "🔍 验证 VitePress 配置..."
-          cd docs
-
-          # 检查配置文件
-          if [ -f ".vitepress/config.ts" ]; then
-            echo "✅ 配置文件存在: .vitepress/config.ts"
-          else
-            echo "❌ 配置文件不存在"
-            exit 1
-          fi
-
-          # 检查 package.json
-          if [ -f "package.json" ]; then
-            echo "✅ package.json 存在"
-          else
-            echo "❌ package.json 不存在"
-            exit 1
-          fi
-
-      - name: Build with VitePress
-        run: |
-          echo "🔨 构建 VitePress 文档..."
-          cd docs
-
-          # 设置环境变量
-          export NODE_ENV=production
-          export VITEPRESS_BASE=/taskflow-ai/
-
-          npm run build
-          echo "✅ 文档构建完成"
-
-          # 验证构建产物
-          if [ -d ".vitepress/dist" ]; then
-            echo "📊 构建产物大小:"
-            du -sh .vitepress/dist
-            echo "📁 构建产物内容:"
-            ls -la .vitepress/dist
-          else
-            echo "❌ 构建产物目录不存在"
-            exit 1
-          fi
-
-      - name: Upload artifact for Pages
-        if: steps.check_pages.outputs.pages_enabled == 'true'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/.vitepress/dist
-
-      - name: Upload artifact for manual deployment
-        if: steps.check_pages.outputs.pages_enabled == 'false'
-        uses: actions/upload-artifact@v4
-        with:
-          name: vitepress-docs-${{ github.sha }}
-          path: docs/.vitepress/dist
-          retention-days: 30
-
-      - name: Create deployment summary
-        run: |
-          echo "## 📚 VitePress 文档构建报告" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.check_pages.outputs.pages_enabled }}" = "true" ]; then
-            echo "✅ **GitHub Pages 配置**: 成功" >> $GITHUB_STEP_SUMMARY
-            echo "🚀 **部署状态**: 准备自动部署" >> $GITHUB_STEP_SUMMARY
-            echo "🔗 **预期 URL**: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ **GitHub Pages 配置**: 需要手动启用" >> $GITHUB_STEP_SUMMARY
-            echo "📋 **解决方案**: [启用 GitHub Pages](https://github.com/${{ github.repository }}/settings/pages)" >> $GITHUB_STEP_SUMMARY
-            echo "📦 **备用方案**: 构建产物已上传为 Artifact，可手动下载部署" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "📊 **构建信息**:" >> $GITHUB_STEP_SUMMARY
-          echo "- 构建时间: $(date)" >> $GITHUB_STEP_SUMMARY
-          echo "- Node.js 版本: $(node --version)" >> $GITHUB_STEP_SUMMARY
-
-  # 部署作业
-  deploy:
-    if: github.ref == 'refs/heads/main' && needs.build.outputs.pages_enabled == 'true'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
-    runs-on: ubuntu-latest
-    name: Deploy
-    steps:
+        run: npm ci
+        
+      - name: Build docs
+        run: npm run docs:build
+        env:
+          CI: true
+          
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-      - name: Deployment success notification
-        run: |
-          echo "🎉 文档已成功部署到 GitHub Pages!"
-          echo "🔗 访问地址: ${{ steps.deployment.outputs.page_url }}"
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/.vitepress/dist
+          publish_branch: gh-pages
