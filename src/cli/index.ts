@@ -23,6 +23,9 @@ import { flowCommand } from './commands/flow';
 import { pluginCommand } from './commands/plugin';
 import { templateCommand } from './commands/template';
 import { agentCommand } from './commands/agent';
+import { statsCommand } from './commands/stats';
+import { doctorCommand } from './commands/doctor';
+import { upgradeCommand } from './commands/upgrade';
 
 const program = new Command();
 
@@ -71,6 +74,9 @@ flowCommand(program);
 pluginCommand(program);
 templateCommand(program);
 agentCommand(program);
+statsCommand(program);
+doctorCommand(program);
+upgradeCommand(program);
 
 // 添加帮助信息
 program.on('--help', () => {
