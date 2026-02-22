@@ -189,7 +189,7 @@ async function loadProjectData(dataFiles: string[]): Promise<any> {
       if (fileData.summary) {
         Object.assign(allData.summary, fileData.summary);
       }
-    } catch (error) {
+    } catch (_error) {
       console.warn(chalk.yellow(`警告: 无法解析文件 ${file}`));
     }
   }

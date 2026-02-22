@@ -5,9 +5,7 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
-import boxen from 'boxen';
 import { ThoughtChainManager, createRenderer } from '../../core/thought';
-import { ModelGateway } from '../../core/ai';
 import { loadConfig } from '../../core/config';
 
 const program = new Command('think');
@@ -49,7 +47,7 @@ program
       try {
         // 使用 AI 进行深度分析
         await analyzeWithAI(manager, prompt, options.model);
-      } catch (error) {
+      } catch (_error) {
         console.log(chalk.yellow('AI 分析失败，使用本地分析...\n'));
         analyzeLocally(manager, prompt);
       }
@@ -129,7 +127,7 @@ function analyzeLocally(manager: ThoughtChainManager, prompt: string): void {
 async function analyzeWithAI(
   manager: ThoughtChainManager,
   prompt: string,
-  preferredModel?: string
+  _preferredModel?: string
 ): Promise<void> {
   // 简化实现 - 实际应该调用 ModelGateway
   analyzeLocally(manager, prompt);

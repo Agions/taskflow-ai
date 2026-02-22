@@ -33,8 +33,8 @@ function getParser(): WorkflowParser {
  */
 program
   .command('list')
- 所有工作流')
-  .option('-d, --dir <dir>', '工作流目录 .description('列出', './workflows')
+  .description('列出所有工作流')
+  .option('-d, --dir <dir>', '工作流目录', './workflows')
   .action(async (options) => {
     const workflowDir = path.resolve(options.dir);
     
@@ -64,7 +64,7 @@ program
         console.log(`    文件: ${file}`);
         console.log(`    步骤: ${workflow.steps.length}`);
         console.log(`    描述: ${workflow.description || '-'}\n`);
-      } catch (e) {
+      } catch (_e) {
         console.log(chalk.red(`  ${file} - 解析失败`));
       }
     }

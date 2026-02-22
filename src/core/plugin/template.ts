@@ -119,7 +119,7 @@ export class TemplateManager {
         description: '{{description}}',
         type: 'development',
         priority: 'medium',
-        estimatedHours: {{hours}},
+        estimatedHours: 8,
         acceptanceCriteria: [
           '{{criteria_1}}',
           '{{criteria_2}}',
