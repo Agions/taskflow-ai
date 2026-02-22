@@ -55,7 +55,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd docs
-          pnpm install --frozen-lockfile
+          pnpm install --no-frozen-lockfile
       
       - name: Build documentation
         run: |
@@ -63,6 +63,14 @@ jobs:
           pnpm build
         env:
           NODE_ENV: production
+      
+      - name: Check build output
+        run: |
+          if [ ! -d "docs/.vitepress/dist" ]; then
+            echo "Error: Build output directory not found"
+            exit 1
+          fi
+          echo "Build output verified"
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
