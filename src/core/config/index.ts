@@ -2,379 +2,135 @@
  * 配置管理器 - 负责加载、保存和验证项目配置
  */
 
-import path from 'path';
-import fs from 'fs-extra';
 import { TaskFlowConfig, AIModelConfig } from '../../types';
-import { CONFIG_DIR, CONFIG_FILE, DEFAULT_CONFIG, ERROR_CODES } from '../../constants';
-import { createTaskFlowError } from '../../utils/errors';
-import { validateConfig, encryptApiKeys, decryptApiKeys } from '../../utils/config';
+import { ConfigOperations } from './operations';
+import { AIModelManager } from './ai-models';
+import { ConfigBackupManager } from './backup';
+import { MCPSettingsManager } from './mcp-settings';
+import { ConfigImportExportManager } from './import-export';
+import { ConfigStatsManager } from './stats';
+import { ConfigStats, ApiKeyValidationResult, IConfigManager } from './types';
 
-export class ConfigManager {
-  private configPath: string;
-  private configDir: string;
+/**
+ * 配置管理器
+ * 整合所有配置相关功能
+ */
+export class ConfigManager implements IConfigManager {
+  private operations: ConfigOperations;
+  private aiModelManager: AIModelManager;
+  private backupManager: ConfigBackupManager;
+  private mcpSettingsManager: MCPSettingsManager;
+  private importExportManager: ConfigImportExportManager;
+  private statsManager: ConfigStatsManager;
 
   constructor(basePath?: string) {
-    const baseDir = basePath || process.cwd();
-    this.configDir = path.join(baseDir, CONFIG_DIR);
-    this.configPath = path.join(this.configDir, CONFIG_FILE);
+    this.operations = new ConfigOperations(basePath);
+    this.aiModelManager = new AIModelManager(this.operations);
+    this.backupManager = new ConfigBackupManager(this.operations);
+    this.mcpSettingsManager = new MCPSettingsManager(this.operations);
+    this.importExportManager = new ConfigImportExportManager(this.operations);
+    this.statsManager = new ConfigStatsManager(this.operations);
   }
 
-  /**
-   * 加载配置文件
-   */
+  // 基础操作
   async loadConfig(): Promise<TaskFlowConfig | null> {
-    try {
-      if (!(await fs.pathExists(this.configPath))) {
-        return null;
-      }
-
-      const configData = await fs.readJson(this.configPath);
-      const config = this.mergeWithDefaults(configData);
-
-      const validation = validateConfig(config);
-      if (!validation.valid) {
-        throw createTaskFlowError(
-          'config',
-          ERROR_CODES.CONFIG_INVALID,
-          `配置文件无效: ${validation.errors?.join(', ')}`,
-          { errors: validation.errors }
-        );
-      }
-
-      if (config.aiModels) {
-        config.aiModels = await Promise.all(
-          config.aiModels.map(async model => ({
-            ...model,
-            apiKey: await decryptApiKeys(model.apiKey),
-          }))
-        );
-      }
-
-      return config;
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
-        return null;
-      }
-
-      if (error.name === 'TaskFlowError') {
-        throw error;
-      }
-
-      throw createTaskFlowError('config', ERROR_CODES.CONFIG_PARSE_ERROR, '配置文件解析失败', {
-        originalError: error,
-      });
-    }
+    return this.operations.loadConfig();
   }
 
-  /**
-   * 保存配置文件
-   */
   async saveConfig(config: TaskFlowConfig): Promise<void> {
-    try {
-      const validation = validateConfig(config);
-      if (!validation.valid) {
-        throw createTaskFlowError(
-          'config',
-          ERROR_CODES.CONFIG_INVALID,
-          `配置无效: ${validation.errors?.join(', ')}`,
-          { errors: validation.errors }
-        );
-      }
-
-      await fs.ensureDir(this.configDir);
-
-      const configToSave = { ...config };
-      if (configToSave.aiModels) {
-        configToSave.aiModels = await Promise.all(
-          configToSave.aiModels.map(async model => ({
-            ...model,
-            apiKey: await encryptApiKeys(model.apiKey),
-          }))
-        );
-      }
-
-      await fs.writeJson(this.configPath, configToSave, { spaces: 2 });
-
-      await fs.chmod(this.configPath, 0o600);
-    } catch (error: any) {
-      if (error?.name === 'TaskFlowError') {
-        throw error;
-      }
-
-      throw createTaskFlowError('config', ERROR_CODES.FILE_WRITE_ERROR, '配置文件保存失败', {
-        originalError: error,
-      });
-    }
+    return this.operations.saveConfig(config);
   }
 
-  /**
-   * 更新AI模型配置
-   */
-  async updateAIModel(modelConfig: AIModelConfig): Promise<void> {
-    const config = await this.loadConfig();
-    if (!config) {
-      throw createTaskFlowError('config', ERROR_CODES.CONFIG_NOT_FOUND, '配置文件不存在');
-    }
-
-    const existingIndex = config.aiModels.findIndex(
-      model => model.provider === modelConfig.provider && model.modelName === modelConfig.modelName
-    );
-
-    if (existingIndex >= 0) {
-      config.aiModels[existingIndex] = modelConfig;
-    } else {
-      config.aiModels.push(modelConfig);
-    }
-
-    await this.saveConfig(config);
-  }
-
-  /**
-   * 删除AI模型配置
-   */
-  async removeAIModel(provider: string, modelName: string): Promise<void> {
-    const config = await this.loadConfig();
-    if (!config) {
-      throw createTaskFlowError('config', ERROR_CODES.CONFIG_NOT_FOUND, '配置文件不存在');
-    }
-
-    config.aiModels = config.aiModels.filter(
-      model => !(model.provider === provider && model.modelName === modelName)
-    );
-
-    await this.saveConfig(config);
-  }
-
-  /**
-   * 获取AI模型配置
-   */
-  async getAIModels(): Promise<AIModelConfig[]> {
-    const config = await this.loadConfig();
-    return config?.aiModels || [];
-  }
-
-  /**
-   * 获取启用的AI模型
-   */
-  async getEnabledAIModels(): Promise<AIModelConfig[]> {
-    const models = await this.getAIModels();
-    return models.filter(model => model.enabled).sort((a, b) => a.priority - b.priority);
-  }
-
-  /**
-   * 更新MCP设置
-   */
-  async updateMCPSettings(mcpSettings: Partial<TaskFlowConfig['mcpSettings']>): Promise<void> {
-    const config = await this.loadConfig();
-    if (!config) {
-      throw createTaskFlowError('config', ERROR_CODES.CONFIG_NOT_FOUND, '配置文件不存在');
-    }
-
-    config.mcpSettings = {
-      ...config.mcpSettings,
-      ...mcpSettings,
-    };
-
-    await this.saveConfig(config);
-  }
-
-  /**
-   * 检查配置文件是否存在
-   */
   async configExists(): Promise<boolean> {
-    return await fs.pathExists(this.configPath);
+    return this.operations.configExists();
   }
 
-  /**
-   * 获取配置文件路径
-   */
   getConfigPath(): string {
-    return this.configPath;
+    return this.operations.getConfigPath();
   }
 
-  /**
-   * 获取配置目录路径
-   */
   getConfigDir(): string {
-    return this.configDir;
+    return this.operations.getConfigDir();
   }
 
-  /**
-   * 备份配置文件
-   */
+  // AI模型管理
+  async updateAIModel(modelConfig: AIModelConfig): Promise<void> {
+    return this.aiModelManager.updateAIModel(modelConfig);
+  }
+
+  async removeAIModel(provider: string, modelName: string): Promise<void> {
+    return this.aiModelManager.removeAIModel(provider, modelName);
+  }
+
+  async getAIModels(): Promise<AIModelConfig[]> {
+    return this.aiModelManager.getAIModels();
+  }
+
+  async getEnabledAIModels(): Promise<AIModelConfig[]> {
+    return this.aiModelManager.getEnabledAIModels();
+  }
+
+  async validateApiKeys(): Promise<ApiKeyValidationResult[]> {
+    return this.aiModelManager.validateApiKeys();
+  }
+
+  // MCP设置
+  async updateMCPSettings(mcpSettings: Partial<TaskFlowConfig['mcpSettings']>): Promise<void> {
+    return this.mcpSettingsManager.updateMCPSettings(mcpSettings);
+  }
+
+  // 备份与恢复
   async backupConfig(): Promise<string> {
-    if (!(await this.configExists())) {
-      throw createTaskFlowError('config', ERROR_CODES.CONFIG_NOT_FOUND, '配置文件不存在，无法备份');
-    }
-
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const backupPath = path.join(this.configDir, `${CONFIG_FILE}.backup.${timestamp}`);
-
-    await fs.copy(this.configPath, backupPath);
-    return backupPath;
+    return this.backupManager.backupConfig();
   }
 
-  /**
-   * 恢复配置文件
-   */
   async restoreConfig(backupPath: string): Promise<void> {
-    if (!(await fs.pathExists(backupPath))) {
-      throw createTaskFlowError('config', ERROR_CODES.FILE_NOT_FOUND, '备份文件不存在');
-    }
-
-    const backupData = await fs.readJson(backupPath);
-    const validation = validateConfig(backupData);
-
-    if (!validation.valid) {
-      throw createTaskFlowError(
-        'config',
-        ERROR_CODES.CONFIG_INVALID,
-        `备份文件无效: ${validation.errors?.join(', ')}`
-      );
-    }
-
-    await fs.copy(backupPath, this.configPath);
+    return this.backupManager.restoreConfig(backupPath);
   }
 
-  /**
-   * 重置配置为默认值
-   */
-  async resetConfig(): Promise<void> {
-    await this.saveConfig(DEFAULT_CONFIG);
+  async listBackups(): Promise<{ path: string; created: Date; size: number }[]> {
+    return this.backupManager.listBackups();
   }
 
-  /**
-   * 获取配置统计信息
-   */
-  async getConfigStats(): Promise<{
-    hasConfig: boolean;
-    aiModelsCount: number;
-    enabledModelsCount: number;
-    mcpEnabled: boolean;
-    lastModified?: Date;
-  }> {
-    const hasConfig = await this.configExists();
-
-    if (!hasConfig) {
-      return {
-        hasConfig: false,
-        aiModelsCount: 0,
-        enabledModelsCount: 0,
-        mcpEnabled: false,
-      };
-    }
-
-    const config = await this.loadConfig();
-    const stats = await fs.stat(this.configPath);
-
-    return {
-      hasConfig: true,
-      aiModelsCount: config?.aiModels.length || 0,
-      enabledModelsCount: config?.aiModels.filter(m => m.enabled).length || 0,
-      mcpEnabled: config?.mcpSettings.enabled || false,
-      lastModified: stats.mtime,
-    };
+  async cleanupOldBackups(keepCount?: number): Promise<number> {
+    return this.backupManager.cleanupOldBackups(keepCount);
   }
 
-  /**
-   * 验证API密钥
-   */
-  async validateApiKeys(): Promise<{ provider: string; valid: boolean; error?: string }[]> {
-    const models = await this.getEnabledAIModels();
-    const results = [];
-
-    for (const model of models) {
-      try {
-        const valid = !!model.apiKey && model.apiKey.length > 0;
-        results.push({
-          provider: model.provider,
-          valid,
-          error: valid ? undefined : 'API密钥为空或无效',
-        });
-      } catch (error) {
-        results.push({
-          provider: model.provider,
-          valid: false,
-          error: (error as Error).message,
-        });
-      }
-    }
-
-    return results;
-  }
-
-  /**
-   * 导出配置（不包含敏感信息）
-   */
+  // 导入导出
   async exportConfig(): Promise<Partial<TaskFlowConfig>> {
-    const config = await this.loadConfig();
-    if (!config) {
-      throw createTaskFlowError('config', ERROR_CODES.CONFIG_NOT_FOUND, '配置文件不存在');
-    }
-
-    const exportConfig = {
-      ...config,
-      aiModels: config.aiModels.map(model => ({
-        ...model,
-        apiKey: '***', // 隐藏API密钥
-      })),
-    };
-
-    return exportConfig;
+    return this.importExportManager.exportConfig();
   }
 
-  /**
-   * 导入配置
-   */
   async importConfig(configData: Partial<TaskFlowConfig>): Promise<void> {
-    const currentConfig = (await this.loadConfig()) || DEFAULT_CONFIG;
-
-    const mergedConfig = {
-      ...currentConfig,
-      ...configData,
-      aiModels: configData.aiModels || currentConfig.aiModels,
-      mcpSettings: {
-        ...currentConfig.mcpSettings,
-        ...(configData.mcpSettings || {}),
-      },
-    };
-
-    await this.saveConfig(mergedConfig);
+    return this.importExportManager.importConfig(configData);
   }
 
-  /**
-   * 合并默认配置
-   */
-  private mergeWithDefaults(config: Partial<TaskFlowConfig>): TaskFlowConfig {
-    return {
-      ...DEFAULT_CONFIG,
-      ...config,
-      mcpSettings: {
-        ...DEFAULT_CONFIG.mcpSettings,
-        ...(config.mcpSettings || {}),
-        security: {
-          ...DEFAULT_CONFIG.mcpSettings.security,
-          ...(config.mcpSettings?.security || {}),
-          rateLimit: {
-            ...DEFAULT_CONFIG.mcpSettings.security.rateLimit,
-            ...(config.mcpSettings?.security?.rateLimit || {}),
-          },
-          sandbox: {
-            ...DEFAULT_CONFIG.mcpSettings.security.sandbox,
-            ...(config.mcpSettings?.security?.sandbox || {}),
-          },
-        },
-      },
-    };
+  async resetConfig(): Promise<void> {
+    return this.importExportManager.resetConfig();
+  }
+
+  // 统计信息
+  async getConfigStats(): Promise<ConfigStats> {
+    return this.statsManager.getConfigStats();
   }
 }
 
-export async function loadConfig(basePath?: string): Promise<any> {
+// 便捷函数
+export async function loadConfig(basePath?: string): Promise<TaskFlowConfig | null> {
   const manager = new ConfigManager(basePath);
   return manager.loadConfig();
 }
 
-export async function saveConfig(config: any, basePath?: string): Promise<void> {
+export async function saveConfig(config: TaskFlowConfig, basePath?: string): Promise<void> {
   const manager = new ConfigManager(basePath);
   await manager.saveConfig(config);
 }
+
+// 导出子模块
+export * from './types';
+export { ConfigOperations } from './operations';
+export { AIModelManager } from './ai-models';
+export { ConfigBackupManager } from './backup';
+export { MCPSettingsManager } from './mcp-settings';
+export { ConfigImportExportManager } from './import-export';
+export { ConfigStatsManager } from './stats';
