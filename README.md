@@ -496,6 +496,6 @@ export default class MyPlugin implements Plugin {
 
 <div align="center">
 
-**Made with ❤️ by TaskFlow AI Team**
+**Made with ❤️ by agions**
 
 </div>
