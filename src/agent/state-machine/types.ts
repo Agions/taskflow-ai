@@ -1,0 +1,30 @@
+/**
+ * 状态机类型定义
+ */
+
+import { AgentContext, AgentConfig, TaskPlan, ExecutionResult, VerificationResult } from '../types';
+
+export interface MachineContext extends AgentContext {
+  error?: Error;
+  config: AgentConfig;
+}
+
+export type MachineEvent =
+  | { type: 'START' }
+  | { type: 'PLAN_COMPLETE'; data: TaskPlan }
+  | { type: 'PLAN_FAILED'; error: Error }
+  | { type: 'EXECUTION_COMPLETE'; data: ExecutionResult }
+  | { type: 'EXECUTION_FAILED'; error: Error }
+  | { type: 'VERIFICATION_PASS'; data: VerificationResult }
+  | { type: 'VERIFICATION_FAIL'; data: VerificationResult; fixTasks?: TaskPlan }
+  | { type: 'APPROVED' }
+  | { type: 'REJECTED' };
+
+export type AgentState =
+  | 'idle'
+  | 'planning'
+  | 'executing'
+  | 'verifying'
+  | 'awaitingApproval'
+  | 'completed'
+  | 'failed';
