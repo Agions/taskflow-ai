@@ -1,165 +1,417 @@
 /**
- * Agent 命令
- * taskflow agent create|list|run|collaborate
+ * Agent CLI 命令
+ * AI Agent 自主执行模式
  */
 
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { agentCoordinator, AgentFactory } from '../../core/agent';
-import { AgentTask } from '../../core/agent/types';
+import ora from 'ora';
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import { AgentService } from '../../agent/state-machine';
+import { PlanningEngine } from '../../agent/planning/engine';
+import { ExecutionEngine } from '../../agent/execution/engine';
+import { VerificationEngine } from '../../agent/verification/engine';
+import { MCPServer } from '../../mcp/server';
+import { ConfigManager } from '../../core/config';
+import {
+  AgentConfig,
+  AgentContext,
+  PRDDocument,
+  Requirement
+} from '../../agent/types';
 
-const program = new Command('agent');
-
-/**
- * 创建 Agent
- */
-program
-  .command('create')
-  .description('创建新的 Agent')
-  .argument('<type>', 'Agent 类型 (analyzer|executor|reviewer)')
-  .argument('[name]', 'Agent 名称')
-  .action((type: string, name?: string) => {
-    let agent;
-    
-    switch (type) {
-      case 'analyzer':
-        agent = AgentFactory.createAnalyzer(name || 'analyzer');
-        break;
-      case 'executor':
-        agent = AgentFactory.createExecutor(name || 'executor');
-        break;
-      case 'reviewer':
-        agent = AgentFactory.createReviewer(name || 'reviewer');
-        break;
-      default:
-        console.log(chalk.red(`未知类型: ${type}`));
-        return;
+// 模拟 AI 服务（实际应该使用 OpenAI 或其他 AI 服务）
+class MockAIService {
+  async complete(prompt: string, options?: any): Promise<string> {
+    // 模拟 AI 响应
+    if (prompt.includes('task plan')) {
+      return JSON.stringify({
+        tasks: [
+          {
+            title: 'Setup Project',
+            description: 'Initialize project structure',
+            type: 'shell',
+            priority: 'high',
+            estimate: 2,
+            dependencies: [],
+            tags: ['setup']
+          },
+          {
+            title: 'Implement Feature',
+            description: 'Implement the main feature',
+            type: 'code',
+            priority: 'high',
+            estimate: 8,
+            dependencies: [],
+            outputPath: 'src/feature/index.ts',
+            tags: ['core', 'feature']
+          },
+          {
+            title: 'Add Tests',
+            description: 'Write unit tests',
+            type: 'test',
+            priority: 'medium',
+            estimate: 4,
+            dependencies: ['T002'],
+            tags: ['test']
+          }
+        ]
+      });
     }
 
-    agentCoordinator.register(agent);
-    
-    console.log(chalk.green(`\n✅ Agent 已创建:`));
-    console.log(`   ID: ${agent.id}`);
-    console.log(`   名称: ${agent.name}`);
-    console.log(`   类型: ${type}`);
-    console.log(`   能力: ${agent.capabilities.join(', ')}`);
-    console.log(`   工具: ${agent.tools.join(', ')}\n`);
-  });
-
-/**
- * 列出 Agent
- */
-program
-  .command('list')
-  .description('列出所有 Agent')
-  .action(() => {
-    const agents = agentCoordinator.list();
-
-    if (agents.length === 0) {
-      console.log(chalk.yellow('暂无 Agent'));
-      return;
+    if (prompt.includes('analyze')) {
+      return JSON.stringify({
+        features: [
+          {
+            name: 'Core Feature',
+            description: 'Main feature implementation',
+            complexity: 'medium',
+            dependencies: []
+          }
+        ],
+        technicalConstraints: ['TypeScript', 'React'],
+        risks: []
+      });
     }
 
-    console.log(chalk.bold('\n🤖 Agent 列表:\n'));
-    
-    for (const agent of agents) {
-      const statusColor = agent.status === 'idle' ? chalk.green :
-                        agent.status === 'executing' ? chalk.cyan :
-                        agent.status === 'failed' ? chalk.red : chalk.gray;
-      
-      console.log(`  ${chalk.cyan(agent.name)}`);
-      console.log(`    ID: ${agent.id}`);
-      console.log(`    状态: ${statusColor(agent.status)}`);
-      console.log(`    能力: ${agent.capabilities.join(', ')}`);
-      console.log(`    描述: ${agent.description || '-'}\n`);
-    }
-  });
+    return '{}';
+  }
+}
 
-/**
- * 运行 Agent
- */
-program
-  .command('run')
-  .description('运行 Agent 执行任务')
-  .argument('<agentId>', 'Agent ID')
-  .argument('<task>', '任务描述')
-  .option('-g, --goal <goal>', '目标')
-  .action(async (agentId: string, task: string, options) => {
-    const agent = agentCoordinator.get(agentId);
-    
-    if (!agent) {
-      console.log(chalk.red(`Agent 不存在: ${agentId}`));
-      return;
-    }
-
-    console.log(chalk.cyan(`\n🚀 启动 Agent: ${agentId}`));
-    console.log(`   任务: ${task}\n`);
-
-    const agentTask: AgentTask = {
-      id: `task-${Date.now()}`,
-      description: task,
-      goal: options.goal || task,
-      status: 'pending',
-      createdAt: Date.now(),
-    };
+export const agentCommand = new Command('agent')
+  .description('AI Agent autonomous execution mode')
+  .option('-p, --prd <path>', 'PRD document path')
+  .option('-m, --mode <mode>', 'Execution mode: assisted|autonomous|supervised', 'assisted')
+  .option('-c, --constraint <constraints...>', 'Constraints (e.g., "use TypeScript", "follow existing style")')
+  .option('--max-iterations <n>', 'Maximum iterations', '10')
+  .option('--timeout <ms>', 'Task timeout in milliseconds', '30000')
+  .option('--dry-run', 'Simulate execution without making changes')
+  .option('--continue-on-error', 'Continue execution even if tasks fail')
+  .action(async (options) => {
+    const spinner = ora('Initializing AI Agent...').start();
 
     try {
-      const execution = await agent.execute(agentTask);
-      
-      console.log(chalk.bold('\n📊 执行结果:\n'));
-      console.log(`   状态: ${execution.status === 'completed' ? chalk.green('完成') : chalk.red('失败')}`);
-      console.log(`   步骤数: ${execution.steps.length}`);
-      console.log(`   耗时: ${execution.finishedAt && execution.startedAt ? execution.finishedAt - execution.startedAt : 0}ms`);
-      
-      if (execution.steps.length > 0) {
-        console.log(chalk.bold('\n📝 执行步骤:'));
-        for (const step of execution.steps.slice(0, 5)) {
-          const icon = step.type === 'thought' ? '💭' : 
-                      step.type === 'action' ? '⚡' : 
-                      step.type === 'observation' ? '👁️' : '🔍';
-          console.log(`   ${icon} ${step.content.substring(0, 60)}...`);
-        }
+      // 1. 加载 PRD
+      if (!options.prd) {
+        spinner.fail('PRD path is required. Use --prd <path>');
+        process.exit(1);
       }
-      
-      console.log();
+
+      const prdPath = path.resolve(options.prd);
+      if (!await fs.pathExists(prdPath)) {
+        spinner.fail(`PRD file not found: ${prdPath}`);
+        process.exit(1);
+      }
+
+      const prdContent = await fs.readFile(prdPath, 'utf-8');
+      const prd = parsePRD(prdContent, prdPath);
+
+      spinner.succeed(`PRD loaded: ${prd.title}`);
+
+      // 2. 加载项目配置
+      const configManager = new ConfigManager(process.cwd());
+      let projectConfig = await configManager.loadConfig();
+
+      if (!projectConfig) {
+        projectConfig = {
+          projectName: 'Untitled Project',
+          version: '1.0.0',
+          aiModels: [],
+          mcpSettings: {
+            enabled: true,
+            serverName: 'taskflow-agent',
+            version: '1.0.0',
+            port: 3000,
+            host: 'localhost',
+            capabilities: [
+              { name: 'tools', version: '1.0', description: 'Tool support', enabled: true },
+              { name: 'resources', version: '1.0', description: 'Resource support', enabled: true },
+              { name: 'prompts', version: '1.0', description: 'Prompt support', enabled: true }
+            ],
+            security: {
+              authRequired: false,
+              allowedOrigins: [],
+              rateLimit: { enabled: true, maxRequests: 100, windowMs: 60000 },
+              sandbox: { enabled: true, timeout: 30000, memoryLimit: 512 }
+            },
+            tools: [],
+            resources: []
+          },
+          outputFormats: ['markdown'],
+          plugins: []
+        };
+      }
+
+      // 3. 创建 Agent 配置
+      const agentConfig: AgentConfig = {
+        mode: options.mode as AgentConfig['mode'],
+        maxIterations: parseInt(options.maxIterations),
+        autoFix: options.mode === 'autonomous',
+        approvalRequired: options.mode === 'supervised'
+          ? ['file_write', 'shell_exec']
+          : [],
+        continueOnError: options.continueOnError || false,
+        timeout: parseInt(options.timeout)
+      };
+
+      console.log(chalk.blue('\n⚙️  Agent Configuration:'));
+      console.log(`   Mode: ${chalk.yellow(agentConfig.mode)}`);
+      console.log(`   Max Iterations: ${chalk.yellow(agentConfig.maxIterations)}`);
+      console.log(`   Auto Fix: ${chalk.yellow(agentConfig.autoFix)}`);
+      console.log(`   Continue on Error: ${chalk.yellow(agentConfig.continueOnError)}`);
+
+      if (options.dryRun) {
+        console.log(chalk.yellow('\n🔍 DRY RUN MODE - No changes will be made\n'));
+      }
+
+      // 4. 创建 Agent 上下文
+      const agentContext: AgentContext = {
+        prd,
+        projectConfig,
+        availableTools: [], // 从 MCP 服务器获取
+        constraints: options.constraint || []
+      };
+
+      // 5. 创建引擎
+      const aiService = new MockAIService();
+      const planningEngine = new PlanningEngine(aiService);
+      const mcpServer = new MCPServer(
+        { serverName: 'agent', version: '1.0.0' },
+        projectConfig
+      );
+      const executionEngine = new ExecutionEngine(mcpServer, {
+        config: agentConfig,
+        projectPath: process.cwd(),
+        workspacePath: path.join(process.cwd(), '.taskflow', 'workspace')
+      });
+      const verificationEngine = new VerificationEngine(process.cwd());
+
+      // 6. 创建 Agent 服务
+      const agentService = new AgentService(
+        agentContext,
+        agentConfig,
+        planningEngine,
+        executionEngine,
+        verificationEngine
+      );
+
+      // 7. 监听状态变化
+      agentService.onTransition((state) => {
+        const statusMessage = getStatusMessage(state.status);
+        spinner.text = statusMessage;
+
+        if (state.status === 'completed') {
+          spinner.succeed(chalk.green('✅ Agent execution completed successfully!'));
+          console.log(chalk.green('\n📊 Execution Report:'));
+          console.log(generateReport(state));
+        } else if (state.status === 'failed') {
+          spinner.fail(chalk.red('❌ Agent execution failed'));
+          if (state.error) {
+            console.error(chalk.red('\nError:'), state.error.message);
+          }
+        } else if (state.status === 'awaitingApproval') {
+          spinner.stop();
+          console.log(chalk.yellow('\n⏸️  Awaiting user approval...'));
+          console.log('Actions requiring approval:', agentConfig.approvalRequired);
+          // 这里可以添加交互式确认
+        }
+      });
+
+      // 8. 启动 Agent
+      console.log(chalk.blue('\n🚀 Starting Agent...\n'));
+      agentService.start();
+
+      // 9. 等待完成
+      await waitForCompletion(agentService);
+
     } catch (error) {
-      console.log(chalk.red('执行失败:'), error);
+      spinner.fail(`Failed: ${error instanceof Error ? error.message : String(error)}`);
+      process.exit(1);
     }
   });
 
-/**
- * 协作模式
- */
-program
-  .command('collaborate')
-  .description('多 Agent 协作')
-  .argument('<agentIds...>', 'Agent ID 列表')
-  .argument('<task>', '任务描述')
-  .action(async (agentIds: string[], task: string) => {
-    console.log(chalk.cyan(`\n🤝 启动协作: ${agentIds.join(', ')}`));
-    console.log(`   任务: ${task}\n`);
-
-    const agentTask: AgentTask = {
-      id: `task-${Date.now()}`,
-      description: task,
-      goal: task,
-      status: 'pending',
-      createdAt: Date.now(),
-    };
-
-    try {
-      const executions = await agentCoordinator.collaborate(agentTask, agentIds);
-      
-      console.log(chalk.bold('\n📊 协作结果:\n'));
-      console.log(`   参与 Agent: ${executions.length}`);
-      
-      const successCount = executions.filter(e => e.status === 'completed').length;
-      console.log(`   成功: ${chalk.green(successCount)}`);
-      console.log(`   失败: ${chalk.red(executions.length - successCount)}\n`);
-    } catch (error) {
-      console.log(chalk.red('协作失败:'), error);
+// Agent 子命令
+agentCommand
+  .command('status')
+  .description('Check agent execution status')
+  .option('-s, --session <id>', 'Session ID')
+  .action(async (options) => {
+    if (!options.session) {
+      console.log(chalk.yellow('No session ID provided'));
+      return;
     }
+
+    console.log(chalk.blue(`Checking status for session: ${options.session}`));
+    // 实现状态查询逻辑
   });
 
-export default program;
-export const agentCommand = program;
+agentCommand
+  .command('list')
+  .description('List all agent sessions')
+  .action(async () => {
+    console.log(chalk.blue('Active Agent Sessions:'));
+    // 实现会话列表逻辑
+  });
+
+agentCommand
+  .command('pause')
+  .description('Pause agent execution')
+  .option('-s, --session <id>', 'Session ID')
+  .action(async (options) => {
+    if (!options.session) {
+      console.log(chalk.red('Session ID is required'));
+      return;
+    }
+    console.log(chalk.yellow(`Pausing session: ${options.session}`));
+  });
+
+agentCommand
+  .command('resume')
+  .description('Resume agent execution')
+  .option('-s, --session <id>', 'Session ID')
+  .action(async (options) => {
+    if (!options.session) {
+      console.log(chalk.red('Session ID is required'));
+      return;
+    }
+    console.log(chalk.green(`Resuming session: ${options.session}`));
+  });
+
+agentCommand
+  .command('stop')
+  .description('Stop agent execution')
+  .option('-s, --session <id>', 'Session ID')
+  .action(async (options) => {
+    if (!options.session) {
+      console.log(chalk.red('Session ID is required'));
+      return;
+    }
+    console.log(chalk.red(`Stopping session: ${options.session}`));
+  });
+
+// 辅助函数
+
+function getStatusMessage(status: string): string {
+  const messages: Record<string, string> = {
+    'idle': 'Ready to start',
+    'planning': '📋 Analyzing PRD and planning tasks...',
+    'executing': '🔄 Executing tasks...',
+    'verifying': '🔍 Verifying results...',
+    'awaitingApproval': '⏸️  Awaiting user approval...',
+    'completed': '✅ Completed!',
+    'failed': '❌ Failed'
+  };
+  return messages[status] || 'Processing...';
+}
+
+function parsePRD(content: string, filePath: string): PRDDocument {
+  // 简化实现：从 Markdown 解析 PRD
+  const lines = content.split('\n');
+  const title = lines[0]?.replace(/^#\s*/, '') || 'Untitled';
+
+  const requirements: Requirement[] = [];
+  let inRequirements = false;
+
+  for (const line of lines) {
+    if (line.includes('## Requirements') || line.includes('## 需求')) {
+      inRequirements = true;
+      continue;
+    }
+
+    if (inRequirements && line.startsWith('##')) {
+      inRequirements = false;
+      continue;
+    }
+
+    if (inRequirements && line.startsWith('- ')) {
+      const reqText = line.replace(/^-\s*/, '');
+      const priority = reqText.includes('[High]') || reqText.includes('[高]')
+        ? 'high'
+        : reqText.includes('[Low]') || reqText.includes('[低]')
+          ? 'low'
+          : 'medium';
+
+      requirements.push({
+        id: `REQ-${requirements.length + 1}`,
+        title: reqText.replace(/\[.*?\]\s*/, ''),
+        description: reqText,
+        priority,
+        type: 'functional'
+      });
+    }
+  }
+
+  // 提取验收标准
+  const acceptanceCriteria: string[] = [];
+  let inCriteria = false;
+
+  for (const line of lines) {
+    if (line.includes('## Acceptance') || line.includes('## 验收')) {
+      inCriteria = true;
+      continue;
+    }
+
+    if (inCriteria && line.startsWith('##')) {
+      inCriteria = false;
+      continue;
+    }
+
+    if (inCriteria && line.startsWith('- ')) {
+      acceptanceCriteria.push(line.replace(/^-\s*/, ''));
+    }
+  }
+
+  return {
+    id: `PRD-${Date.now()}`,
+    title,
+    description: content.slice(0, 500),
+    requirements,
+    acceptanceCriteria,
+    metadata: {
+      author: 'unknown',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      version: '1.0.0',
+      tags: []
+    }
+  };
+}
+
+function generateReport(state: any): string {
+  const lines: string[] = [];
+
+  if (state.context?.taskPlan) {
+    lines.push(`Tasks Planned: ${state.context.taskPlan.tasks.length}`);
+    lines.push(`Total Estimate: ${state.context.taskPlan.totalEstimate} hours`);
+  }
+
+  if (state.context?.executionResult) {
+    const result = state.context.executionResult;
+    lines.push(`Tasks Completed: ${result.summary.completedTasks}/${result.summary.totalTasks}`);
+    lines.push(`Tasks Failed: ${result.summary.failedTasks}`);
+    lines.push(`Total Duration: ${(result.summary.totalDuration / 1000).toFixed(2)}s`);
+  }
+
+  if (state.context?.verificationResult) {
+    const result = state.context.verificationResult;
+    const passed = result.checks.filter((c: any) => c.passed).length;
+    lines.push(`Verification Checks: ${passed}/${result.checks.length} passed`);
+  }
+
+  return lines.map(l => `   ${l}`).join('\n');
+}
+
+async function waitForCompletion(agentService: AgentService): Promise<void> {
+  return new Promise((resolve) => {
+    const checkInterval = setInterval(() => {
+      const state = agentService.getState();
+      if (state.status === 'completed' || state.status === 'failed') {
+        clearInterval(checkInterval);
+        resolve();
+      }
+    }, 1000);
+  });
+}
+
+export default agentCommand;
