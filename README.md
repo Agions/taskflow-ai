@@ -1,132 +1,404 @@
+<div align="center">
+
+<img src="assets/logo.svg" alt="TaskFlow AI Logo" width="120" />
+
 # TaskFlow AI
 
-![TaskFlow AI Logo](https://img.shields.io/badge/TaskFlow%20AI-v2.1-blue)
-![Node.js](https://img.shields.io/badge/Node.js-20%2B-green)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-blue)
-![MCP](https://img.shields.io/badge/MCP-Enabled-purple)
-![CI](https://github.com/Agions/taskflow-ai/workflows/CI/badge.svg)
-![NPM Version](https://img.shields.io/npm/v/taskflow-ai)
-![License](https://img.shields.io/npm/l/taskflow-ai)
-![Downloads](https://img.shields.io/npm/dm/taskflow-ai)
+**AI 思维流编排引擎**
 
-**AI 思维流编排引擎** - 专为开发团队设计的下一代 AI 开发工具，支持多模型协同、MCP 集成、思维链可视化、工作流编排和自主 Agent。
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/Agions/taskflow-ai)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![MCP](https://img.shields.io/badge/MCP-Enabled-purple)](https://modelcontextprotocol.io/)
+
+<p align="center">
+  <a href="#核心特性">核心特性</a> •
+  <a href="#快速开始">快速开始</a> •
+  <a href="#使用指南">使用指南</a> •
+  <a href="#架构设计">架构设计</a> •
+  <a href="#开发文档">开发文档</a>
+</p>
+
+</div>
+
+---
 
 ## ✨ 核心特性
 
 ### 🧠 思维链可视化
 
-- **推理过程可视化**: 展示 AI 思考的每一步
-- **多种渲染格式**: Text、Markdown、Mermaid 流程图、思维导图
-- **反思机制**: AI 自我审视，优化结果
-- **置信度评估**: 显示每步推理的可靠性
+将 AI 推理过程可视化，让思考过程一目了然：
+
+- **多格式渲染**: Text、Markdown、Mermaid 流程图、思维导图
+- **反思机制**: AI 自我审视，迭代优化结果
+- **置信度评估**: 每步推理的可靠性评分
+- **历史追溯**: 完整的思考链路记录
 
 ### 🤖 多模型智能路由
 
-- **统一模型网关**: 一个接口管理所有 LLM 提供商
-- **智能路由策略**: smart / cost / speed / priority
-- **级联降级**: 主模型失败自动切换备选
-- **成本估算**: 实时计算 API 费用
-- **支持模型**: DeepSeek, OpenAI, Anthropic, 智谱, 通义千问
+统一接口管理多厂商 LLM，智能选择最优模型：
+
+| 特性 | 说明 |
+|------|------|
+| **统一网关** | 一个接口调用所有模型 |
+| **智能路由** | smart / cost / speed / priority 策略 |
+| **级联降级** | 主模型失败自动切换备选 |
+| **成本估算** | 实时计算 API 费用 |
+
+**支持模型**: DeepSeek, OpenAI, Anthropic, 智谱 GLM, 通义千问
 
 ### 📝 智能 PRD 解析
 
-- **多格式支持**: Markdown、Word、PDF
-- **任务自动拆分**: AI 驱动的任务分解
-- **工时估算**: 基于历史数据的预测
-- **风险识别**: 自动识别项目风险
+自动解析产品需求文档，生成开发任务：
+
+- **多格式支持**: Markdown, Word, PDF
+- **任务拆分**: AI 驱动的智能任务分解
+- **工时估算**: 基于历史数据的预测模型
+- **风险识别**: 自动识别潜在项目风险
 
 ### ⚡ 工作流引擎
 
-- **声明式定义**: YAML/JSON 格式
-- **流程控制**: 顺序、并行、条件分支、循环
-- **变量系统**: 支持 `{{variable}}` 替换
-- **状态持久化**: SQLite 存储执行状态
-- **错误处理**: 重试、降级机制
+声明式工作流编排，支持复杂业务逻辑：
+
+```yaml
+# 示例工作流
+name: 代码审查流程
+steps:
+  - name: 语法检查
+    type: command
+    command: npm run lint
+  
+  - name: 类型检查
+    type: command
+    command: npm run type-check
+  
+  - name: AI 代码审查
+    type: ai
+    prompt: "审查以下代码: {{code}}"
+    condition: "{{files.length}} > 0"
+```
+
+**特性**:
+- 顺序、并行、条件分支、循环控制
+- 变量替换系统 `{{variable}}`
+- SQLite 状态持久化
+- 错误重试与降级
 
 ### 🔌 MCP 集成
 
-- **编辑器支持**: Cursor、VSCode、Windsurf、Trae、Claude Desktop
-- **动态工具注册**: 运行时加载自定义工具
-- **安全策略**: 权限控制、速率限制
-- **工具市场**: 丰富的内置工具
+Model Context Protocol 集成，连接主流编辑器：
+
+| 编辑器 | 状态 |
+|--------|------|
+| Cursor | ✅ 完整支持 |
+| VSCode | ✅ 完整支持 |
+| Windsurf | ✅ 完整支持 |
+| Trae | ✅ 完整支持 |
+| Claude Desktop | ✅ 完整支持 |
+
+**功能**:
+- 动态工具注册
+- 权限控制
+- 速率限制
+- 工具市场
 
 ### 🧩 插件系统
 
-- **热插拔**: 动态加载/卸载插件
-- **钩子系统**: onInit, onTaskCreate, onWorkflowExecute 等
-- **生命周期管理**: 完整的加载/卸载流程
+可扩展的插件架构：
+
+- **热插拔**: 运行时加载/卸载
+- **钩子系统**: onInit, onTaskCreate, onWorkflowExecute
+- **生命周期**: 完整的加载/卸载流程
+- **API 暴露**: 插件间通信机制
 
 ### 🤖 Agent 系统
 
-- **自主执行**: 目标驱动的任务完成
-- **反思机制**: 自我审视和改进
+自主任务执行 Agent：
+
+- **目标驱动**: 给定目标自动规划执行
+- **反思改进**: 自我审视优化策略
 - **多 Agent 协作**: 消息传递、任务分发
-- **记忆系统**: 短期/长期记忆
+- **记忆系统**: 短期/长期记忆管理
 
-## 🏗️ 项目架构
-
-```
-src/
-├── cli/                        # CLI 入口
-│   ├── commands/              # 命令实现
-│   │   ├── model.ts          # 模型管理
-│   │   ├── think.ts          # 思维分析
-│   │   ├── flow.ts           # 工作流
-│   │   ├── plugin.ts         # 插件管理
-│   │   ├── template.ts       # 模板管理
-│   │   └── agent.ts          # Agent 管理
-│   └── index.ts
-│
-├── core/
-│   ├── ai/                    # AI 模型网关
-│   │   ├── types.ts          # 类型定义
-│   │   ├── adapter.ts        # 适配器基类
-│   │   ├── gateway.ts        # 模型网关
-│   │   ├── router.ts         # 路由策略
-│   │   └── providers/        # 模型适配器
-│   │       ├── deepseek.ts
-│   │       ├── openai.ts
-│   │       └── anthropic.ts
-│   │
-│   ├── thought/               # 思维链系统
-│   │   ├── types.ts
-│   │   ├── chain.ts         # 思维链管理器
-│   │   └── renderer.ts      # 渲染器
-│   │
-│   ├── workflow/             # 工作流引擎
-│   │   ├── types.ts
-│   │   ├── parser.ts        # 解析器
-│   │   ├── engine.ts        # 引擎
-│   │   ├── executor.ts      # 执行器
-│   │   ├── flow-control.ts  # 流程控制
-│   │   └── storage.ts       # 状态存储
-│   │
-│   ├── plugin/               # 插件系统
-│   │   ├── types.ts
-│   │   ├── manager.ts       # 插件管理器
-│   │   └── template.ts      # 模板系统
-│   │
-│   ├── agent/                # Agent 系统
-│   │   ├── types.ts
-│   │   ├── core.ts         # Agent 核心
-│   │   └── coordinator.ts  # 多 Agent 协作
-│   │
-│   └── parser/               # PRD 解析器
-│       ├── enhanced.ts
-│       ├── word.ts
-│       └── pdf.ts
-│
-└── mcp/                      # MCP 服务器
-    ├── server.ts
-    ├── tools/
-    │   ├── registry.ts      # 工具注册表
-    │   └── search-replace.ts
-    └── ...
-```
+---
 
 ## 🚀 快速开始
 
+### 环境要求
+
+- Node.js ≥ 20
+- npm ≥ 10
+
 ### 安装
+
+```bash
+# 全局安装
+npm install -g taskflow-ai
+
+# 或使用 npx
+npx taskflow-ai --help
+```
+
+### 初始化配置
+
+```bash
+# 初始化项目
+taskflow init
+
+# 配置 AI 模型
+taskflow model add \
+  --id deepseek-chat \
+  --provider deepseek \
+  --model deepseek-chat \
+  --key YOUR_API_KEY
+```
+
+### 第一个工作流
+
+```bash
+# 创建思维链
+taskflow think "如何设计一个用户认证系统"
+
+# 解析 PRD
+taskflow parse requirements.md
+
+# 运行工作流
+taskflow flow run ci-pipeline
+```
+
+---
+
+## 📖 使用指南
+
+### 模型管理
+
+```bash
+# 列出所有模型
+taskflow model list
+
+# 添加模型
+taskflow model add -i <id> -p <provider> -m <model> -k <key>
+
+# 测试连接
+taskflow model test
+
+# 测试路由策略
+taskflow model route "帮我写个函数"
+
+# 性能基准测试
+taskflow model benchmark
+```
+
+### 思维分析
+
+```bash
+# 基础思维分析
+taskflow think "分析这个技术方案"
+
+# 可视化输出
+taskflow think "设计数据库架构" --visualize
+
+# 查看历史
+taskflow think history
+
+# 导出为 Mermaid
+taskflow think "优化算法" --format mermaid
+```
+
+### 工作流管理
+
+```bash
+# 列出工作流
+taskflow flow list
+
+# 运行工作流
+taskflow flow run <name>
+
+# 创建新工作流
+taskflow flow create <name>
+
+# 查看执行历史
+taskflow flow history
+
+# 暂停/恢复
+taskflow flow pause <id>
+taskflow flow resume <id>
+```
+
+### PRD 解析
+
+```bash
+# 解析 Markdown
+taskflow parse prd.md
+
+# 解析 Word
+taskflow parse prd.docx
+
+# 解析 PDF
+taskflow parse prd.pdf
+
+# 导出任务
+taskflow parse prd.md --output tasks.json
+```
+
+### 插件管理
+
+```bash
+# 列出插件
+taskflow plugin list
+
+# 加载插件
+taskflow plugin load <id>
+
+# 卸载插件
+taskflow plugin unload <id>
+
+# 安装插件
+taskflow plugin install <package>
+```
+
+### 模板使用
+
+```bash
+# 列出模板
+taskflow template list
+
+# 使用模板
+taskflow template use <id> -o output.md
+
+# 搜索模板
+taskflow template search <query>
+
+# 创建模板
+taskflow template create <name>
+```
+
+### Agent 控制
+
+```bash
+# 启动 Agent
+taskflow agent start
+
+# 发送任务
+taskflow agent task "优化代码性能"
+
+# 查看状态
+taskflow agent status
+
+# 停止 Agent
+taskflow agent stop
+```
+
+### MCP 操作
+
+```bash
+# 启动 MCP 服务器
+taskflow mcp start
+
+# 列出工具
+taskflow mcp tools
+
+# 测试工具
+taskflow mcp test <tool-name>
+
+# 查看资源
+taskflow mcp resources
+```
+
+---
+
+## 🏗️ 架构设计
+
+### 系统架构
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        CLI 层                                │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐           │
+│  │  model  │ │  think  │ │  flow   │ │  agent  │           │
+│  └────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘           │
+└───────┼───────────┼───────────┼───────────┼─────────────────┘
+        │           │           │           │
+        └───────────┴─────┬─────┴───────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                      核心服务层                              │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐       │
+│  │  AI 网关  │ │ 思维链   │ │ 工作流   │ │  Agent   │       │
+│  │  Gateway │ │  Thought │ │ Workflow │ │  System  │       │
+│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └────┬─────┘       │
+│       │            │            │            │              │
+│  ┌────▼─────┐ ┌────▼─────┐ ┌────▼─────┐ ┌────▼─────┐       │
+│  │  Parser  │ │  Plugin  │ │  Template│ │   MCP    │       │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘       │
+└─────────────────────────────────────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────────┐
+│                      适配器层                                │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐          │
+│  │DeepSeek │ │ OpenAI  │ │Anthropic│ │  智谱   │          │
+│  └─────────┘ └─────────┘ └─────────┘ └─────────┘          │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 模块说明
+
+| 模块 | 职责 | 核心文件 |
+|------|------|----------|
+| **AI Gateway** | 多模型统一管理 | `core/ai/gateway.ts` |
+| **Thought Chain** | 思维链管理 | `core/thought/chain.ts` |
+| **Workflow Engine** | 工作流执行 | `core/workflow/engine.ts` |
+| **Agent System** | 自主 Agent | `core/agent/core.ts` |
+| **PRD Parser** | 文档解析 | `core/parser/enhanced.ts` |
+| **Plugin Manager** | 插件管理 | `core/plugin/manager.ts` |
+| **MCP Server** | MCP 服务 | `mcp/server.ts` |
+
+---
+
+## 🛠️ 开发文档
+
+### 项目结构
+
+```
+taskflow-ai/
+├── src/
+│   ├── cli/                    # CLI 入口
+│   │   ├── commands/          # 命令实现
+│   │   │   ├── model.ts      # 模型管理
+│   │   │   ├── think.ts      # 思维分析
+│   │   │   ├── flow.ts       # 工作流
+│   │   │   ├── parse.ts      # PRD 解析
+│   │   │   ├── agent.ts      # Agent
+│   │   │   ├── plugin.ts     # 插件
+│   │   │   ├── template.ts   # 模板
+│   │   │   ├── mcp.ts        # MCP
+│   │   │   └── ...
+│   │   └── index.ts
+│   │
+│   ├── core/                   # 核心模块
+│   │   ├── ai/                # AI 网关
+│   │   ├── thought/           # 思维链
+│   │   ├── workflow/          # 工作流引擎
+│   │   ├── agent/             # Agent 系统
+│   │   ├── plugin/            # 插件系统
+│   │   └── parser/            # PRD 解析器
+│   │
+│   ├── mcp/                    # MCP 实现
+│   │   ├── server.ts
+│   │   ├── tools/
+│   │   └── resources/
+│   │
+│   ├── types/                  # 类型定义
+│   └── constants/              # 常量配置
+│
+├── tests/                      # 测试
+├── docs/                       # 文档
+├── templates/                  # 模板
+└── assets/                     # 资源
+```
+
+### 开发环境
 
 ```bash
 # 克隆项目
@@ -136,160 +408,94 @@ cd taskflow-ai
 # 安装依赖
 npm install
 
-# 构建项目
-npm run build
-```
+# 开发模式
+npm run dev
 
-### 配置 AI 模型
-
-```bash
-# 添加模型
-taskflow model add -i deepseek-chat -p deepseek -m deepseek-chat -k YOUR_API_KEY
-
-# 列出模型
-taskflow model list
-
-# 测试连接
-taskflow model test
-```
-
-## 📋 命令参考
-
-### 模型管理
-
-```bash
-taskflow model list                    # 列出所有模型
-taskflow model add -i <id> -p <provider> -m <model> -k <key>  # 添加模型
-taskflow model test                    # 测试连接
-taskflow model route "帮我写个函数"     # 测试路由
-taskflow model benchmark              # 基准测试
-```
-
-### 思维分析
-
-```bash
-taskflow think "帮我分析这个需求"       # 思维分析
-taskflow think --visualize             # 可视化输出
-taskflow think history                 # 查看历史
-```
-
-### 工作流
-
-```bash
-taskflow flow list                     # 列出工作流
-taskflow flow run <name>               # 运行工作流
-taskflow flow create <name>            # 创建工作流
-taskflow flow history                  # 执行历史
-```
-
-### 插件
-
-```bash
-taskflow plugin list                   # 列出插件
-taskflow plugin load <id>             # 加载插件
-taskflow plugin unload <id>            # 卸载插件
-```
-
-### 模板
-
-```bash
-taskflow template list                 # 列出模板
-taskflow template use <id> -o file.md # 使用模板
-taskflow template search <query>      # 搜索模板
-```
-
-### Agent
-
-```bash
-taskflow agent create analyzer         # 创建分析 Agent
-taskflow agent list                   # 列出 Agent
-taskflow agent run <id> <task>        # 运行 Agent
-taskflow agent collaborate <ids...>   # 多 Agent 协作
-```
-
-### 原有命令
-
-```bash
-taskflow init                         # 初始化项目
-taskflow parse <file>                 # 解析 PRD
-taskflow status                       # 查看状态
-taskflow visualize                    # 生成图表
-taskflow mcp start                    # 启动 MCP
-```
-
-## 📊 版本历史
-
-### v2.0 - 跨时代升级
-
-| 模块 | 新增功能 |
-|------|----------|
-| **模型网关** | 多模型路由、智能选择、成本估算 |
-| **思维链** | 推理可视化、Mermaid 导出、反思机制 |
-| **工作流** | YAML/JSON 定义、并行执行、状态持久化 |
-| **插件** | 动态加载、钩子系统、模板市场 |
-| **Agent** | 自主执行、多 Agent 协作、记忆系统 |
-
-### v1.x - 基础版本
-
-- PRD 解析
-- 任务管理
-- 可视化报告
-- MCP 集成
-
-## 🧪 测试验证
-
-```bash
-# ✅ 模型网关测试
-taskflow model test
-# 结果: 显示所有模型的连接状态
-
-# ✅ 思维分析测试
-taskflow think "分析用户登录功能需求"
-# 结果: 输出思维链分析结果
-
-# ✅ 工作流测试
-taskflow flow run prd-to-code
-# 结果: 执行完整工作流
-
-# ✅ Agent 测试
-taskflow agent create executor
-taskflow agent run executor "帮我写个 API"
-# 结果: Agent 自主执行任务
-```
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-### 开发环境
-
-```bash
-git clone https://github.com/Agions/taskflow-ai.git
-cd taskflow-ai
-npm install
-npm run build
+# 运行测试
 npm test
+
+# 代码检查
+npm run lint
+
+# 格式化
+npm run format
 ```
 
-## 📄 许可证
+### 添加新模型
 
-MIT License
+```typescript
+// src/core/ai/providers/custom.ts
+import { AIProvider, AIRequest, AIResponse } from '../types';
 
-## 🙏 致谢
+export class CustomProvider implements AIProvider {
+  readonly name = 'custom';
+  
+  async chat(request: AIRequest): Promise<AIResponse> {
+    // 实现模型调用
+  }
+}
+```
 
-感谢所有为 TaskFlow AI 贡献代码和建议的开发者！
+### 创建插件
+
+```typescript
+// my-plugin.ts
+import { Plugin, PluginContext } from 'taskflow-ai';
+
+export default class MyPlugin implements Plugin {
+  name = 'my-plugin';
+  version = '1.0.0';
+  
+  async onInit(ctx: PluginContext) {
+    console.log('Plugin initialized');
+  }
+  
+  async onTaskCreate(task: Task) {
+    // 任务创建钩子
+  }
+}
+```
 
 ---
 
-**TaskFlow AI** - 让 AI 开发工作流从"被动执行"变为"主动思考"！
+## 📝 更新日志
 
-🔗 [GitHub](https://github.com/Agions/taskflow-ai) | 📚 [文档](https://agions.github.io/taskflow-ai/) | 💬 [讨论](https://github.com/Agions/taskflow-ai/discussions)
+### v2.1.0 (2026-02-22)
 
-## 📖 文档导航
+- ✨ 新增 Agent 系统
+- 🔌 MCP 集成增强
+- 🧠 思维链可视化优化
+- ⚡ 工作流性能提升
 
-- [API 参考](docs/api-reference.md) - 完整的 API 文档
-- [MCP 配置指南](docs/guide/mcp-setup.md) - MCP 服务器配置
-- [开发者指南](docs/development/developer-guide.md) - 开发环境搭建
-- [贡献指南](docs/development/contributing.md) - 如何贡献代码
-- [安全策略](docs/security.md) - 安全相关信息
-- [示例 PRD](docs/examples/example-prd.md) - PRD 文档示例
+### v2.0.0 (2026-01-15)
+
+- 🎉 全新架构设计
+- 🤖 多模型智能路由
+- 📝 智能 PRD 解析
+- 🧩 插件系统
+
+---
+
+## 🤝 贡献指南
+
+欢迎提交 Issue 和 PR！
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送分支 (`git push origin feature/AmazingFeature`)
+5. 创建 Pull Request
+
+---
+
+## 📄 许可证
+
+[MIT](LICENSE) © 2026 TaskFlow AI Team
+
+---
+
+<div align="center">
+
+**Made with ❤️ by TaskFlow AI Team**
+
+</div>
