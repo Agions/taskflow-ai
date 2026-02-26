@@ -17,13 +17,11 @@ export const upgradeCommand = {
   async action(options: { check?: boolean; force?: boolean }) {
     console.log(chalk.cyan.bold('\n⬆️ TaskFlow AI 版本检查\n'));
 
-    // 获取当前版本
     const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
     const currentVersion = packageJson.version;
     
     console.log(chalk.gray(`当前版本: ${chalk.yellow(currentVersion)}`));
 
-    // 检查 npm 最新版本
     console.log(chalk.gray('\n检查 npm 最新版本...\n'));
     
     try {
@@ -49,7 +47,6 @@ export const upgradeCommand = {
       console.log(chalk.gray('  - 无法检查最新版本 (可能未发布到 npm)'));
     }
 
-    // 检查依赖更新
     console.log(chalk.cyan('\n📦 检查依赖更新...\n'));
     
     try {

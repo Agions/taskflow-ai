@@ -9,11 +9,9 @@ import { ConfigManager } from '../core/config';
 
 async function main() {
   try {
-    // 加载配置
     const configManager = new ConfigManager();
     const config = await configManager.loadConfig();
 
-    // 如果没有配置，使用默认配置
     const effectiveConfig = config || {
       projectName: 'taskflow-ai',
       version: '2.0.0',
@@ -46,17 +44,14 @@ async function main() {
       plugins: [],
     };
 
-    // 创建MCP服务器设置
     const mcpSettings = {
       serverName: 'taskflow-ai',
       version: '2.0.0',
     };
 
-    // 创建并启动MCP服务器
     const mcpServer = new MCPServer(mcpSettings, effectiveConfig);
     await mcpServer.start();
 
-    // 服务器会持续运行直到进程结束
   } catch (error) {
     console.error('MCP Server Error:', error);
     process.exit(1);

@@ -5,7 +5,6 @@
 
 import chalk from 'chalk';
 
-// 常用颜色输出
 export const log = {
   info: (msg: string) => console.log(chalk.cyan(msg)),
   success: (msg: string) => console.log(chalk.green(msg)),
@@ -14,7 +13,6 @@ export const log = {
   dim: (msg: string) => console.log(chalk.gray(msg)),
 };
 
-// 格式化输出
 export const format = {
   title: (msg: string) => console.log(chalk.bold.cyan(`\n${msg}\n`)),
   section: (msg: string) => console.log(chalk.bold(`\n📋 ${msg}\n`)),
@@ -24,25 +22,21 @@ export const format = {
   },
 };
 
-// 表格输出
 export const table = {
   simple: (headers: string[], rows: string[][]) => {
     const colWidths = headers.map((h, i) => 
       Math.max(h.length, ...rows.map(r => (r[i] || '').length))
     );
     
-    // 表头
     console.log(headers.map((h, i) => chalk.bold(h.padEnd(colWidths[i]))).join('  '));
     console.log(colWidths.map(w => '-'.repeat(w)).join('  '));
     
-    // 行
     rows.forEach(row => {
       console.log(row.map((c, i) => (c || '').padEnd(colWidths[i])).join('  '));
     });
   },
 };
 
-// 确认提示
 export async function confirm(message: string): Promise<boolean> {
   const readline = require('readline');
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -55,7 +49,6 @@ export async function confirm(message: string): Promise<boolean> {
   });
 }
 
-// 加载动画
 export class Spinner {
   private interval: NodeJS.Timeout | null = null;
   private frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
@@ -77,5 +70,4 @@ export class Spinner {
   }
 }
 
-// 导出 chalk 直接使用
 export { chalk };

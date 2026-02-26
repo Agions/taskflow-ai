@@ -111,7 +111,6 @@ export function validateFilePath(filePath: string): void {
     throw createTaskFlowError('validation', ERROR_CODES.INVALID_FORMAT, '无效的文件路径');
   }
 
-  // 检查危险路径
   const dangerous = ['../', '..\\', '/etc/', '/root/', 'C:\\Windows\\'];
   if (dangerous.some(pattern => filePath.includes(pattern))) {
     throw createTaskFlowError('validation', ERROR_CODES.VALIDATION_ERROR, '不安全的文件路径');

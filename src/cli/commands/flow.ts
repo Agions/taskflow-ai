@@ -92,11 +92,9 @@ program
     console.log(chalk.cyan(`\n🚀 运行工作流: ${name}\n`));
 
     try {
-      // 读取工作流
       const content = await fs.readFile(filePath, 'utf-8');
       const workflow = getParser().parse(content, options.format as any);
 
-      // 解析输入
       let input: Record<string, unknown> = {};
       if (options.input) {
         try {
@@ -107,10 +105,8 @@ program
         }
       }
 
-      // 执行工作流
       const result = await getEngine().execute(workflow, input);
 
-      // 输出结果
       if (result.success) {
         console.log(chalk.green(`\n✅ 工作流执行成功!`));
         console.log(`   耗时: ${result.duration}ms`);
@@ -139,15 +135,12 @@ program
   .action(async (name: string, options) => {
     const workflowDir = path.resolve(options.dir);
     
-    // 确保目录存在
     await fs.ensureDir(workflowDir);
 
-    // 选择模板
     const template = getTemplate(options.template);
     template.name = name;
     template.version = '1.0.0';
 
-    // 保存文件
     const filePath = path.join(workflowDir, `${name}.json`);
     await fs.writeFile(filePath, JSON.stringify(template, null, 2));
 

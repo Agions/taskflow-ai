@@ -34,21 +34,17 @@ export class PRDParser {
     this.logger.info(`开始解析PRD文档: ${filePath}`);
 
     try {
-      // 检查文件是否存在
       if (!(await fs.pathExists(filePath))) {
         throw createTaskFlowError('parsing', 'FILE_NOT_FOUND', `文件不存在: ${filePath}`);
       }
 
-      // 检查文件格式
       const ext = path.extname(filePath).toLowerCase();
       if (!SUPPORTED_PRD_FORMATS.includes(ext as any)) {
         throw createTaskFlowError('parsing', 'UNSUPPORTED_FORMAT', `不支持的文件格式: ${ext}`);
       }
 
-      // 读取文件内容
       const content = await fs.readFile(filePath, 'utf-8');
 
-      // 解析文档
       const document = await this.parseContent(content, filePath);
 
       this.logger.info(`PRD文档解析完成，包含 ${document.sections.length} 个章节`);
@@ -66,14 +62,11 @@ export class PRDParser {
   private async parseContent(content: string, filePath: string): Promise<PRDDocument> {
     const fileName = path.basename(filePath, path.extname(filePath));
 
-    // 解析Markdown内容
     const tokens = this.markdown.parse(content, {});
 
-    // 提取文档信息
     const title = this.extractTitle(tokens) || fileName;
     const sections = this.extractSections(tokens);
 
-    // 估算复杂度和工时
     const estimatedHours = this.estimateWorkHours(sections);
     const complexity = this.determineComplexity(sections, estimatedHours);
 
@@ -127,12 +120,10 @@ export class PRDParser {
       const token = tokens[i];
 
       if (token.type === 'heading_open' && ['h2', 'h3'].includes(token.tag)) {
-        // 保存之前的章节
         if (currentSection) {
           sections.push(currentSection as PRDSection);
         }
 
-        // 开始新章节
         const nextToken = tokens[i + 1];
         const title = nextToken?.content || 'Untitled Section';
 
@@ -146,12 +137,10 @@ export class PRDParser {
           order: sectionOrder++,
         };
       } else if (currentSection && token.content) {
-        // 添加内容到当前章节
         currentSection.content += token.content + '\n';
       }
     }
 
-    // 添加最后一个章节
     if (currentSection) {
       sections.push(currentSection as PRDSection);
     }

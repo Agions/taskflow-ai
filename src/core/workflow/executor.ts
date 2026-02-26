@@ -38,7 +38,6 @@ export abstract class BaseExecutor {
 
   /** 准备输入 */
   protected prepareInput(input: Record<string, unknown>): Record<string, unknown> {
-    // 替换变量占位符
     const result: Record<string, unknown> = {};
     
     for (const [key, value] of Object.entries(input)) {
@@ -55,11 +54,9 @@ export abstract class BaseExecutor {
   /** 替换变量 */
   protected replaceVariables(text: string): string {
     return text.replace(/\{\{(\w+(?:\.\w+)*)\}\}/g, (match, path) => {
-      // 尝试从变量获取
       const value = this.getByPath(this.context.variables, path);
       if (value !== undefined) return String(value);
       
-      // 尝试从输出获取
       const outputValue = this.getByPath(this.context.outputs, path);
       if (outputValue !== undefined) return String(outputValue);
       
@@ -109,7 +106,6 @@ export class ToolExecutor extends BaseExecutor {
       
       const result = await toolRegistry.execute(toolName, toolInput);
 
-      // 保存输出
       if (this.step.config.outputKey) {
         this.context.outputs[this.step.config.outputKey] = result;
       }
@@ -137,14 +133,12 @@ export class ThoughtExecutor extends BaseExecutor {
   async execute(): Promise<StepResult> {
     const startTime = Date.now();
     
-    // TODO: 集成 ModelGateway 进行实际分析
     const prompt = this.replaceVariables(
       this.step.config.prompt || ''
     );
 
     this.logger.info(`执行思维分析: ${this.step.id}`);
 
-    // 模拟执行
     await this.sleep(100);
 
     const result = {
@@ -152,7 +146,6 @@ export class ThoughtExecutor extends BaseExecutor {
       timestamp: Date.now(),
     };
 
-    // 保存输出
     if (this.step.config.outputKey) {
       this.context.outputs[this.step.config.outputKey] = result;
     }
@@ -177,7 +170,6 @@ export class TaskExecutor extends BaseExecutor {
     const startTime = Date.now();
     this.logger.info(`执行任务: ${this.step.id}`);
 
-    // 模拟任务执行
     await this.sleep(50);
 
     const result = {

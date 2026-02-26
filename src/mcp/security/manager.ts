@@ -48,11 +48,9 @@ export class SecurityManager {
     this.logger.info('正在初始化安全管理器...');
 
     try {
-      // 生成默认访问令牌
       const defaultToken = this.generateToken();
       this.allowedTokens.add(defaultToken);
 
-      // 启动清理任务
       this.startCleanupTasks();
 
       this.logger.info('安全管理器初始化完成');
@@ -73,29 +71,24 @@ export class SecurityManager {
     };
 
     try {
-      // 检查IP黑名单
       const clientIP = this.getClientIP(request);
       if (this.blacklistedIPs.has(clientIP)) {
         throw new Error('IP已被禁止访问');
       }
 
-      // 检查来源
       if (!this.validateOrigin(request)) {
         throw new Error('来源不被允许');
       }
 
-      // 检查速率限制
       if (this.settings.rateLimit.enabled) {
         if (!this.checkRateLimit(clientIP)) {
           throw new Error('请求频率超过限制');
         }
       }
 
-      // 身份验证
       if (this.settings.authRequired) {
         await this.authenticateRequest(request, context);
       } else {
-        // 匿名访问，给予基本权限
         context.permissions = ['read'];
       }
 
@@ -135,7 +128,6 @@ export class SecurityManager {
     let clientData = this.rateLimitStore.get(clientIP);
 
     if (!clientData || now > clientData.resetTime) {
-      // 重置或初始化
       clientData = {
         count: 1,
         resetTime: now + windowMs,
@@ -181,7 +173,6 @@ export class SecurityManager {
       throw new Error('无效的访问令牌');
     }
 
-    // 简单的令牌权限映射
     context.userId = 'token-user';
     context.permissions = ['read', 'write', 'execute'];
   }
@@ -194,7 +185,6 @@ export class SecurityManager {
       const decoded = Buffer.from(credentials, 'base64').toString('utf-8');
       const [username, password] = decoded.split(':');
 
-      // 简单的用户验证（实际应用中应使用数据库）
       if (username === 'admin' && password === 'taskflow2024') {
         context.userId = username;
         context.permissions = ['read', 'write', 'execute', 'admin'];
@@ -287,7 +277,6 @@ export class SecurityManager {
       allowedModules: ['fs', 'path', 'util'],
       blockedModules: ['child_process', 'cluster', 'net', 'dgram'],
       executeInContext: (code: string, context: any) => {
-        // 简单的沙箱实现
         try {
           const vm = require('vm');
           const sandbox = {
@@ -334,7 +323,6 @@ export class SecurityManager {
    * 启动清理任务
    */
   private startCleanupTasks(): void {
-    // 每分钟清理过期的速率限制记录
     setInterval(() => {
       const now = Date.now();
       for (const [ip, data] of this.rateLimitStore.entries()) {

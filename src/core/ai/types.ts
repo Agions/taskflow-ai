@@ -56,9 +56,7 @@ export interface ModelInfo {
   costPer1MOutput: number;
 }
 
-// 内置模型信息注册表
 export const MODEL_REGISTRY: Record<string, ModelInfo> = {
-  // DeepSeek
   'deepseek-chat': {
     id: 'deepseek-chat',
     provider: 'deepseek',
@@ -78,7 +76,6 @@ export const MODEL_REGISTRY: Record<string, ModelInfo> = {
     costPer1MOutput: 2,
   },
   
-  // OpenAI
   'gpt-4o': {
     id: 'gpt-4o',
     provider: 'openai',
@@ -116,7 +113,6 @@ export const MODEL_REGISTRY: Record<string, ModelInfo> = {
     costPer1MOutput: 12,
   },
   
-  // Anthropic
   'claude-3-5-sonnet': {
     id: 'claude-3-5-sonnet',
     provider: 'anthropic',
@@ -136,7 +132,6 @@ export const MODEL_REGISTRY: Record<string, ModelInfo> = {
     costPer1MOutput: 75,
   },
   
-  // 智谱 AI
   'glm-4': {
     id: 'glm-4',
     provider: 'zhipu',
@@ -156,7 +151,6 @@ export const MODEL_REGISTRY: Record<string, ModelInfo> = {
     costPer1MOutput: 0.1,
   },
   
-  // 通义千问
   'qwen-turbo': {
     id: 'qwen-turbo',
     provider: 'qwen',
@@ -177,7 +171,6 @@ export const MODEL_REGISTRY: Record<string, ModelInfo> = {
   },
 };
 
-// Provider API 端点配置
 export const PROVIDER_ENDPOINTS: Record<ProviderType, string> = {
   deepseek: 'https://api.deepseek.com/v1',
   openai: 'https://api.openai.com/v1',

@@ -78,7 +78,6 @@ export class ToolRegistry {
    * 注册内置工具
    */
   private registerBuiltinTools(): void {
-    // 文件读取工具
     this.register({
       name: 'file_read',
       description: '读取文件内容',
@@ -110,7 +109,6 @@ export class ToolRegistry {
       tags: ['read', 'file'],
     });
 
-    // 文件写入工具
     this.register({
       name: 'file_write',
       description: '写入文件内容',
@@ -142,7 +140,6 @@ export class ToolRegistry {
       tags: ['write', 'file'],
     });
 
-    // 文件编辑工具
     this.register({
       name: 'file_edit',
       description: '编辑文件局部内容',
@@ -178,7 +175,6 @@ export class ToolRegistry {
       tags: ['edit', 'file'],
     });
 
-    // Shell 执行工具
     this.register({
       name: 'shell_exec',
       description: '执行 Shell 命令',
@@ -218,7 +214,6 @@ export class ToolRegistry {
       tags: ['shell', 'exec'],
     });
 
-    // 项目分析工具
     this.register({
       name: 'project_analyze',
       description: '分析项目结构',
@@ -244,7 +239,6 @@ export class ToolRegistry {
       tags: ['analyze', 'project'],
     });
 
-    // 任务创建工具
     this.register({
       name: 'task_create',
       description: '创建新任务',
@@ -259,7 +253,6 @@ export class ToolRegistry {
         required: ['title'],
       },
       handler: async (input) => {
-        // 简化的任务创建
         const task = {
           id: `task-${Date.now()}`,
           title: input.title,
@@ -289,7 +282,6 @@ export class ToolRegistry {
 
     this.tools.set(tool.name, registration);
 
-    // 添加到分类
     const category = tool.category || 'custom';
     if (this.categories.has(category)) {
       this.categories.get(category)!.tools.push(tool.name);
@@ -305,7 +297,6 @@ export class ToolRegistry {
     const tool = this.tools.get(name);
     if (!tool) return false;
 
-    // 从分类中移除
     const category = tool.tool.category || 'custom';
     if (this.categories.has(category)) {
       const tools = this.categories.get(category)!.tools;
@@ -423,7 +414,6 @@ export class ToolRegistry {
         for (const entry of entries) {
           const fullPath = path.join(dir, entry.name);
 
-          // 跳过隐藏文件和 node_modules
           if (entry.name.startsWith('.') || entry.name === 'node_modules') {
             continue;
           }
@@ -440,12 +430,10 @@ export class ToolRegistry {
               const stat = await fs.stat(fullPath);
               result.size += stat.size;
             } catch {
-              // 忽略无法访问的文件
             }
           }
         }
       } catch {
-        // 忽略无法访问的目录
       }
     };
 
@@ -454,5 +442,4 @@ export class ToolRegistry {
   }
 }
 
-// 导出单例
 export const toolRegistry = new ToolRegistry();

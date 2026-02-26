@@ -9,5 +9,4 @@ export * from './engine';
 
 import { WorkflowEngine } from './engine';
 
-// 导出单例
 export const workflowEngine = new WorkflowEngine();

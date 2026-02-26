@@ -120,7 +120,6 @@ export class OpenAIAdapter extends BaseAdapter {
             })),
           };
         } catch {
-          // 跳过无效 JSON
         }
       }
     }

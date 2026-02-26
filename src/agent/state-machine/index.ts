@@ -16,13 +16,11 @@ import { PlanningEngine } from '../planning/engine';
 import { ExecutionEngine } from '../execution/engine';
 import { VerificationEngine } from '../verification/engine';
 
-// 状态机上下文
 interface MachineContext extends AgentContext {
   error?: Error;
   config: AgentConfig;
 }
 
-// 状态机事件类型
 type MachineEvent =
   | { type: 'START' }
   | { type: 'PLAN_COMPLETE'; data: TaskPlan }
@@ -34,7 +32,6 @@ type MachineEvent =
   | { type: 'APPROVED' }
   | { type: 'REJECTED' };
 
-// 创建 Agent 状态机
 export const createAgentMachine = (
   context: AgentContext,
   agentConfig: AgentConfig,
@@ -194,7 +191,6 @@ export const createAgentMachine = (
     }
   }, {
     actions: {
-      // 日志动作
       logStart: ({ context }: { context: MachineContext }) => {
         console.log('🚀 Agent started');
         console.log(`📋 PRD: ${context.prd.title}`);
@@ -275,24 +271,18 @@ export const createAgentMachine = (
         }
       },
 
-      // 状态设置
       setPlanningStatus: () => {
-        // 更新状态
       },
 
       setExecutingStatus: () => {
-        // 更新状态
       },
 
       setVerifyingStatus: () => {
-        // 更新状态
       },
 
       setAwaitingApprovalStatus: () => {
-        // 更新状态
       },
 
-      // 数据设置
       setTaskPlan: ({ context, event }: { context: MachineContext; event: any }) => {
         context.taskPlan = event.output as TaskPlan;
       },
@@ -309,25 +299,18 @@ export const createAgentMachine = (
         context.error = event.error as Error;
       },
 
-      // 任务管理
       createFixTasks: ({ context, event }: { context: MachineContext; event: any }) => {
         const result = event.output as VerificationResult;
-        // 根据验证失败创建修复任务
         if (result.fixTasks) {
-          // 更新任务计划
         }
       },
 
-      // 时间记录
       recordStartTime: () => {
-        // 记录开始时间
       },
 
       recordEndTime: () => {
-        // 记录结束时间
       },
 
-      // 报告生成
       generateReport: ({ context }: { context: MachineContext }) => {
         console.log('\n📊 Execution Report:');
         console.log('===================');
@@ -340,10 +323,8 @@ export const createAgentMachine = (
         }
       },
 
-      // 清理
       cleanup: () => {
         console.log('🧹 Cleaning up...');
-        // 清理临时文件等
       }
     },
 
@@ -374,14 +355,12 @@ export const createAgentMachine = (
       },
 
       canRetry: () => {
-        // 检查是否可以重试（未达到最大迭代次数）
         return true; // 简化实现
       }
     }
   });
 };
 
-// Agent 服务类
 export class AgentService {
   private machine: any;
   private actor: any;

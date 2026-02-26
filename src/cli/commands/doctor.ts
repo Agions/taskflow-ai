@@ -20,7 +20,6 @@ export const doctorCommand = {
     const issues: string[] = [];
     const fixes: string[] = [];
 
-    // 检查 1: node_modules
     console.log(chalk.gray('检查 node_modules...'));
     if (!fs.existsSync('node_modules')) {
       issues.push('node_modules 不存在');
@@ -29,7 +28,6 @@ export const doctorCommand = {
       console.log(chalk.green('  ✓ node_modules 存在'));
     }
 
-    // 检查 2: dist 目录
     console.log(chalk.gray('检查构建输出...'));
     if (!fs.existsSync('dist')) {
       issues.push('dist 目录不存在');
@@ -38,7 +36,6 @@ export const doctorCommand = {
       console.log(chalk.green('  ✓ dist 目录存在'));
     }
 
-    // 检查 3: package.json
     console.log(chalk.gray('检查 package.json...'));
     if (fs.existsSync('package.json')) {
       console.log(chalk.green('  ✓ package.json 存在'));
@@ -46,7 +43,6 @@ export const doctorCommand = {
       issues.push('package.json 不存在');
     }
 
-    // 检查 4: src 目录
     console.log(chalk.gray('检查 src 目录...'));
     if (fs.existsSync('src')) {
       console.log(chalk.green('  ✓ src 目录存在'));
@@ -54,7 +50,6 @@ export const doctorCommand = {
       issues.push('src 目录不存在');
     }
 
-    // 检查 5: Git 状态
     console.log(chalk.gray('检查 Git 状态...'));
     try {
       const status = execSync('git status --porcelain', { encoding: 'utf8' });
@@ -70,7 +65,6 @@ export const doctorCommand = {
       console.log(chalk.gray('  - 非 Git 仓库'));
     }
 
-    // 检查 6: 构建
     console.log(chalk.gray('检查构建...'));
     try {
       if (fs.existsSync('dist/cli/index.js')) {
@@ -85,7 +79,6 @@ export const doctorCommand = {
       issues.push('无法读取构建文件');
     }
 
-    // 输出结果
     console.log('\n');
     if (issues.length === 0) {
       console.log(chalk.green.bold('✅ 所有检查通过!'));
@@ -97,7 +90,6 @@ export const doctorCommand = {
 
       if (fixes.length > 0 && options.fix) {
         console.log(chalk.cyan('\n🔧 尝试修复...\n'));
-        // 执行修复
         console.log(chalk.green('✓ 修复完成'));
       } else if (fixes.length > 0) {
         console.log(chalk.cyan('\n💡 建议修复:\n'));

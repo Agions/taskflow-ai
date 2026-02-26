@@ -74,27 +74,21 @@ export class PluginManager {
         return { success: false, error: '无效的插件: 缺少 package.json' };
       }
 
-      // 检查是否是 TaskFlow 插件
       if (!packageJson.keywords?.includes('taskflow-plugin')) {
         return { success: false, error: '不是 TaskFlow 插件' };
       }
 
-      // 加载插件入口
       const mainPath = path.join(pluginPath, packageJson.main || 'index.js');
       if (!(await fs.pathExists(mainPath))) {
         return { success: false, error: '插件入口文件不存在' };
       }
 
-      // 动态加载插件
       const plugin = await this.importPlugin(pluginId, packageJson, mainPath);
 
-      // 注册插件
       this.plugins.set(pluginId, plugin);
 
-      // 注册钩子
       this.registerHooks(plugin);
 
-      // 调用 onLoad 钩子
       if (plugin.hooks?.onLoad) {
         await plugin.hooks.onLoad(plugin);
       }
@@ -119,15 +113,12 @@ export class PluginManager {
     }
 
     try {
-      // 调用 onUnload 钩子
       if (plugin.hooks?.onUnload) {
         await plugin.hooks.onUnload(plugin);
       }
 
-      // 注销钩子
       this.unregisterHooks(plugin);
 
-      // 移除插件
       this.plugins.delete(pluginId);
 
       this.logger.info(`插件已卸载: ${plugin.name}`);
@@ -160,7 +151,6 @@ export class PluginManager {
     packageJson: any,
     mainPath: string
   ): Promise<Plugin> {
-    // 简单实现 - 实际需要动态 require
     const plugin: Plugin = {
       id: pluginId,
       name: packageJson.name,

@@ -32,7 +32,6 @@ async function runInit(options: any) {
   const spinner = ora('正在初始化TaskFlow项目...').start();
 
   try {
-    // 1. 检查现有配置
     const configPath = path.join(process.cwd(), CONFIG_DIR, CONFIG_FILE);
     const configExists = await fs.pathExists(configPath);
 
@@ -54,12 +53,10 @@ async function runInit(options: any) {
       spinner.start('正在重新初始化...');
     }
 
-    // 2. 收集项目信息
     spinner.stop();
     const projectInfo = await collectProjectInfo();
     spinner.start('正在配置项目...');
 
-    // 3. 配置AI模型
     let aiModels: AIModelConfig[] = [];
     if (!options.skipAi) {
       spinner.stop();
@@ -67,7 +64,6 @@ async function runInit(options: any) {
       spinner.start('正在保存配置...');
     }
 
-    // 4. 创建配置
     const config: TaskFlowConfig = {
       ...DEFAULT_CONFIG,
       projectName: projectInfo.projectName,
@@ -75,18 +71,14 @@ async function runInit(options: any) {
       aiModels,
     };
 
-    // 5. 创建目录结构
     await createProjectStructure(config);
 
-    // 6. 保存配置文件
     await saveConfig(config);
 
-    // 7. 创建示例文件
     await createExampleFiles();
 
     spinner.succeed(chalk.green('项目初始化完成！'));
 
-    // 显示后续步骤
     showNextSteps(config);
   } catch (error) {
     spinner.fail('初始化失败');
@@ -246,7 +238,6 @@ async function saveConfig(config: TaskFlowConfig) {
 }
 
 async function createExampleFiles() {
-  // 创建示例PRD文档
   const examplePRD = `# 示例PRD文档
 
 ## 项目概述
@@ -273,7 +264,6 @@ async function createExampleFiles() {
   const examplePath = path.join(process.cwd(), 'docs', 'example-prd.md');
   await fs.writeFile(examplePath, examplePRD);
 
-  // 创建README
   const readme = `# ${DEFAULT_CONFIG.projectName || 'TaskFlow Project'}
 
 这个项目使用 TaskFlow AI 进行管理和开发。

@@ -23,18 +23,15 @@ export class TaskGenerator {
       const tasks: Task[] = [];
       let taskOrder = 0;
 
-      // 为每个章节生成任务
       for (const section of prdDocument.sections) {
         const sectionTasks = await this.generateTasksForSection(section, taskOrder);
         tasks.push(...sectionTasks);
         taskOrder += sectionTasks.length;
       }
 
-      // 添加通用任务
       const commonTasks = this.generateCommonTasks(prdDocument, taskOrder);
       tasks.push(...commonTasks);
 
-      // 分析任务依赖关系
       this.analyzeDependencies(tasks);
 
       this.logger.info(`任务生成完成，共生成 ${tasks.length} 个任务`);
@@ -77,7 +74,6 @@ export class TaskGenerator {
   private generateFunctionalTasks(section: any, baseId: string): Task[] {
     const tasks: Task[] = [];
 
-    // 后端API任务
     tasks.push({
       id: `${baseId}-backend`,
       title: `实现${section.title}后端API`,
@@ -95,7 +91,6 @@ export class TaskGenerator {
       updatedAt: new Date(),
     });
 
-    // 前端实现任务
     tasks.push({
       id: `${baseId}-frontend`,
       title: `实现${section.title}前端功能`,
@@ -264,10 +259,8 @@ export class TaskGenerator {
    * 分析任务依赖关系
    */
   private analyzeDependencies(tasks: Task[]): void {
-    // 设置基本依赖关系
     tasks.forEach(task => {
       if (task.type === 'frontend') {
-        // 前端任务依赖对应的后端任务
         const backendTask = tasks.find(
           t =>
             t.type === 'backend' &&
@@ -279,7 +272,6 @@ export class TaskGenerator {
       }
 
       if (task.type === 'testing') {
-        // 测试任务依赖所有开发任务
         const devTasks = tasks.filter(
           t => ['frontend', 'backend', 'database'].includes(t.type) && t.id !== task.id
         );
@@ -287,7 +279,6 @@ export class TaskGenerator {
       }
 
       if (task.type === 'deployment') {
-        // 部署任务依赖测试任务
         const testingTasks = tasks.filter(t => t.type === 'testing');
         task.dependencies.push(...testingTasks.map(t => t.id));
       }

@@ -31,7 +31,6 @@ export class ConfigManager {
       const configData = await fs.readJson(this.configPath);
       const config = this.mergeWithDefaults(configData);
 
-      // 验证配置
       const validation = validateConfig(config);
       if (!validation.valid) {
         throw createTaskFlowError(
@@ -42,7 +41,6 @@ export class ConfigManager {
         );
       }
 
-      // 解密API密钥
       if (config.aiModels) {
         config.aiModels = await Promise.all(
           config.aiModels.map(async model => ({
@@ -73,7 +71,6 @@ export class ConfigManager {
    */
   async saveConfig(config: TaskFlowConfig): Promise<void> {
     try {
-      // 验证配置
       const validation = validateConfig(config);
       if (!validation.valid) {
         throw createTaskFlowError(
@@ -84,10 +81,8 @@ export class ConfigManager {
         );
       }
 
-      // 确保配置目录存在
       await fs.ensureDir(this.configDir);
 
-      // 复制配置并加密API密钥
       const configToSave = { ...config };
       if (configToSave.aiModels) {
         configToSave.aiModels = await Promise.all(
@@ -98,10 +93,8 @@ export class ConfigManager {
         );
       }
 
-      // 保存配置文件
       await fs.writeJson(this.configPath, configToSave, { spaces: 2 });
 
-      // 设置文件权限（仅用户可读写）
       await fs.chmod(this.configPath, 0o600);
     } catch (error: any) {
       if (error?.name === 'TaskFlowError') {
@@ -229,7 +222,6 @@ export class ConfigManager {
       throw createTaskFlowError('config', ERROR_CODES.FILE_NOT_FOUND, '备份文件不存在');
     }
 
-    // 验证备份文件
     const backupData = await fs.readJson(backupPath);
     const validation = validateConfig(backupData);
 
@@ -293,8 +285,6 @@ export class ConfigManager {
 
     for (const model of models) {
       try {
-        // 这里可以添加实际的API密钥验证逻辑
-        // 暂时只检查密钥是否存在
         const valid = !!model.apiKey && model.apiKey.length > 0;
         results.push({
           provider: model.provider,
@@ -322,7 +312,6 @@ export class ConfigManager {
       throw createTaskFlowError('config', ERROR_CODES.CONFIG_NOT_FOUND, '配置文件不存在');
     }
 
-    // 移除敏感信息
     const exportConfig = {
       ...config,
       aiModels: config.aiModels.map(model => ({
@@ -340,7 +329,6 @@ export class ConfigManager {
   async importConfig(configData: Partial<TaskFlowConfig>): Promise<void> {
     const currentConfig = (await this.loadConfig()) || DEFAULT_CONFIG;
 
-    // 合并配置
     const mergedConfig = {
       ...currentConfig,
       ...configData,
@@ -381,7 +369,6 @@ export class ConfigManager {
   }
 }
 
-// 便捷函数
 export async function loadConfig(basePath?: string): Promise<any> {
   const manager = new ConfigManager(basePath);
   return manager.loadConfig();

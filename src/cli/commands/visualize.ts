@@ -31,42 +31,34 @@ async function runVisualize(options: any) {
   const spinner = ora('正在生成可视化报告...').start();
 
   try {
-    // 交互式模式
     if (options.interactive) {
       spinner.stop();
       options = await getVisualizationOptions(options);
       spinner.start('正在生成可视化报告...');
     }
 
-    // 检查数据源
     const dataFiles = await findDataFiles();
     if (dataFiles.length === 0) {
       spinner.fail(chalk.yellow('未找到项目数据，请先运行 "taskflow parse" 解析PRD文档'));
       return;
     }
 
-    // 加载数据
     const data = await loadProjectData(dataFiles);
 
-    // 生成图表
     const charts = await generateCharts(data, options);
 
-    // 生成报告
     const reportPath = await generateReport(charts, options);
 
     spinner.succeed(chalk.green('可视化报告生成完成！'));
 
-    // 显示结果
     console.log(chalk.cyan('\n📊 可视化报告:'));
     console.log(chalk.gray('  类型: ') + chalk.white(options.type));
     console.log(chalk.gray('  格式: ') + chalk.white(options.format));
     console.log(chalk.gray('  输出: ') + chalk.blue(reportPath));
     console.log(chalk.gray('  数据源: ') + chalk.white(`${dataFiles.length} 个文件`));
 
-    // 显示统计信息
     showVisualizationStats(data);
 
-    // 打开文件建议
     if (options.format === 'html') {
       console.log(chalk.yellow('\n💡 提示: 使用浏览器打开 HTML 文件查看交互式图表'));
     }

@@ -40,10 +40,7 @@ export class MCPServer {
     try {
       this.logger.info('正在启动MCP服务器...');
 
-      // 初始化工具注册表
-      // await this.toolRegistry.initialize();
 
-      // 创建MCP服务器实例
       this.server = new Server(
         {
           name: this.settings.serverName || 'taskflow-ai',
@@ -58,19 +55,15 @@ export class MCPServer {
         }
       );
 
-      // 设置请求处理器
       this.setupRequestHandlers();
 
-      // 创建stdio传输层
       this.transport = new StdioServerTransport();
 
-      // 连接服务器到传输层
       await this.server.connect(this.transport);
 
       this.isRunning = true;
       this.logger.info('MCP服务器已启动 (stdio模式)');
 
-      // 保持进程运行
       process.stdin.on('end', () => {
         this.logger.info('stdin ended, shutting down...');
         this.stop();
@@ -100,7 +93,6 @@ export class MCPServer {
       this.isRunning = false;
 
       if (this.toolRegistry) {
-        // await this.toolRegistry.cleanup();
       }
 
       if (this.server) {
@@ -120,7 +112,6 @@ export class MCPServer {
   private setupRequestHandlers(): void {
     if (!this.server) return;
 
-    // 工具列表处理器
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       const tools = this.toolRegistry?.getAllTools() || [];
       return {
@@ -132,7 +123,6 @@ export class MCPServer {
       };
     });
 
-    // 工具调用处理器
     this.server.setRequestHandler(CallToolRequestSchema, async request => {
       const { name, arguments: args } = request.params;
 
@@ -159,7 +149,6 @@ export class MCPServer {
       }
     });
 
-    // 资源列表处理器
     this.server.setRequestHandler(ListResourcesRequestSchema, async () => {
       return {
         resources: [
@@ -179,7 +168,6 @@ export class MCPServer {
       };
     });
 
-    // 资源读取处理器
     this.server.setRequestHandler(ReadResourceRequestSchema, async request => {
       const { uri } = request.params;
 
@@ -211,7 +199,6 @@ export class MCPServer {
       throw new Error(`Unknown resource: ${uri}`);
     });
 
-    // Prompt列表处理器
     this.server.setRequestHandler(ListPromptsRequestSchema, async () => {
       return {
         prompts: [
@@ -227,7 +214,6 @@ export class MCPServer {
       };
     });
 
-    // Prompt获取处理器
     this.server.setRequestHandler(GetPromptRequestSchema, async request => {
       const { name, arguments: args } = request.params;
 
@@ -269,16 +255,13 @@ export class MCPServer {
    * 执行工具
    */
   private async executeTool(name: string, args: any): Promise<any> {
-    // 工具执行已简化
     return { error: 'Tool execution not implemented' };
     
     /* 原来代码
-    // 首先尝试从注册表执行
     if (this.toolRegistry) {
       try {
         return await this.toolRegistry.callTool(name, args);
       } catch (error: any) {
-        // 如果注册表中没有，尝试内置执行
         if (!error.message?.includes('工具不存在')) {
           throw error;
         }
@@ -286,7 +269,6 @@ export class MCPServer {
     }
     */
 
-    // 内置工具执行
     switch (name) {
       case 'file_read':
         return await this.executeFileRead(args);
@@ -313,11 +295,9 @@ export class MCPServer {
       throw new Error('Path is required');
     }
 
-    // 安全检查：确保路径在允许范围内
     const resolvedPath = path.resolve(filePath);
     const cwd = process.cwd();
 
-    // 只允许访问当前工作目录及其子目录
     if (!resolvedPath.startsWith(cwd)) {
       throw new Error('Access denied: path outside of working directory');
     }
@@ -340,7 +320,6 @@ export class MCPServer {
       throw new Error('Path and content are required');
     }
 
-    // 安全检查
     const resolvedPath = path.resolve(filePath);
     const cwd = process.cwd();
 
@@ -367,7 +346,6 @@ export class MCPServer {
       throw new Error('Command is required');
     }
 
-    // 命令白名单检查
     const allowedCommands = [
       'ls', 'cat', 'grep', 'find', 'head', 'tail', 'wc',
       'git', 'npm', 'node', 'npx', 'tsc', 'eslint', 'prettier',
@@ -422,7 +400,6 @@ export class MCPServer {
         const entries = await fs.readdir(dirPath, { withFileTypes: true });
 
         for (const entry of entries) {
-          // 跳过隐藏文件和 node_modules
           if (entry.name.startsWith('.') || entry.name === 'node_modules') {
             continue;
           }
@@ -451,7 +428,6 @@ export class MCPServer {
           }
         }
       } catch (error) {
-        // 忽略无法访问的目录
       }
 
       return items;
@@ -481,7 +457,6 @@ export class MCPServer {
       createdAt: new Date().toISOString(),
     };
 
-    // 保存到任务文件
     const tasksDir = path.join(process.cwd(), '.taskflow', 'tasks');
     await fs.ensureDir(tasksDir);
     await fs.writeJson(path.join(tasksDir, `${task.id}.json`), task, { spaces: 2 });

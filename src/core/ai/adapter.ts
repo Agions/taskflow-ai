@@ -78,7 +78,6 @@ export abstract class BaseAdapter {
   async *stream(options: Omit<ChatCompletionOptions, 'model'> & { stream: true }): AsyncGenerator<StreamChunk> {
     const response = await this.complete({ ...options, stream: true } as ChatCompletionOptions);
     
-    // 模拟流式响应 (实际实现需要根据提供商调整)
     for (const choice of response.choices) {
       yield {
         id: response.id,

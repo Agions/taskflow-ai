@@ -10,7 +10,6 @@ import { loadConfig, saveConfig } from '../../core/config';
 
 const program = new Command('model');
 
-// 存储当前 gateway 实例
 let gateway: ModelGateway | null = null;
 
 function getGateway(): ModelGateway {
@@ -86,7 +85,6 @@ program
       capabilities: ['chat'],
     };
 
-    // 检查是否已存在
     const existingIndex = config.aiModels?.findIndex(m => m.id === newModel.id);
     if (existingIndex !== undefined && existingIndex >= 0) {
       config.aiModels![existingIndex] = newModel;
@@ -99,7 +97,6 @@ program
 
     saveConfig(config);
     
-    // 重置 gateway
     gateway = null;
   });
 
@@ -129,7 +126,6 @@ program
     
     console.log(chalk.green(`已移除模型: ${options.id}`));
     
-    // 重置 gateway
     gateway = null;
   });
 

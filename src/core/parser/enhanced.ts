@@ -48,11 +48,9 @@ export class TaskDecomposer {
     let taskOrder = 0;
 
     for (const section of functionalSections) {
-      // 提取功能点
       const features = this.extractFeatures(section);
       
       for (const feature of features) {
-        // 为每个功能生成任务
         const featureTasks = await this.createTasksForFeature(
           feature,
           document.title,
@@ -64,10 +62,8 @@ export class TaskDecomposer {
       }
     }
 
-    // 添加工时估算
     this.estimateTaskHours(tasks);
 
-    // 分析依赖关系
     this.analyzeDependencies(tasks);
 
     this.logger.info(`任务拆分完成，生成 ${tasks.length} 个任务`);
@@ -81,11 +77,9 @@ export class TaskDecomposer {
   private extractFeatures(section: PRDSection): string[] {
     const features: string[] = [];
     
-    // 简单实现 - 实际需要更智能的 NLP
     const lines = section.content.split('\n');
     for (const line of lines) {
       const trimmed = line.trim();
-      // 检测功能描述
       if (
         trimmed.startsWith('-') || 
         trimmed.startsWith('*') ||
@@ -113,10 +107,8 @@ export class TaskDecomposer {
     const tasks: ProjectTask[] = [];
     const featureId = feature.substring(0, 20).toLowerCase().replace(/\s+/g, '-');
 
-    // 分析功能类型
     const type = this.determineTaskType(feature);
 
-    // 开发任务
     tasks.push({
       id: `task-${startOrder + 1}`,
       title: `实现: ${feature}`,
@@ -132,7 +124,6 @@ export class TaskDecomposer {
       updatedAt: new Date(),
     });
 
-    // 如果是复杂功能，添加测试任务
     if (feature.length > 50) {
       tasks.push({
         id: `task-${startOrder + 2}`,
@@ -189,7 +180,6 @@ export class TaskDecomposer {
 
     for (const task of tasks) {
       const base = baseHours[task.type] || 8;
-      // 根据描述长度调整
       const lengthFactor = Math.max(0.5, Math.min(2, task.description.length / 100));
       task.estimatedHours = Math.round(base * lengthFactor);
     }
@@ -199,9 +189,7 @@ export class TaskDecomposer {
    * 分析依赖关系
    */
   private analyzeDependencies(tasks: ProjectTask[]): void {
-    // 简单实现 - 后续可以基于关键字匹配
     for (let i = 1; i < tasks.length; i++) {
-      // 默认后续任务依赖前一个
       if (tasks[i].type === 'testing' && tasks[i-1].type === 'development') {
         tasks[i].dependencies = [tasks[i-1].id];
       }
@@ -223,7 +211,6 @@ export class RiskAnalyzer {
 
     const risks: Risk[] = [];
 
-    // 检查技术复杂度
     const technicalSections = document.sections.filter(s => s.type === 'technical');
     if (technicalSections.length > 3) {
       risks.push({
@@ -233,7 +220,6 @@ export class RiskAnalyzer {
       });
     }
 
-    // 检查第三方依赖
     const content = document.sections.map(s => s.content).join(' ');
     if (content.includes('第三方') || content.includes('3rd party') || content.includes('API')) {
       risks.push({
@@ -243,7 +229,6 @@ export class RiskAnalyzer {
       });
     }
 
-    // 检查数据安全
     if (content.includes('用户数据') || content.includes('隐私') || content.includes('password')) {
       risks.push({
         description: '涉及用户数据处理，需要关注安全性',
@@ -252,7 +237,6 @@ export class RiskAnalyzer {
       });
     }
 
-    // 检查性能要求
     if (content.includes('并发') || content.includes('性能') || content.includes('performance')) {
       risks.push({
         description: '有性能要求，需要进行性能测试和优化',
@@ -261,7 +245,6 @@ export class RiskAnalyzer {
       });
     }
 
-    // 检查集成点
     const integrationKeywords = ['集成', 'integration', '对接', '同步'];
     const hasIntegration = integrationKeywords.some(k => content.includes(k));
     if (hasIntegration) {

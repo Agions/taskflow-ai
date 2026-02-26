@@ -61,9 +61,7 @@ export class AnthropicAdapter extends BaseAdapter {
       }
     }
 
-    // 将 system 消息放入单独的字段
     if (systemMessage) {
-      // @ts-ignore - 临时处理
       converted[0]?.system ? (converted[0].system = systemMessage) : null;
     }
 
@@ -201,7 +199,6 @@ export class AnthropicAdapter extends BaseAdapter {
             };
           }
         } catch {
-          // 跳过无效数据
         }
       }
     }

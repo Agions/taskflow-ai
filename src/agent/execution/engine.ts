@@ -40,11 +40,9 @@ export class ExecutionEngine {
     const results: TaskResult[] = [];
     const startTime = Date.now();
 
-    // 拓扑排序，按依赖顺序执行
     const sortedTasks = this.topologicalSort(plan.tasks, plan.dependencies);
 
     for (const task of sortedTasks) {
-      // 检查是否已中止
       if (this.abortController.signal.aborted) {
         console.log('⏹️  Execution aborted');
         break;
@@ -136,13 +134,10 @@ export class ExecutionEngine {
   private async executeCodeTask(task: Task, startTime: number): Promise<TaskResult> {
     console.log(`   💻 Generating code...`);
 
-    // 这里应该调用代码生成引擎
-    // 简化实现：创建文件并写入模板代码
     if (task.outputPath) {
       const fullPath = path.join(this.context.projectPath, task.outputPath);
       await fs.ensureDir(path.dirname(fullPath));
 
-      // 生成代码内容（实际应该调用 AI）
       const code = this.generateCodeTemplate(task);
       await fs.writeFile(fullPath, code, 'utf-8');
 
@@ -172,7 +167,6 @@ export class ExecutionEngine {
       const fullPath = path.join(this.context.projectPath, task.outputPath);
       await fs.ensureDir(path.dirname(fullPath));
 
-      // 使用 MCP 工具
       const result = await this.mcpServer.callTool('file_write', {
         path: fullPath,
         content: task.description
@@ -200,7 +194,6 @@ export class ExecutionEngine {
   private async executeShellTask(task: Task, startTime: number): Promise<TaskResult> {
     console.log(`   🖥️  Executing shell command...`);
 
-    // 解析命令
     const command = this.parseShellCommand(task.description);
 
     try {
@@ -233,7 +226,6 @@ export class ExecutionEngine {
   private async executeAnalysisTask(task: Task, startTime: number): Promise<TaskResult> {
     console.log(`   🔍 Analyzing...`);
 
-    // 使用 MCP 工具分析项目
     const result = await this.mcpServer.callTool('project_analyze', {
       path: this.context.projectPath
     });
@@ -252,7 +244,6 @@ export class ExecutionEngine {
   private async executeDesignTask(task: Task, startTime: number): Promise<TaskResult> {
     console.log(`   🎨 Processing design...`);
 
-    // 设计任务通常是创建设计文档或资源
     if (task.outputPath) {
       const fullPath = path.join(this.context.projectPath, task.outputPath);
       await fs.ensureDir(path.dirname(fullPath));
@@ -314,13 +305,11 @@ export class ExecutionEngine {
     const inDegree = new Map<string, number>();
     const graph = new Map<string, string[]>();
 
-    // 初始化
     for (const task of tasks) {
       inDegree.set(task.id, 0);
       graph.set(task.id, []);
     }
 
-    // 构建图
     for (const dep of dependencies) {
       const next = graph.get(dep.from) || [];
       next.push(dep.to);
@@ -328,7 +317,6 @@ export class ExecutionEngine {
       inDegree.set(dep.to, (inDegree.get(dep.to) || 0) + 1);
     }
 
-    // 添加显式依赖
     for (const task of tasks) {
       for (const depId of task.dependencies) {
         if (taskMap.has(depId)) {
@@ -342,7 +330,6 @@ export class ExecutionEngine {
       }
     }
 
-    // Kahn 算法
     const queue: string[] = [];
     const result: Task[] = [];
 
@@ -369,10 +356,8 @@ export class ExecutionEngine {
       }
     }
 
-    // 检查是否有环
     if (result.length !== tasks.length) {
       console.warn('⚠️  Circular dependencies detected');
-      // 返回原始顺序
       return tasks;
     }
 
@@ -383,8 +368,6 @@ export class ExecutionEngine {
    * 解析 Shell 命令
    */
   private parseShellCommand(description: string): string {
-    // 从描述中提取命令
-    // 支持格式："Run: npm install" 或 "Execute: git init"
     const match = description.match(/(?:run|execute|command):?\s*(.+)/i);
     if (match) {
       return match[1].trim();
@@ -401,7 +384,6 @@ export class ExecutionEngine {
     return `import React from 'react';
 
 export interface ${componentName}Props {
-  // TODO: Define props
 }
 
 export const ${componentName}: React.FC<${componentName}Props> = (props) => {

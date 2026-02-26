@@ -3,7 +3,6 @@
  * TaskFlow AI v3.0 - 代码生成与同步
  */
 
-// 代码模板
 export interface CodeTemplate {
   id: string;
   name: string;
@@ -44,7 +43,6 @@ export interface TemplateMetadata {
   complexity: 'simple' | 'medium' | 'complex';
 }
 
-// 模板上下文
 export interface TemplateContext {
   [key: string]: unknown;
   projectName?: string;
@@ -55,7 +53,6 @@ export interface TemplateContext {
   exports?: string[];
 }
 
-// 组件规范
 export interface ComponentSpec {
   name: string;
   description: string;
@@ -77,7 +74,6 @@ export interface ComponentProp {
   description?: string;
 }
 
-// 生成的组件
 export interface GeneratedComponent {
   name: string;
   framework: string;
@@ -95,7 +91,6 @@ export interface GeneratedFile {
   type: 'tsx' | 'ts' | 'jsx' | 'js' | 'css' | 'scss' | 'test' | 'other';
 }
 
-// 代码生成结果
 export interface CodeGenerationResult {
   success: boolean;
   component?: GeneratedComponent;
@@ -103,7 +98,6 @@ export interface CodeGenerationResult {
   warnings?: string[];
 }
 
-// 代码生成引擎配置
 export interface CodegenConfig {
   templatesDir: string;
   outputDir: string;
@@ -114,7 +108,6 @@ export interface CodegenConfig {
   prettierConfig?: Record<string, unknown>;
 }
 
-// 框架配置
 export interface FrameworkConfig {
   name: string;
   extensions: string[];
@@ -135,7 +128,6 @@ export interface FileStructure {
   indexFile: boolean;
 }
 
-// 同步配置
 export interface SyncConfig {
   strategy: 'overwrite' | 'merge' | 'skip';
   backup: boolean;
@@ -143,7 +135,6 @@ export interface SyncConfig {
   ignorePatterns: string[];
 }
 
-// 代码生成请求
 export interface CodegenRequest {
   spec: ComponentSpec;
   templateId?: string;
@@ -151,7 +142,6 @@ export interface CodegenRequest {
   sync?: SyncConfig;
 }
 
-// 模板仓库
 export interface TemplateRepository {
   id: string;
   name: string;
@@ -160,7 +150,6 @@ export interface TemplateRepository {
   templates: string[];
 }
 
-// 代码质量检查
 export interface CodeQualityCheck {
   name: string;
   passed: boolean;
@@ -168,7 +157,6 @@ export interface CodeQualityCheck {
   severity: 'error' | 'warning' | 'info';
 }
 
-// 生成统计
 export interface GenerationStats {
   totalFiles: number;
   totalLines: number;

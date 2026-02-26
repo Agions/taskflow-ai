@@ -40,7 +40,6 @@ export class SearchReplaceTool {
     const extensions = options.extensions || ['ts', 'js', 'tsx', 'jsx', 'md', 'json'];
     const exclude = options.exclude || ['node_modules', '.git', 'dist'];
     
-    // 获取搜索目录
     const searchPaths = options.paths || [process.cwd()];
     
     for (const searchPath of searchPaths) {
@@ -50,7 +49,6 @@ export class SearchReplaceTool {
         
         const matches: SearchResult['matches'] = [];
         
-        // 构建正则
         let regex: RegExp;
         try {
           const flags = (options.caseSensitive ? '' : 'i') + (options.useRegex ? 'g' : 'g');
@@ -109,7 +107,6 @@ export class SearchReplaceTool {
         const content = await fs.readFile(result.file, 'utf-8');
         let newContent = content;
         
-        // 构建正则
         let regex: RegExp;
         try {
           const flags = (options.caseSensitive ? '' : 'i') + 'g';
@@ -156,7 +153,6 @@ export class SearchReplaceTool {
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
         
-        // 排除
         if (exclude.includes(entry.name)) continue;
         
         if (entry.isDirectory()) {
@@ -169,7 +165,6 @@ export class SearchReplaceTool {
         }
       }
     } catch {
-      // 忽略无法访问的目录
     }
   }
 }

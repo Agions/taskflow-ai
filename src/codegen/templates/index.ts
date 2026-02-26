@@ -15,7 +15,6 @@ import {
   GeneratedFile
 } from '../types';
 
-// 内置模板
 const BUILT_IN_TEMPLATES: Record<string, CodeTemplate> = {
   'react-functional': {
     id: 'react-functional',
@@ -51,7 +50,6 @@ export const {{componentName}}: React.FC<{{componentName}}Props> = ({
 {{#if hasEffects}}
 
   useEffect(() => {
-    // TODO: Implement effect
   }, []);
 {{/if}}
 
@@ -118,7 +116,6 @@ export function {{hookName}}() {
     setError(null);
     
     try {
-      // TODO: Implement logic
       setState(null);
     } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)));
@@ -203,7 +200,6 @@ const state = ref<any>(null);
 {{#if hasEffects}}
 
 onMounted(() => {
-  // TODO: Implement mounted logic
 });
 {{/if}}
 </script>
@@ -276,7 +272,6 @@ export async function {{handlerName}}(
     const validated = {{schemaName}}.parse(req.body);
 {{/if}}
     
-    // TODO: Implement handler logic
     
     res.json({
       success: true,
@@ -337,17 +332,14 @@ describe('{{targetName}}', () => {
 
 {{#each testCases}}
   it('{{description}}', () => {
-    // Arrange
     {{#if arrange}}
     {{arrange}}
     {{/if}}
     
-    // Act
     {{#if act}}
     {{act}}
     {{/if}}
     
-    // Assert
     {{#if assert}}
     {{assert}}
     {{else}}
@@ -357,7 +349,6 @@ describe('{{targetName}}', () => {
 {{/each}}
 
   it('should handle errors gracefully', () => {
-    // TODO: Add error handling test
     expect(true).toBe(true);
   });
 });
@@ -381,7 +372,6 @@ describe('{{targetName}}', () => {
   }
 };
 
-// 注册 Handlebars 辅助函数
 Handlebars.registerHelper('kebabCase', (str: string) => {
   return str
     .replace(/([a-z])([A-Z])/g, '$1-$2')
@@ -488,10 +478,8 @@ export class TemplateManager {
       throw new Error(`Template not found: ${templateId}`);
     }
 
-    // 验证变量
     this.validateVariables(template, context);
 
-    // 渲染
     const compiled = Handlebars.compile(template.template);
     return compiled(context);
   }
@@ -543,8 +531,6 @@ export class TemplateManager {
       return undefined;
     }
 
-    // 优先选择匹配度最高的模板
-    // 简化实现：返回第一个匹配的模板
     return candidates.find(t => {
       if (spec.hasState && t.id.includes('hook')) {
         return true;

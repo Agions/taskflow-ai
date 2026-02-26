@@ -32,14 +32,12 @@ async function runParse(filePath: string, options: any) {
   const spinner = ora('正在解析PRD文档...').start();
 
   try {
-    // 验证文件存在
     const fullPath = path.resolve(filePath);
     if (!(await fs.pathExists(fullPath))) {
       spinner.fail(chalk.red('文件不存在: ' + filePath));
       return;
     }
 
-    // 加载配置
     const configManager = new ConfigManager();
     const config = await configManager.loadConfig();
 
@@ -50,11 +48,9 @@ async function runParse(filePath: string, options: any) {
 
     spinner.text = '正在解析文档内容...';
 
-    // 解析PRD文档
     const parser = new PRDParser(config);
     const prdDocument = await parser.parse(fullPath);
 
-    // 生成任务（如果需要）
     let tasks: any[] = [];
     if (options.tasks !== false) {
       spinner.text = '正在生成任务...';
@@ -62,12 +58,10 @@ async function runParse(filePath: string, options: any) {
       tasks = await taskGenerator.generateTasks(prdDocument);
     }
 
-    // 保存结果
     const outputPath = await saveResults(prdDocument, tasks, options);
 
     spinner.succeed(chalk.green('解析完成！'));
 
-    // 显示结果摘要
     console.log(chalk.cyan('\n📊 解析结果:'));
     console.log(chalk.gray('  文档标题: ') + chalk.white(prdDocument.title));
     console.log(chalk.gray('  章节数量: ') + chalk.white(prdDocument.sections.length));

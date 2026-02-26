@@ -18,7 +18,6 @@ export class DeepSeekAdapter extends BaseAdapter {
     const requestBody = {
       model: this.config.modelName,
       ...options,
-      // DeepSeek 特定的参数
       stream: false,
     };
 
@@ -113,7 +112,6 @@ export class DeepSeekAdapter extends BaseAdapter {
             })),
           };
         } catch {
-          // 跳过无效 JSON
         }
       }
     }

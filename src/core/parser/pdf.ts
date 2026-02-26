@@ -16,13 +16,10 @@ export class PDFParser {
     this.logger.info(`解析 PDF 文档: ${filePath}`);
 
     try {
-      // 检查文件是否存在
       if (!(await fs.pathExists(filePath))) {
         throw new Error(`文件不存在: ${filePath}`);
       }
 
-      // 尝试使用 pdf-parse
-      // 如果未安装，返回提示
       try {
         const pdfParse = require('pdf-parse');
         const dataBuffer = await fs.readFile(filePath);
@@ -42,7 +39,6 @@ export class PDFParser {
    * 备选解析方案
    */
   private async fallbackParse(filePath: string): Promise<string> {
-    // 简单实现 - 实际应该使用专门的库
     return '无法解析 PDF 文档，请转换为 Markdown 格式。\n\n如需启用 PDF 支持，请运行: npm install pdf-parse';
   }
 }

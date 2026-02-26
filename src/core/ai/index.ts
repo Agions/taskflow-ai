@@ -9,12 +9,10 @@ export * from './router';
 
 import { ModelGateway, ModelGatewayOptions } from './gateway';
 
-// 便捷创建函数
 export function createModelGateway(options: ModelGatewayOptions): ModelGateway {
   return new ModelGateway(options);
 }
 
-// 默认配置
 export const DEFAULT_MODELS = [
   {
     id: 'deepseek-chat',

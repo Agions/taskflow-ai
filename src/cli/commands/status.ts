@@ -69,7 +69,6 @@ async function runStatus(options: any) {
       return;
     }
 
-    // 显示项目信息
     console.log(chalk.cyan('\n📊 项目状态报告\n'));
 
     console.log(chalk.white('📁 项目信息:'));
@@ -79,7 +78,6 @@ async function runStatus(options: any) {
       chalk.gray('  最后修改: ') + chalk.white(configStats.lastModified?.toLocaleString() || '未知')
     );
 
-    // AI模型状态
     console.log(chalk.white('\n🤖 AI模型配置:'));
     console.log(chalk.gray('  已配置模型: ') + chalk.yellow(configStats.aiModelsCount));
     console.log(chalk.gray('  启用的模型: ') + chalk.green(configStats.enabledModelsCount));
@@ -97,7 +95,6 @@ async function runStatus(options: any) {
       });
     }
 
-    // MCP服务器状态
     console.log(chalk.white('\n🔌 MCP服务器:'));
     console.log(
       chalk.gray('  状态: ') + (configStats.mcpEnabled ? chalk.green('启用') : chalk.red('禁用'))
@@ -114,24 +111,20 @@ async function runStatus(options: any) {
       );
     }
 
-    // 系统信息
     if (options.detailed) {
       console.log(chalk.white('\n💻 系统信息:'));
       console.log(chalk.gray('  Node.js版本: ') + chalk.white(process.version));
       console.log(chalk.gray('  操作系统: ') + chalk.white(process.platform));
       console.log(chalk.gray('  工作目录: ') + chalk.white(process.cwd()));
 
-      // 内存使用情况
       const memUsage = process.memoryUsage();
       console.log(
         chalk.gray('  内存使用: ') + chalk.white(`${Math.round(memUsage.heapUsed / 1024 / 1024)}MB`)
       );
     }
 
-    // 健康检查
     console.log(chalk.white('\n🏥 健康检查:'));
 
-    // 检查API密钥
     const apiKeyValidation = await configManager.validateApiKeys();
     const validKeys = apiKeyValidation.filter(result => result.valid).length;
     const totalKeys = apiKeyValidation.length;
@@ -155,11 +148,9 @@ async function runStatus(options: any) {
       console.log(chalk.gray('  API密钥: ') + chalk.yellow('未配置'));
     }
 
-    // 配置文件检查
     const configPath = configManager.getConfigPath();
     console.log(chalk.gray('  配置文件: ') + chalk.green('正常') + chalk.gray(` (${configPath})`));
 
-    // 显示建议
     console.log(chalk.cyan('\n💡 建议操作:'));
 
     if (configStats.aiModelsCount === 0) {

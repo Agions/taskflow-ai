@@ -2,13 +2,11 @@
  * TaskFlow AI 常量定义
  */
 
-// ==================== 应用常量 ====================
 
 export const APP_NAME = 'TaskFlow AI';
 export const APP_VERSION = '2.0.0';
 export const APP_DESCRIPTION = '智能PRD文档解析与任务管理助手';
 
-// ==================== 文件和目录常量 ====================
 
 export const CONFIG_DIR = '.taskflow';
 export const CONFIG_FILE = 'config.json';
@@ -20,7 +18,6 @@ export const PLUGINS_DIR = 'plugins';
 export const DEFAULT_OUTPUT_DIR = 'output';
 export const DEFAULT_REPORTS_DIR = 'reports';
 
-// ==================== 支持的文件格式 ====================
 
 export const SUPPORTED_PRD_FORMATS = [
   '.md',
@@ -42,7 +39,6 @@ export const SUPPORTED_OUTPUT_FORMATS = [
   'excel',
 ] as const;
 
-// ==================== AI模型常量 ====================
 
 export const AI_PROVIDERS = {
   DEEPSEEK: 'deepseek',
@@ -72,7 +68,6 @@ export const AI_MODEL_ENDPOINTS = {
   [AI_PROVIDERS.SPARK]: 'https://spark-api.xf-yun.com/v1.1',
 };
 
-// ==================== MCP常量 ====================
 
 export const MCP_CONFIG = {
   DEFAULT_PORT: 3000,
@@ -105,7 +100,6 @@ export const MCP_RESOURCES = {
   HEALTH: '/health',
 } as const;
 
-// ==================== 任务和项目常量 ====================
 
 export const TASK_TYPES = {
   FRONTEND: 'frontend',
@@ -142,7 +136,6 @@ export const COMPLEXITY_LEVELS = {
   EPIC: 'epic',
 } as const;
 
-// ==================== 图表和可视化常量 ====================
 
 export const CHART_TYPES = {
   GANTT: 'gantt',
@@ -172,45 +165,36 @@ export const DEFAULT_COLORS = [
   '#6B7280', // Gray
 ];
 
-// ==================== 错误码常量 ====================
 
 export const ERROR_CODES = {
-  // 配置错误
   CONFIG_NOT_FOUND: 'CONFIG_NOT_FOUND',
   CONFIG_INVALID: 'CONFIG_INVALID',
   CONFIG_PARSE_ERROR: 'CONFIG_PARSE_ERROR',
 
-  // 文件系统错误
   FILE_NOT_FOUND: 'FILE_NOT_FOUND',
   FILE_READ_ERROR: 'FILE_READ_ERROR',
   FILE_WRITE_ERROR: 'FILE_WRITE_ERROR',
 
-  // PRD解析错误
   PRD_PARSE_ERROR: 'PRD_PARSE_ERROR',
   PRD_FORMAT_UNSUPPORTED: 'PRD_FORMAT_UNSUPPORTED',
   PRD_CONTENT_INVALID: 'PRD_CONTENT_INVALID',
 
-  // AI模型错误
   AI_MODEL_ERROR: 'AI_MODEL_ERROR',
   AI_API_ERROR: 'AI_API_ERROR',
   AI_RATE_LIMIT: 'AI_RATE_LIMIT',
   AI_TIMEOUT: 'AI_TIMEOUT',
 
-  // MCP错误
   MCP_SERVER_ERROR: 'MCP_SERVER_ERROR',
   MCP_TOOL_ERROR: 'MCP_TOOL_ERROR',
   MCP_RESOURCE_ERROR: 'MCP_RESOURCE_ERROR',
 
-  // 验证错误
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   REQUIRED_FIELD_MISSING: 'REQUIRED_FIELD_MISSING',
   INVALID_FORMAT: 'INVALID_FORMAT',
 
-  // 网络错误
   NETWORK_ERROR: 'NETWORK_ERROR',
   CONNECTION_TIMEOUT: 'CONNECTION_TIMEOUT',
 
-  // 插件错误
   PLUGIN_NOT_FOUND: 'PLUGIN_NOT_FOUND',
   PLUGIN_LOAD_ERROR: 'PLUGIN_LOAD_ERROR',
   PLUGIN_EXECUTION_ERROR: 'PLUGIN_EXECUTION_ERROR',
@@ -250,7 +234,6 @@ export const DEFAULT_CONFIG = {
   plugins: [],
 };
 
-// ==================== CLI常量 ====================
 
 export const CLI_COLORS = {
   PRIMARY: '#3B82F6',
@@ -271,7 +254,6 @@ export const CLI_SYMBOLS = {
   BULLET: '•',
 };
 
-// ==================== 正则表达式常量 ====================
 
 export const REGEX_PATTERNS = {
   EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -281,7 +263,6 @@ export const REGEX_PATTERNS = {
   PROJECT_NAME: /^[a-zA-Z0-9-_\s]+$/,
 };
 
-// ==================== 性能常量 ====================
 
 export const PERFORMANCE = {
   CACHE_TTL: 60 * 60 * 1000, // 1小时
@@ -291,7 +272,6 @@ export const PERFORMANCE = {
   THROTTLE_DELAY: 1000,
 };
 
-// ==================== 环境变量 ====================
 
 export const ENV_VARS = {
   NODE_ENV: 'NODE_ENV',

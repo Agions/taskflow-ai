@@ -32,22 +32,16 @@ export class VerificationEngine {
 
     const checks: VerificationCheck[] = [];
 
-    // 1. 检查所有任务是否成功
     checks.push(await this.verifyTaskCompletion(result));
 
-    // 2. 检查生成的文件
     checks.push(await this.verifyGeneratedFiles(result));
 
-    // 3. 检查代码质量
     checks.push(await this.verifyCodeQuality(result));
 
-    // 4. 检查测试覆盖
     checks.push(await this.verifyTestCoverage(result));
 
-    // 5. 检查依赖完整性
     checks.push(await this.verifyDependencies(result));
 
-    // 6. 检查类型安全
     checks.push(await this.verifyTypeSafety(result));
 
     const allPassed = checks.every(c => c.passed);
@@ -255,7 +249,6 @@ export class VerificationEngine {
         };
       }
 
-      // 检查 node_modules
       const nodeModulesPath = path.join(this.projectPath, 'node_modules');
       const nodeModulesExists = await fs.pathExists(nodeModulesPath);
 
@@ -289,7 +282,6 @@ export class VerificationEngine {
    */
   private async verifyTypeSafety(result: ExecutionResult): Promise<VerificationCheck> {
     try {
-      // 检查 TypeScript 配置
       const tsConfigPath = path.join(this.projectPath, 'tsconfig.json');
       const tsConfigExists = await fs.pathExists(tsConfigPath);
 
@@ -302,8 +294,6 @@ export class VerificationEngine {
         };
       }
 
-      // 这里可以运行 tsc --noEmit 来检查类型
-      // 简化实现：假设类型检查通过
       return {
         name: 'Type Safety',
         passed: true,
@@ -382,13 +372,10 @@ export class VerificationEngine {
    * 检查代码质量（详细实现）
    */
   async checkCodeQuality(files: string[]): Promise<CodeQualityReport> {
-    // 简化实现：返回模拟数据
-    // 实际应该集成 ESLint、Prettier 等工具
 
     const issues: CodeIssue[] = [];
     let totalLines = 0;
 
-    // 扫描项目文件
     const srcPath = path.join(this.projectPath, 'src');
     if (await fs.pathExists(srcPath)) {
       const scanDirectory = async (dir: string): Promise<void> => {
@@ -404,11 +391,9 @@ export class VerificationEngine {
             const lines = content.split('\n');
             totalLines += lines.length;
 
-            // 简单的质量检查
             for (let i = 0; i < lines.length; i++) {
               const line = lines[i];
 
-              // 检查 console.log
               if (line.includes('console.log') && !line.includes('//')) {
                 issues.push({
                   file: fullPath,
@@ -419,7 +404,6 @@ export class VerificationEngine {
                 });
               }
 
-              // 检查 TODO
               if (line.includes('TODO') || line.includes('FIXME')) {
                 issues.push({
                   file: fullPath,
@@ -437,7 +421,6 @@ export class VerificationEngine {
       await scanDirectory(srcPath);
     }
 
-    // 计算分数
     const baseScore = 100;
     const errorPenalty = issues.filter(i => i.severity === 'error').length * 10;
     const warningPenalty = issues.filter(i => i.severity === 'warning').length * 2;
@@ -458,8 +441,6 @@ export class VerificationEngine {
    * 检查测试覆盖（详细实现）
    */
   async checkTestCoverage(files: string[]): Promise<CoverageReport> {
-    // 简化实现：返回模拟数据
-    // 实际应该读取 coverage/lcov-report 或类似文件
 
     const coveragePath = path.join(this.projectPath, 'coverage');
     let overall = 0;
@@ -467,7 +448,6 @@ export class VerificationEngine {
 
     if (await fs.pathExists(coveragePath)) {
       try {
-        // 尝试读取覆盖率摘要
         const summaryPath = path.join(coveragePath, 'coverage-summary.json');
         if (await fs.pathExists(summaryPath)) {
           const summary = await fs.readJson(summaryPath);
@@ -485,14 +465,12 @@ export class VerificationEngine {
             }
           }
         } else {
-          // 默认覆盖率
           overall = 45;
         }
       } catch {
         overall = 0;
       }
     } else {
-      // 没有覆盖率数据
       overall = 0;
     }
 

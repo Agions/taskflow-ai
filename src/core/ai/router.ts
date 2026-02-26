@@ -43,7 +43,6 @@ interface RoutingRule {
 
 /** 路由规则 */
 const DEFAULT_ROUTING_RULES: RoutingRule[] = [
-  // 代码生成任务
   {
     match: (ctx, msgs) => {
       const lastMsg = msgs[msgs.length - 1]?.content?.toLowerCase() || '';
@@ -55,31 +54,26 @@ const DEFAULT_ROUTING_RULES: RoutingRule[] = [
     prefer: ['deepseek-coder', 'gpt-4o', 'claude-3-5-sonnet'],
     weight: 1.0,
   },
-  // 复杂推理任务
   {
     match: (ctx) => ctx.complexity === 'high' || ctx.taskType === 'reasoning',
     prefer: ['o1', 'claude-3-opus', 'qwen-plus'],
     weight: 0.9,
   },
-  // 视觉任务
   {
     match: (ctx) => ctx.taskType === 'vision',
     prefer: ['gpt-4o', 'claude-3-5-sonnet'],
     weight: 1.0,
   },
-  // 函数调用
   {
     match: (ctx) => ctx.taskType === 'function',
     prefer: ['gpt-4o', 'claude-3-5-sonnet'],
     weight: 1.0,
   },
-  // 简单对话 - 成本优先
   {
     match: (ctx) => ctx.complexity === 'low' && !ctx.budget,
     prefer: ['glm-4-flash', 'qwen-turbo', 'gpt-4o-mini'],
     weight: 0.7,
   },
-  // 紧急任务 - 速度优先
   {
     match: (ctx) => ctx.urgent,
     prefer: ['gpt-4o-mini', 'glm-4-flash', 'qwen-turbo'],
@@ -103,7 +97,6 @@ abstract class BaseRouter {
     let taskType: RoutingContext['taskType'];
     let complexity: RoutingContext['complexity'] = 'medium';
 
-    // 简单启发式判断
     if (lastMessage.includes('code') || lastMessage.includes('function')) {
       taskType = 'code';
     } else if (lastMessage.includes('analyze') || lastMessage.includes('think')) {
@@ -115,7 +108,6 @@ abstract class BaseRouter {
       taskType = 'chat';
     }
 
-    // 根据消息长度估计复杂度
     const totalLength = messages.reduce((sum, m) => sum + (m.content?.length || 0), 0);
     if (totalLength < 200) {
       complexity = 'low';
@@ -138,7 +130,6 @@ class SmartRouter extends BaseRouter {
     availableModels: ModelConfig[],
     preferredModel?: string
   ): Promise<RoutingResult> {
-    // 如果指定了首选模型，优先使用
     if (preferredModel) {
       const model = availableModels.find(m => m.id === preferredModel);
       if (model) {
@@ -154,7 +145,6 @@ class SmartRouter extends BaseRouter {
     const context = this.extractContext(messages);
     const scoredModels = new Map<string, number>();
 
-    // 应用所有规则
     for (const rule of this.rules) {
       if (rule.match(context, messages)) {
         for (const preferId of rule.prefer) {
@@ -164,7 +154,6 @@ class SmartRouter extends BaseRouter {
       }
     }
 
-    // 按分数排序
     const sortedModels = [...availableModels].sort((a, b) => {
       const scoreA = scoredModels.get(a.id) || 0;
       const scoreB = scoredModels.get(b.id) || 0;
@@ -191,7 +180,6 @@ class CostRouter extends BaseRouter {
     messages: any[],
     availableModels: ModelConfig[]
   ): Promise<RoutingResult> {
-    // 按输入成本排序
     const sortedModels = [...availableModels].sort((a, b) => {
       const costA = a.costPer1MInput || 999;
       const costB = b.costPer1MInput || 999;
@@ -211,7 +199,6 @@ class CostRouter extends BaseRouter {
  * 速度优化路由器
  */
 class SpeedRouter extends BaseRouter {
-  // 模拟延迟 (实际应该基于历史数据)
   private estimatedLatency: Record<string, number> = {
     'gpt-4o-mini': 500,
     'glm-4-flash': 600,

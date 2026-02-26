@@ -16,7 +16,6 @@ export const knowledgeCommand = new Command('knowledge')
   .description('RAG Knowledge Base - manage and query knowledge')
   .alias('kb');
 
-// 初始化命令
 knowledgeCommand
   .command('init')
   .description('Initialize knowledge base')
@@ -49,11 +48,9 @@ knowledgeCommand
         autoIndex: true
       };
 
-      // 保存配置
       const configPath = path.join(process.cwd(), '.taskflow', 'knowledge-config.json');
       await require('fs-extra').writeJson(configPath, config, { spaces: 2 });
 
-      // 初始化引擎
       const embeddingManager = new EmbeddingManager(config.embeddingModel);
       const vectorStore = new VectorStoreManager(
         config.vectorStore,
@@ -78,7 +75,6 @@ knowledgeCommand
     }
   });
 
-// 索引命令
 knowledgeCommand
   .command('index')
   .description('Index documents into knowledge base')
@@ -89,7 +85,6 @@ knowledgeCommand
     const spinner = ora('Indexing documents...').start();
 
     try {
-      // 加载配置
       const configPath = path.join(process.cwd(), '.taskflow', 'knowledge-config.json');
       const fs = require('fs-extra');
 
@@ -100,7 +95,6 @@ knowledgeCommand
 
       const config: KnowledgeBaseConfig = await fs.readJson(configPath);
 
-      // 初始化引擎
       const embeddingManager = new EmbeddingManager(config.embeddingModel);
       const vectorStore = new VectorStoreManager(
         config.vectorStore,
@@ -115,7 +109,6 @@ knowledgeCommand
 
       await engine.initialize();
 
-      // 索引文档
       const resolvedPath = path.resolve(docPath);
       const stats = await fs.stat(resolvedPath);
 
@@ -145,7 +138,6 @@ knowledgeCommand
     }
   });
 
-// 查询命令
 knowledgeCommand
   .command('query')
   .description('Query knowledge base')
@@ -157,7 +149,6 @@ knowledgeCommand
     const spinner = ora('Querying knowledge base...').start();
 
     try {
-      // 加载配置
       const configPath = path.join(process.cwd(), '.taskflow', 'knowledge-config.json');
       const fs = require('fs-extra');
 
@@ -168,7 +159,6 @@ knowledgeCommand
 
       const config: KnowledgeBaseConfig = await fs.readJson(configPath);
 
-      // 初始化引擎
       const embeddingManager = new EmbeddingManager(config.embeddingModel);
       const vectorStore = new VectorStoreManager(
         config.vectorStore,
@@ -183,7 +173,6 @@ knowledgeCommand
 
       await engine.initialize();
 
-      // 执行查询
       const result = await engine.retrieve(query, {
         topK: parseInt(options.topK),
         threshold: parseFloat(options.threshold),
@@ -211,7 +200,6 @@ knowledgeCommand
     }
   });
 
-// 问答命令
 knowledgeCommand
   .command('ask')
   .description('Ask a question using knowledge base')
@@ -221,7 +209,6 @@ knowledgeCommand
     const spinner = ora('Thinking...').start();
 
     try {
-      // 加载配置
       const configPath = path.join(process.cwd(), '.taskflow', 'knowledge-config.json');
       const fs = require('fs-extra');
 
@@ -232,7 +219,6 @@ knowledgeCommand
 
       const config: KnowledgeBaseConfig = await fs.readJson(configPath);
 
-      // 初始化引擎
       const embeddingManager = new EmbeddingManager(config.embeddingModel);
       const vectorStore = new VectorStoreManager(
         config.vectorStore,
@@ -247,7 +233,6 @@ knowledgeCommand
 
       await engine.initialize();
 
-      // 获取答案
       const result = await engine.answer(question, {
         topK: parseInt(options.topK)
       });
@@ -273,7 +258,6 @@ knowledgeCommand
     }
   });
 
-// 统计命令
 knowledgeCommand
   .command('stats')
   .description('Show knowledge base statistics')
@@ -281,7 +265,6 @@ knowledgeCommand
     const spinner = ora('Loading statistics...').start();
 
     try {
-      // 加载配置
       const configPath = path.join(process.cwd(), '.taskflow', 'knowledge-config.json');
       const fs = require('fs-extra');
 
@@ -292,7 +275,6 @@ knowledgeCommand
 
       const config: KnowledgeBaseConfig = await fs.readJson(configPath);
 
-      // 初始化引擎
       const embeddingManager = new EmbeddingManager(config.embeddingModel);
       const vectorStore = new VectorStoreManager(
         config.vectorStore,
@@ -307,7 +289,6 @@ knowledgeCommand
 
       await engine.initialize();
 
-      // 获取统计
       const stats = await engine.getStats();
 
       spinner.stop();
@@ -337,7 +318,6 @@ knowledgeCommand
     }
   });
 
-// 清除命令
 knowledgeCommand
   .command('clear')
   .description('Clear knowledge base')
@@ -351,7 +331,6 @@ knowledgeCommand
     const spinner = ora('Clearing knowledge base...').start();
 
     try {
-      // 加载配置
       const configPath = path.join(process.cwd(), '.taskflow', 'knowledge-config.json');
       const fs = require('fs-extra');
 
@@ -362,7 +341,6 @@ knowledgeCommand
 
       const config: KnowledgeBaseConfig = await fs.readJson(configPath);
 
-      // 初始化引擎
       const embeddingManager = new EmbeddingManager(config.embeddingModel);
       const vectorStore = new VectorStoreManager(
         config.vectorStore,

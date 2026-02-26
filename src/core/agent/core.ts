@@ -33,8 +33,6 @@ export class AgentCore {
   async parseGoal(goal: string): Promise<GoalParserResult> {
     this.logger.info(`解析目标: ${goal}`);
 
-    // TODO: 集成 AI 进行目标解析
-    // 简单实现
     const result: GoalParserResult = {
       goal,
       subgoals: this.extractSubgoals(goal),
@@ -64,10 +62,8 @@ export class AgentCore {
     this.logger.info(`开始执行任务: ${task.description}`);
 
     try {
-      // 解析目标
       const parsedGoal = await this.parseGoal(task.goal || task.description);
       
-      // 添加初始思考步骤
       this.addStep(execution, {
         step: execution.steps.length + 1,
         type: 'thought',
@@ -76,22 +72,18 @@ export class AgentCore {
         timestamp: Date.now(),
       });
 
-      // 逐步执行
       for (const subgoal of parsedGoal.subgoals) {
         if (execution.status === 'failed') break;
 
         await this.executeSubgoal(execution, subgoal);
       }
 
-      // 反思
       const reflection = await this.reflect(execution);
       
       if (!reflection.success && reflection.shouldRetry) {
-        // 重试
         this.logger.info('反思建议重试');
       }
 
-      // 完成
       execution.status = 'completed';
       execution.finishedAt = Date.now();
       
@@ -116,7 +108,6 @@ export class AgentCore {
   private async executeSubgoal(execution: AgentExecution, subgoal: string): Promise<void> {
     execution.status = 'executing';
     
-    // 添加思考步骤
     this.addStep(execution, {
       step: execution.steps.length + 1,
       type: 'thought',
@@ -124,17 +115,14 @@ export class AgentCore {
       timestamp: Date.now(),
     });
 
-    // 决定使用工具还是继续思考
     const shouldAct = this.shouldUseTool(subgoal);
     
     if (shouldAct && this.agent.tools.length > 0) {
-      // 使用工具
       const toolName = this.selectTool(subgoal);
       if (toolName) {
         await this.executeTool(execution, toolName, { query: subgoal });
       }
     } else {
-      // 继续思考
       await this.think(execution, subgoal);
     }
   }
@@ -151,7 +139,6 @@ export class AgentCore {
       timestamp: Date.now(),
     });
 
-    // 模拟思考延迟
     await this.sleep(100);
   }
 
@@ -177,12 +164,10 @@ export class AgentCore {
     try {
       const result = await toolRegistry.execute(toolName, input);
       
-      // 更新步骤结果
       const lastStep = execution.steps[execution.steps.length - 1];
       lastStep.toolResult = result;
       lastStep.duration = Date.now() - startTime;
 
-      // 添加观察步骤
       this.addStep(execution, {
         step: execution.steps.length + 1,
         type: 'observation',
@@ -215,12 +200,10 @@ export class AgentCore {
       timestamp: Date.now(),
     });
 
-    // 简单实现 - 实际应该使用 AI
     const issues: string[] = [];
     const improvements: string[] = [];
     const learnedLessons: string[] = [];
 
-    // 检查是否有失败的步骤
     const hasFailure = execution.steps.some(s => s.type === 'observation' && 
       s.content.includes('失败'));
 
@@ -229,7 +212,6 @@ export class AgentCore {
       improvements.push('考虑使用备选工具');
     }
 
-    // 检查步骤数
     if (execution.steps.length < 3) {
       improvements.push('可能需要更多步骤来完成任务');
     }
@@ -259,7 +241,6 @@ export class AgentCore {
 
     this.agent.memory.shortTerm.push(item);
 
-    // 修剪短期记忆
     if (this.agent.memory.shortTerm.length > this.agent.memory.maxShortTerm) {
       this.agent.memory.shortTerm.shift();
     }
@@ -279,7 +260,6 @@ export class AgentCore {
     return Array.from(this.executions.values());
   }
 
-  // 辅助方法
   private addStep(execution: AgentExecution, step: AgentStep): void {
     execution.steps.push(step);
     execution.currentStep = step.step;
@@ -291,7 +271,6 @@ export class AgentCore {
   }
 
   private selectTool(context: string): string | null {
-    // 简单的工具选择逻辑
     if (context.includes('搜索') || context.includes('search')) {
       return 'project_analyze';
     }
@@ -302,7 +281,6 @@ export class AgentCore {
   }
 
   private extractSubgoals(goal: string): string[] {
-    // 简单实现 - 实际应该使用 NLP
     return goal.split(/[,，]/).map(s => s.trim()).filter(s => s);
   }
 

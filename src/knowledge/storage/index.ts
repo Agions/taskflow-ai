@@ -16,8 +16,6 @@ import {
 } from '../types';
 import { EmbeddingManager } from '../embedding';
 
-// 简化的向量存储实现
-// 实际应该使用 LanceDB、Chroma 等真实数据库
 
 interface StoredChunk extends DocumentChunk {
   timestamp: number;
@@ -45,7 +43,6 @@ export class VectorStoreManager {
   async initialize(): Promise<void> {
     await fs.ensureDir(this.dataDir);
 
-    // 加载已有数据
     await this.loadData();
 
     console.log(`✅ Vector store initialized: ${this.store.type}`);
@@ -63,7 +60,6 @@ export class VectorStoreManager {
       this.data.set(chunk.id, storedChunk);
     }
 
-    // 保存到磁盘
     await this.saveData();
 
     console.log(`✅ Added ${chunks.length} chunks to vector store`);
@@ -103,19 +99,15 @@ export class VectorStoreManager {
       rerank = false
     } = options;
 
-    // 生成查询嵌入
     const queryEmbedding = await this.embeddingManager.embed(query);
 
-    // 计算相似度
     let results: RetrievedChunk[] = [];
 
     for (const chunk of this.data.values()) {
-      // 应用过滤器
       if (!this.matchesFilters(chunk, filters)) {
         continue;
       }
 
-      // 计算相似度
       const score = this.embeddingManager.cosineSimilarity(
         queryEmbedding,
         chunk.embedding
@@ -130,13 +122,10 @@ export class VectorStoreManager {
       }
     }
 
-    // 排序
     results.sort((a, b) => b.score - a.score);
 
-    // 取前 K 个
     results = results.slice(0, topK);
 
-    // 重排序（简化实现）
     if (rerank) {
       results = this.rerank(results, query);
     }
@@ -156,10 +145,8 @@ export class VectorStoreManager {
   ): Promise<RetrievedChunk[]> {
     const vectorResults = await this.search(query, options);
 
-    // 关键词搜索
     const keywordResults = this.keywordSearch(query, options);
 
-    // 合并结果
     const merged = this.mergeResults(vectorResults, keywordResults);
 
     return merged.slice(0, options.topK || 5);
@@ -177,7 +164,6 @@ export class VectorStoreManager {
       totalChunks++;
     }
 
-    // 计算存储大小
     const dataFile = path.join(this.dataDir, `${this.store.connection.collection || 'default'}.json`);
     let size = 0;
     if (await fs.pathExists(dataFile)) {
@@ -245,7 +231,6 @@ export class VectorStoreManager {
   ): RetrievedChunk[] {
     const merged = new Map<string, RetrievedChunk>();
 
-    // 添加向量搜索结果
     for (const result of vectorResults) {
       merged.set(result.chunk.id, {
         ...result,
@@ -253,7 +238,6 @@ export class VectorStoreManager {
       });
     }
 
-    // 添加关键词搜索结果
     for (const result of keywordResults) {
       const existing = merged.get(result.chunk.id);
       if (existing) {
@@ -273,7 +257,6 @@ export class VectorStoreManager {
    * 重排序
    */
   private rerank(results: RetrievedChunk[], query: string): RetrievedChunk[] {
-    // 简化实现：使用关键词匹配度进行重排序
     const keywords = query.toLowerCase().split(/\s+/);
 
     return results.map(result => {
@@ -285,7 +268,6 @@ export class VectorStoreManager {
         keywordScore += count;
       }
 
-      // 结合向量相似度和关键词匹配
       const combinedScore = result.score * 0.8 + Math.min(keywordScore * 0.1, 0.2);
 
       return {

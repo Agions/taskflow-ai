@@ -41,7 +41,6 @@ export class TemplateManager {
    * 初始化内置模板
    */
   private initBuiltinTemplates(): void {
-    // PRD 模板
     this.register({
       id: 'prd-default',
       name: '标准 PRD 模板',
@@ -87,7 +86,6 @@ export class TemplateManager {
       ],
     });
 
-    // 工作流模板
     this.register({
       id: 'workflow-prd-to-code',
       name: 'PRD 转代码工作流',
@@ -108,7 +106,6 @@ export class TemplateManager {
       }, null, 2),
     });
 
-    // 任务模板
     this.register({
       id: 'task-feature',
       name: '功能开发任务',
@@ -199,13 +196,11 @@ export class TemplateManager {
 
     let content = template.content;
 
-    // 替换变量
     for (const [key, value] of Object.entries(variables)) {
       const pattern = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
       content = content.replace(pattern, String(value));
     }
 
-    // 移除未替换的变量
     content = content.replace(/\{\{\w+\}\}/g, '');
 
     return content;

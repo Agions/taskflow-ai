@@ -32,14 +32,12 @@ export class WorkflowEngine {
   async execute(workflow: Workflow, input?: Record<string, unknown>): Promise<ExecutionResult> {
     const startTime = Date.now();
     
-    // 创建执行上下文
     const context: ExecutionContext = {
       variables: { ...workflow.variables, ...input },
       outputs: {},
       stepStatuses: {},
     };
 
-    // 创建执行记录
     const execution: WorkflowExecution = {
       id: `exec-${Date.now()}`,
       workflowId: workflow.id,
@@ -55,22 +53,17 @@ export class WorkflowEngine {
     this.logger.info(`开始执行工作流: ${workflow.name} (${execution.id})`);
 
     try {
-      // 验证工作流
       const validation = this.validateWorkflow(workflow);
       if (!validation.valid) {
         throw new Error(`工作流验证失败: ${validation.errors.join(', ')}`);
       }
 
-      // 构建步骤映射
       const stepMap = new Map(workflow.steps.map(s => [s.id, s]));
 
-      // 找到起始步骤
       const startSteps = this.findStartSteps(workflow);
       
-      // 执行工作流
       await this.executeSteps(stepMap, startSteps, context, execution);
 
-      // 完成
       execution.status = 'completed';
       execution.finishedAt = Date.now();
 
@@ -127,7 +120,6 @@ export class WorkflowEngine {
       throw new Error('无法恢复执行');
     }
 
-    // TODO: 实现恢复逻辑
     this.logger.info(`恢复工作流: ${executionId}`);
     
     return {
@@ -166,30 +158,23 @@ export class WorkflowEngine {
     execution: WorkflowExecution
   ): Promise<void> {
     for (const step of steps) {
-      // 检查是否应该跳过
       if (execution.stepStatuses[step.id] === 'skipped') {
         continue;
       }
 
-      // 更新当前步骤
       execution.currentStep = step.id;
       execution.stepStatuses[step.id] = 'running';
       context.stepStatuses[step.id] = 'running';
 
-      // 创建执行器
       const executor = createExecutor(step, context);
 
-      // 执行步骤
       const result = await executor.execute();
 
-      // 更新状态
       if (result.success) {
         execution.stepStatuses[step.id] = 'completed';
         context.stepStatuses[step.id] = 'completed';
       } else {
-        // 检查错误处理
         if (step.errorHandling?.onError) {
-          // 跳转到错误处理步骤
           const errorStep = stepMap.get(step.errorHandling.onError);
           if (errorStep) {
             await this.executeSteps(stepMap, [errorStep], context, execution);
@@ -201,7 +186,6 @@ export class WorkflowEngine {
         }
       }
 
-      // 执行下一步
       if (step.next && step.next.length > 0) {
         const nextSteps = step.next
           .map(id => stepMap.get(id))
@@ -216,7 +200,6 @@ export class WorkflowEngine {
    * 查找起始步骤
    */
   private findStartSteps(workflow: Workflow): WorkflowStep[] {
-    // 没有依赖的步骤就是起始步骤
     const dependentSteps = new Set<string>();
     
     for (const step of workflow.steps) {
@@ -238,18 +221,15 @@ export class WorkflowEngine {
   private validateWorkflow(workflow: Workflow): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
 
-    // 检查是否有步骤
     if (workflow.steps.length === 0) {
       errors.push('工作流没有步骤');
     }
 
-    // 检查步骤 ID 唯一性
     const ids = new Set(workflow.steps.map(s => s.id));
     if (ids.size !== workflow.steps.length) {
       errors.push('步骤 ID 重复');
     }
 
-    // 检查引用完整性
     const stepIds = new Set(workflow.steps.map(s => s.id));
     for (const step of workflow.steps) {
       if (step.next) {
@@ -284,7 +264,6 @@ export class ParallelExecutor {
     const results = new Map<string, { success: boolean; output?: unknown; error?: string }>();
     const maxConcurrency = 5; // 限制并发数
 
-    // 分批执行
     for (let i = 0; i < steps.length; i += maxConcurrency) {
       const batch = steps.slice(i, i + maxConcurrency);
       

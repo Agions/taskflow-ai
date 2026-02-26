@@ -3,10 +3,8 @@
  * TaskFlow AI v3.0 - CI/CD 流水线集成
  */
 
-// CI/CD 提供商
 export type CIProvider = 'github' | 'gitlab' | 'jenkins' | 'azure' | 'circleci' | 'travis';
 
-// 流水线配置
 export interface PipelineConfig {
   provider: CIProvider;
   name: string;
@@ -60,7 +58,6 @@ export interface NotificationConfig {
   events: ('start' | 'success' | 'failure' | 'always')[];
 }
 
-// GitHub Actions 特定配置
 export interface GitHubActionsConfig extends PipelineConfig {
   provider: 'github';
   workflowFile: string;
@@ -80,7 +77,6 @@ export interface GitHubConcurrency {
   cancelInProgress: boolean;
 }
 
-// 验证结果
 export interface ValidationResult {
   valid: boolean;
   errors: ValidationError[];
@@ -99,7 +95,6 @@ export interface ValidationWarning {
   suggestion?: string;
 }
 
-// 流水线状态
 export interface PipelineStatus {
   id: string;
   status: 'pending' | 'running' | 'success' | 'failure' | 'cancelled' | 'skipped';
@@ -112,7 +107,6 @@ export interface PipelineStatus {
   logs?: string;
 }
 
-// 任务同步配置
 export interface TaskSyncConfig {
   enabled: boolean;
   provider: 'jira' | 'linear' | 'asana' | 'trello' | 'github';
@@ -129,7 +123,6 @@ export interface TaskFieldMapping {
   transform?: string;
 }
 
-// PR 审查配置
 export interface PRReviewConfig {
   enabled: boolean;
   autoReview: boolean;
@@ -139,7 +132,6 @@ export interface PRReviewConfig {
   aiReviewPrompt?: string;
 }
 
-// 部署配置
 export interface DeployConfig {
   environments: DeployEnvironment[];
   strategies: DeployStrategy[];
@@ -172,7 +164,6 @@ export interface HealthCheckConfig {
   retries: number;
 }
 
-// 集成配置
 export interface CIIntegrationConfig {
   provider: CIProvider;
   repository: string;
@@ -185,7 +176,6 @@ export interface CIIntegrationConfig {
   deploy?: DeployConfig;
 }
 
-// 工作流模板
 export interface WorkflowTemplate {
   id: string;
   name: string;
@@ -202,7 +192,6 @@ export interface WorkflowVariable {
   required: boolean;
 }
 
-// 构建报告
 export interface BuildReport {
   id: string;
   status: PipelineStatus['status'];

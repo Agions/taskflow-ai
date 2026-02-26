@@ -43,7 +43,6 @@ export function mcpCommand(program: Command) {
 
 async function startMCPServer(_options: any) {
   try {
-    // 加载配置
     const configManager = new ConfigManager();
     const config = await configManager.loadConfig();
 
@@ -52,18 +51,14 @@ async function startMCPServer(_options: any) {
       process.exit(1);
     }
 
-    // 创建MCP服务器设置
     const mcpSettings = {
       serverName: 'taskflow-ai',
       version: '2.0.0',
     };
 
-    // 创建并启动MCP服务器
     const mcpServer = new MCPServer(mcpSettings, config);
     await mcpServer.start();
 
-    // 服务器会持续运行直到进程结束
-    // 不需要额外的进程监听，因为 server.start() 已经处理了
   } catch (error) {
     console.error(chalk.red('启动失败:'), error);
     throw error;

@@ -16,7 +16,6 @@ import {
   TaskMetadata
 } from '../types';
 
-// AI 接口（简化版，实际使用 OpenAI 或其他 AI 服务）
 interface AIService {
   complete(prompt: string, options?: any): Promise<string>;
 }
@@ -34,19 +33,14 @@ export class PlanningEngine {
   async plan(prd: PRDDocument): Promise<TaskPlan> {
     console.log('🧠 Analyzing PRD with AI...');
 
-    // 1. 分析需求
     const analysis = await this.analyzeRequirements(prd);
 
-    // 2. 生成任务
     const tasks = await this.generateTasks(prd, analysis);
 
-    // 3. 分析依赖
     const dependencies = this.analyzeDependencies(tasks);
 
-    // 4. 计算关键路径
     const criticalPath = this.calculateCriticalPath(tasks, dependencies);
 
-    // 5. 计算总工时
     const totalEstimate = tasks.reduce((sum, t) => sum + t.estimate, 0);
 
     return {
@@ -72,7 +66,6 @@ export class PlanningEngine {
       return this.parseAnalysisResponse(response);
     } catch (error) {
       console.error('AI analysis failed:', error);
-      // 返回默认分析
       return this.getDefaultAnalysis(prd);
     }
   }
@@ -96,7 +89,6 @@ export class PlanningEngine {
       return this.enrichTasks(taskData, prd);
     } catch (error) {
       console.error('Task generation failed:', error);
-      // 返回基于模板的默认任务
       return this.getDefaultTasks(prd);
     }
   }
@@ -107,13 +99,11 @@ export class PlanningEngine {
   private analyzeDependencies(tasks: Task[]): Dependency[] {
     const dependencies: Dependency[] = [];
 
-    // 基于任务类型和元数据分析依赖
     for (let i = 0; i < tasks.length; i++) {
       for (let j = i + 1; j < tasks.length; j++) {
         const taskA = tasks[i];
         const taskB = tasks[j];
 
-        // 检查是否有显式依赖
         if (taskB.dependencies.includes(taskA.id)) {
           dependencies.push({
             from: taskA.id,
@@ -122,7 +112,6 @@ export class PlanningEngine {
           });
         }
 
-        // 基于任务类型推断依赖
         if (this.hasImplicitDependency(taskA, taskB)) {
           dependencies.push({
             from: taskA.id,
@@ -140,7 +129,6 @@ export class PlanningEngine {
    * 计算关键路径
    */
   private calculateCriticalPath(tasks: Task[], dependencies: Dependency[]): string[] {
-    // 简化实现：返回最长依赖链
     const graph = this.buildDependencyGraph(tasks, dependencies);
     const path: string[] = [];
     const visited = new Set<string>();
@@ -163,7 +151,6 @@ export class PlanningEngine {
       }
     };
 
-    // 从入度为 0 的任务开始
     const inDegree = new Map<string, number>();
     for (const task of tasks) {
       inDegree.set(task.id, 0);
@@ -207,17 +194,14 @@ export class PlanningEngine {
    * 检查隐式依赖
    */
   private hasImplicitDependency(taskA: Task, taskB: Task): boolean {
-    // API 定义在实现之前
     if (taskA.type === 'analysis' && taskB.type === 'code') {
       return true;
     }
 
-    // 数据库模型在 API 之前
     if (taskA.metadata.tags.includes('model') && taskB.metadata.tags.includes('api')) {
       return true;
     }
 
-    // 组件在页面之前
     if (taskA.metadata.tags.includes('component') && taskB.metadata.tags.includes('page')) {
       return true;
     }
@@ -301,7 +285,6 @@ Output in JSON format:
    */
   private parseAnalysisResponse(response: string): RequirementAnalysis {
     try {
-      // 提取 JSON 部分
       const jsonMatch = response.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);

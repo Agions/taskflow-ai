@@ -7,13 +7,11 @@ import { WorkflowExecution, StepStatus } from './types';
 import { Logger } from '../../utils/logger';
 
 export interface StorageBackend {
-  // 工作流
   saveWorkflow(workflow: any): Promise<void>;
   getWorkflow(id: string): Promise<any | null>;
   listWorkflows(): Promise<any[]>;
   deleteWorkflow(id: string): Promise<void>;
 
-  // 执行
   saveExecution(execution: WorkflowExecution): Promise<void>;
   getExecution(id: string): Promise<WorkflowExecution | null>;
   listExecutions(workflowId?: string, limit?: number): Promise<WorkflowExecution[]>;
@@ -38,11 +36,9 @@ export class SQLiteStorage implements StorageBackend {
     if (this.initialized) return;
 
     try {
-      // 动态导入 better-sqlite3
       const Database = require('better-sqlite3');
       this.db = new Database(this.dbPath);
       
-      // 创建表
       this.db.exec(`
         CREATE TABLE IF NOT EXISTS workflows (
           id TEXT PRIMARY KEY,

@@ -3,7 +3,6 @@
  * TaskFlow AI v3.0 - MCP 工具市场
  */
 
-// 工具包
 export interface ToolPackage {
   id: string;
   name: string;
@@ -74,7 +73,6 @@ export interface PackageMetadata {
   official: boolean;
 }
 
-// 注册表
 export interface Registry {
   name: string;
   url: string;
@@ -83,7 +81,6 @@ export interface Registry {
   lastSync?: Date;
 }
 
-// 安装结果
 export interface InstallResult {
   success: boolean;
   package: ToolPackage;
@@ -92,14 +89,12 @@ export interface InstallResult {
   error?: string;
 }
 
-// 发布配置
 export interface PublishConfig {
   registry: string;
   access: 'public' | 'restricted';
   tag?: string;
 }
 
-// 搜索选项
 export interface SearchOptions {
   query?: string;
   category?: ToolCategory;
@@ -110,7 +105,6 @@ export interface SearchOptions {
   limit?: number;
 }
 
-// 搜索结果
 export interface SearchResult {
   packages: ToolPackage[];
   total: number;
@@ -118,7 +112,6 @@ export interface SearchResult {
   pageSize: number;
 }
 
-// 版本信息
 export interface VersionInfo {
   version: string;
   changelog: string;
@@ -127,14 +120,12 @@ export interface VersionInfo {
   deprecatedMessage?: string;
 }
 
-// 依赖解析
 export interface DependencyTree {
   name: string;
   version: string;
   dependencies: DependencyTree[];
 }
 
-// 市场配置
 export interface MarketplaceConfig {
   defaultRegistry: string;
   registries: Registry[];
@@ -143,7 +134,6 @@ export interface MarketplaceConfig {
   verifySignatures: boolean;
 }
 
-// 工具包清单
 export interface PackageManifest {
   name: string;
   versions: Record<string, ToolPackage>;

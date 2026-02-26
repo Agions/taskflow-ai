@@ -39,17 +39,14 @@ export class ConditionExecutor {
       };
     }
 
-    // 评估条件
     const conditionValue = this.evaluateCondition(step.condition, context);
 
     this.logger.info(`评估条件: ${step.condition} = ${conditionValue}`);
 
-    // 找到匹配的分支
     let selectedBranch = step.branches.find(b => b.id === 'true' && conditionValue) ||
                         step.branches.find(b => b.id === 'false' && !conditionValue);
 
     if (!selectedBranch) {
-      // 默认选择第一个分支
       selectedBranch = step.branches[0];
     }
 
@@ -65,20 +62,16 @@ export class ConditionExecutor {
    */
   private evaluateCondition(condition: string, context: ExecutionContext): boolean {
     try {
-      // 替换变量
       let expr = condition;
       expr = expr.replace(/\{\{(\w+)\}\}/g, (_, key) => {
         const value = context.variables[key] ?? context.outputs[key];
         return JSON.stringify(value);
       });
 
-      // 简单评估 (注意: 这是一个简化的实现)
-      // 实际应该使用安全的表达式解析器
       if (expr.startsWith('!')) {
         return !this.evaluateCondition(expr.slice(1), context);
       }
 
-      // 处理比较运算符
       const comparisons = [
         { op: '===', fn: (a: any, b: any) => a === b },
         { op: '==', fn: (a: any, b: any) => a == b },
@@ -99,11 +92,9 @@ export class ConditionExecutor {
         }
       }
 
-      // 布尔值
       if (expr === 'true') return true;
       if (expr === 'false') return false;
 
-      // 字符串比较
       return !!expr;
     } catch (e) {
       this.logger.error('条件评估错误:', e);
@@ -130,7 +121,6 @@ export class ParallelFlowExecutor {
 
     this.logger.info(`并行执行 ${steps.length} 个步骤 (最大并发: ${max})`);
 
-    // 分批执行
     for (let i = 0; i < steps.length; i += max) {
       const batch = steps.slice(i, i + max);
       
@@ -147,7 +137,6 @@ export class ParallelFlowExecutor {
       }
     }
 
-    // 检查是否有失败
     const hasFailed = Object.values(results).some(r => !r.success);
 
     return {
@@ -179,13 +168,11 @@ export class LoopExecutor {
     const results: unknown[] = [];
 
     for (let i = 0; i < maxIterations; i++) {
-      // 检查循环条件
       if (condition && !this.evaluateCondition(condition, context, i)) {
         this.logger.info(`循环条件不满足，退出 (第 ${i + 1} 次)`);
         break;
       }
 
-      // 执行循环体
       const executor = createExecutor(step, context);
       const result = await executor.execute();
       
@@ -201,7 +188,6 @@ export class LoopExecutor {
         };
       }
 
-      // 延迟
       if (delay > 0 && i < maxIterations - 1) {
         await new Promise(r => setTimeout(r, delay));
       }
@@ -217,7 +203,6 @@ export class LoopExecutor {
   }
 
   private evaluateCondition(condition: string, context: ExecutionContext, iteration: number): boolean {
-    // 简化实现
     if (condition === '{{done}}') {
       return false;
     }
@@ -253,7 +238,6 @@ export class ErrorHandlerExecutor {
         lastError = error instanceof Error ? error.message : String(error);
       }
 
-      // 重试前等待
       if (attempt < maxRetries) {
         this.logger.info(`重试 (${attempt + 1}/${maxRetries})...`);
         await new Promise(r => setTimeout(r, retryDelay * (attempt + 1)));

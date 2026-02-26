@@ -56,13 +56,10 @@ export class MCPPromptManager {
     this.logger.info('正在初始化MCP提示管理器...');
 
     try {
-      // 确保提示目录存在
       await fs.ensureDir(this.promptsDir);
 
-      // 注册默认提示
       await this.registerDefaultPrompts();
 
-      // 加载自定义提示
       await this.loadCustomPrompts();
 
       this.logger.info(`提示管理器初始化完成，共加载 ${this.prompts.size} 个提示`);
@@ -379,7 +376,6 @@ export class MCPPromptManager {
         }
       }
     } catch (error) {
-      // 目录不存在或无法读取
     }
 
     return files;
@@ -438,10 +434,8 @@ export class MCPPromptManager {
       throw new Error(`提示不存在: ${name}`);
     }
 
-    // 验证参数
     this.validateArguments(prompt, args);
 
-    // 渲染模板
     const content = await this.renderTemplate(prompt.template, args);
 
     return {
@@ -518,13 +512,10 @@ export class MCPPromptManager {
   private async renderTemplate(template: string, args: Record<string, any>): Promise<string> {
     let result = template;
 
-    // 简单的模板渲染实现
-    // 替换 {{variable}} 格式的变量
     result = result.replace(/\{\{(\w+)\}\}/g, (match, varName) => {
       return args[varName]?.toString() || match;
     });
 
-    // 处理条件语句 {{#if condition}}...{{/if}}
     result = result.replace(
       /\{\{#if\s+(\w+)\}\}([\s\S]*?)\{\{\/if\}\}/g,
       (match, condition, content) => {
@@ -532,7 +523,6 @@ export class MCPPromptManager {
       }
     );
 
-    // 处理循环语句 {{#each array}}...{{/each}}
     result = result.replace(
       /\{\{#each\s+(\w+)\}\}([\s\S]*?)\{\{\/each\}\}/g,
       (match, arrayName, itemTemplate) => {

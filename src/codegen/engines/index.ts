@@ -50,10 +50,8 @@ export class CodeGenerationEngine {
     const warnings: string[] = [];
 
     try {
-      // 1. 验证规范
       this.validateSpec(spec);
 
-      // 2. 选择模板
       const template = this.templateManager.selectTemplateForSpec(spec);
       if (!template) {
         return {
@@ -62,34 +60,26 @@ export class CodeGenerationEngine {
         };
       }
 
-      // 3. 准备上下文
       const context = this.buildTemplateContext(spec);
 
-      // 4. 渲染模板
       const mainContent = this.templateManager.renderTemplate(template.id, context);
 
-      // 5. 生成文件
       const files: GeneratedFile[] = [];
 
-      // 主组件文件
       const mainFile = this.generateMainFile(spec, mainContent);
       files.push(mainFile);
 
-      // 样式文件
       if (spec.hasStyles) {
         const styleFile = this.generateStyleFile(spec);
         files.push(styleFile);
       }
 
-      // 测试文件
       const testFile = this.generateTestFile(spec);
       files.push(testFile);
 
-      // 索引文件
       const indexFile = this.generateIndexFile(spec);
       files.push(indexFile);
 
-      // 6. 代码质量检查
       const qualityChecks = await this.checkCodeQuality(files);
       const failedChecks = qualityChecks.filter(c => !c.passed && c.severity === 'error');
 
@@ -97,7 +87,6 @@ export class CodeGenerationEngine {
         warnings.push(...failedChecks.map(c => c.message));
       }
 
-      // 7. 格式化代码
       if (this.config.autoFormat) {
         await this.formatFiles(files);
       }
@@ -158,18 +147,15 @@ export class CodeGenerationEngine {
       for (const file of component.files) {
         const targetPath = path.join(this.config.outputDir, file.path);
 
-        // 检查是否忽略
         if (this.shouldIgnore(targetPath, config.ignorePatterns)) {
           continue;
         }
 
-        // 备份现有文件
         if (config.backup && await fs.pathExists(targetPath)) {
           const backupPath = `${targetPath}.backup-${Date.now()}`;
           await fs.copy(targetPath, backupPath);
         }
 
-        // 检查策略
         const exists = await fs.pathExists(targetPath);
 
         if (exists && config.strategy === 'skip') {
@@ -178,11 +164,9 @@ export class CodeGenerationEngine {
         }
 
         if (exists && config.strategy === 'merge') {
-          // 合并逻辑（简化实现）
           console.log(`🔀 Merged: ${file.path}`);
         }
 
-        // 写入文件
         if (!config.dryRun) {
           await fs.ensureDir(path.dirname(targetPath));
           await fs.writeFile(targetPath, file.content, 'utf-8');
@@ -261,10 +245,8 @@ export class CodeGenerationEngine {
 
     const content = extension === 'scss'
       ? `.${className} {
-  // TODO: Add styles
 
   &__container {
-    // Container styles
   }
 }`
       : `.${className} {
@@ -297,7 +279,6 @@ describe('${spec.name}', () => {
 
 ${spec.props?.map(prop => `  it('should handle ${prop.name} prop', () => {
     render(<${spec.name} ${prop.name}={${prop.defaultValue || 'null'}} />);
-    // TODO: Add assertion
   });`).join('\n\n') || ''}
 });
 `;
@@ -331,7 +312,6 @@ export type { ${spec.name}Props } from './${spec.name}';
     const checks: CodeQualityCheck[] = [];
 
     for (const file of files) {
-      // 检查文件大小
       const lines = file.content.split('\n').length;
       if (lines > 500) {
         checks.push({
@@ -342,7 +322,6 @@ export type { ${spec.name}Props } from './${spec.name}';
         });
       }
 
-      // 检查 TODO 标记
       const todoCount = (file.content.match(/TODO/g) || []).length;
       if (todoCount > 5) {
         checks.push({
@@ -353,7 +332,6 @@ export type { ${spec.name}Props } from './${spec.name}';
         });
       }
 
-      // 检查 console.log
       if (file.content.includes('console.log')) {
         checks.push({
           name: 'Console Usage',
@@ -371,9 +349,7 @@ export type { ${spec.name}Props } from './${spec.name}';
    * 格式化文件
    */
   private async formatFiles(files: GeneratedFile[]): Promise<void> {
-    // 简化实现：实际应该使用 Prettier
     for (const file of files) {
-      // 基本的格式化：确保文件以换行符结尾
       if (!file.content.endsWith('\n')) {
         file.content += '\n';
       }

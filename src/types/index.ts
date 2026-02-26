@@ -2,7 +2,6 @@
  * TaskFlow AI 核心类型定义
  */
 
-// ==================== 基础类型 ====================
 
 export interface TaskFlowConfig {
   projectName: string;
@@ -34,7 +33,6 @@ export type AIProvider =
   | 'openai'
   | 'claude';
 
-// ==================== PRD相关类型 ====================
 
 export interface PRDDocument {
   id: string;
@@ -100,7 +98,6 @@ export interface AcceptanceCriteria {
   testable: boolean;
 }
 
-// ==================== 任务管理类型 ====================
 
 export interface Task {
   id: string;
@@ -188,7 +185,6 @@ export interface ProjectMetadata {
   deploymentUrl?: string;
 }
 
-// ==================== MCP相关类型 ====================
 
 export interface MCPSettings {
   enabled: boolean;
@@ -242,7 +238,6 @@ export interface MCPResource {
   handler: string;
 }
 
-// ==================== 输出格式类型 ====================
 
 export type OutputFormat = string;
 
@@ -264,7 +259,6 @@ export interface ChartOptions {
   grid: boolean;
 }
 
-// ==================== 插件系统类型 ====================
 
 export interface PluginConfig {
   name: string;
@@ -297,7 +291,6 @@ export interface PluginResult {
   warnings?: string[];
 }
 
-// ==================== 日志和错误类型 ====================
 
 export interface Logger {
   debug: (message: string, ...args: any[]) => void;
@@ -322,7 +315,6 @@ export type ErrorType =
   | 'filesystem'
   | 'plugin';
 
-// ==================== CLI相关类型 ====================
 
 export interface CLIContext {
   config: TaskFlowConfig;
@@ -339,7 +331,6 @@ export interface CommandResult {
   error?: string;
 }
 
-// ==================== 实用工具类型 ====================
 
 export interface ProgressIndicator {
   start: (message: string) => void;

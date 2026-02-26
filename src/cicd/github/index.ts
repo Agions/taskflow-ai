@@ -33,7 +33,6 @@ export class GitHubActionsIntegration {
     const errors: any[] = [];
     const warnings: any[] = [];
 
-    // 验证触发器
     if (!config.triggers || config.triggers.length === 0) {
       errors.push({
         field: 'triggers',
@@ -42,7 +41,6 @@ export class GitHubActionsIntegration {
       });
     }
 
-    // 验证阶段
     if (!config.stages || config.stages.length === 0) {
       errors.push({
         field: 'stages',
@@ -51,7 +49,6 @@ export class GitHubActionsIntegration {
       });
     }
 
-    // 验证 secrets
     for (const secret of config.secrets || []) {
       if (!/^[A-Z_][A-Z0-9_]*$/.test(secret)) {
         errors.push({
@@ -80,7 +77,6 @@ export class GitHubActionsIntegration {
       jobs: {}
     };
 
-    // 添加并发控制
     if (config.concurrency) {
       workflow.concurrency = {
         group: config.concurrency.group,
@@ -88,12 +84,10 @@ export class GitHubActionsIntegration {
       };
     }
 
-    // 添加环境变量
     if (config.environment && Object.keys(config.environment).length > 0) {
       workflow.env = config.environment;
     }
 
-    // 生成任务
     for (const stage of config.stages) {
       for (const job of stage.jobs) {
         workflow.jobs[job.name] = this.generateJob(job, stage);
@@ -182,7 +176,6 @@ export class GitHubActionsIntegration {
    */
   async getBuildReport(runId: string): Promise<BuildReport> {
     try {
-      // 获取运行信息
       const runResponse = await axios.get(
         `${this.baseUrl}/repos/${this.repository}/actions/runs/${runId}`,
         {
@@ -195,7 +188,6 @@ export class GitHubActionsIntegration {
 
       const run = runResponse.data;
 
-      // 获取任务信息
       const jobsResponse = await axios.get(
         `${this.baseUrl}/repos/${this.repository}/actions/runs/${runId}/jobs`,
         {
@@ -208,7 +200,6 @@ export class GitHubActionsIntegration {
 
       const jobs = jobsResponse.data.jobs;
 
-      // 构建报告
       const report: BuildReport = {
         id: run.id.toString(),
         status: this.mapStatus(run.status, run.conclusion),
@@ -225,7 +216,6 @@ export class GitHubActionsIntegration {
         artifacts: []
       };
 
-      // 解析任务为阶段
       for (const job of jobs) {
         const stageReport: any = {
           name: job.name,
@@ -340,7 +330,6 @@ export class GitHubActionsIntegration {
     ];
   }
 
-  // 私有辅助方法
 
   private generateTriggers(triggers: any[]): any {
     const on: any = {};
@@ -398,17 +387,14 @@ export class GitHubActionsIntegration {
       }))
     };
 
-    // 添加依赖
     if (stage.needs && stage.needs.length > 0) {
       jobConfig.needs = stage.needs;
     }
 
-    // 添加超时
     if (job.timeout) {
       jobConfig['timeout-minutes'] = job.timeout;
     }
 
-    // 添加产物
     if (job.artifacts && job.artifacts.length > 0) {
       jobConfig.steps.push({
         uses: 'actions/upload-artifact@v4',
@@ -419,7 +405,6 @@ export class GitHubActionsIntegration {
       });
     }
 
-    // 添加缓存
     if (job.cache) {
       jobConfig.steps.unshift({
         uses: 'actions/cache@v4',

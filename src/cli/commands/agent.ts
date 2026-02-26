@@ -21,10 +21,8 @@ import {
   Requirement
 } from '../../agent/types';
 
-// 模拟 AI 服务（实际应该使用 OpenAI 或其他 AI 服务）
 class MockAIService {
   async complete(prompt: string, options?: any): Promise<string> {
-    // 模拟 AI 响应
     if (prompt.includes('task plan')) {
       return JSON.stringify({
         tasks: [
@@ -92,7 +90,6 @@ export const agentCommand = new Command('agent')
     const spinner = ora('Initializing AI Agent...').start();
 
     try {
-      // 1. 加载 PRD
       if (!options.prd) {
         spinner.fail('PRD path is required. Use --prd <path>');
         process.exit(1);
@@ -109,7 +106,6 @@ export const agentCommand = new Command('agent')
 
       spinner.succeed(`PRD loaded: ${prd.title}`);
 
-      // 2. 加载项目配置
       const configManager = new ConfigManager(process.cwd());
       let projectConfig = await configManager.loadConfig();
 
@@ -143,7 +139,6 @@ export const agentCommand = new Command('agent')
         };
       }
 
-      // 3. 创建 Agent 配置
       const agentConfig: AgentConfig = {
         mode: options.mode as AgentConfig['mode'],
         maxIterations: parseInt(options.maxIterations),
@@ -165,7 +160,6 @@ export const agentCommand = new Command('agent')
         console.log(chalk.yellow('\n🔍 DRY RUN MODE - No changes will be made\n'));
       }
 
-      // 4. 创建 Agent 上下文
       const agentContext: AgentContext = {
         prd,
         projectConfig,
@@ -173,7 +167,6 @@ export const agentCommand = new Command('agent')
         constraints: options.constraint || []
       };
 
-      // 5. 创建引擎
       const aiService = new MockAIService();
       const planningEngine = new PlanningEngine(aiService);
       const mcpServer = new MCPServer(
@@ -187,7 +180,6 @@ export const agentCommand = new Command('agent')
       });
       const verificationEngine = new VerificationEngine(process.cwd());
 
-      // 6. 创建 Agent 服务
       const agentService = new AgentService(
         agentContext,
         agentConfig,
@@ -196,7 +188,6 @@ export const agentCommand = new Command('agent')
         verificationEngine
       );
 
-      // 7. 监听状态变化
       agentService.onTransition((state) => {
         const statusMessage = getStatusMessage(state.status);
         spinner.text = statusMessage;
@@ -214,15 +205,12 @@ export const agentCommand = new Command('agent')
           spinner.stop();
           console.log(chalk.yellow('\n⏸️  Awaiting user approval...'));
           console.log('Actions requiring approval:', agentConfig.approvalRequired);
-          // 这里可以添加交互式确认
         }
       });
 
-      // 8. 启动 Agent
       console.log(chalk.blue('\n🚀 Starting Agent...\n'));
       agentService.start();
 
-      // 9. 等待完成
       await waitForCompletion(agentService);
 
     } catch (error) {
@@ -231,7 +219,6 @@ export const agentCommand = new Command('agent')
     }
   });
 
-// Agent 子命令
 agentCommand
   .command('status')
   .description('Check agent execution status')
@@ -243,7 +230,6 @@ agentCommand
     }
 
     console.log(chalk.blue(`Checking status for session: ${options.session}`));
-    // 实现状态查询逻辑
   });
 
 agentCommand
@@ -251,7 +237,6 @@ agentCommand
   .description('List all agent sessions')
   .action(async () => {
     console.log(chalk.blue('Active Agent Sessions:'));
-    // 实现会话列表逻辑
   });
 
 agentCommand
@@ -290,7 +275,6 @@ agentCommand
     console.log(chalk.red(`Stopping session: ${options.session}`));
   });
 
-// 辅助函数
 
 function getStatusMessage(status: string): string {
   const messages: Record<string, string> = {
@@ -306,7 +290,6 @@ function getStatusMessage(status: string): string {
 }
 
 function parsePRD(content: string, filePath: string): PRDDocument {
-  // 简化实现：从 Markdown 解析 PRD
   const lines = content.split('\n');
   const title = lines[0]?.replace(/^#\s*/, '') || 'Untitled';
 
@@ -342,7 +325,6 @@ function parsePRD(content: string, filePath: string): PRDDocument {
     }
   }
 
-  // 提取验收标准
   const acceptanceCriteria: string[] = [];
   let inCriteria = false;
 

@@ -5,7 +5,6 @@
 
 import { TaskFlowConfig } from '../types';
 
-// Agent 配置
 export interface AgentConfig {
   mode: 'assisted' | 'autonomous' | 'supervised';
   maxIterations: number;
@@ -15,7 +14,6 @@ export interface AgentConfig {
   timeout: number; // 单个任务超时时间（毫秒）
 }
 
-// Agent 状态
 export type AgentStatus = 
   | 'idle' 
   | 'planning' 
@@ -36,7 +34,6 @@ export interface AgentState {
   endTime?: Date;
 }
 
-// Agent 上下文
 export interface AgentContext {
   prd: PRDDocument;
   projectConfig: TaskFlowConfig;
@@ -47,7 +44,6 @@ export interface AgentContext {
   verificationResult?: VerificationResult;
 }
 
-// PRD 文档
 export interface PRDDocument {
   id: string;
   title: string;
@@ -73,7 +69,6 @@ export interface PRDMetadata {
   tags: string[];
 }
 
-// 任务计划
 export interface TaskPlan {
   tasks: Task[];
   dependencies: Dependency[];
@@ -127,7 +122,6 @@ export interface Dependency {
   type: 'blocks' | 'depends-on';
 }
 
-// 执行结果
 export interface ExecutionResult {
   results: TaskResult[];
   completedAt: Date;
@@ -151,7 +145,6 @@ export interface ExecutionSummary {
   totalDuration: number;
 }
 
-// 验证结果
 export interface VerificationResult {
   checks: VerificationCheck[];
   allPassed: boolean;
@@ -165,7 +158,6 @@ export interface VerificationCheck {
   severity: 'error' | 'warning' | 'info';
 }
 
-// 工具定义
 export interface Tool {
   name: string;
   description: string;
@@ -181,7 +173,6 @@ export interface ToolResult {
   error?: string;
 }
 
-// 操作历史
 export interface ActionHistory {
   id: string;
   type: ActionType;
@@ -199,7 +190,6 @@ export type ActionType =
   | 'approve' 
   | 'reject';
 
-// Agent 事件
 export type AgentEvent =
   | { type: 'START' }
   | { type: 'PLAN_COMPLETE'; data: TaskPlan }
@@ -211,7 +201,6 @@ export type AgentEvent =
   | { type: 'APPROVED' }
   | { type: 'REJECTED' };
 
-// 会话管理
 export interface AgentSession {
   id: string;
   state: AgentState;
@@ -220,14 +209,12 @@ export interface AgentSession {
   updatedAt: Date;
 }
 
-// 执行上下文
 export interface ExecutionContext {
   config: AgentConfig;
   projectPath: string;
   workspacePath: string;
 }
 
-// 代码生成相关
 export interface CodeTemplate {
   id: string;
   name: string;
@@ -257,7 +244,6 @@ export interface TemplateContext {
   [key: string]: unknown;
 }
 
-// 组件生成
 export interface ComponentSpec {
   name: string;
   description: string;
@@ -286,7 +272,6 @@ export interface GeneratedFile {
   content: string;
 }
 
-// 规划引擎
 export interface PlanningEngine {
   plan(prd: PRDDocument): Promise<TaskPlan>;
   analyzeRequirements(prd: PRDDocument): Promise<RequirementAnalysis>;
@@ -313,7 +298,6 @@ export interface Risk {
   mitigation: string;
 }
 
-// 验证引擎
 export interface VerificationEngine {
   verify(result: ExecutionResult): Promise<VerificationResult>;
   checkCodeQuality(files: string[]): Promise<CodeQualityReport>;

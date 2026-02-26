@@ -58,7 +58,6 @@ function collectStats(verbose: boolean): ProjectStats {
     size: { src: '', node_modules: '', dist: '' }
   };
 
-  // 统计文件数
   try {
     const srcCount = execSync('find src -type f | wc -l', { encoding: 'utf8' }).trim();
     stats.files.total = parseInt(srcCount) || 0;
@@ -66,10 +65,8 @@ function collectStats(verbose: boolean): ProjectStats {
     const codeCount = execSync('find src -name "*.ts" -o -name "*.tsx" | wc -l', { encoding: 'utf8' }).trim();
     stats.files.code = parseInt(codeCount) || 0;
   } catch (e) {
-    // ignore
   }
 
-  // 统计代码行数
   try {
     const lines = execSync('find src -name "*.ts" -o -name "*.tsx" | xargs wc -l 2>/dev/null | tail -1', { encoding: 'utf8' }).trim();
     const match = lines.match(/(\d+)\s+total/);
@@ -77,10 +74,8 @@ function collectStats(verbose: boolean): ProjectStats {
       stats.lines.code = parseInt(match[1]) || 0;
     }
   } catch (e) {
-    // ignore
   }
 
-  // 统计目录大小
   try {
     const srcSize = execSync('du -sh src 2>/dev/null | cut -f1', { encoding: 'utf8' }).trim();
     stats.size.src = srcSize || '0';

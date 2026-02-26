@@ -28,7 +28,6 @@ export class EmbeddingManager {
    * 生成文本嵌入
    */
   async embed(text: string): Promise<number[]> {
-    // 检查缓存
     const cacheKey = this.hashText(text);
     if (this.cache.has(cacheKey)) {
       return this.cache.get(cacheKey)!;
@@ -47,11 +46,9 @@ export class EmbeddingManager {
         embedding = await this.embedWithHuggingFace(text);
         break;
       default:
-        // 使用简单的哈希作为回退
         embedding = this.simpleEmbedding(text);
     }
 
-    // 缓存结果
     this.cache.set(cacheKey, embedding);
 
     return embedding;
@@ -63,7 +60,6 @@ export class EmbeddingManager {
   async embedBatch(texts: string[]): Promise<number[][]> {
     const results: number[][] = [];
 
-    // 分批处理
     for (let i = 0; i < texts.length; i += this.model.batchSize) {
       const batch = texts.slice(i, i + this.model.batchSize);
       const batchResults = await Promise.all(
@@ -162,7 +158,6 @@ export class EmbeddingManager {
    * 使用本地模型生成嵌入
    */
   private async embedWithLocal(text: string): Promise<number[]> {
-    // 简化实现：实际应该调用本地模型服务
     return this.simpleEmbedding(text);
   }
 
@@ -199,17 +194,13 @@ export class EmbeddingManager {
    * 简单的回退嵌入（基于词频）
    */
   private simpleEmbedding(text: string): number[] {
-    // 创建一个简单的基于字符的嵌入
-    // 实际应用中应该使用真实的嵌入模型
     const dimensions = this.model.dimensions;
     const embedding = new Array(dimensions).fill(0);
 
-    // 使用字符编码创建简单的向量
     for (let i = 0; i < text.length && i < dimensions; i++) {
       embedding[i] = text.charCodeAt(i) / 255;
     }
 
-    // 归一化
     const norm = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
     if (norm > 0) {
       return embedding.map(val => val / norm);

@@ -29,7 +29,6 @@ export class RegistryManager {
   async initialize(): Promise<void> {
     await fs.ensureDir(this.cacheDir);
 
-    // 加载默认注册表
     this.addRegistry({
       name: 'taskflow-official',
       url: 'https://registry.taskflow.ai',
@@ -37,7 +36,6 @@ export class RegistryManager {
       packages: []
     });
 
-    // 加载本地缓存
     await this.loadCache();
   }
 
@@ -77,13 +75,10 @@ export class RegistryManager {
       }
     }
 
-    // 去重
     const uniquePackages = this.deduplicatePackages(results);
 
-    // 排序
     const sorted = this.sortPackages(uniquePackages, options.sortBy || 'downloads');
 
-    // 分页
     const limit = options.limit || 20;
     const page = 1;
     const pageSize = limit;
@@ -102,12 +97,10 @@ export class RegistryManager {
   async getPackage(name: string, version?: string): Promise<ToolPackage | null> {
     const cacheKey = `${name}@${version || 'latest'}`;
 
-    // 检查缓存
     if (this.cache.has(cacheKey)) {
       return this.cache.get(cacheKey)!;
     }
 
-    // 从注册表获取
     for (const registry of this.registries.values()) {
       try {
         const pkg = await this.fetchPackage(registry, name, version);
@@ -117,7 +110,6 @@ export class RegistryManager {
           return pkg;
         }
       } catch (error) {
-        // 继续尝试下一个注册表
       }
     }
 
@@ -140,7 +132,6 @@ export class RegistryManager {
           }));
         }
       } catch (error) {
-        // 继续尝试下一个注册表
       }
     }
 
@@ -158,7 +149,6 @@ export class RegistryManager {
           return manifest['dist-tags'].latest;
         }
       } catch (error) {
-        // 继续尝试下一个注册表
       }
     }
 
@@ -197,12 +187,10 @@ export class RegistryManager {
     }
 
     try {
-      // 获取所有包列表
       const packages = await this.fetchPackageList(registry);
       registry.packages = packages.map(p => p.name);
       registry.lastSync = new Date();
 
-      // 更新缓存
       for (const pkg of packages) {
         this.cache.set(`${pkg.name}@${pkg.version}`, pkg);
         await this.saveToCache(pkg);
@@ -251,7 +239,6 @@ export class RegistryManager {
    * 搜索 Git 注册表
    */
   private async searchGitRegistry(registry: Registry, options: SearchOptions): Promise<ToolPackage[]> {
-    // 简化实现：从 Git 仓库搜索
     return [];
   }
 
@@ -311,7 +298,6 @@ export class RegistryManager {
    */
   private async fetchPackageList(registry: Registry): Promise<ToolPackage[]> {
     if (registry.type === 'npm') {
-      // 获取所有包（简化实现）
       return [];
     } else if (registry.type === 'local') {
       const packages: ToolPackage[] = [];
@@ -456,15 +442,12 @@ export class RegistryManager {
       const cacheFile = path.join(this.cacheDir, 'registry-cache.json');
       const data: Record<string, ToolPackage> = {};
 
-      // 读取现有缓存
       if (await fs.pathExists(cacheFile)) {
         Object.assign(data, await fs.readJson(cacheFile));
       }
 
-      // 添加新包
       data[`${pkg.name}@${pkg.version}`] = pkg;
 
-      // 保存
       await fs.writeJson(cacheFile, data, { spaces: 2 });
     } catch (error) {
       console.warn('Failed to save cache:', error);

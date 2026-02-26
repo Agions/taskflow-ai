@@ -130,7 +130,6 @@ export class MultiAgentCoordinator {
 
     switch (strategy) {
       case 'sequential':
-        // 顺序执行
         for (const agentId of agentIds) {
           const agent = this.agents.get(agentId);
           if (agent) {
@@ -143,7 +142,6 @@ export class MultiAgentCoordinator {
         break;
 
       case 'parallel':
-        // 并行执行
         const promises = agentIds.map(async (agentId) => {
           const agent = this.agents.get(agentId);
           if (agent) {
@@ -155,7 +153,6 @@ export class MultiAgentCoordinator {
         break;
 
       case 'hierarchical':
-        // 层级执行 - 主 Agent 协调
         const mainAgent = this.agents.get(agentIds[0]);
         if (mainAgent) {
           const exec = await mainAgent.execute(task);
@@ -176,10 +173,8 @@ export class MultiAgentCoordinator {
   ): Promise<AgentExecution[]> {
     this.logger.info(`启动协作任务`);
 
-    // 1. 分解任务
     const subtasks = this.decomposeTask(task);
     
-    // 2. 分发给不同 Agent
     const distributions: TaskDistribution[] = [];
     
     for (let i = 0; i < agentIds.length; i++) {
@@ -191,7 +186,6 @@ export class MultiAgentCoordinator {
       });
     }
 
-    // 3. 执行
     const executions: AgentExecution[] = [];
     
     for (const dist of distributions) {
@@ -206,10 +200,8 @@ export class MultiAgentCoordinator {
       }
     }
 
-    // 4. 聚合结果
     const aggregated = this.aggregateResults(executions);
     
-    // 5. 通知所有 Agent
     this.broadcast('coordinator', `任务完成: ${aggregated}`);
 
     return executions;
@@ -219,7 +211,6 @@ export class MultiAgentCoordinator {
    * 分解任务
    */
   private decomposeTask(task: AgentTask): AgentTask[] {
-    // 简单实现 - 实际应该使用 AI
     const parts = task.description.split(/[;.；]/).filter(s => s.trim());
     
     return parts.map((part, index) => ({
@@ -300,5 +291,4 @@ export class AgentFactory {
   }
 }
 
-// 导出单例
 export const agentCoordinator = new MultiAgentCoordinator();

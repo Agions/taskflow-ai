@@ -14,7 +14,6 @@ export const cicdCommand = new Command('cicd')
   .description('CI/CD Pipeline Integration - manage deployment workflows')
   .alias('ci');
 
-// 初始化命令
 cicdCommand
   .command('init')
   .description('Initialize CI/CD configuration')
@@ -31,10 +30,8 @@ cicdCommand
         return;
       }
 
-      // 检测仓库
       let repo = options.repo;
       if (!repo) {
-        // 尝试从 git 配置读取
         const { execSync } = require('child_process');
         try {
           const remoteUrl = execSync('git remote get-url origin', { encoding: 'utf-8' }).trim();
@@ -43,7 +40,6 @@ cicdCommand
             repo = match[1];
           }
         } catch {
-          // 忽略错误
         }
       }
 
@@ -52,7 +48,6 @@ cicdCommand
         return;
       }
 
-      // 创建配置
       const config: GitHubActionsConfig = {
         provider: 'github',
         name: 'TaskFlow CI',
@@ -89,7 +84,6 @@ cicdCommand
         }
       };
 
-      // 保存配置
       const configPath = path.join(process.cwd(), '.taskflow', 'cicd-config.json');
       await require('fs-extra').writeJson(configPath, config, { spaces: 2 });
 
@@ -106,7 +100,6 @@ cicdCommand
     }
   });
 
-// 部署命令
 cicdCommand
   .command('deploy')
   .description('Deploy CI/CD workflow')
@@ -115,7 +108,6 @@ cicdCommand
     const spinner = ora('Deploying CI/CD workflow...').start();
 
     try {
-      // 加载配置
       const configPath = options.config || path.join(process.cwd(), '.taskflow', 'cicd-config.json');
       const fs = require('fs-extra');
 
@@ -126,14 +118,12 @@ cicdCommand
 
       const config: GitHubActionsConfig = await fs.readJson(configPath);
 
-      // 检查 token
       const token = process.env.GITHUB_TOKEN;
       if (!token) {
         spinner.fail('GITHUB_TOKEN environment variable not set');
         return;
       }
 
-      // 获取仓库
       const { execSync } = require('child_process');
       const remoteUrl = execSync('git remote get-url origin', { encoding: 'utf-8' }).trim();
       const match = remoteUrl.match(/github\.com[:/](.+?)\.git?$/);
@@ -143,7 +133,6 @@ cicdCommand
       }
       const repo = match[1];
 
-      // 部署
       const integration = new GitHubActionsIntegration(token, repo);
       await integration.deployWorkflow(config);
 
@@ -159,7 +148,6 @@ cicdCommand
     }
   });
 
-// 模板命令
 cicdCommand
   .command('template')
   .description('List available workflow templates')
@@ -182,7 +170,6 @@ cicdCommand
     }
   });
 
-// 验证命令
 cicdCommand
   .command('validate')
   .description('Validate CI/CD configuration')
@@ -191,7 +178,6 @@ cicdCommand
     const spinner = ora('Validating configuration...').start();
 
     try {
-      // 加载配置
       const configPath = options.config || path.join(process.cwd(), '.taskflow', 'cicd-config.json');
       const fs = require('fs-extra');
 
@@ -202,7 +188,6 @@ cicdCommand
 
       const config: GitHubActionsConfig = await fs.readJson(configPath);
 
-      // 验证
       const token = process.env.GITHUB_TOKEN || 'dummy-token';
       const integration = new GitHubActionsIntegration(token, 'owner/repo');
       const result = await integration.validateConfig(config);
@@ -230,7 +215,6 @@ cicdCommand
     }
   });
 
-// 状态命令
 cicdCommand
   .command('status')
   .description('Get pipeline status')
@@ -245,7 +229,6 @@ cicdCommand
         return;
       }
 
-      // 获取仓库
       const { execSync } = require('child_process');
       const remoteUrl = execSync('git remote get-url origin', { encoding: 'utf-8' }).trim();
       const match = remoteUrl.match(/github\.com[:/](.+?)\.git?$/);
@@ -255,7 +238,6 @@ cicdCommand
       }
       const repo = match[1];
 
-      // 获取状态
       const integration = new GitHubActionsIntegration(token, repo);
       const status = await integration.getPipelineStatus(runId);
 
@@ -289,7 +271,6 @@ cicdCommand
     }
   });
 
-// 触发命令
 cicdCommand
   .command('trigger')
   .description('Trigger pipeline manually')
@@ -304,7 +285,6 @@ cicdCommand
         return;
       }
 
-      // 获取仓库
       const { execSync } = require('child_process');
       const remoteUrl = execSync('git remote get-url origin', { encoding: 'utf-8' }).trim();
       const match = remoteUrl.match(/github\.com[:/](.+?)\.git?$/);
@@ -314,7 +294,6 @@ cicdCommand
       }
       const repo = match[1];
 
-      // 触发
       const integration = new GitHubActionsIntegration(token, repo);
       const runId = await integration.triggerPipeline(options.branch);
 
@@ -325,7 +304,6 @@ cicdCommand
     }
   });
 
-// 报告命令
 cicdCommand
   .command('report')
   .description('Get build report')
@@ -340,7 +318,6 @@ cicdCommand
         return;
       }
 
-      // 获取仓库
       const { execSync } = require('child_process');
       const remoteUrl = execSync('git remote get-url origin', { encoding: 'utf-8' }).trim();
       const match = remoteUrl.match(/github\.com[:/](.+?)\.git?$/);
@@ -350,7 +327,6 @@ cicdCommand
       }
       const repo = match[1];
 
-      // 获取报告
       const integration = new GitHubActionsIntegration(token, repo);
       const report = await integration.getBuildReport(runId);
 

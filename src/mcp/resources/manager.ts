@@ -40,13 +40,10 @@ export class MCPResourceManager {
     this.logger.info('正在初始化MCP资源管理器...');
 
     try {
-      // 确保数据目录存在
       await fs.ensureDir(this.dataDir);
 
-      // 注册默认资源
       await this.registerDefaultResources();
 
-      // 扫描现有资源
       await this.scanResources();
 
       this.logger.info(`资源管理器初始化完成，共注册 ${this.resources.size} 个资源`);
@@ -127,7 +124,6 @@ export class MCPResourceManager {
    */
   private async scanResources(): Promise<void> {
     try {
-      // 扫描数据目录中的文件
       const files = await this.findDataFiles();
 
       for (const file of files) {
@@ -156,7 +152,6 @@ export class MCPResourceManager {
         }
       }
     } catch (error) {
-      // 目录不存在或无法读取
     }
 
     return files;
@@ -233,12 +228,10 @@ export class MCPResourceManager {
   private async loadResourceContent(resource: MCPResource): Promise<any> {
     const uri = resource.uri;
 
-    // 处理默认资源
     if (uri.startsWith('/')) {
       return await this.loadDefaultResourceContent(uri);
     }
 
-    // 处理文件资源
     if (uri.startsWith('/files/')) {
       const fileName = uri.substring(7);
       const filePath = path.join(this.dataDir, fileName);
@@ -280,7 +273,6 @@ export class MCPResourceManager {
    */
   private async getTasksData(): Promise<any> {
     try {
-      // 尝试从多个可能的位置读取任务数据
       const possiblePaths = [
         path.join(process.cwd(), 'output'),
         path.join(process.cwd(), '.taskflow', 'data'),
@@ -345,7 +337,6 @@ export class MCPResourceManager {
       const configPath = path.join(process.cwd(), '.taskflow', 'config.json');
       if (await fs.pathExists(configPath)) {
         const config = await fs.readJson(configPath);
-        // 移除敏感信息
         const safeConfig = { ...config };
         if (safeConfig.aiModels) {
           safeConfig.aiModels = safeConfig.aiModels.map((model: any) => ({

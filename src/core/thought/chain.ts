@@ -43,7 +43,6 @@ export class ThoughtChainManager {
     const id = generateId();
     const now = Date.now();
 
-    // 创建根节点 - 需求理解
     const root: ThoughtNode = {
       id: generateId(),
       type: 'requirement',
@@ -92,7 +91,6 @@ export class ThoughtChainManager {
       return null;
     }
 
-    // 检查节点数量限制
     if (chain.nodes.size >= this.options.maxNodes) {
       console.warn('Max nodes reached');
       return null;
@@ -104,7 +102,6 @@ export class ThoughtChainManager {
       return null;
     }
 
-    // 检查深度限制
     const depth = this.getNodeDepth(chain, parentId);
     if (depth >= this.options.maxDepth) {
       console.warn('Max depth reached');
@@ -123,11 +120,8 @@ export class ThoughtChainManager {
       metadata: options?.metadata,
     };
 
-    // 添加到父节点
     parent.children.push(node);
-    // 添加到节点映射
     chain.nodes.set(node.id, node);
-    // 更新时间
     chain.updatedAt = Date.now();
 
     return node;
@@ -142,7 +136,6 @@ export class ThoughtChainManager {
 
     while (current && current !== chain.root) {
       depth++;
-      // 找到父节点 (简化处理，实际需要维护父子关系)
       for (const [, node] of chain.nodes) {
         if (node.children.some(c => c.id === nodeId)) {
           current = node;

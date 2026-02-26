@@ -14,7 +14,6 @@ export const marketplaceCommand = new Command('marketplace')
   .description('MCP Tool Marketplace - manage and install tools')
   .alias('mp');
 
-// 搜索命令
 marketplaceCommand
   .command('search')
   .description('Search for packages in the marketplace')
@@ -70,7 +69,6 @@ marketplaceCommand
     }
   });
 
-// 安装命令
 marketplaceCommand
   .command('install')
   .description('Install a package from the marketplace')
@@ -116,7 +114,6 @@ marketplaceCommand
     }
   });
 
-// 卸载命令
 marketplaceCommand
   .command('uninstall')
   .description('Uninstall a package')
@@ -146,7 +143,6 @@ marketplaceCommand
     }
   });
 
-// 更新命令
 marketplaceCommand
   .command('update')
   .description('Update installed packages')
@@ -162,7 +158,6 @@ marketplaceCommand
       const installer = new PackageInstaller(registryManager);
 
       if (packageName) {
-        // 更新单个包
         spinner.text = `Updating ${packageName}...`;
         const result = await installer.update(packageName, {
           global: options.global
@@ -174,7 +169,6 @@ marketplaceCommand
           spinner.fail(chalk.red(`Update failed: ${result.error}`));
         }
       } else {
-        // 更新所有包
         const installed = await installer.listInstalled({ global: options.global });
 
         if (installed.length === 0) {
@@ -205,7 +199,6 @@ marketplaceCommand
     }
   });
 
-// 列出命令
 marketplaceCommand
   .command('list')
   .description('List installed packages')
@@ -243,7 +236,6 @@ marketplaceCommand
     }
   });
 
-// 信息命令
 marketplaceCommand
   .command('info')
   .description('Show package information')
@@ -288,7 +280,6 @@ marketplaceCommand
         console.log(`  ${chalk.gray('Homepage:')} ${pkg.homepage}`);
       }
 
-      // 获取版本历史
       const versions = await registryManager.getPackageVersions(packageName);
       if (versions.length > 0) {
         console.log(chalk.blue('\nVersions:'));
@@ -305,7 +296,6 @@ marketplaceCommand
     }
   });
 
-// 同步命令
 marketplaceCommand
   .command('sync')
   .description('Sync registry cache')

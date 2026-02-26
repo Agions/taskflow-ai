@@ -39,7 +39,6 @@ export class PackageInstaller {
     try {
       console.log(`📦 Installing ${packageName}${version ? `@${version}` : ''}...`);
 
-      // 1. 获取包信息
       const pkg = await this.registryManager.getPackage(packageName, version);
       if (!pkg) {
         return {
@@ -50,30 +49,24 @@ export class PackageInstaller {
         };
       }
 
-      // 2. 解析依赖
       const depTree = await this.resolveDependencies(pkg);
 
-      // 3. 安装依赖
       for (const dep of depTree.dependencies) {
         await this.installDependency(dep);
       }
 
-      // 4. 下载并安装包
       const targetDir = options?.global ? this.globalDir : this.installDir;
       const pkgDir = path.join(targetDir, pkg.name);
 
       await fs.ensureDir(pkgDir);
       await this.downloadPackage(pkg, pkgDir);
 
-      // 5. 安装 npm 依赖
       if (Object.keys(pkg.dependencies).length > 0) {
         await this.installNpmDependencies(pkgDir, pkg.dependencies);
       }
 
-      // 6. 注册工具
       const installedTools = await this.registerTools(pkg, pkgDir);
 
-      // 7. 保存到项目配置
       if (options?.save !== false && !options?.global) {
         await this.saveToProjectConfig(pkg);
       }
@@ -112,7 +105,6 @@ export class PackageInstaller {
         await fs.remove(pkgDir);
         console.log(`✅ Uninstalled ${packageName}`);
 
-        // 从项目配置中移除
         await this.removeFromProjectConfig(packageName);
 
         return true;
@@ -132,10 +124,8 @@ export class PackageInstaller {
    */
   async update(packageName: string, options?: { global?: boolean }): Promise<InstallResult> {
     try {
-      // 获取当前版本
       const currentVersion = await this.getInstalledVersion(packageName, options?.global);
 
-      // 获取最新版本
       const latestVersion = await this.registryManager.getLatestVersion(packageName);
 
       if (!latestVersion) {
@@ -158,10 +148,8 @@ export class PackageInstaller {
 
       console.log(`🔄 Updating ${packageName} from ${currentVersion} to ${latestVersion}...`);
 
-      // 卸载旧版本
       await this.uninstall(packageName, options);
 
-      // 安装新版本
       return await this.install(packageName, latestVersion, options);
 
     } catch (error) {
@@ -196,7 +184,6 @@ export class PackageInstaller {
             const pkgJson = await fs.readJson(pkgJsonPath);
             packages.push(pkgJson as ToolPackage);
           } catch {
-            // 忽略无效包
           }
         }
       }
@@ -261,14 +248,12 @@ export class PackageInstaller {
     const pkgDir = path.join(this.installDir, dep.name);
 
     if (await fs.pathExists(pkgDir)) {
-      // 已安装，检查版本
       const installedVersion = await this.getInstalledVersion(dep.name);
       if (installedVersion === dep.version) {
         return; // 版本匹配，跳过
       }
     }
 
-    // 下载并安装
     const pkg = await this.registryManager.getPackage(dep.name, dep.version);
     if (pkg) {
       await fs.ensureDir(pkgDir);
@@ -280,7 +265,6 @@ export class PackageInstaller {
    * 下载包
    */
   private async downloadPackage(pkg: ToolPackage, targetDir: string): Promise<void> {
-    // 创建 package.json
     const packageJson = {
       name: pkg.name,
       version: pkg.version,
@@ -297,18 +281,15 @@ export class PackageInstaller {
 
     await fs.writeJson(path.join(targetDir, 'package.json'), packageJson, { spaces: 2 });
 
-    // 创建工具文件
     for (const tool of pkg.tools) {
       const toolFile = path.join(targetDir, `${tool.name}.js`);
       const toolCode = this.generateToolCode(tool);
       await fs.writeFile(toolFile, toolCode, 'utf-8');
     }
 
-    // 创建入口文件
     const indexCode = this.generateIndexCode(pkg);
     await fs.writeFile(path.join(targetDir, 'index.js'), indexCode, 'utf-8');
 
-    // 创建 README
     const readme = this.generateReadme(pkg);
     await fs.writeFile(path.join(targetDir, 'README.md'), readme, 'utf-8');
   }
@@ -396,7 +377,6 @@ module.exports = {
   description: '${tool.description}',
   inputSchema: ${JSON.stringify(tool.inputSchema, null, 2)},
   handler: async (input) => {
-    // TODO: Implement tool logic
     return { success: true };
   }
 };

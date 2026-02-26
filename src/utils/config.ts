@@ -12,7 +12,6 @@ import { REGEX_PATTERNS } from '../constants';
 export function validateConfig(config: any): { valid: boolean; errors?: string[] } {
   const errors: string[] = [];
 
-  // 检查基本字段
   if (!config.projectName || typeof config.projectName !== 'string') {
     errors.push('projectName is required and must be a string');
   }
@@ -21,7 +20,6 @@ export function validateConfig(config: any): { valid: boolean; errors?: string[]
     errors.push('version must be a valid semantic version');
   }
 
-  // 检查AI模型配置
   if (config.aiModels && Array.isArray(config.aiModels)) {
     config.aiModels.forEach((model: any, index: number) => {
       if (!model.provider || typeof model.provider !== 'string') {
@@ -36,7 +34,6 @@ export function validateConfig(config: any): { valid: boolean; errors?: string[]
     });
   }
 
-  // 检查MCP设置
   if (config.mcpSettings) {
     const mcp = config.mcpSettings;
     if (typeof mcp.enabled !== 'boolean') {
@@ -59,7 +56,6 @@ export function validateConfig(config: any): { valid: boolean; errors?: string[]
 export async function encryptApiKeys(apiKey: string): Promise<string> {
   if (!apiKey) return '';
 
-  // 简单的base64编码（生产环境应使用更安全的加密）
   return Buffer.from(apiKey).toString('base64');
 }
 

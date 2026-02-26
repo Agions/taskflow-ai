@@ -70,7 +70,6 @@ export class ModelGateway {
     this.maxRetries = options.maxRetries ?? 2;
     this.retryDelay = options.retryDelay ?? 1000;
 
-    // 初始化模型
     for (const config of options.models) {
       this.addModel(config);
     }
@@ -80,13 +79,11 @@ export class ModelGateway {
   addModel(config: ModelConfig): void {
     this.models.set(config.id, config);
     
-    // 创建适配器
     const adapter = this.createAdapter(config);
     if (adapter) {
       this.adapters.set(config.id, adapter);
     }
 
-    // 更新可用模型列表
     if (config.enabled) {
       this.enabledModels = [...this.enabledModels.filter(m => m.id !== config.id), config]
         .sort((a, b) => a.priority - b.priority);
@@ -138,7 +135,6 @@ export class ModelGateway {
         return new OpenAIAdapter(config);
       case 'anthropic':
         return new AnthropicAdapter(config);
-      // 其他提供商可以后续添加
       default:
         console.warn(`Unknown provider: ${config.provider}`);
         return null;
@@ -149,7 +145,6 @@ export class ModelGateway {
    * 发送聊天请求 (自动路由)
    */
   async complete(request: CompletionRequest): Promise<CompletionResult> {
-    // 确定使用的模型和路由策略
     const strategy = request.strategy || this.defaultRouter;
     const routing = await createRouter(strategy).select(
       request.messages,
@@ -164,7 +159,6 @@ export class ModelGateway {
       throw new Error(`No adapter for model: ${model.id}`);
     }
 
-    // 准备请求选项
     const options: ChatCompletionOptions = {
       messages: request.messages,
       temperature: request.temperature ?? model.temperature,
@@ -178,7 +172,6 @@ export class ModelGateway {
       ];
     }
 
-    // 发送请求 (带重试)
     let lastError: Error | null = null;
     const startTime = Date.now();
 
@@ -186,7 +179,6 @@ export class ModelGateway {
       try {
         const response = await adapter.complete(options);
         
-        // 计算成本
         const cost = adapter.estimateCost(
           response.usage?.prompt_tokens || 0,
           response.usage?.completion_tokens || 0
@@ -202,11 +194,9 @@ export class ModelGateway {
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         
-        // 如果不是最后一次尝试，等待后重试
         if (attempt < this.maxRetries && this.enableFallback) {
           await this.sleep(this.retryDelay * (attempt + 1));
           
-          // 尝试降级到下一个模型
           const fallbackModels = this.enabledModels.filter(m => m.priority > model.priority);
           if (fallbackModels.length > 0) {
             const newModel = fallbackModels[0];

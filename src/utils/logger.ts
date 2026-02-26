@@ -45,13 +45,11 @@ export class Logger {
     );
 
     const transports: winston.transport[] = [
-      // 控制台输出
       new winston.transports.Console({
         level: process.env.LOG_LEVEL || 'info',
         format: winston.format.combine(winston.format.colorize(), logFormat),
       }),
 
-      // 所有日志文件
       new winston.transports.File({
         filename: path.join(logsDir, 'taskflow.log'),
         level: 'debug',
@@ -60,7 +58,6 @@ export class Logger {
         maxFiles: 5,
       }),
 
-      // 错误日志文件
       new winston.transports.File({
         filename: path.join(logsDir, 'error.log'),
         level: 'error',

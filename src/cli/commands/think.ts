@@ -10,7 +10,6 @@ import { loadConfig } from '../../core/config';
 
 const program = new Command('think');
 
-// 存储管理器实例
 let manager: ThoughtChainManager | null = null;
 
 function getManager(): ThoughtChainManager {
@@ -40,12 +39,10 @@ program
     const manager = getManager();
     const config = loadConfig();
 
-    // 如果有配置模型，尝试使用 AI 分析
     const models = config.aiModels?.filter(m => m.enabled) || [];
     
     if (models.length > 0) {
       try {
-        // 使用 AI 进行深度分析
         await analyzeWithAI(manager, prompt, options.model);
       } catch (_error) {
         console.log(chalk.yellow('AI 分析失败，使用本地分析...\n'));
@@ -56,7 +53,6 @@ program
       analyzeLocally(manager, prompt);
     }
 
-    // 获取最新的思维链
     const chains = manager.listChains();
     if (chains.length === 0) {
       console.log(chalk.red('分析失败'));
@@ -66,13 +62,10 @@ program
     const latestChain = manager.getChain(chains[chains.length - 1].id);
     if (!latestChain) return;
 
-    // 渲染输出
     if (options.visualize) {
-      // 输出 Mermaid 流程图
       const renderer = createRenderer('mermaid');
       console.log(renderer.render(latestChain));
     } else {
-      // 标准输出
       const renderer = createRenderer(options.format as any);
       console.log(renderer.render(latestChain));
     }
@@ -84,7 +77,6 @@ program
 function analyzeLocally(manager: ThoughtChainManager, prompt: string): void {
   const chain = manager.createChain(prompt);
   
-  // 简单分析
   manager.addNode(
     chain.id,
     chain.root.id,
@@ -93,7 +85,6 @@ function analyzeLocally(manager: ThoughtChainManager, prompt: string): void {
     '理解需求内容'
   );
 
-  // 任务拆解
   manager.addNode(
     chain.id,
     chain.root.id,
@@ -102,7 +93,6 @@ function analyzeLocally(manager: ThoughtChainManager, prompt: string): void {
     '将复杂问题分解为可管理的部分'
   );
 
-  // 生成任务
   manager.addNode(
     chain.id,
     chain.root.id,
@@ -111,7 +101,6 @@ function analyzeLocally(manager: ThoughtChainManager, prompt: string): void {
     '创建可执行的任务项'
   );
 
-  // 总结
   manager.addNode(
     chain.id,
     chain.root.id,
@@ -129,10 +118,8 @@ async function analyzeWithAI(
   prompt: string,
   _preferredModel?: string
 ): Promise<void> {
-  // 简化实现 - 实际应该调用 ModelGateway
   analyzeLocally(manager, prompt);
   
-  // TODO: 集成 ModelGateway 进行深度 AI 分析
   console.log(chalk.gray('(AI 分析模块待完善...)'));
 }
 

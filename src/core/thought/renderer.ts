@@ -172,7 +172,6 @@ export class MermaidRenderer {
     lines.push('    classDef synthesis fill:#4facfe,stroke:#00f2fe,stroke-width:2px');
     lines.push('');
 
-    // 生成节点和连线
     let nodeId = 0;
     const idMap = new Map<string, string>();
     

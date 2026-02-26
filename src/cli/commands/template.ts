@@ -27,7 +27,6 @@ program
       return;
     }
 
-    // 按分类显示
     const byCategory = templateManager.listByCategory();
     const categories = ['prd', 'workflow', 'task'];
 
@@ -66,7 +65,6 @@ program
       return;
     }
 
-    // 渲染模板
     const variables = options.variable || {};
     const content = templateManager.render(templateId, variables);
 
@@ -75,7 +73,6 @@ program
       return;
     }
 
-    // 输出
     if (options.output) {
       await fs.writeFile(options.output, content);
       console.log(chalk.green(`✅ 已保存到: ${options.output}`));

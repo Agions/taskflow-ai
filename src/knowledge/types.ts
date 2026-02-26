@@ -3,7 +3,6 @@
  * TaskFlow AI v3.0 - RAG 知识库集成
  */
 
-// 文档
 export interface Document {
   id: string;
   content: string;
@@ -36,7 +35,6 @@ export type DocumentType =
   | 'conversation'
   | 'other';
 
-// 文档块
 export interface DocumentChunk {
   id: string;
   documentId: string;
@@ -54,7 +52,6 @@ export interface ChunkMetadata {
   tokenCount: number;
 }
 
-// 检索结果
 export interface RetrievalResult {
   chunks: RetrievedChunk[];
   query: string;
@@ -68,7 +65,6 @@ export interface RetrievedChunk {
   distance: number;
 }
 
-// 检索选项
 export interface RetrievalOptions {
   topK?: number;
   threshold?: number;
@@ -83,7 +79,6 @@ export interface FilterCondition {
   value: any;
 }
 
-// 嵌入模型
 export interface EmbeddingModel {
   name: string;
   provider: 'openai' | 'local' | 'huggingface' | 'custom';
@@ -92,7 +87,6 @@ export interface EmbeddingModel {
   batchSize: number;
 }
 
-// 向量存储
 export interface VectorStore {
   name: string;
   type: 'lancedb' | 'chroma' | 'pinecone' | 'weaviate' | 'qdrant';
@@ -106,7 +100,6 @@ export interface VectorStoreConnection {
   collection?: string;
 }
 
-// 知识库配置
 export interface KnowledgeBaseConfig {
   embeddingModel: EmbeddingModel;
   vectorStore: VectorStore;
@@ -116,7 +109,6 @@ export interface KnowledgeBaseConfig {
   autoIndex: boolean;
 }
 
-// 索引状态
 export interface IndexStatus {
   totalDocuments: number;
   totalChunks: number;
@@ -125,7 +117,6 @@ export interface IndexStatus {
   size: number; // bytes
 }
 
-// 问答结果
 export interface QAResult {
   answer: string;
   sources: Source[];
@@ -141,7 +132,6 @@ export interface Source {
   metadata: DocumentMetadata;
 }
 
-// 知识库统计
 export interface KnowledgeStats {
   documents: number;
   chunks: number;
@@ -152,7 +142,6 @@ export interface KnowledgeStats {
   documentTypes: Record<DocumentType, number>;
 }
 
-// 同步配置
 export interface SyncConfig {
   watch: boolean;
   interval: number; // minutes
@@ -161,7 +150,6 @@ export interface SyncConfig {
   autoIndex: boolean;
 }
 
-// 知识应用
 export interface KnowledgeContext {
   relevantDocs: RetrievedChunk[];
   summary: string;
