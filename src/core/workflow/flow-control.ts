@@ -17,6 +17,7 @@ export interface StepResult {
   success: boolean;
   output?: unknown;
   error?: string;
+  duration?: number;
 }
 
 /**
@@ -75,10 +76,10 @@ export class ConditionExecutor {
         { op: '==', fn: (a: any, b: any) => a == b },
         { op: '!==', fn: (a: any, b: any) => a !== b },
         { op: '!=', fn: (a: any, b: any) => a != b },
-        { op: '>=', fn: (a: number, b: number) => a >= b },
-        { op: '<=', fn: (a: number, b: number) => a <= b },
-        { op: '>', fn: (a: number, b: number) => a > b },
-        { op: '<', fn: (a: number, b: number) => a < b },
+        { op: '>=', fn: (a: any, b: any) => a >= b },
+        { op: '<=', fn: (a: any, b: any) => a <= b },
+        { op: '>', fn: (a: any, b: any) => a > b },
+        { op: '<', fn: (a: any, b: any) => a < b },
       ] as const;
 
       for (const { op, fn } of comparisons) {

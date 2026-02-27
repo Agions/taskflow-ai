@@ -208,7 +208,7 @@ export class WorkflowEngine {
         const deps = Array.isArray(config.dependsOn) 
           ? config.dependsOn 
           : [config.dependsOn];
-        deps.forEach(d => dependentSteps.add(d));
+        deps.forEach((d: string) => dependentSteps.add(d));
       }
     }
 
