@@ -66,7 +66,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
       projectConfig
     );
     const executionEngine = new ExecutionEngine(mcpServer, {
-      config: agentConfig as Record<string, unknown>,
+      config: agentConfig as unknown as Record<string, unknown>,
       projectPath: process.cwd(),
       workspacePath: path.join(process.cwd(), '.taskflow', 'workspace')
     });
@@ -94,7 +94,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
       });
     });
     
-    const success = agent.getState() === 'completed';
+    const success = (agent.getState() as any) === 'completed';
 
     if (success) {
       console.log(chalk.green('\n✅ Agent execution completed successfully!'));

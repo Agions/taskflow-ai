@@ -9,6 +9,7 @@ import { Task } from './task';
  */
 export interface ExecutionContext {
   projectPath: string;
+  workspacePath?: string;
   config: Record<string, unknown>;
 }
 

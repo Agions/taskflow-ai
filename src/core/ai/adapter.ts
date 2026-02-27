@@ -84,7 +84,7 @@ export abstract class BaseAdapter {
         choices: [{
           index: choice.index,
           delta: choice.message,
-          finish_reason: choice.finish_reason,
+          finish_reason: choice.finish_reason || undefined,
         }],
       };
     }
