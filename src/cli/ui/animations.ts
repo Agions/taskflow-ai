@@ -869,7 +869,7 @@ export const emojis = {
   alien2: '👽',
   monster2: '👾',
   robot2: '🤖',
-  cat2: '😺',
+  catFace: '😺',
   grinning5: '😸',
   joy: '😹',
   smiling6: '😻',

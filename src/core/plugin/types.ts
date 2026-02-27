@@ -2,6 +2,20 @@
  * 插件系统核心类型定义
  */
 
+/**
+ * 插件注册表
+ */
+export interface PluginRegistry {
+  /** 注册插件 */
+  register: (plugin: Plugin) => void;
+  /** 注销插件 */
+  unregister: (pluginId: string) => void;
+  /** 获取插件 */
+  get: (pluginId: string) => Plugin | undefined;
+  /** 获取所有插件 */
+  getAll: () => Plugin[];
+}
+
 export interface Plugin {
   /** 插件唯一标识 */
   id: string;
