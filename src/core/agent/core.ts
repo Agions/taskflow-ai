@@ -217,7 +217,7 @@ export class AgentCore {
     }
 
     const result: ReflectionResult = {
-      success: execution.status === 'completed',
+      success: (execution.status as any) === 'completed',
       issues,
       improvements,
       learnedLessons,

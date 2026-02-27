@@ -24,7 +24,7 @@ export class CodeValidator {
     const checks: CodeQualityCheck[] = [];
 
     for (const file of files) {
-      if (file.type === 'component') {
+      if (file.path.includes('component') || file.type === 'tsx' || file.type === 'jsx') {
         checks.push(this.checkComponentStructure(file));
         checks.push(this.checkImports(file));
       }
