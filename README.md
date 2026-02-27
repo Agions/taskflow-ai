@@ -524,7 +524,7 @@ export default class MyPlugin implements Plugin {
 
 ## 📄 许可证
 
-[MIT](LICENSE) © 2026 TaskFlow AI Team
+[MIT](LICENSE) © 2026 agions
 
 ---
 
