@@ -45,7 +45,7 @@ export class PackageSearcher {
 
       return response.data.objects?.map((obj: any) => this.mapToToolPackage(obj.package)) || [];
     } catch {
-      return registry.packages || [];
+      return [];
     }
   }
 

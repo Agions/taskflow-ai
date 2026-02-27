@@ -120,7 +120,7 @@ export class KnowledgeRetrievalEngine {
 
   async getStats(): Promise<KnowledgeStats> {
     const status = await this.vectorStore.getStatus();
-    const chunks = await this.vectorStore.getAllChunks();
+    const chunks = await (this.vectorStore as any).getAllChunks();
 
     const documentTypes: Record<string, number> = {};
     const tags: string[] = [];
@@ -164,10 +164,10 @@ export class KnowledgeRetrievalEngine {
         title: path.basename(filePath),
         source: filePath,
         type: path.extname(filePath).slice(1) as import('../types').DocumentType,
-        createdAt: stats.birthtime,
-        updatedAt: stats.mtime,
         tags: []
-      }
+      },
+      createdAt: stats.birthtime,
+      updatedAt: stats.mtime
     };
   }
 
