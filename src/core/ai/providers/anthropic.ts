@@ -119,14 +119,7 @@ export class AnthropicAdapter extends BaseAdapter {
 
   async *stream(
     options: { messages: ChatMessage[]; temperature?: number; max_tokens?: number } & { stream: true }
-  ): AsyncGenerator<{
-    id: string;
-    choices: Array<{
-      index: number;
-      delta: { role?: string; content?: string };
-      finish_reason?: string;
-    }>;
-  }> {
+  ): AsyncGenerator<StreamChunk> {
     const systemMessages = options.messages.filter(m => m.role === 'system');
     const otherMessages = options.messages.filter(m => m.role !== 'system');
 

@@ -88,11 +88,11 @@ program
 
     const existingIndex = config.aiModels?.findIndex((m: any) => m.id === newModel.id);
     if (existingIndex !== undefined && existingIndex >= 0) {
-      config.aiModels![existingIndex] = newModel;
+      config.aiModels![existingIndex] = newModel as any;
       console.log(chalk.yellow(`更新现有模型: ${newModel.id}`));
     } else {
       config.aiModels = config.aiModels || [];
-      config.aiModels.push(newModel);
+      config.aiModels.push(newModel as any);
       console.log(chalk.green(`添加新模型: ${newModel.id}`));
     }
 
@@ -139,7 +139,7 @@ program
   .requiredOption('-i, --id <id>', '模型 ID')
   .action(async (options) => {
     const config = await loadConfig();
-    const model = config?.aiModels?.find((m: ModelConfig) => m.id === options.id);
+    const model = config?.aiModels?.find((m: any) => m.id === options.id);
     
     if (!model) {
       console.log(chalk.red(`未找到模型: ${options.id}`));
@@ -159,7 +159,7 @@ program
   .requiredOption('-i, --id <id>', '模型 ID')
   .action(async (options) => {
     const config = await loadConfig();
-    const model = config?.aiModels?.find((m: ModelConfig) => m.id === options.id);
+    const model = config?.aiModels?.find((m: any) => m.id === options.id);
     
     if (!model) {
       console.log(chalk.red(`未找到模型: ${options.id}`));
