@@ -6,10 +6,9 @@
  */
 
 import { Command } from 'commander';
-import chalk from 'chalk';
-import boxen from 'boxen';
 import packageJson from '../../package.json';
 
+import { ui, showLogo, showSimpleLogo } from './ui';
 import { initCommand } from './commands/init';
 import { parseCommand } from './commands/parse';
 import { statusCommand } from './commands/status';
@@ -23,29 +22,11 @@ import { cicdCommand } from './commands/cicd';
 
 const program = new Command();
 
-function showLogo() {
-  console.log(chalk.cyan.bold('TaskFlow AI'));
-
-  console.log(
-    boxen(
-      chalk.white.bold('智能PRD文档解析与任务管理助手\n') +
-        chalk.gray('支持多模型AI协同、MCP编辑器集成\n') +
-        chalk.blue(`版本: ${packageJson.version}`),
-      {
-        padding: 1,
-        margin: 1,
-        borderStyle: 'round',
-        borderColor: 'cyan',
-      }
-    )
-  );
-}
-
 program
   .name('taskflow')
   .description('TaskFlow AI - 智能PRD文档解析与任务管理助手')
-  .version(packageJson.version)
-  .option('-v, --verbose', '显示详细输出')
+  .version(packageJson.version, '-v, --version', '显示版本号')
+  .option('--verbose', '显示详细输出')
   .option('--debug', '启用调试模式')
   .hook('preAction', thisCommand => {
     if (thisCommand.opts().debug) {
@@ -53,6 +34,7 @@ program
     }
   });
 
+// 注册命令
 initCommand(program);
 parseCommand(program);
 statusCommand(program);
@@ -64,47 +46,60 @@ program.addCommand(marketplaceCommand);
 program.addCommand(knowledgeCommand);
 program.addCommand(cicdCommand);
 
+// 自定义帮助信息
 program.on('--help', () => {
-  console.log('\n' + chalk.cyan('示例用法:'));
-  console.log('  $ taskflow init');
-  console.log('  $ taskflow status');
-  console.log('  $ taskflow parse document.md');
-  console.log('  $ taskflow mcp start');
-  console.log('\n' + chalk.cyan('更多信息:'));
-  console.log('  文档: https://github.com/Agions/taskflow-ai');
-  console.log('  问题反馈: https://github.com/Agions/taskflow-ai/issues');
+  ui.section('示例用法');
+  console.log(`  ${ui.primary('$')} taskflow init`);
+  console.log(`  ${ui.primary('$')} taskflow status`);
+  console.log(`  ${ui.primary('$')} taskflow parse document.md`);
+  console.log(`  ${ui.primary('$')} taskflow mcp start`);
+  console.log();
+  ui.section('更多信息');
+  console.log(`  文档: ${ui.info('https://github.com/Agions/taskflow-ai')}`);
+  console.log(`  问题反馈: ${ui.info('https://github.com/Agions/taskflow-ai/issues')}`);
 });
 
+// 未知命令处理
 program.on('command:*', operands => {
-  console.error(chalk.red(`未知命令: ${operands[0]}`));
-  console.log(chalk.yellow('使用 "taskflow --help" 查看可用命令'));
+  ui.error(
+    '未知命令',
+    `命令 "${operands[0]}" 不存在`,
+    '使用 "taskflow --help" 查看可用命令'
+  );
   process.exit(1);
 });
 
+// 主函数
 async function main() {
   try {
+    // 无参数时显示 Logo 和帮助
     if (process.argv.length === 2) {
-      showLogo();
+      await showLogo();
       program.help();
     } else {
       await program.parseAsync();
     }
   } catch (error) {
-    console.error(chalk.red('执行错误:'), error);
+    ui.error(
+      '执行错误',
+      error instanceof Error ? error.message : String(error)
+    );
     process.exit(1);
   }
 }
 
+// 错误处理
 process.on('uncaughtException', error => {
-  console.error(chalk.red('未捕获的异常:'), error);
+  ui.error('未捕获的异常', error.message);
   process.exit(1);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error(chalk.red('未处理的Promise拒绝:'), reason);
+process.on('unhandledRejection', (reason) => {
+  ui.error('未处理的Promise拒绝', String(reason));
   process.exit(1);
 });
 
+// 运行主程序
 if (require.main === module) {
   main();
 }
