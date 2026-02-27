@@ -9,60 +9,27 @@ on:
         description: 'Version to publish (e.g., 2.1.0)'
         required: true
         type: string
+      tag:
+        description: 'NPM tag (latest, beta, alpha)'
+        required: false
+        default: 'latest'
+        type: choice
+        options:
+          - latest
+          - beta
+          - alpha
 
 permissions:
   contents: write
   id-token: write
 
-jobs:
-  test:
-    name: Run Tests
-    runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-    
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Run linter
-        run: npm run lint
-      
-      - name: Run type check
-        run: npm run type-check
-      
-      - name: Run tests
-        run: npm test
-      
-      - name: Build project
-        run: npm run build
-      
-      - name: Check build output
-        run: |
-          if [ ! -d "dist" ]; then
-            echo "Error: dist directory not found"
-            exit 1
-          fi
-          if [ ! -f "dist/index.js" ]; then
-            echo "Error: dist/index.js not found"
-            exit 1
-          fi
-          echo "✅ Build output verified"
+env:
+  NODE_VERSION: '20'
 
-  publish:
-    name: Publish to NPM
-    needs: test
+jobs:
+  # 质量检查
+  quality:
+    name: Quality Check
     runs-on: ubuntu-latest
     
     steps:
@@ -72,7 +39,87 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run type check
+        run: npm run type-check
+      
+      - name: Run linter
+        run: npm run lint
+      
+      - name: Check code formatting
+        run: npm run format:check
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Build project
+        run: npm run build
+      
+      - name: Verify build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "❌ Error: dist directory not found"
+            exit 1
+          fi
+          if [ ! -f "dist/index.js" ]; then
+            echo "❌ Error: dist/index.js not found"
+            exit 1
+          fi
+          echo "✅ Build output verified"
+
+  # 安全扫描
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run security audit
+        run: |
+          npm audit --audit-level=high || true
+          
+          # Check for critical vulnerabilities
+          critical_count=$(npm audit --json 2>/dev/null | jq '.metadata.vulnerabilities.critical // 0' || echo "0")
+          
+          if [ "$critical_count" -gt 0 ]; then
+            echo "❌ Found $critical_count critical vulnerabilities"
+            exit 1
+          fi
+          
+          echo "✅ Security audit passed"
+
+  # 发布到 NPM
+  publish:
+    name: Publish to NPM
+    needs: [quality, security]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
       
@@ -82,20 +129,40 @@ jobs:
       - name: Build project
         run: npm run build
       
-      - name: Update version (if manual trigger)
+      - name: Determine version and tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/v}
+            TAG="latest"
+            
+            # Determine tag from version
+            if [[ "$VERSION" == *"-alpha"* ]]; then
+              TAG="alpha"
+            elif [[ "$VERSION" == *"-beta"* ]]; then
+              TAG="beta"
+            fi
+          fi
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "📦 Publishing version: $VERSION (tag: $TAG)"
+      
+      - name: Update package version
         if: github.event_name == 'workflow_dispatch'
         run: |
-          npm version ${{ github.event.inputs.version }} --no-git-tag-version
-          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-      
-      - name: Get version from package.json
-        if: github.event_name == 'release'
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          npm version ${{ steps.version.outputs.version }} --no-git-tag-version --allow-same-version
       
       - name: Publish to NPM
-        run: npm publish --access public
+        run: |
+          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
+            npm publish --access public
+          else
+            npm publish --access public --tag ${{ steps.version.outputs.tag }}
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
@@ -104,35 +171,48 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "v${{ env.VERSION }}" -m "Release v${{ env.VERSION }}"
-          git push origin "v${{ env.VERSION }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Create GitHub Release (if manual trigger)
-        if: github.event_name == 'workflow_dispatch'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ env.VERSION }}
-          name: Release v${{ env.VERSION }}
-          body: |
-            ## 🚀 Release v${{ env.VERSION }}
-            
-            Published to NPM: https://www.npmjs.com/package/taskflow-ai/v/${{ env.VERSION }}
-            
-            ### Installation
-            ```bash
-            npm install -g taskflow-ai@${{ env.VERSION }}
-            ```
-            
-            ### Changes
-            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
-          draft: false
-          prerelease: false
+          
+          # Check if tag exists
+          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "⚠️ Tag v${{ steps.version.outputs.version }} already exists"
+          else
+            git tag -a "v${{ steps.version.outputs.version }}" -m "Release v${{ steps.version.outputs.version }}"
+            git push origin "v${{ steps.version.outputs.version }}"
+            echo "✅ Created tag v${{ steps.version.outputs.version }}"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Notify success
         run: |
-          echo "✅ Successfully published taskflow-ai@${{ env.VERSION }} to NPM"
-          echo "📦 Package: https://www.npmjs.com/package/taskflow-ai"
+          echo "✅ Successfully published taskflow-ai@${{ steps.version.outputs.version }} to NPM"
+          echo "📦 Package: https://www.npmjs.com/package/taskflow-ai/v/${{ steps.version.outputs.version }}"
+          echo "🏷️ Tag: ${{ steps.version.outputs.tag }}"
+
+  # 更新文档
+  update-docs:
+    name: Update Documentation
+    needs: publish
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.event.inputs.tag == 'latest')
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build documentation
+        run: npm run docs:build
+      
+      - name: Deploy documentation
+        run: npm run docs:deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -3,15 +3,25 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 permissions:
   contents: write
   id-token: write
+  packages: write
+
+env:
+  NODE_VERSION: '20'
 
 jobs:
-  create-release:
-    name: Create GitHub Release
+  # 预检查
+  pre-check:
+    name: Pre-release Check
     runs-on: ubuntu-latest
     
     steps:
@@ -20,70 +30,173 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Setup Node.js
+      - name: Verify tag matches package.json
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          
+          echo "Tag version: $TAG_VERSION"
+          echo "Package version: $PKG_VERSION"
+          
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "❌ Version mismatch! Tag: $TAG_VERSION, Package: $PKG_VERSION"
+            exit 1
+          fi
+          
+          echo "✅ Version check passed"
+      
+      - name: Check CHANGELOG
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          
+          if ! grep -q "## \[$VERSION\]" CHANGELOG.md; then
+            echo "⚠️ Warning: No CHANGELOG entry found for version $VERSION"
+          else
+            echo "✅ CHANGELOG entry found"
+          fi
+
+  # 运行完整测试
+  test:
+    name: Test Suite
+    runs-on: ${{ matrix.os }}
+    needs: pre-check
+    
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18.x, 20.x, 22.x]
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
       
       - name: Install dependencies
         run: npm ci
       
+      - name: Run quality checks
+        run: |
+          npm run type-check
+          npm run lint
+          npm run format:check
+      
+      - name: Run tests
+        run: npm test
+      
       - name: Build project
         run: npm run build
+
+  # 创建 GitHub Release
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: test
+    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
-      - name: Get version
+      - name: Get version info
         id: version
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
+          TAG=${GITHUB_REF#refs/tags/}
+          
+          # Determine release type
+          if [[ "$VERSION" == *"-alpha"* ]]; then
+            RELEASE_TYPE="alpha"
+          elif [[ "$VERSION" == *"-beta"* ]]; then
+            RELEASE_TYPE="beta"
+          elif [[ "$VERSION" == *"-rc"* ]]; then
+            RELEASE_TYPE="rc"
+          else
+            RELEASE_TYPE="stable"
+          fi
+          
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+          
+          echo "📦 Version: $VERSION"
+          echo "🏷️ Tag: $TAG"
+          echo "📋 Type: $RELEASE_TYPE"
       
-      - name: Extract changelog
+      - name: Generate changelog
         id: changelog
         run: |
           VERSION=${{ steps.version.outputs.version }}
           
           # Extract changelog for this version
-          CHANGELOG=$(awk "/## \[$VERSION\]/,/## \[/" CHANGELOG.md | sed '1d;$d')
+          CHANGELOG=$(awk "/## \[$VERSION\]/,/## \[/" CHANGELOG.md | sed '1d;$d' | sed '/^$/d')
           
           if [ -z "$CHANGELOG" ]; then
             CHANGELOG="See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details."
           fi
           
+          # Write to file for multiline output
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
       
+      - name: Build release notes
+        run: |
+          cat > release-notes.md << 'EOF'
+          ## 🚀 TaskFlow AI ${{ steps.version.outputs.tag }}
+
+          ### 📦 Installation
+
+          ```bash
+          # Using npm
+          npm install -g taskflow-ai@${{ steps.version.outputs.version }}
+
+          # Using yarn
+          yarn global add taskflow-ai@${{ steps.version.outputs.version }}
+
+          # Using pnpm
+          pnpm add -g taskflow-ai@${{ steps.version.outputs.version }}
+          ```
+
+          ### 📝 Changes
+
+          ${{ steps.changelog.outputs.changelog }}
+
+          ### 📚 Documentation
+
+          - [Documentation](https://agions.github.io/taskflow-ai/)
+          - [NPM Package](https://www.npmjs.com/package/taskflow-ai)
+          - [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
+
+          ### 🐛 Issues
+
+          Found a bug? [Report it here](https://github.com/${{ github.repository }}/issues)
+
+          ### 🙏 Contributors
+
+          Thank you to all contributors who made this release possible!
+          EOF
+      
       - name: Create Release
+        id: create_release
         uses: softprops/action-gh-release@v2
         with:
           name: Release ${{ steps.version.outputs.tag }}
-          body: |
-            ## 🚀 TaskFlow AI ${{ steps.version.outputs.tag }}
-            
-            ### 📦 Installation
-            
-            ```bash
-            npm install -g taskflow-ai@${{ steps.version.outputs.version }}
-            ```
-            
-            ### 📝 Changes
-            
-            ${{ steps.changelog.outputs.changelog }}
-            
-            ### 📚 Documentation
-            
-            - [Documentation](https://agions.github.io/taskflow-ai/)
-            - [NPM Package](https://www.npmjs.com/package/taskflow-ai)
-            - [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
-            
-            ### 🙏 Contributors
-            
-            Thank you to all contributors who made this release possible!
+          body_path: release-notes.md
           draft: false
-          prerelease: ${{ contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
+          prerelease: ${{ steps.version.outputs.type != 'stable' }}
           generate_release_notes: true
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
@@ -92,3 +205,67 @@ jobs:
           echo "✅ Release ${{ steps.version.outputs.tag }} created successfully"
           echo "📦 NPM: https://www.npmjs.com/package/taskflow-ai/v/${{ steps.version.outputs.version }}"
           echo "📚 Docs: https://agions.github.io/taskflow-ai/"
+
+  # 触发 NPM 发布
+  trigger-publish:
+    name: Trigger NPM Publish
+    runs-on: ubuntu-latest
+    needs: create-release
+    
+    steps:
+      - name: Trigger publish workflow
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'npm-publish.yml',
+              ref: context.ref
+            })
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # 更新文档
+  update-docs:
+    name: Update Documentation
+    runs-on: ubuntu-latest
+    needs: create-release
+    if: ${{ !contains(github.ref, '-alpha') && !contains(github.ref, '-beta') }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build documentation
+        run: npm run docs:build
+      
+      - name: Deploy documentation
+        run: npm run docs:deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # 发布完成通知
+  notify:
+    name: Notify Release
+    runs-on: ubuntu-latest
+    needs: [create-release, trigger-publish]
+    if: always()
+    
+    steps:
+      - name: Release summary
+        run: |
+          echo "## 🎉 Release Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ needs.create-release.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Release**: ${{ needs.create-release.result == 'success' && '✅ Success' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **NPM Publish**: Triggered" >> $GITHUB_STEP_SUMMARY

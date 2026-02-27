@@ -12,6 +12,12 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "node build.js",
+    "prepublishOnly": "npm run quality && npm run build",
+    "publish:patch": "npm version patch && npm publish",
+    "publish:minor": "npm version minor && npm publish",
+    "publish:major": "npm version major && npm publish",
+    "publish:beta": "npm version prerelease --preid=beta && npm publish --tag beta",
+    "publish:alpha": "npm version prerelease --preid=alpha && npm publish --tag alpha",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -20,7 +26,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit",
-    "quality": "npm run type-check && npm run lint && npm run format:check",
+    "quality": "npm run type-check && npm run lint && npm run format:check && npm run test",
     "docs:dev": "cd docs && pnpm dev",
     "docs:build": "cd docs && pnpm build",
     "docs:deploy": "bash scripts/deploy-docs.sh",
@@ -132,6 +138,11 @@
     "dist",
     "README.md",
     "CHANGELOG.md",
-    "LICENSE"
-  ]
+    "LICENSE",
+    "assets"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }

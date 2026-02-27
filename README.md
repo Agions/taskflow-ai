@@ -421,6 +421,31 @@ npm run lint
 npm run format
 ```
 
+### 发布流程
+
+```bash
+# 1. 确保所有测试通过
+npm run quality
+
+# 2. 更新版本号并发布
+npm run publish:patch   # 补丁版本 (1.0.0 -> 1.0.1)
+npm run publish:minor   # 次要版本 (1.0.0 -> 1.1.0)
+npm run publish:major   # 主要版本 (1.0.0 -> 2.0.0)
+
+# 3. 预发布版本
+npm run publish:beta    # Beta 版本
+npm run publish:alpha   # Alpha 版本
+```
+
+### CI/CD 工作流
+
+| 工作流 | 触发条件 | 说明 |
+|--------|----------|------|
+| `CI` | Push/PR | 代码质量检查、测试、构建 |
+| `Release` | Tag push | 创建 GitHub Release |
+| `NPM Publish` | Release/手动 | 发布到 NPM |
+| `Deploy Docs` | Release | 部署文档网站 |
+
 ### 添加新模型
 
 ```typescript
@@ -460,6 +485,13 @@ export default class MyPlugin implements Plugin {
 
 ## 📝 更新日志
 
+### v2.1.1 (2026-02-27)
+
+- ✨ 新增专业级 CLI UI 组件库
+- 📦 优化 NPM 发布配置
+- 🔧 增强 CI/CD 工作流
+- 📝 完善项目文档
+
 ### v2.1.0 (2026-02-22)
 
 - ✨ 新增 Agent 系统
@@ -473,6 +505,8 @@ export default class MyPlugin implements Plugin {
 - 🤖 多模型智能路由
 - 📝 智能 PRD 解析
 - 🧩 插件系统
+
+[查看完整更新日志](CHANGELOG.md)
 
 ---
 
