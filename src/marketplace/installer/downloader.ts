@@ -14,8 +14,9 @@ export class PackageDownloader {
     await fs.ensureDir(tempDir);
 
     try {
-      if (pkg.dist?.tarball) {
-        await this.downloadFromTarball(pkg.dist.tarball, tempDir);
+      const dist = (pkg as any).dist;
+      if (dist?.tarball) {
+        await this.downloadFromTarball(dist.tarball, tempDir);
       } else if (pkg.repository) {
         await this.downloadFromGit(pkg.repository, tempDir);
       } else {
@@ -41,8 +42,8 @@ export class PackageDownloader {
     const writer = fs.createWriteStream(tarballPath);
     response.data.pipe(writer);
 
-    await new Promise((resolve, reject) => {
-      writer.on('finish', resolve);
+    await new Promise<void>((resolve, reject) => {
+      writer.on('finish', () => resolve());
       writer.on('error', reject);
     });
 

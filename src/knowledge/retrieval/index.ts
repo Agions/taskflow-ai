@@ -153,6 +153,7 @@ export class KnowledgeRetrievalEngine {
   }
 
   private async loadDocument(filePath: string): Promise<Document> {
+    const fs = await import('fs-extra');
     const content = await fs.readFile(filePath, 'utf-8');
     const stats = await fs.stat(filePath);
 
@@ -162,7 +163,7 @@ export class KnowledgeRetrievalEngine {
       metadata: {
         title: path.basename(filePath),
         source: filePath,
-        type: path.extname(filePath).slice(1),
+        type: path.extname(filePath).slice(1) as import('../types').DocumentType,
         createdAt: stats.birthtime,
         updatedAt: stats.mtime,
         tags: []

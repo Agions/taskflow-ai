@@ -52,11 +52,11 @@ program
   .description('使用模板创建文件')
   .argument('<templateId>', '模板 ID')
   .option('-o, --output <file>', '输出文件')
-  .option('-v, --variable <key=value>', '模板变量', (val, memo) => {
+  .option('-v, --variable <key=value>', '模板变量', (val: string, memo: Record<string, string>) => {
     const [key, value] = val.split('=');
     memo[key] = value;
     return memo;
-  }, {})
+  }, {} as Record<string, string>)
   .action(async (templateId: string, options) => {
     const template = templateManager.get(templateId);
     

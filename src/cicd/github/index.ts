@@ -14,7 +14,7 @@ export * from './workflow-generator';
 export * from './api-client';
 export * from './file-manager';
 
-export class GitHubActionsIntegration implements CIProvider {
+export class GitHubActionsIntegration {
   private validator: GitHubConfigValidator;
   private generator: GitHubWorkflowGenerator;
   private apiClient: GitHubApiClient;

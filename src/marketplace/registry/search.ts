@@ -65,9 +65,13 @@ export class PackageSearcher {
       tools: pkg.tools || [],
       dependencies: pkg.dependencies || {},
       metadata: {
+        createdAt: new Date(),
+        updatedAt: new Date(),
         downloads: 0,
         rating: 0,
-        updatedAt: new Date()
+        reviews: 0,
+        verified: false,
+        official: false
       }
     };
   }

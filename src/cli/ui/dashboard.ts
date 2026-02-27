@@ -79,7 +79,7 @@ export function projectDashboard(project: ProjectStatus): void {
 
   console.log(boxen(content, {
     padding: 1,
-    margin: { top: 1, bottom: 1 },
+    margin: 1,
     borderStyle: 'round',
     borderColor: 'cyan',
     title: theme.primary(' PROJECT STATUS '),
@@ -108,7 +108,7 @@ export function systemDashboard(system: SystemStatus): void {
 
   console.log(boxen(content, {
     padding: 1,
-    margin: { top: 0, bottom: 1 },
+    margin: 1,
     borderStyle: 'round',
     borderColor: 'blue',
     title: theme.secondary(' SYSTEM INFO '),

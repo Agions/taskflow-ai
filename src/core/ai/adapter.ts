@@ -97,7 +97,7 @@ export abstract class BaseAdapter {
       await this.complete({
         messages: [{ role: 'user', content: 'Hi' }],
         max_tokens: 10,
-      });
+      } as Omit<ChatCompletionOptions, 'model'>);
       return { success: true, latency: Date.now() - start };
     } catch (error) {
       return { 

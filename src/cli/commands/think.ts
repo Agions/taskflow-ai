@@ -37,9 +37,9 @@ program
     console.log(chalk.cyan('\n🧠 思维分析中...\n'));
 
     const manager = getManager();
-    const config = loadConfig();
+    const config = await loadConfig();
 
-    const models = config.aiModels?.filter(m => m.enabled) || [];
+    const models = config?.aiModels?.filter((m: any) => m.enabled) || [];
     
     if (models.length > 0) {
       try {

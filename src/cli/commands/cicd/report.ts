@@ -26,7 +26,7 @@ export async function executeReport(runId: string): Promise<void> {
     }
 
     const integration = createIntegration(repo);
-    const report = await integration.getBuildReport(runId);
+    const report = await integration.getPipelineStatus(runId);
 
     spinner.stop();
 

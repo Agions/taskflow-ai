@@ -28,11 +28,11 @@ export async function executeSearch(query: string, options: SearchCommandOptions
 
     const searchOptions: SearchOptions = {
       query,
-      category: options.category,
+      category: options.category as import('../../../marketplace/types').ToolCategory | undefined,
       author: options.author,
       verified: options.verified,
       official: options.official,
-      sortBy: options.sort as any,
+      sortBy: options.sort as 'downloads' | 'rating' | 'updated' | 'name',
       limit: parseInt(options.limit)
     };
 

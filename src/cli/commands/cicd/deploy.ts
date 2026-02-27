@@ -41,7 +41,8 @@ export async function executeDeploy(options: DeployOptions): Promise<void> {
     }
 
     const integration = createIntegration(repo);
-    await integration.deployWorkflow(config);
+    const workflowContent = await integration.generateWorkflow(config);
+    await integration.deployWorkflow(config.workflowFile, workflowContent);
 
     spinner.succeed(chalk.green('CI/CD workflow deployed'));
     console.log(chalk.blue(`\nWorkflow file: .github/workflows/${config.workflowFile}`));

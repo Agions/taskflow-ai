@@ -53,8 +53,10 @@ export class DocumentChunker {
     return {
       ...doc.metadata,
       chunkIndex: index,
-      startPosition: start,
-      endPosition: end,
+      start,
+      end,
+      overlap: this.chunkOverlap,
+      tokenCount: end - start,
       totalChunks: Math.ceil(doc.content.length / (this.chunkSize - this.chunkOverlap))
     };
   }

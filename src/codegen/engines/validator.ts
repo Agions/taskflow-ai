@@ -42,7 +42,7 @@ export class CodeValidator {
     const hasDefaultExport = file.content.includes('export default');
 
     return {
-      rule: 'component-structure',
+      name: 'component-structure',
       passed: hasExport || hasDefaultExport,
       message: hasExport ? 'Component has export' : 'Component missing export',
       severity: 'error'
@@ -53,7 +53,7 @@ export class CodeValidator {
     const unusedImports = this.findUnusedImports(file.content);
 
     return {
-      rule: 'unused-imports',
+      name: 'unused-imports',
       passed: unusedImports.length === 0,
       message: unusedImports.length > 0 ? `Unused imports: ${unusedImports.join(', ')}` : 'No unused imports',
       severity: 'warning'
@@ -64,7 +64,7 @@ export class CodeValidator {
     const hasTests = file.content.includes('it(') || file.content.includes('test(');
 
     return {
-      rule: 'test-coverage',
+      name: 'test-coverage',
       passed: hasTests,
       message: hasTests ? 'Tests found' : 'No tests found',
       severity: 'warning'

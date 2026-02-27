@@ -4,10 +4,10 @@
 
 import chalk from 'chalk';
 import ora from 'ora';
-import { AgentService } from '../../../agent/state-machine';
+import { AgentStateMachine } from '../../../agent/state-machine';
 import { AgentConfig, AgentContext, PRDDocument } from '../../../agent/types';
-import { PlanningEngine } from '../../../agent/planning/engine';
-import { ExecutionEngine } from '../../../agent/execution/engine';
+import { PlanningEngine } from '../../../agent/planning';
+import { ExecutionEngine } from '../../../agent/execution';
 import { VerificationEngine } from '../../../agent/verification/engine';
 import { MCPServer } from '../../../mcp/server';
 import { ConfigManager } from '../../../core/config';
@@ -72,9 +72,9 @@ export async function runAgent(options: RunOptions): Promise<void> {
     });
     const verificationEngine = new VerificationEngine();
 
-    const agent = new AgentService(
-      agentConfig,
+    const agent = new AgentStateMachine(
       agentContext,
+      agentConfig,
       planningEngine,
       executionEngine,
       verificationEngine
@@ -82,15 +82,24 @@ export async function runAgent(options: RunOptions): Promise<void> {
 
     console.log(chalk.blue('\n🚀 Starting Agent execution...\n'));
 
-    const result = await agent.run();
+    agent.start();
+    agent.send({ type: 'START' });
+    
+    // Wait for completion
+    await new Promise<void>((resolve) => {
+      agent.onStateChange((state) => {
+        if (state === 'completed' || state === 'failed') {
+          resolve();
+        }
+      });
+    });
+    
+    const success = agent.getState() === 'completed';
 
-    if (result.success) {
+    if (success) {
       console.log(chalk.green('\n✅ Agent execution completed successfully!'));
     } else {
       console.log(chalk.red('\n❌ Agent execution failed'));
-      if (result.error) {
-        console.log(chalk.red(`   Error: ${result.error}`));
-      }
       process.exit(1);
     }
   } catch (error) {

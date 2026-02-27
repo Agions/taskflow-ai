@@ -35,7 +35,6 @@ export class ConditionExecutor {
       return {
         success: false,
         error: '条件分支配置错误',
-        duration: Date.now() - startTime,
       };
     }
 
@@ -53,7 +52,6 @@ export class ConditionExecutor {
     return {
       success: true,
       output: { condition: conditionValue, branch: selectedBranch?.id },
-      duration: Date.now() - startTime,
     };
   }
 
@@ -81,7 +79,7 @@ export class ConditionExecutor {
         { op: '<=', fn: (a: number, b: number) => a <= b },
         { op: '>', fn: (a: number, b: number) => a > b },
         { op: '<', fn: (a: number, b: number) => a < b },
-      ];
+      ] as const;
 
       for (const { op, fn } of comparisons) {
         const index = expr.indexOf(op);
@@ -184,7 +182,6 @@ export class LoopExecutor {
           success: false,
           output: { iterations: i + 1, results },
           error: result.error,
-          duration: Date.now() - startTime,
         };
       }
 
@@ -198,7 +195,6 @@ export class LoopExecutor {
     return {
       success: true,
       output: { iterations: results.length, results },
-      duration: Date.now() - startTime,
     };
   }
 

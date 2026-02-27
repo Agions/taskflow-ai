@@ -54,7 +54,10 @@ export class PackageInstaller {
 
       const depTree = await this.depManager.resolve(pkg);
       for (const dep of depTree.dependencies) {
-        await this.depManager.installDependency(dep);
+        const depPkg = await this.registryManager.getPackage(dep.name, dep.version);
+        if (depPkg) {
+          await this.depManager.installDependency(depPkg);
+        }
       }
 
       const targetDir = options?.global ? this.globalDir : this.installDir;

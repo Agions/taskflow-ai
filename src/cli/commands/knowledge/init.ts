@@ -31,7 +31,7 @@ export async function executeInit(options: InitOptions): Promise<void> {
       },
       vectorStore: {
         name: 'default',
-        type: options.store,
+        type: options.store as 'lancedb' | 'chroma' | 'pinecone' | 'weaviate' | 'qdrant',
         connection: {
           path: path.join(process.cwd(), '.taskflow', 'knowledge'),
           collection: 'documents'

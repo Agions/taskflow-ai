@@ -50,6 +50,14 @@ export interface ChunkMetadata {
   end: number;
   overlap: number;
   tokenCount: number;
+  title: string;
+  source: string;
+  type: DocumentType;
+  tags: string[];
+  chunkIndex?: number;
+  startPosition?: number;
+  endPosition?: number;
+  totalChunks?: number;
 }
 
 export interface RetrievalResult {

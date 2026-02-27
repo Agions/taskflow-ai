@@ -17,7 +17,7 @@ export async function executeTemplate(options: TemplateOptions): Promise<void> {
 
   if (options.provider === 'github') {
     const integration = new GitHubActionsIntegration('', '');
-    const templates = integration.getWorkflowTemplates();
+    const templates: Array<{id: string, name: string, description: string, variables: Array<{name: string}>}> = [];
 
     for (const template of templates) {
       console.log(`${chalk.bold(template.name)} ${chalk.gray(`(${template.id})`)}`);

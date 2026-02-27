@@ -7,7 +7,7 @@ import chalk from 'chalk';
 import { AIProvider, AIModelConfig } from '../../../types';
 import { AI_PROVIDERS } from '../../../constants';
 
-const PROVIDER_NAMES: Record<AIProvider, string> = {
+const PROVIDER_NAMES: Record<string, string> = {
   [AI_PROVIDERS.DEEPSEEK]: '深度求索 (DeepSeek)',
   [AI_PROVIDERS.ZHIPU]: '智谱AI (GLM)',
   [AI_PROVIDERS.QWEN]: '通义千问 (Qwen)',
@@ -18,7 +18,7 @@ const PROVIDER_NAMES: Record<AIProvider, string> = {
   [AI_PROVIDERS.CLAUDE]: 'Claude',
 };
 
-const DEFAULT_MODELS: Record<AIProvider, string> = {
+const DEFAULT_MODELS: Record<string, string> = {
   [AI_PROVIDERS.DEEPSEEK]: 'deepseek-chat',
   [AI_PROVIDERS.ZHIPU]: 'glm-4',
   [AI_PROVIDERS.QWEN]: 'qwen-turbo',
@@ -109,12 +109,12 @@ export async function configureAIModels(): Promise<AIModelConfig[]> {
  * 获取提供商名称
  */
 export function getProviderName(provider: AIProvider): string {
-  return PROVIDER_NAMES[provider] || provider;
+  return PROVIDER_NAMES[provider as string] || provider;
 }
 
 /**
  * 获取默认模型名称
  */
 export function getDefaultModelName(provider: AIProvider): string {
-  return DEFAULT_MODELS[provider] || 'default';
+  return DEFAULT_MODELS[provider as string] || 'default';
 }

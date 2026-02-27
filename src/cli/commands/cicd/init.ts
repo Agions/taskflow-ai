@@ -28,7 +28,7 @@ export async function executeInit(options: InitOptions): Promise<void> {
 
     let repo = options.repo;
     if (!repo) {
-      repo = detectRepo();
+      repo = detectRepo() ?? undefined;
     }
 
     if (!repo) {

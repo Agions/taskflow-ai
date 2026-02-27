@@ -160,6 +160,7 @@ export class ModelGateway {
     }
 
     const options: ChatCompletionOptions = {
+      model: model.modelName,
       messages: request.messages,
       temperature: request.temperature ?? model.temperature,
       max_tokens: request.maxTokens ?? model.maxTokens,
@@ -226,6 +227,7 @@ export class ModelGateway {
     }
 
     const options: ChatCompletionOptions = {
+      model: routing.model.modelName,
       messages: request.messages,
       temperature: request.temperature ?? routing.model.temperature,
       max_tokens: request.maxTokens ?? routing.model.maxTokens,
@@ -239,7 +241,7 @@ export class ModelGateway {
       ];
     }
 
-    yield* adapter.stream(options);
+    yield* adapter.stream(options as Omit<ChatCompletionOptions, 'model'> & { stream: true });
   }
 
   /** 测试所有模型连接 */

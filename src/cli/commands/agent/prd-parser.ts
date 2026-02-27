@@ -20,9 +20,19 @@ export function parsePRD(content: string, filePath: string): PRDDocument {
   }
 
   return {
+    id: filePath,
     title,
     description,
     content,
-    filePath
+    filePath,
+    requirements: [],
+    acceptanceCriteria: [],
+    metadata: {
+      author: '',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      version: '1.0.0',
+      tags: []
+    }
   };
 }

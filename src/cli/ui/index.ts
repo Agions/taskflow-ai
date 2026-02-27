@@ -55,7 +55,7 @@ export function showSimpleLogo(): void {
     theme.muted('智能PRD文档解析与任务管理助手'),
     {
       padding: 1,
-      margin: { top: 0, bottom: 1 },
+      margin: 1,
       borderStyle: 'round',
       borderColor: 'cyan',
       dimBorder: false
@@ -117,7 +117,7 @@ export function successBox(title: string, message: string): void {
     theme.success.bold('✓ ' + title) + '\n\n' + theme.info(message),
     {
       padding: 1,
-      margin: { top: 0, bottom: 1 },
+      margin: 1,
       borderStyle: 'round',
       borderColor: 'green',
       title: theme.success(' SUCCESS '),
@@ -137,7 +137,7 @@ export function errorBox(title: string, message: string, details?: string): void
 
   console.log(boxen(content, {
     padding: 1,
-    margin: { top: 0, bottom: 1 },
+    margin: 1,
     borderStyle: 'round',
     borderColor: 'red',
     title: theme.error(' ERROR '),
@@ -153,7 +153,7 @@ export function warningBox(title: string, message: string): void {
     theme.warning.bold('⚠ ' + title) + '\n\n' + theme.info(message),
     {
       padding: 1,
-      margin: { top: 0, bottom: 1 },
+      margin: 1,
       borderStyle: 'round',
       borderColor: 'yellow',
       title: theme.warning(' WARNING '),
@@ -170,7 +170,7 @@ export function infoBox(title: string, message: string): void {
     theme.secondary.bold('ℹ ' + title) + '\n\n' + theme.info(message),
     {
       padding: 1,
-      margin: { top: 0, bottom: 1 },
+      margin: 1,
       borderStyle: 'round',
       borderColor: 'blue',
       title: theme.secondary(' INFO '),

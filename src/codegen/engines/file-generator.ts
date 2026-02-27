@@ -11,20 +11,20 @@ export class FileGenerator {
     return {
       path: path.join('components', spec.name, `${spec.name}.${extension}`),
       content,
-      type: 'component'
+      type: 'tsx'
     };
   }
 
   generateStyleFile(spec: ComponentSpec): GeneratedFile {
-    const extension = spec.cssFramework === 'styled-components' ? 'ts' : 'css';
-    const content = spec.cssFramework === 'styled-components'
+    const extension = (spec as any).cssFramework === 'styled-components' ? 'ts' : 'css';
+    const content = (spec as any).cssFramework === 'styled-components'
       ? this.generateStyledComponents(spec)
       : this.generateCSS(spec);
 
     return {
       path: path.join('components', spec.name, `${spec.name}.styles.${extension}`),
       content,
-      type: 'style'
+      type: 'css'
     };
   }
 
@@ -42,7 +42,7 @@ export class FileGenerator {
     return {
       path: path.join('components', spec.name, `index.${extension}`),
       content: `export { ${spec.name} } from './${spec.name}';\nexport type { ${spec.name}Props } from './${spec.name}';\n`,
-      type: 'index'
+      type: 'ts'
     };
   }
 

@@ -72,13 +72,7 @@ export class PackageFetcher {
     const versionData = manifest.versions[targetVersion];
     if (!versionData) return null;
 
-    const versionData = manifest.versions[targetVersion];
-    if (!versionData) return null;
-
-    return {
-      ...versionData,
-      installed: false
-    };
+    return versionData;
   }
 
   private async fetchManifest(registry: Registry, name: string): Promise<PackageManifest | null> {

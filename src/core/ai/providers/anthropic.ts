@@ -61,10 +61,6 @@ export class AnthropicAdapter extends BaseAdapter {
       }
     }
 
-    if (systemMessage) {
-      converted[0]?.system ? (converted[0].system = systemMessage) : null;
-    }
-
     return converted;
   }
 

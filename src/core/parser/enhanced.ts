@@ -114,7 +114,7 @@ export class TaskDecomposer {
       title: `实现: ${feature}`,
       description: `开发 ${projectName} 的 ${feature} 功能`,
       type,
-      status: 'pending',
+      status: 'todo',
       priority: 'medium',
       order: startOrder + 1,
       dependencies: [],
@@ -122,7 +122,7 @@ export class TaskDecomposer {
       acceptanceCriteria: [],
       createdAt: new Date(),
       updatedAt: new Date(),
-    });
+    } as ProjectTask);
 
     if (feature.length > 50) {
       tasks.push({
@@ -130,7 +130,7 @@ export class TaskDecomposer {
         title: `测试: ${feature}`,
         description: `测试 ${projectName} 的 ${feature} 功能`,
         type: 'testing',
-        status: 'pending',
+        status: 'todo',
         priority: 'medium',
         order: startOrder + 2,
         dependencies: [`task-${startOrder + 1}`],
@@ -138,7 +138,7 @@ export class TaskDecomposer {
         acceptanceCriteria: [],
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      } as ProjectTask);
     }
 
     return tasks;
@@ -161,7 +161,7 @@ export class TaskDecomposer {
     } else if (lower.includes('研究') || lower.includes('调研')) {
       return 'research';
     } else {
-      return 'development';
+      return 'frontend';
     }
   }
 
@@ -169,8 +169,10 @@ export class TaskDecomposer {
    * 估算工时
    */
   private estimateTaskHours(tasks: ProjectTask[]): void {
-    const baseHours: Record<ProjectTask['type'], number> = {
-      development: 8,
+    const baseHours: Partial<Record<ProjectTask['type'], number>> = {
+      frontend: 8,
+      backend: 8,
+      database: 8,
       design: 4,
       testing: 4,
       documentation: 2,
@@ -179,7 +181,7 @@ export class TaskDecomposer {
     };
 
     for (const task of tasks) {
-      const base = baseHours[task.type] || 8;
+      const base = baseHours[task.type] ?? 8;
       const lengthFactor = Math.max(0.5, Math.min(2, task.description.length / 100));
       task.estimatedHours = Math.round(base * lengthFactor);
     }
@@ -190,7 +192,7 @@ export class TaskDecomposer {
    */
   private analyzeDependencies(tasks: ProjectTask[]): void {
     for (let i = 1; i < tasks.length; i++) {
-      if (tasks[i].type === 'testing' && tasks[i-1].type === 'development') {
+      if (tasks[i].type === 'testing' && (tasks[i-1].type === 'frontend' || tasks[i-1].type === 'backend')) {
         tasks[i].dependencies = [tasks[i-1].id];
       }
     }

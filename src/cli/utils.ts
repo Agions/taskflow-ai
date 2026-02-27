@@ -16,9 +16,9 @@ export const log = {
 export const format = {
   title: (msg: string) => console.log(chalk.bold.cyan(`\n${msg}\n`)),
   section: (msg: string) => console.log(chalk.bold(`\n📋 ${msg}\n`)),
-  item: (label: string, value: string) => console.log(`  ${chalk.cyan(label)}: ${value}`),
+  listItem: (label: string, value: string) => console.log(`  ${chalk.cyan(label)}: ${value}`),
   keyValue: (obj: Record<string, string>) => {
-    Object.entries(obj).forEach(([k, v]) => log.item(k, v));
+    Object.entries(obj).forEach(([k, v]) => format.listItem(k, v));
   },
 };
 
@@ -42,7 +42,7 @@ export async function confirm(message: string): Promise<boolean> {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   
   return new Promise(resolve => {
-    rl.question(chalk.yellow(`${message} (y/N): `), answer => {
+    rl.question(chalk.yellow(`${message} (y/N): `), (answer: string) => {
       rl.close();
       resolve(answer.toLowerCase() === 'y');
     });

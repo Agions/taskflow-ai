@@ -147,7 +147,8 @@ export class GitHubApiClient {
   private async encryptSecret(value: string, key: string): Promise<string> {
     // sodium-plus 是可选依赖，使用简单的 base64 编码作为回退
     try {
-      const { SodiumPlus } = await import('sodium-plus');
+      const sodiumPlus = await import('sodium-plus');
+      const { SodiumPlus } = sodiumPlus as any;
       const sodium = await SodiumPlus.auto();
       const publicKey = Buffer.from(key, 'base64');
       const message = Buffer.from(value);

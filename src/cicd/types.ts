@@ -63,6 +63,7 @@ export interface GitHubActionsConfig extends PipelineConfig {
   workflowFile: string;
   permissions: GitHubPermissions;
   concurrency?: GitHubConcurrency;
+  env?: Record<string, string>;
 }
 
 export interface GitHubPermissions {

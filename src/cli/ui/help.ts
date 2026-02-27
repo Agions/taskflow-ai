@@ -113,7 +113,7 @@ export class HelpDisplay {
       `${emoji} ${theme.highlight(cmd.name)}\n${theme.info(cmd.description)}`,
       {
         padding: 1,
-        margin: { top: 0, bottom: 1 },
+        margin: 1,
         borderStyle: 'round',
         borderColor: 'cyan',
         title: theme.primary(' COMMAND '),
@@ -279,7 +279,7 @@ export function showErrorHelp(error: string, suggestion?: string): void {
     (suggestion ? `${theme.info('💡 建议: ' + suggestion)}` : ''),
     {
       padding: 1,
-      margin: { top: 1, bottom: 1 },
+      margin: 1,
       borderStyle: 'round',
       borderColor: 'red',
       title: theme.error(' ERROR '),
@@ -306,7 +306,7 @@ export function showSuccessHelp(message: string, nextSteps?: string[]): void {
     content.join('\n'),
     {
       padding: 1,
-      margin: { top: 1, bottom: 1 },
+      margin: 1,
       borderStyle: 'round',
       borderColor: 'green',
       title: theme.success(' SUCCESS '),

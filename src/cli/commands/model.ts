@@ -7,15 +7,16 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { ModelGateway, ModelConfig, DEFAULT_MODELS } from '../../core/ai';
 import { loadConfig, saveConfig } from '../../core/config';
+import { TaskFlowConfig } from '../../types';
 
 const program = new Command('model');
 
 let gateway: ModelGateway | null = null;
 
-function getGateway(): ModelGateway {
+async function getGateway(): Promise<ModelGateway> {
   if (!gateway) {
-    const config = loadConfig();
-    const models: ModelConfig[] = config.aiModels || DEFAULT_MODELS;
+    const config = await loadConfig();
+    const models: ModelConfig[] = config?.aiModels || DEFAULT_MODELS;
     gateway = new ModelGateway({ models, defaultRouter: 'smart' });
   }
   return gateway;
@@ -27,8 +28,8 @@ function getGateway(): ModelGateway {
 program
   .command('list')
   .description('列出所有配置的模型')
-  .action(() => {
-    const gw = getGateway();
+  .action(async () => {
+    const gw = await getGateway();
     const models = gw.getModels();
     
     if (models.length === 0) {
@@ -72,7 +73,7 @@ program
   .option('--priority <n>', '优先级', '10')
   .option('--enabled', '是否启用', 'true')
   .action(async (options) => {
-    const config = loadConfig();
+    const config = await loadConfig() || {} as TaskFlowConfig;
     
     const newModel: ModelConfig = {
       id: options.id,
@@ -85,7 +86,7 @@ program
       capabilities: ['chat'],
     };
 
-    const existingIndex = config.aiModels?.findIndex(m => m.id === newModel.id);
+    const existingIndex = config.aiModels?.findIndex((m: ModelConfig) => m.id === newModel.id);
     if (existingIndex !== undefined && existingIndex >= 0) {
       config.aiModels![existingIndex] = newModel;
       console.log(chalk.yellow(`更新现有模型: ${newModel.id}`));
@@ -95,7 +96,7 @@ program
       console.log(chalk.green(`添加新模型: ${newModel.id}`));
     }
 
-    saveConfig(config);
+    await saveConfig(config);
     
     gateway = null;
   });
@@ -107,22 +108,22 @@ program
   .command('remove')
   .description('移除模型')
   .requiredOption('-i, --id <id>', '模型 ID')
-  .action((options) => {
-    const config = loadConfig();
+  .action(async (options) => {
+    const config = await loadConfig();
     
-    if (!config.aiModels) {
+    if (!config?.aiModels) {
       console.log(chalk.yellow('没有配置模型'));
       return;
     }
 
-    const index = config.aiModels.findIndex(m => m.id === options.id);
+    const index = config.aiModels.findIndex((m: ModelConfig) => m.id === options.id);
     if (index < 0) {
       console.log(chalk.yellow(`未找到模型: ${options.id}`));
       return;
     }
 
     config.aiModels.splice(index, 1);
-    saveConfig(config);
+    await saveConfig(config);
     
     console.log(chalk.green(`已移除模型: ${options.id}`));
     
@@ -136,9 +137,9 @@ program
   .command('enable')
   .description('启用模型')
   .requiredOption('-i, --id <id>', '模型 ID')
-  .action((options) => {
-    const config = loadConfig();
-    const model = config.aiModels?.find(m => m.id === options.id);
+  .action(async (options) => {
+    const config = await loadConfig();
+    const model = config?.aiModels?.find((m: ModelConfig) => m.id === options.id);
     
     if (!model) {
       console.log(chalk.red(`未找到模型: ${options.id}`));
@@ -146,7 +147,7 @@ program
     }
 
     model.enabled = true;
-    saveConfig(config);
+    if (config) await saveConfig(config);
     
     console.log(chalk.green(`已启用模型: ${options.id}`));
     gateway = null;
@@ -156,9 +157,9 @@ program
   .command('disable')
   .description('禁用模型')
   .requiredOption('-i, --id <id>', '模型 ID')
-  .action((options) => {
-    const config = loadConfig();
-    const model = config.aiModels?.find(m => m.id === options.id);
+  .action(async (options) => {
+    const config = await loadConfig();
+    const model = config?.aiModels?.find((m: ModelConfig) => m.id === options.id);
     
     if (!model) {
       console.log(chalk.red(`未找到模型: ${options.id}`));
@@ -166,7 +167,7 @@ program
     }
 
     model.enabled = false;
-    saveConfig(config);
+    if (config) await saveConfig(config);
     
     console.log(chalk.yellow(`已禁用模型: ${options.id}`));
     gateway = null;
@@ -180,15 +181,16 @@ program
   .description('测试所有模型的连接')
   .option('-i, --id <id>', '只测试指定模型')
   .action(async (options) => {
-    const gw = getGateway();
+    const gw = await getGateway();
     
     console.log(chalk.bold('\n🔄 测试模型连接...\n'));
     
-    const results = options.id 
-      ? [{ modelId: options.id, ...(await gw.getModel(options.id)?.test() || { success: false, latency: 0, error: 'Model not found' }) }]
-      : await gw.testAll();
+    const results = await gw.testAll();
+    const filteredResults = options.id 
+      ? results.filter(r => r.modelId === options.id)
+      : results;
     
-    results.forEach(result => {
+    filteredResults.forEach(result => {
       if (result.success) {
         console.log(chalk.green(`✓ ${result.modelId}: 成功 (${result.latency}ms)`));
       } else {
@@ -208,7 +210,7 @@ program
   .argument('<message>', '测试消息')
   .option('-s, --strategy <strategy>', '路由策略 (smart|cost|speed|priority)', 'smart')
   .action(async (message, options) => {
-    const gw = getGateway();
+    const gw = await getGateway();
     
     const result = await gw.complete({
       messages: [{ role: 'user', content: message }],
@@ -233,7 +235,7 @@ program
   .description('对比不同路由策略')
   .argument('<message>', '测试消息')
   .action(async (message) => {
-    const gw = getGateway();
+    const gw = await getGateway();
     const strategies = ['smart', 'cost', 'speed', 'priority'] as const;
     
     console.log(chalk.bold('\n📊 路由策略基准测试:\n'));

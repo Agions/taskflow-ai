@@ -13,14 +13,19 @@ export class DependencyManager {
 
   async resolve(pkg: ToolPackage): Promise<DependencyTree> {
     const tree: DependencyTree = {
-      root: pkg,
+      name: pkg.name,
+      version: pkg.version,
       dependencies: []
     };
 
     for (const [depName, depVersion] of Object.entries(pkg.dependencies || {})) {
       const dep = await this.registryManager.getPackage(depName, depVersion as string);
       if (dep) {
-        tree.dependencies.push(dep);
+        tree.dependencies.push({
+          name: dep.name,
+          version: dep.version,
+          dependencies: []
+        });
       }
     }
 

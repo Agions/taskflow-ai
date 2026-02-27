@@ -141,24 +141,27 @@ export class MultiAgentCoordinator {
         }
         break;
 
-      case 'parallel':
+      case 'parallel': {
         const promises = agentIds.map(async (agentId) => {
           const agent = this.agents.get(agentId);
           if (agent) {
             return agent.execute(task);
           }
+          return undefined;
         });
         const results = await Promise.all(promises);
-        executions.push(...results.filter(Boolean));
+        executions.push(...results.filter((r): r is AgentExecution => r !== undefined));
         break;
+      }
 
-      case 'hierarchical':
+      case 'hierarchical': {
         const mainAgent = this.agents.get(agentIds[0]);
         if (mainAgent) {
           const exec = await mainAgent.execute(task);
           executions.push(exec);
         }
         break;
+      }
     }
 
     return executions;

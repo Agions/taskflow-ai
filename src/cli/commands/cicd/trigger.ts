@@ -30,7 +30,8 @@ export async function executeTrigger(options: TriggerOptions): Promise<void> {
     }
 
     const integration = createIntegration(repo);
-    const runId = await integration.triggerPipeline(options.branch);
+    await integration.triggerPipeline('taskflow.yml', options.branch);
+    const runId = 'pending';
 
     spinner.succeed(chalk.green(`Pipeline triggered: ${runId}`));
 

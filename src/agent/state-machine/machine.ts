@@ -28,7 +28,7 @@ export const createAgentMachine = (
       planning: {
         invoke: {
           src: fromPromise(async ({ input }: { input: { context: MachineContext } }) => {
-            return planningEngine.createPlan(input.context.requirements);
+            return planningEngine.createPlan(input.context.requirements || []);
           }),
           input: ({ context }: { context: MachineContext }) => ({ context }),
           onDone: { target: 'executing', actions: { type: 'setTaskPlan' } },
