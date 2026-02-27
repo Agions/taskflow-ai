@@ -2,10 +2,10 @@
  * 任务拓扑排序器
  */
 
-import { Task } from '../types';
+import { Task, Dependency } from '../types';
 
 export class TaskSorter {
-  topologicalSort(tasks: Task[], dependencies: Map<string, string[]>): Task[] {
+  topologicalSort(tasks: Task[], dependencies: Dependency[]): Task[] {
     const sorted: Task[] = [];
     const visited = new Set<string>();
     const visiting = new Set<string>();
@@ -18,7 +18,7 @@ export class TaskSorter {
 
       visiting.add(taskId);
 
-      const deps = dependencies.get(taskId) || [];
+      const deps = dependencies.filter(d => d.to === taskId).map(d => d.from);
       for (const depId of deps) {
         visit(depId);
       }

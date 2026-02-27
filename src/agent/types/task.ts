@@ -54,6 +54,7 @@ export interface TaskMetadata {
   framework?: string;
   language?: string;
   template?: string;
+  source?: string;
   tags: string[];
 }
 
@@ -65,6 +66,7 @@ export interface TaskPlan {
   dependencies: Dependency[];
   totalEstimate: number;
   criticalPath: string[];
+  continueOnError?: boolean;
 }
 
 /**

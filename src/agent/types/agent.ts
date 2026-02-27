@@ -3,6 +3,12 @@
  */
 
 import { TaskFlowConfig } from '../../types';
+import { Task, TaskPlan, TaskPriority, TaskType } from './task';
+import { PRDDocument, Feature } from './prd';
+import { Tool } from './tool';
+import { ExecutionResult, ExecutionSummary } from './execution';
+import { VerificationResult, VerificationCheck } from './verification';
+import { ActionHistory } from './history';
 
 /**
  * Agent 配置

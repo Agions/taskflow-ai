@@ -9,6 +9,7 @@ export interface PRDDocument {
   id: string;
   title: string;
   description: string;
+  content: string;
   requirements: Requirement[];
   acceptanceCriteria: string[];
   metadata: PRDMetadata;
@@ -52,6 +53,7 @@ export interface Feature {
   name: string;
   description: string;
   complexity: 'low' | 'medium' | 'high';
+  priority: 'critical' | 'high' | 'medium' | 'low';
   dependencies: string[];
 }
 

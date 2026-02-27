@@ -19,6 +19,7 @@ export interface VerificationCheck {
   passed: boolean;
   message: string;
   severity: 'error' | 'warning' | 'info';
+  details?: string[];
 }
 
 /**
