@@ -24,7 +24,6 @@ export function parsePRD(content: string, filePath: string): PRDDocument {
     title,
     description,
     content,
-    filePath,
     requirements: [],
     acceptanceCriteria: [],
     metadata: {
