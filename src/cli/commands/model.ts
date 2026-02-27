@@ -16,7 +16,7 @@ let gateway: ModelGateway | null = null;
 async function getGateway(): Promise<ModelGateway> {
   if (!gateway) {
     const config = await loadConfig();
-    const models: ModelConfig[] = config?.aiModels || DEFAULT_MODELS;
+    const models = (config?.aiModels as unknown as ModelConfig[]) || DEFAULT_MODELS;
     gateway = new ModelGateway({ models, defaultRouter: 'smart' });
   }
   return gateway;
