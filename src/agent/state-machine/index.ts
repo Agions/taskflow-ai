@@ -5,8 +5,8 @@
 
 import { createActor } from 'xstate';
 import { AgentContext, AgentConfig, AgentState } from '../types';
-import { PlanningEngine } from '../planning/engine';
-import { ExecutionEngine } from '../execution/engine';
+import { PlanningEngine } from '../planning';
+import { ExecutionEngine } from '../execution';
 import { VerificationEngine } from '../verification/engine';
 import { createAgentMachine } from './machine';
 import { MachineContext } from './types';

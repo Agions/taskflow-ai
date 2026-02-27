@@ -73,11 +73,4 @@ export interface AgentSession {
   updatedAt: Date;
 }
 
-/**
- * 执行上下文
- */
-export interface ExecutionContext {
-  config: AgentConfig;
-  projectPath: string;
-  workspacePath: string;
-}
+// ExecutionContext 定义在 execution.ts 中

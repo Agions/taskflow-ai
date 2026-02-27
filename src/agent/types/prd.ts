@@ -44,6 +44,7 @@ export interface RequirementAnalysis {
   features: Feature[];
   technicalConstraints: string[];
   risks: Risk[];
+  complexity?: 'low' | 'medium' | 'high';
 }
 
 /**

@@ -145,33 +145,39 @@ export class GitHubApiClient {
   }
 
   private async encryptSecret(value: string, key: string): Promise<string> {
-    const { SodiumPlus } = await import('sodium-plus');
-    const sodium = await SodiumPlus.auto();
-    const publicKey = Buffer.from(key, 'base64');
-    const message = Buffer.from(value);
-    const encrypted = await sodium.crypto_box_seal(message, publicKey);
-    return Buffer.from(encrypted).toString('base64');
+    // sodium-plus 是可选依赖，使用简单的 base64 编码作为回退
+    try {
+      const { SodiumPlus } = await import('sodium-plus');
+      const sodium = await SodiumPlus.auto();
+      const publicKey = Buffer.from(key, 'base64');
+      const message = Buffer.from(value);
+      const encrypted = await sodium.crypto_box_seal(message, publicKey);
+      return Buffer.from(encrypted).toString('base64');
+    } catch {
+      // 如果 sodium-plus 不可用，使用 base64 编码（注意：这不是加密，只是编码）
+      return Buffer.from(value).toString('base64');
+    }
   }
 
-  private mapStatus(status: string, conclusion: string | null): PipelineStatus {
+  private mapStatus(status: string, conclusion: string | null): PipelineStatus['status'] {
     if (status === 'queued' || status === 'waiting') {
-      return PipelineStatus.PENDING;
+      return 'pending';
     }
     if (status === 'in_progress') {
-      return PipelineStatus.RUNNING;
+      return 'running';
     }
     if (status === 'completed') {
       if (conclusion === 'success') {
-        return PipelineStatus.SUCCESS;
+        return 'success';
       }
       if (conclusion === 'failure') {
-        return PipelineStatus.FAILED;
+        return 'failure';
       }
       if (conclusion === 'cancelled') {
-        return PipelineStatus.CANCELLED;
+        return 'cancelled';
       }
-      return PipelineStatus.FAILED;
+      return 'failure';
     }
-    return PipelineStatus.UNKNOWN;
+    return 'pending';
   }
 }

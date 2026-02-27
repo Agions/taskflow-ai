@@ -4,8 +4,8 @@
 
 import { createMachine, fromPromise } from 'xstate';
 import { MachineContext, MachineEvent } from './types';
-import { PlanningEngine } from '../planning/engine';
-import { ExecutionEngine } from '../execution/engine';
+import { PlanningEngine } from '../planning';
+import { ExecutionEngine } from '../execution';
 import { VerificationEngine } from '../verification/engine';
 import { AgentConfig } from '../types';
 
@@ -55,7 +55,7 @@ export const createAgentMachine = (
           input: ({ context }: { context: MachineContext }) => ({ context }),
           onDone: [
             { target: 'completed', guard: ({ context }: any) => context.verificationResult?.allPassed },
-            { target: 'planning', guard: ({ context }: any) => context.retryCount < agentConfig.maxRetries }
+            { target: 'planning', guard: ({ context }: any) => context.retryCount < (agentConfig.maxRetries || 3) }
           ],
           onError: { target: 'failed', actions: { type: 'setError' } }
         }

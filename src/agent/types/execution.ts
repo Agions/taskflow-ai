@@ -21,6 +21,7 @@ export interface TaskResult {
   output?: string;
   error?: string;
   duration: number;
+  artifacts?: string[];
 }
 
 /**
