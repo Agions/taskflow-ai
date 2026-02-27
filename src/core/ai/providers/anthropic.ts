@@ -2,7 +2,7 @@
  * Anthropic (Claude) 适配器
  */
 
-import { BaseAdapter, ChatMessage } from '../adapter';
+import { BaseAdapter, ChatMessage, StreamChunk } from '../adapter';
 import { ModelConfig, PROVIDER_ENDPOINTS } from '../types';
 
 interface ClaudeMessage {

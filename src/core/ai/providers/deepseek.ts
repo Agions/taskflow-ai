@@ -2,7 +2,7 @@
  * DeepSeek 适配器
  */
 
-import { BaseAdapter, ChatCompletionOptions, ChatCompletionResponse } from '../adapter';
+import { BaseAdapter, ChatCompletionOptions, ChatCompletionResponse, StreamChunk } from '../adapter';
 import { ModelConfig, PROVIDER_ENDPOINTS } from '../types';
 
 export class DeepSeekAdapter extends BaseAdapter {
@@ -59,14 +59,7 @@ export class DeepSeekAdapter extends BaseAdapter {
 
   async *stream(
     options: Omit<ChatCompletionOptions, 'model'> & { stream: true }
-  ): AsyncGenerator<{
-    id: string;
-    choices: Array<{
-      index: number;
-      delta: { role?: string; content?: string };
-      finish_reason?: string;
-    }>;
-  }> {
+  ): AsyncGenerator<StreamChunk> {
     const requestBody = {
       model: this.config.modelName,
       ...options,

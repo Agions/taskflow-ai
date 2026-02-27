@@ -86,7 +86,7 @@ program
       capabilities: ['chat'],
     };
 
-    const existingIndex = config.aiModels?.findIndex((m: ModelConfig) => m.id === newModel.id);
+    const existingIndex = config.aiModels?.findIndex((m: any) => m.id === newModel.id);
     if (existingIndex !== undefined && existingIndex >= 0) {
       config.aiModels![existingIndex] = newModel;
       console.log(chalk.yellow(`更新现有模型: ${newModel.id}`));
@@ -116,7 +116,7 @@ program
       return;
     }
 
-    const index = config.aiModels.findIndex((m: ModelConfig) => m.id === options.id);
+    const index = config.aiModels.findIndex((m: any) => m.id === options.id);
     if (index < 0) {
       console.log(chalk.yellow(`未找到模型: ${options.id}`));
       return;
