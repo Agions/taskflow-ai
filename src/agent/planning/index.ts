@@ -46,9 +46,19 @@ export class PlanningEngine {
 
   async createPlan(requirements: string): Promise<TaskPlan> {
     const prd: PRDDocument = {
+      id: `prd-${Date.now()}`,
       title: 'Generated Plan',
       description: requirements,
-      content: requirements
+      content: requirements,
+      requirements: [],
+      acceptanceCriteria: [],
+      metadata: {
+        author: 'taskflow-ai',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        version: '1.0.0',
+        tags: []
+      }
     };
     return this.plan(prd);
   }

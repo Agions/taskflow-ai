@@ -61,31 +61,39 @@ Generate tasks in JSON format:
   }
 
   private enrichTasks(taskData: Array<Partial<Task>>, prd: PRDDocument): Task[] {
+    const now = new Date();
     return taskData.map((data, index) => ({
       id: `task-${index + 1}`,
       title: data.title || `Task ${index + 1}`,
       description: data.description || '',
       type: (data.type as TaskType) || 'code',
+      status: 'pending' as const,
       priority: (data.priority as TaskPriority) || 'medium',
       estimate: data.estimate || 2,
       dependencies: data.dependencies || [],
       metadata: {
         source: prd.title,
-        createdAt: new Date().toISOString()
-      }
+        tags: []
+      },
+      createdAt: now,
+      updatedAt: now
     }));
   }
 
   private getDefaultTasks(prd: PRDDocument): Task[] {
+    const now = new Date();
     return [{
       id: 'task-1',
       title: `Implement ${prd.title}`,
       description: prd.description || 'Implementation task',
       type: 'code',
+      status: 'pending',
       priority: 'high',
       estimate: 4,
       dependencies: [],
-      metadata: { source: prd.title, createdAt: new Date().toISOString() }
+      metadata: { source: prd.title, tags: [] },
+      createdAt: now,
+      updatedAt: now
     }];
   }
 }

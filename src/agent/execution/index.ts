@@ -76,11 +76,14 @@ export class ExecutionEngine {
     console.log(`   Total: ${summary.totalTasks} | Completed: ${summary.completedTasks} | Failed: ${summary.failedTasks}`);
     console.log(`   Duration: ${(Date.now() - startTime) / 1000}s`);
 
+    const endTime = Date.now();
     return {
       results,
       completedAt: new Date(),
       success: summary.failedTasks === 0,
-      summary
+      summary,
+      startTime: new Date(startTime),
+      endTime: new Date(endTime)
     };
   }
 

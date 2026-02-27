@@ -33,6 +33,8 @@ export interface ExecutionResult {
   summary: ExecutionSummary;
   startTime: Date;
   endTime: Date;
+  completedAt?: Date;
+  success?: boolean;
 }
 
 /**
@@ -42,7 +44,7 @@ export interface ExecutionSummary {
   totalTasks: number;
   completedTasks: number;
   failedTasks: number;
-  skippedTasks?: number;
+  skippedTasks: number;
   totalDuration: number;
   averageDuration?: number;
 }

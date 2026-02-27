@@ -53,14 +53,17 @@ Provide analysis in JSON format:
     return this.getDefaultAnalysis({ title: '', description: '', content: response });
   }
 
-  private getDefaultAnalysis(prd: PRDDocument): RequirementAnalysis {
+  private getDefaultAnalysis(prd: Partial<PRDDocument>): RequirementAnalysis {
     return {
       features: [{
         name: prd.title || 'Main Feature',
         description: prd.description || 'Main feature implementation',
-        priority: 'high'
+        complexity: 'medium',
+        priority: 'high',
+        dependencies: []
       }],
       risks: [],
+      technicalConstraints: [],
       complexity: 'medium'
     };
   }

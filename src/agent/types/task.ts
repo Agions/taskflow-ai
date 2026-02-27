@@ -78,34 +78,4 @@ export interface Dependency {
   type: 'blocks' | 'depends-on';
 }
 
-/**
- * 任务结果
- */
-export interface TaskResult {
-  taskId: string;
-  success: boolean;
-  output?: string;
-  error?: string;
-  duration: number;
-  artifacts?: string[];
-}
-
-/**
- * 执行结果
- */
-export interface ExecutionResult {
-  results: TaskResult[];
-  completedAt: Date;
-  success: boolean;
-  summary: ExecutionSummary;
-}
-
-/**
- * 执行摘要
- */
-export interface ExecutionSummary {
-  totalTasks: number;
-  completedTasks: number;
-  failedTasks: number;
-  totalDuration: number;
-}
+// 注意: TaskResult, ExecutionResult, ExecutionSummary 定义在 execution.ts 中

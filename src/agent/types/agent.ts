@@ -16,6 +16,7 @@ import { ActionHistory } from './history';
 export interface AgentConfig {
   mode: 'assisted' | 'autonomous' | 'supervised';
   maxIterations: number;
+  maxRetries?: number;
   autoFix: boolean;
   approvalRequired: string[];
   continueOnError: boolean;
