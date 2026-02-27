@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "node build.js",
+    "build:fast": "tsc --skipLibCheck",
     "prepublishOnly": "npm run quality && npm run build",
     "publish:patch": "npm version patch && npm publish",
     "publish:minor": "npm version minor && npm publish",
@@ -26,13 +27,20 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit",
+    "type-check:fast": "tsc --noEmit --skipLibCheck",
     "quality": "npm run type-check && npm run lint && npm run format:check && npm run test",
+    "quality:fast": "npm run type-check:fast && npm run lint && npm run test",
+    "check": "npm run type-check && npm run lint && npm run format:check",
+    "check:fix": "npm run lint:fix && npm run format",
+    "ci": "npm run quality && npm run build",
     "docs:dev": "cd docs && pnpm dev",
     "docs:build": "cd docs && pnpm build",
     "docs:deploy": "bash scripts/deploy-docs.sh",
     "clean": "rm -rf dist coverage .nyc_output",
+    "clean:all": "rm -rf dist coverage .nyc_output node_modules docs/node_modules docs/dist",
     "mcp": "node dist/mcp/stdio-server.js",
     "mcp:dev": "npm run build && node dist/mcp/stdio-server.js",
+    "verify": "npm run check && npm run build && npm run test",
     "postinstall": "node -e \"console.log('\\n🎉 TaskFlow AI 安装成功！\\n运行 taskflow --help 开始使用\\n')\""
   },
   "keywords": [
