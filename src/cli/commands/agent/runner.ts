@@ -70,7 +70,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
       projectPath: process.cwd(),
       workspacePath: path.join(process.cwd(), '.taskflow', 'workspace')
     });
-    const verificationEngine = new VerificationEngine();
+    const verificationEngine = new VerificationEngine(process.cwd());
 
     const agent = new AgentStateMachine(
       agentContext,
