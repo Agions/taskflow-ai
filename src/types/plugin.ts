@@ -20,15 +20,7 @@ export interface Plugin {
   cleanup: () => Promise<void>;
 }
 
-/**
- * 插件配置
- */
-export interface PluginConfig {
-  name: string;
-  version: string;
-  enabled: boolean;
-  settings: Record<string, any>;
-}
+import { PluginConfig } from './config';
 
 /**
  * 插件上下文

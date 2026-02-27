@@ -72,17 +72,11 @@ export class PackageFetcher {
     const versionData = manifest.versions[targetVersion];
     if (!versionData) return null;
 
+    const versionData = manifest.versions[targetVersion];
+    if (!versionData) return null;
+
     return {
-      name: manifest.name,
-      version: targetVersion,
-      description: manifest.description || '',
-      author: manifest.author?.name || manifest.author || '',
-      license: manifest.license || 'MIT',
-      keywords: manifest.keywords || [],
-      homepage: manifest.homepage || '',
-      repository: typeof manifest.repository === 'string' ? manifest.repository : manifest.repository?.url || '',
-      downloads: 0,
-      rating: 0,
+      ...versionData,
       installed: false
     };
   }

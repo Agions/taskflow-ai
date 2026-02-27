@@ -51,17 +51,24 @@ export class PackageSearcher {
 
   private mapToToolPackage(pkg: any): ToolPackage {
     return {
+      id: pkg.name,
       name: pkg.name,
       version: pkg.version,
       description: pkg.description || '',
       author: pkg.author?.name || pkg.author || '',
       license: pkg.license || 'MIT',
       keywords: pkg.keywords || [],
+      categories: pkg.categories || [],
       homepage: pkg.links?.homepage || '',
       repository: pkg.links?.repository || '',
-      downloads: 0,
-      rating: 0,
-      installed: false
+      mcpVersion: pkg.mcpVersion || '1.0.0',
+      tools: pkg.tools || [],
+      dependencies: pkg.dependencies || {},
+      metadata: {
+        downloads: 0,
+        rating: 0,
+        updatedAt: new Date()
+      }
     };
   }
 
@@ -79,16 +86,16 @@ export class PackageSearcher {
 
     switch (sortBy) {
       case 'downloads':
-        sorted.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+        sorted.sort((a, b) => (b.metadata?.downloads || 0) - (a.metadata?.downloads || 0));
         break;
       case 'rating':
-        sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        sorted.sort((a, b) => (b.metadata?.rating || 0) - (a.metadata?.rating || 0));
         break;
       case 'name':
         sorted.sort((a, b) => a.name.localeCompare(b.name));
         break;
       case 'updated':
-        sorted.sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime());
+        sorted.sort((a, b) => new Date(b.metadata?.updatedAt || 0).getTime() - new Date(a.metadata?.updatedAt || 0).getTime());
         break;
     }
 

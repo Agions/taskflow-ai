@@ -4,6 +4,7 @@
 
 import { TaskFlowConfig } from './config';
 import { Project } from './project';
+import { OutputFormat } from './visualization';
 
 /**
  * 日志器
@@ -47,11 +48,6 @@ export interface CLIContext {
   debug: boolean;
   outputFormat: OutputFormat;
 }
-
-/**
- * 输出格式
- */
-export type OutputFormat = string;
 
 /**
  * 命令结果
