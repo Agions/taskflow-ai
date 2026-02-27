@@ -9,19 +9,16 @@ import boxen from 'boxen';
 import figlet from 'figlet';
 import gradient from 'gradient-string';
 
-// ==================== 颜色主题 ====================
+// 导入主题（必须在其他导入之前）
+import { theme } from './theme';
 
-export const theme = {
-  primary: chalk.cyan,
-  secondary: chalk.blue,
-  success: chalk.green,
-  warning: chalk.yellow,
-  error: chalk.red,
-  info: chalk.gray,
-  muted: chalk.dim,
-  highlight: chalk.bold.white,
-  accent: chalk.magenta,
-};
+// 导入动画和帮助组件
+import { animations } from './animations';
+import { createHelpDisplay, showQuickHelp, showErrorHelp, showSuccessHelp } from './help';
+import { createAutocomplete, createPreview, createHints } from './autocomplete';
+
+// 重新导出主题
+export { theme };
 
 // ==================== Logo 展示 ====================
 
@@ -299,6 +296,7 @@ export function section(title: string): void {
 }
 
 // Re-export prompts and dashboard
+export * from './theme';
 export * from './prompts';
 export * from './dashboard';
 export * from './animations';
@@ -306,11 +304,6 @@ export * from './autocomplete';
 export * from './help';
 
 // ==================== 快捷方法 ====================
-
-// 导入动画和帮助组件
-import { animations } from './animations';
-import { createHelpDisplay, showQuickHelp, showErrorHelp, showSuccessHelp } from './help';
-import { createAutocomplete, createPreview, createHints } from './autocomplete';
 
 export const ui = {
   // 颜色

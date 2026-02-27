@@ -3,7 +3,7 @@
  */
 
 import readline from 'readline';
-import { theme } from './index';
+import { theme } from './theme';
 
 // ==================== 自动补全 ====================
 

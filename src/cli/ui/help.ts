@@ -4,7 +4,7 @@
 
 import chalk from 'chalk';
 import boxen from 'boxen';
-import { theme } from './index';
+import { theme } from './theme';
 import { animations } from './animations';
 
 // ==================== 命令定义 ====================
