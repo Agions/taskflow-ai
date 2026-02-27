@@ -37,7 +37,7 @@ export class PluginManager {
       workspace: process.cwd(),
       config: {},
       logger: this.logger,
-      registry: this,
+      registry: this as any,
     };
   }
 

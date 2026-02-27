@@ -116,13 +116,16 @@ export class TaskDecomposer {
       type,
       status: 'todo',
       priority: 'medium',
+      complexity: 'medium',
       order: startOrder + 1,
       dependencies: [],
       estimatedHours: 8,
-      acceptanceCriteria: [],
+      tags: [],
+      subtasks: [],
+      progress: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
-    } as ProjectTask);
+    } as unknown as ProjectTask);
 
     if (feature.length > 50) {
       tasks.push({
@@ -132,13 +135,16 @@ export class TaskDecomposer {
         type: 'testing',
         status: 'todo',
         priority: 'medium',
+        complexity: 'medium',
         order: startOrder + 2,
         dependencies: [`task-${startOrder + 1}`],
         estimatedHours: 4,
-        acceptanceCriteria: [],
+        tags: [],
+        subtasks: [],
+        progress: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
-      } as ProjectTask);
+      } as unknown as ProjectTask);
     }
 
     return tasks;
