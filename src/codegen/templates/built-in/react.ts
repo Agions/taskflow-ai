@@ -2,7 +2,7 @@
  * React 内置模板
  */
 
-import { CodeTemplate } from '../types';
+import { CodeTemplate } from '../../types';
 
 export const reactFunctionalTemplate: CodeTemplate = {
   id: 'react-functional',

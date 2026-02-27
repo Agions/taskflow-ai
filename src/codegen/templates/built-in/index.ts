@@ -2,7 +2,7 @@
  * 内置模板集合
  */
 
-import { CodeTemplate } from '../types';
+import { CodeTemplate } from '../../types';
 import { reactFunctionalTemplate, reactHookTemplate } from './react';
 
 export const builtInTemplates: Record<string, CodeTemplate> = {
