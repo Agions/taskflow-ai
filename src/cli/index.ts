@@ -48,15 +48,75 @@ program.addCommand(cicdCommand);
 
 // 自定义帮助信息
 program.on('--help', () => {
-  ui.section('示例用法');
-  console.log(`  ${ui.primary('$')} taskflow init`);
-  console.log(`  ${ui.primary('$')} taskflow status`);
-  console.log(`  ${ui.primary('$')} taskflow parse document.md`);
-  console.log(`  ${ui.primary('$')} taskflow mcp start`);
-  console.log();
-  ui.section('更多信息');
-  console.log(`  文档: ${ui.info('https://github.com/Agions/taskflow-ai')}`);
-  console.log(`  问题反馈: ${ui.info('https://github.com/Agions/taskflow-ai/issues')}`);
+  const helpDisplay = ui.createHelpDisplay();
+
+  // 注册所有命令
+  helpDisplay.register({
+    name: 'init',
+    description: '初始化新项目',
+    category: '项目',
+    emoji: ui.emojis.rocket,
+    usage: 'taskflow init [name]',
+    examples: ['taskflow init my-project', 'taskflow init --template typescript'],
+  });
+
+  helpDisplay.register({
+    name: 'status',
+    description: '查看项目状态',
+    category: '项目',
+    emoji: ui.emojis.chart,
+    usage: 'taskflow status',
+    examples: ['taskflow status', 'taskflow status --watch'],
+  });
+
+  helpDisplay.register({
+    name: 'parse',
+    description: '解析 PRD 文档',
+    category: 'AI',
+    emoji: ui.emojis.ai,
+    usage: 'taskflow parse <file>',
+    examples: ['taskflow parse document.md', 'taskflow parse --output json'],
+  });
+
+  helpDisplay.register({
+    name: 'mcp',
+    description: 'MCP 服务器管理',
+    category: 'MCP',
+    emoji: ui.emojis.gear,
+    usage: 'taskflow mcp <command>',
+    examples: ['taskflow mcp start', 'taskflow mcp stop'],
+  });
+
+  helpDisplay.register({
+    name: 'config',
+    description: '配置管理',
+    category: '配置',
+    emoji: ui.emojis.config,
+    usage: 'taskflow config <command>',
+    examples: ['taskflow config set', 'taskflow config get'],
+  });
+
+  helpDisplay.register({
+    name: 'agent',
+    description: 'Agent 管理',
+    category: 'AI',
+    emoji: ui.emojis.robot,
+    usage: 'taskflow agent <command>',
+    examples: ['taskflow agent start', 'taskflow agent status'],
+  });
+
+  helpDisplay.register({
+    name: 'visualize',
+    description: '可视化思维链',
+    category: 'AI',
+    emoji: ui.emojis.bulb,
+    usage: 'taskflow visualize',
+    examples: ['taskflow visualize', 'taskflow visualize --format mermaid'],
+  });
+
+  helpDisplay.showMainHelp('TaskFlow', packageJson.version, '智能PRD文档解析与任务管理助手');
+  helpDisplay.showGlobalOptions();
+  helpDisplay.showTips();
 });
 
 // 未知命令处理

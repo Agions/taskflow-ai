@@ -7,6 +7,7 @@ import chalk from 'chalk';
 import ora, { Ora } from 'ora';
 import boxen from 'boxen';
 import figlet from 'figlet';
+import gradient from 'gradient-string';
 
 // ==================== 颜色主题 ====================
 
@@ -25,7 +26,7 @@ export const theme = {
 // ==================== Logo 展示 ====================
 
 /**
- * 显示 ASCII Logo
+ * 显示 ASCII Logo（带渐变效果）
  */
 export async function showLogo(): Promise<void> {
   const logo = figlet.textSync('TaskFlow', {
@@ -34,8 +35,18 @@ export async function showLogo(): Promise<void> {
     verticalLayout: 'default'
   });
 
-  console.log('\n' + theme.primary(logo));
-  console.log(theme.secondary('  AI') + theme.muted(' · ') + theme.success('智能任务编排') + theme.muted(' · ') + theme.warning('PRD解析') + '\n');
+  // 使用品牌渐变
+  const brandGradient = gradient(['#00D9FF', '#00A8E8', '#0077B6']);
+
+  console.log('\n' + brandGradient.multiline(logo));
+  console.log(
+    gradient(['#00D9FF', '#00A8E8'])('  AI') +
+    theme.muted(' · ') +
+    gradient(['#00E676', '#00BFA5'])('智能任务编排') +
+    theme.muted(' · ') +
+    gradient(['#FFD700', '#FFA500'])('PRD解析') +
+    '\n'
+  );
 }
 
 /**
@@ -290,8 +301,16 @@ export function section(title: string): void {
 // Re-export prompts and dashboard
 export * from './prompts';
 export * from './dashboard';
+export * from './animations';
+export * from './autocomplete';
+export * from './help';
 
 // ==================== 快捷方法 ====================
+
+// 导入动画和帮助组件
+import { animations } from './animations';
+import { createHelpDisplay, showQuickHelp, showErrorHelp, showSuccessHelp } from './help';
+import { createAutocomplete, createPreview, createHints } from './autocomplete';
 
 export const ui = {
   // 颜色
@@ -323,6 +342,28 @@ export const ui = {
   // 分隔
   divider,
   section,
+
+  // 动画效果
+  rainbow: animations.rainbow,
+  gradient: animations.gradientText,
+  pulse: animations.pulse,
+  neon: animations.neon,
+  glow: animations.glow,
+  wave: animations.wave,
+  twinkle: animations.twinkle,
+  emoji: animations.statusEmoji,
+  emojis: animations.emojis,
+
+  // 帮助
+  createHelpDisplay,
+  showQuickHelp,
+  showErrorHelp,
+  showSuccessHelp,
+
+  // 自动补全
+  createAutocomplete,
+  createPreview,
+  createHints,
 };
 
 export default ui;
