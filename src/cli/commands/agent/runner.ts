@@ -66,7 +66,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
       projectConfig
     );
     const executionEngine = new ExecutionEngine(mcpServer, {
-      config: agentConfig,
+      config: agentConfig as Record<string, unknown>,
       projectPath: process.cwd(),
       workspacePath: path.join(process.cwd(), '.taskflow', 'workspace')
     });
@@ -87,7 +87,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
     
     // Wait for completion
     await new Promise<void>((resolve) => {
-      agent.onStateChange((state) => {
+      agent.onStateChange((state: any) => {
         if (state === 'completed' || state === 'failed') {
           resolve();
         }
