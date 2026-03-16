@@ -11,6 +11,8 @@ import {
 } from './types';
 import { defaultCategories, categoryMap } from './categories';
 import { allBuiltInTools } from './built-in';
+import { filesystemTools } from './filesystem';
+import { httpTools } from './http';
 
 export * from './types';
 
@@ -32,6 +34,12 @@ export class ToolRegistry {
 
   private registerBuiltinTools(): void {
     for (const tool of allBuiltInTools) {
+      this.register(tool);
+    }
+    for (const tool of filesystemTools) {
+      this.register(tool);
+    }
+    for (const tool of httpTools) {
       this.register(tool);
     }
   }

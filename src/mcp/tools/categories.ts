@@ -26,6 +26,16 @@ export const defaultCategories: ToolCategory[] = [
     tools: [],
   },
   {
+    name: 'FileSystem',
+    description: '文件系统操作',
+    tools: [],
+  },
+  {
+    name: 'HTTP',
+    description: 'HTTP 请求工具',
+    tools: [],
+  },
+  {
     name: 'Custom',
     description: '自定义工具',
     tools: [],
@@ -37,5 +47,7 @@ export const categoryMap: Record<string, string> = {
   'shell': 'Shell Commands',
   'analysis': 'Analysis',
   'task': 'Task Management',
+  'filesystem': 'FileSystem',
+  'http': 'HTTP',
   'custom': 'Custom',
 };
