@@ -1,0 +1,130 @@
+{
+  "version": "1.0.0",
+  "meta": {
+    "name": "AI 报告生成工作流",
+    "description": "自动从数据生成结构化报告",
+    "author": "TaskFlow AI",
+    "tags": ["报告", "AI", "文档"],
+    "category": "automation",
+    "icon": "📊"
+  },
+  "config": {
+    "timeout": 90000,
+    "retry": { "enabled": true, "maxAttempts": 2 }
+  },
+  "nodes": [
+    {
+      "id": "input",
+      "type": "input",
+      "data": { "label": "报告主题" }
+    },
+    {
+      "id": "collect_data",
+      "type": "parallel",
+      "data": { "label": "并行收集数据" }
+    },
+    {
+      "id": "search_web",
+      "type": "http",
+      "data": {
+        "label": "网络搜索",
+        "url": "https://api.example.com/search",
+        "method": "POST",
+        "body": { "query": "{{input.topic}}", "limit": 10 }
+      }
+    },
+    {
+      "id": "get_internal",
+      "type": "tool",
+      "data": {
+        "label": "获取内部数据",
+        "toolName": "http_request",
+        "inputMapping": { "url": "https://internal.api/data/{{input.topic}}" }
+      }
+    },
+    {
+      "id": "analyze",
+      "type": "llm",
+      "data": {
+        "label": "数据分析",
+        "model": "gpt-4",
+        "systemPrompt": "分析以下数据，提取关键洞察和趋势。返回结构化的分析结果。"
+      }
+    },
+    {
+      "id": "generate_outline",
+      "type": "llm",
+      "data": {
+        "label": "生成大纲",
+        "model": "gpt-4",
+        "systemPrompt": "根据分析结果生成报告大纲，包含：1. 执行摘要 2. 背景 3. 主要发现 4. 数据分析 5. 结论建议"
+      }
+    },
+    {
+      "id": "write_section_1",
+      "type": "llm",
+      "data": {
+        "label": "撰写摘要",
+        "model": "gpt-4",
+        "systemPrompt": "撰写执行摘要，简洁明了，不超过200字。"
+      }
+    },
+    {
+      "id": "write_section_2",
+      "type": "llm",
+      "data": {
+        "label": "撰写发现",
+        "model": "gpt-4",
+        "systemPrompt": "详细描述主要发现，包含数据和引用。"
+      }
+    },
+    {
+      "id": "write_section_3",
+      "type": "llm",
+      "data": {
+        "label": "撰写结论",
+        "model": "gpt-4",
+        "systemPrompt": "基于分析结果给出结论和可执行的建议。"
+      }
+    },
+    {
+      "id": "compile",
+      "type": "llm",
+      "data": {
+        "label": "整合报告",
+        "model": "gpt-4",
+        "systemPrompt": "将以下各部分整合成完整的Markdown报告：\n{{write_section_1}}\n{{write_section_2}}\n{{write_section_3}}\n\n添加适当的标题、格式和过渡语。"
+      }
+    },
+    {
+      "id": "save_report",
+      "type": "tool",
+      "data": {
+        "label": "保存报告",
+        "toolName": "fs_writeJson",
+        "inputMapping": { "path": "./reports/{{input.topic}}-{{timestamp}}.md", "data": "{{compile}}" }
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "data": { "label": "完成" }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "input", "target": "collect_data" },
+    { "id": "e2", "source": "collect_data", "target": "search_web" },
+    { "id": "e3", "source": "collect_data", "target": "get_internal" },
+    { "id": "e4", "source": "search_web", "target": "analyze" },
+    { "id": "e5", "source": "get_internal", "target": "analyze" },
+    { "id": "e6", "source": "analyze", "target": "generate_outline" },
+    { "id": "e7", "source": "generate_outline", "target": "write_section_1" },
+    { "id": "e8", "source": "generate_outline", "target": "write_section_2" },
+    { "id": "e9", "source": "generate_outline", "target": "write_section_3" },
+    { "id": "e10", "source": "write_section_1", "target": "compile" },
+    { "id": "e11", "source": "write_section_2", "target": "compile" },
+    { "id": "e12", "source": "write_section_3", "target": "compile" },
+    { "id": "e13", "source": "compile", "target": "save_report" },
+    { "id": "e14", "source": "save_report", "target": "output" }
+  ]
+}
