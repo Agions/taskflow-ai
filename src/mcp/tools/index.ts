@@ -20,6 +20,8 @@ export { vectorTools } from './vector';
 export { shellTools as execShellTools } from './shell';
 export { gitTools } from './git';
 export { memoryTools } from './memory';
+export { codeTools } from './code';
+export { notificationTools } from './notification';
 
 // 配置生成器
 export * from '../config/generator';
