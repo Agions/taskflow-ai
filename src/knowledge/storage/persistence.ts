@@ -10,7 +10,10 @@ import { StoredChunk } from './types';
  * 数据持久化管理器
  */
 export class DataPersistence {
-  constructor(private dataDir: string, private collection: string) {}
+  constructor(
+    private dataDir: string,
+    private collection: string
+  ) {}
 
   /**
    * 获取数据文件路径
@@ -51,7 +54,7 @@ export class DataPersistence {
    */
   async getDataSize(): Promise<number> {
     const dataFile = this.getDataFile();
-    
+
     if (!(await fs.pathExists(dataFile))) {
       return 0;
     }

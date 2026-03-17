@@ -42,7 +42,7 @@ export async function executeInit(options: InitOptions): Promise<void> {
       workflowFile: 'taskflow.yml',
       triggers: [
         { type: 'push', branches: ['main', 'develop'] },
-        { type: 'pr', branches: ['main'] }
+        { type: 'pr', branches: ['main'] },
       ],
       stages: [
         {
@@ -54,11 +54,11 @@ export async function executeInit(options: InitOptions): Promise<void> {
                 { name: 'Checkout', command: 'actions/checkout@v4' },
                 { name: 'Setup Node', command: 'actions/setup-node@v4' },
                 { name: 'Install TaskFlow', command: 'npm install -g taskflow-ai' },
-                { name: 'Validate PRD', command: 'taskflow parse ./**/*.prd.md --validate' }
-              ]
-            }
-          ]
-        }
+                { name: 'Validate PRD', command: 'taskflow parse ./**/*.prd.md --validate' },
+              ],
+            },
+          ],
+        },
       ],
       environment: { NODE_VERSION: '20' },
       secrets: ['TASKFLOW_API_KEY'],
@@ -66,8 +66,8 @@ export async function executeInit(options: InitOptions): Promise<void> {
       permissions: {
         contents: 'read',
         issues: 'write',
-        pullRequests: 'write'
-      }
+        pullRequests: 'write',
+      },
     };
 
     await saveConfig(config);
@@ -79,8 +79,9 @@ export async function executeInit(options: InitOptions): Promise<void> {
     console.log(chalk.yellow('\nNext steps:'));
     console.log('  1. Set GITHUB_TOKEN environment variable');
     console.log('  2. Run "taskflow cicd deploy" to deploy workflow');
-
   } catch (error) {
-    spinner.fail(`Initialization failed: ${error instanceof Error ? error.message : String(error)}`);
+    spinner.fail(
+      `Initialization failed: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }

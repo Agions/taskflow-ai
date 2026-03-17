@@ -85,22 +85,26 @@ export class MCPRequestHandlers {
 
       if (uri === 'taskflow://config') {
         return {
-          contents: [{
-            uri,
-            mimeType: 'application/json',
-            text: JSON.stringify(this.sanitizeConfig(this.configProvider()), null, 2),
-          }],
+          contents: [
+            {
+              uri,
+              mimeType: 'application/json',
+              text: JSON.stringify(this.sanitizeConfig(this.configProvider()), null, 2),
+            },
+          ],
         };
       }
 
       if (uri === 'taskflow://tools') {
         const tools = toolRegistry?.getAllTools() || [];
         return {
-          contents: [{
-            uri,
-            mimeType: 'application/json',
-            text: JSON.stringify(tools, null, 2),
-          }],
+          contents: [
+            {
+              uri,
+              mimeType: 'application/json',
+              text: JSON.stringify(tools, null, 2),
+            },
+          ],
         };
       }
 

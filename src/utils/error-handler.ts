@@ -33,11 +33,7 @@ export async function withErrorHandling<T>(
  * @param errorMessage 错误消息前缀
  * @returns 包装后的函数
  */
-export function withSyncErrorHandling<T>(
-  fn: () => T,
-  errorMessage: string,
-  logger?: Logger
-): T {
+export function withSyncErrorHandling<T>(fn: () => T, errorMessage: string, logger?: Logger): T {
   try {
     return fn();
   } catch (error: any) {
@@ -245,11 +241,7 @@ export async function batchWithErrorHandling<T, R>(
  * @param propertyKey 方法名
  * @param descriptor 属性描述符
  */
-export function LogErrors(
-  target: any,
-  propertyKey: string,
-  descriptor: PropertyDescriptor
-) {
+export function LogErrors(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
   const originalMethod = descriptor.value;
   const className = target.constructor.name;
 

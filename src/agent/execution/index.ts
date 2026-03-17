@@ -9,7 +9,7 @@ import {
   ExecutionResult,
   TaskResult,
   ExecutionContext,
-  ExecutionSummary
+  ExecutionSummary,
 } from '../types';
 import { MCPServer } from '../../mcp/server';
 import { TaskExecutor } from './task-executor';
@@ -64,7 +64,7 @@ export class ExecutionEngine {
           taskId: task.id,
           success: false,
           error: error instanceof Error ? error.message : String(error),
-          duration: 0
+          duration: 0,
         });
         if (!plan.continueOnError) break;
       }
@@ -73,7 +73,9 @@ export class ExecutionEngine {
     const summary = this.summaryCalculator.calculate(results);
 
     console.log(`\n📊 Execution Summary:`);
-    console.log(`   Total: ${summary.totalTasks} | Completed: ${summary.completedTasks} | Failed: ${summary.failedTasks}`);
+    console.log(
+      `   Total: ${summary.totalTasks} | Completed: ${summary.completedTasks} | Failed: ${summary.failedTasks}`
+    );
     console.log(`   Duration: ${(Date.now() - startTime) / 1000}s`);
 
     const endTime = Date.now();
@@ -83,7 +85,7 @@ export class ExecutionEngine {
       success: summary.failedTasks === 0,
       summary,
       startTime: new Date(startTime),
-      endTime: new Date(endTime)
+      endTime: new Date(endTime),
     };
   }
 

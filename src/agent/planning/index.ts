@@ -40,7 +40,7 @@ export class PlanningEngine {
       tasks,
       dependencies,
       totalEstimate,
-      criticalPath
+      criticalPath,
     };
   }
 
@@ -57,8 +57,8 @@ export class PlanningEngine {
         createdAt: new Date(),
         updatedAt: new Date(),
         version: '1.0.0',
-        tags: []
-      }
+        tags: [],
+      },
     };
     return this.plan(prd);
   }

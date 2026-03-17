@@ -17,7 +17,7 @@ export class SummaryCalculator {
       failedTasks: failed,
       skippedTasks: 0,
       totalDuration,
-      averageDuration: total > 0 ? totalDuration / total : 0
+      averageDuration: total > 0 ? totalDuration / total : 0,
     };
   }
 }

@@ -56,7 +56,10 @@ export function gradientText(text: string, gradientName: keyof typeof gradients 
 /**
  * 脉冲动画（用于强调）
  */
-export function pulse(text: string, color: 'green' | 'yellow' | 'red' | 'blue' | 'cyan' = 'green'): string {
+export function pulse(
+  text: string,
+  color: 'green' | 'yellow' | 'red' | 'blue' | 'cyan' = 'green'
+): string {
   const colors = {
     green: chalk.green.bold,
     yellow: chalk.yellow.bold,
@@ -104,7 +107,10 @@ export function glow(text: string, intensity: 'low' | 'medium' | 'high' = 'mediu
 /**
  * 装饰边框
  */
-export function decorativeBorder(length: number = 40, style: 'single' | 'double' | 'heavy' = 'single'): string {
+export function decorativeBorder(
+  length: number = 40,
+  style: 'single' | 'double' | 'heavy' = 'single'
+): string {
   const borders = {
     single: '─',
     double: '═',
@@ -116,7 +122,10 @@ export function decorativeBorder(length: number = 40, style: 'single' | 'double'
 /**
  * 装饰角标
  */
-export function corner(text: string, position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'top-left'): string {
+export function corner(
+  text: string,
+  position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' = 'top-left'
+): string {
   const corners = {
     'top-left': '┌',
     'top-right': '┐',
@@ -136,7 +145,10 @@ export function stars(count: number = 3): string {
 /**
  * 箭头装饰
  */
-export function arrow(direction: 'right' | 'left' | 'up' | 'down' = 'right', color?: string): string {
+export function arrow(
+  direction: 'right' | 'left' | 'up' | 'down' = 'right',
+  color?: string
+): string {
   const arrows = {
     right: '➜',
     left: '⬅',
@@ -183,8 +195,16 @@ export async function typewriter(text: string, delay: number = 50): Promise<void
  */
 export function wave(text: string): string {
   const colors = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
-    '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788'
+    '#FF6B6B',
+    '#4ECDC4',
+    '#45B7D1',
+    '#FFA07A',
+    '#98D8C8',
+    '#F7DC6F',
+    '#BB8FCE',
+    '#85C1E2',
+    '#F8B739',
+    '#52B788',
   ];
 
   return text

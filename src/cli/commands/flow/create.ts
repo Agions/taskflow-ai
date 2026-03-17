@@ -17,7 +17,7 @@ interface CreateOptions {
  */
 export async function executeCreate(name: string, options: CreateOptions): Promise<void> {
   const workflowDir = path.resolve(options.dir);
-  
+
   await fs.ensureDir(workflowDir);
 
   const template = getTemplate(options.template);

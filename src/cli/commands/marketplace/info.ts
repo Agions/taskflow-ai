@@ -54,12 +54,13 @@ export async function executeInfo(packageName: string): Promise<void> {
       console.log(chalk.blue('\nVersions:'));
       versions.slice(0, 5).forEach(v => {
         const deprecated = v.deprecated ? chalk.red(' [deprecated]') : '';
-        console.log(`  ${chalk.yellow(v.version)}${deprecated} - ${v.publishedAt.toLocaleDateString()}`);
+        console.log(
+          `  ${chalk.yellow(v.version)}${deprecated} - ${v.publishedAt.toLocaleDateString()}`
+        );
       });
     }
 
     console.log();
-
   } catch (error) {
     spinner.fail(`Failed to get info: ${error instanceof Error ? error.message : String(error)}`);
   }

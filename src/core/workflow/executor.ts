@@ -29,7 +29,10 @@ export interface StepResult {
 export abstract class BaseExecutor {
   protected logger: Logger;
 
-  constructor(protected step: WorkflowStep, protected context: ExecutionContext) {
+  constructor(
+    protected step: WorkflowStep,
+    protected context: ExecutionContext
+  ) {
     this.logger = Logger.getInstance(`Executor:${step.id}`);
   }
 
@@ -39,7 +42,7 @@ export abstract class BaseExecutor {
   /** 准备输入 */
   protected prepareInput(input: Record<string, unknown>): Record<string, unknown> {
     const result: Record<string, unknown> = {};
-    
+
     for (const [key, value] of Object.entries(input)) {
       if (typeof value === 'string') {
         result[key] = this.replaceVariables(value);
@@ -56,10 +59,10 @@ export abstract class BaseExecutor {
     return text.replace(/\{\{(\w+(?:\.\w+)*)\}\}/g, (match, path) => {
       const value = this.getByPath(this.context.variables, path);
       if (value !== undefined) return String(value);
-      
+
       const outputValue = this.getByPath(this.context.outputs, path);
       if (outputValue !== undefined) return String(outputValue);
-      
+
       return match;
     });
   }
@@ -88,7 +91,7 @@ export class ToolExecutor extends BaseExecutor {
   async execute(): Promise<StepResult> {
     const startTime = Date.now();
     const toolName = this.step.config.tool;
-    
+
     if (!toolName) {
       return {
         success: false,
@@ -98,12 +101,10 @@ export class ToolExecutor extends BaseExecutor {
     }
 
     try {
-      const toolInput = this.prepareInput(
-        this.step.config.toolInput || {}
-      );
+      const toolInput = this.prepareInput(this.step.config.toolInput || {});
 
       this.logger.info(`执行工具: ${toolName}`);
-      
+
       const result = await toolRegistry.execute(toolName, toolInput);
 
       if (this.step.config.outputKey) {
@@ -132,10 +133,8 @@ export class ToolExecutor extends BaseExecutor {
 export class ThoughtExecutor extends BaseExecutor {
   async execute(): Promise<StepResult> {
     const startTime = Date.now();
-    
-    const prompt = this.replaceVariables(
-      this.step.config.prompt || ''
-    );
+
+    const prompt = this.replaceVariables(this.step.config.prompt || '');
 
     this.logger.info(`执行思维分析: ${this.step.id}`);
 
@@ -199,7 +198,7 @@ export class TaskExecutor extends BaseExecutor {
 export class OutputExecutor extends BaseExecutor {
   async execute(): Promise<StepResult> {
     const startTime = Date.now();
-    
+
     const outputKey = this.step.config.outputKey || 'result';
     const output = this.context.outputs[outputKey];
 
@@ -216,10 +215,7 @@ export class OutputExecutor extends BaseExecutor {
 /**
  * 执行器工厂
  */
-export function createExecutor(
-  step: WorkflowStep,
-  context: ExecutionContext
-): BaseExecutor {
+export function createExecutor(step: WorkflowStep, context: ExecutionContext): BaseExecutor {
   switch (step.type) {
     case 'tool':
       return new ToolExecutor(step, context);

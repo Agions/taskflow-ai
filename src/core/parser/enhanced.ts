@@ -49,7 +49,7 @@ export class TaskDecomposer {
 
     for (const section of functionalSections) {
       const features = this.extractFeatures(section);
-      
+
       for (const feature of features) {
         const featureTasks = await this.createTasksForFeature(
           feature,
@@ -76,15 +76,11 @@ export class TaskDecomposer {
    */
   private extractFeatures(section: PRDSection): string[] {
     const features: string[] = [];
-    
+
     const lines = section.content.split('\n');
     for (const line of lines) {
       const trimmed = line.trim();
-      if (
-        trimmed.startsWith('-') || 
-        trimmed.startsWith('*') ||
-        trimmed.match(/^\d+\./)
-      ) {
+      if (trimmed.startsWith('-') || trimmed.startsWith('*') || trimmed.match(/^\d+\./)) {
         const feature = trimmed.replace(/^[-*\d.]+\s*/, '').trim();
         if (feature.length > 5) {
           features.push(feature);
@@ -155,7 +151,7 @@ export class TaskDecomposer {
    */
   private determineTaskType(feature: string): ProjectTask['type'] {
     const lower = feature.toLowerCase();
-    
+
     if (lower.includes('界面') || lower.includes('ui') || lower.includes('前端')) {
       return 'design';
     } else if (lower.includes('测试') || lower.includes('test')) {
@@ -198,8 +194,11 @@ export class TaskDecomposer {
    */
   private analyzeDependencies(tasks: ProjectTask[]): void {
     for (let i = 1; i < tasks.length; i++) {
-      if (tasks[i].type === 'testing' && (tasks[i-1].type === 'frontend' || tasks[i-1].type === 'backend')) {
-        tasks[i].dependencies = [tasks[i-1].id];
+      if (
+        tasks[i].type === 'testing' &&
+        (tasks[i - 1].type === 'frontend' || tasks[i - 1].type === 'backend')
+      ) {
+        tasks[i].dependencies = [tasks[i - 1].id];
       }
     }
   }
@@ -289,7 +288,7 @@ export class HourEstimator {
 
     for (const task of tasks) {
       total += task.estimatedHours;
-      
+
       byType[task.type] = (byType[task.type] || 0) + task.estimatedHours;
       byPriority[task.priority] = (byPriority[task.priority] || 0) + task.estimatedHours;
     }

@@ -20,7 +20,7 @@ export class ConfigManager {
     config.installedPackages[pkg.name] = {
       version: pkg.version,
       installedAt: new Date().toISOString(),
-      tools: pkg.tools || []
+      tools: pkg.tools || [],
     };
 
     await fs.writeJson(this.configPath, config, { spaces: 2 });
@@ -41,7 +41,7 @@ export class ConfigManager {
 
     return Object.entries(packages).map(([name, info]: [string, any]) => ({
       name,
-      version: info.version
+      version: info.version,
     }));
   }
 

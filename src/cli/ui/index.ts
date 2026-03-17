@@ -29,7 +29,7 @@ export async function showLogo(): Promise<void> {
   const logo = figlet.textSync('TaskFlow', {
     font: 'Standard',
     horizontalLayout: 'default',
-    verticalLayout: 'default'
+    verticalLayout: 'default',
   });
 
   // 使用品牌渐变
@@ -38,11 +38,11 @@ export async function showLogo(): Promise<void> {
   console.log('\n' + brandGradient.multiline(logo));
   console.log(
     gradient(['#00D9FF', '#00A8E8'])('  AI') +
-    theme.muted(' · ') +
-    gradient(['#00E676', '#00BFA5'])('智能任务编排') +
-    theme.muted(' · ') +
-    gradient(['#FFD700', '#FFA500'])('PRD解析') +
-    '\n'
+      theme.muted(' · ') +
+      gradient(['#00E676', '#00BFA5'])('智能任务编排') +
+      theme.muted(' · ') +
+      gradient(['#FFD700', '#FFA500'])('PRD解析') +
+      '\n'
   );
 }
 
@@ -50,17 +50,19 @@ export async function showLogo(): Promise<void> {
  * 显示简洁 Logo
  */
 export function showSimpleLogo(): void {
-  console.log('\n' + boxen(
-    theme.primary.bold('⚡ TaskFlow AI') + '\n' +
-    theme.muted('智能PRD文档解析与任务管理助手'),
-    {
-      padding: 1,
-      margin: 1,
-      borderStyle: 'round',
-      borderColor: 'cyan',
-      dimBorder: false
-    }
-  ));
+  console.log(
+    '\n' +
+      boxen(
+        theme.primary.bold('⚡ TaskFlow AI') + '\n' + theme.muted('智能PRD文档解析与任务管理助手'),
+        {
+          padding: 1,
+          margin: 1,
+          borderStyle: 'round',
+          borderColor: 'cyan',
+          dimBorder: false,
+        }
+      )
+  );
 }
 
 // ==================== 加载动画 ====================
@@ -72,7 +74,7 @@ export class Spinner {
     this.spinner = ora({
       text: theme.info(text),
       spinner: 'dots',
-      color: 'cyan'
+      color: 'cyan',
     });
   }
 
@@ -113,17 +115,16 @@ export class Spinner {
  * 成功信息框
  */
 export function successBox(title: string, message: string): void {
-  console.log(boxen(
-    theme.success.bold('✓ ' + title) + '\n\n' + theme.info(message),
-    {
+  console.log(
+    boxen(theme.success.bold('✓ ' + title) + '\n\n' + theme.info(message), {
       padding: 1,
       margin: 1,
       borderStyle: 'round',
       borderColor: 'green',
       title: theme.success(' SUCCESS '),
-      titleAlignment: 'left'
-    }
-  ));
+      titleAlignment: 'left',
+    })
+  );
 }
 
 /**
@@ -135,48 +136,48 @@ export function errorBox(title: string, message: string, details?: string): void
     content += '\n\n' + theme.muted(details);
   }
 
-  console.log(boxen(content, {
-    padding: 1,
-    margin: 1,
-    borderStyle: 'round',
-    borderColor: 'red',
-    title: theme.error(' ERROR '),
-    titleAlignment: 'left'
-  }));
+  console.log(
+    boxen(content, {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'red',
+      title: theme.error(' ERROR '),
+      titleAlignment: 'left',
+    })
+  );
 }
 
 /**
  * 警告信息框
  */
 export function warningBox(title: string, message: string): void {
-  console.log(boxen(
-    theme.warning.bold('⚠ ' + title) + '\n\n' + theme.info(message),
-    {
+  console.log(
+    boxen(theme.warning.bold('⚠ ' + title) + '\n\n' + theme.info(message), {
       padding: 1,
       margin: 1,
       borderStyle: 'round',
       borderColor: 'yellow',
       title: theme.warning(' WARNING '),
-      titleAlignment: 'left'
-    }
-  ));
+      titleAlignment: 'left',
+    })
+  );
 }
 
 /**
  * 信息提示框
  */
 export function infoBox(title: string, message: string): void {
-  console.log(boxen(
-    theme.secondary.bold('ℹ ' + title) + '\n\n' + theme.info(message),
-    {
+  console.log(
+    boxen(theme.secondary.bold('ℹ ' + title) + '\n\n' + theme.info(message), {
       padding: 1,
       margin: 1,
       borderStyle: 'round',
       borderColor: 'blue',
       title: theme.secondary(' INFO '),
-      titleAlignment: 'left'
-    }
-  ));
+      titleAlignment: 'left',
+    })
+  );
 }
 
 // ==================== 列表展示 ====================
@@ -235,10 +236,15 @@ export function table(columns: TableColumn[], data: TableData[]): void {
   const bottomSeparator = '└' + colWidths.map(w => '─'.repeat(w)).join('┴') + '┘';
 
   // 表头
-  const headerRow = '│' + columns.map((col, i) => {
-    const width = colWidths[i];
-    return ' ' + theme.highlight(col.header).padEnd(width - 1);
-  }).join('│') + '│';
+  const headerRow =
+    '│' +
+    columns
+      .map((col, i) => {
+        const width = colWidths[i];
+        return ' ' + theme.highlight(col.header).padEnd(width - 1);
+      })
+      .join('│') +
+    '│';
 
   console.log(theme.muted(separator));
   console.log(headerRow);
@@ -246,11 +252,16 @@ export function table(columns: TableColumn[], data: TableData[]): void {
 
   // 数据行
   data.forEach(row => {
-    const dataRow = '│' + columns.map((col, i) => {
-      const width = colWidths[i];
-      const value = String(row[col.key]);
-      return ' ' + theme.info(value).padEnd(width - 1);
-    }).join('│') + '│';
+    const dataRow =
+      '│' +
+      columns
+        .map((col, i) => {
+          const width = colWidths[i];
+          const value = String(row[col.key]);
+          return ' ' + theme.info(value).padEnd(width - 1);
+        })
+        .join('│') +
+      '│';
     console.log(dataRow);
   });
 

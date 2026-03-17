@@ -27,11 +27,15 @@ export async function executeList(options: ListOptions): Promise<void> {
     spinner.stop();
 
     if (packages.length === 0) {
-      console.log(chalk.yellow(options.global ? 'No global packages installed' : 'No packages installed'));
+      console.log(
+        chalk.yellow(options.global ? 'No global packages installed' : 'No packages installed')
+      );
       return;
     }
 
-    console.log(chalk.blue(`\n${options.global ? 'Global' : 'Local'} packages (${packages.length}):\n`));
+    console.log(
+      chalk.blue(`\n${options.global ? 'Global' : 'Local'} packages (${packages.length}):\n`)
+    );
 
     for (const pkg of packages) {
       const tools = pkg.tools?.map(t => t.name).join(', ') || 'none';
@@ -40,8 +44,9 @@ export async function executeList(options: ListOptions): Promise<void> {
       console.log(`  Tools: ${chalk.cyan(tools)}`);
       console.log();
     }
-
   } catch (error) {
-    spinner.fail(`Failed to list packages: ${error instanceof Error ? error.message : String(error)}`);
+    spinner.fail(
+      `Failed to list packages: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }

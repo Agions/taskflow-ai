@@ -11,10 +11,10 @@ import { ThoughtChain, ReasoningStep } from './types';
 export class TextRenderer {
   render(chain: ThoughtChain): string {
     const lines: string[] = [];
-    
+
     lines.push('🤔 思维链分析\n');
     lines.push('═'.repeat(50));
-    
+
     const steps = this.extractSteps(chain);
     for (const step of steps) {
       const indent = '  '.repeat(step.depth);
@@ -87,13 +87,13 @@ export class TextRenderer {
 export class MarkdownRenderer {
   render(chain: ThoughtChain): string {
     const lines: string[] = [];
-    
+
     lines.push('# 🧠 思维链分析\n');
     lines.push(`**时间**: ${new Date(chain.createdAt).toLocaleString()}`);
     lines.push(`**模型**: ${chain.metadata.model || '未知'}`);
     lines.push(`**输入**: ${chain.metadata.input?.substring(0, 100)}...\n`);
     lines.push('---\n');
-    
+
     const steps = this.extractSteps(chain.root, 0);
     for (const step of steps) {
       const heading = '#'.repeat(Math.min(step.depth + 2, 6));
@@ -109,7 +109,7 @@ export class MarkdownRenderer {
   }
 
   private extractSteps(
-    node: any, 
+    node: any,
     depth: number,
     stepNum = { value: 0 }
   ): Array<{
@@ -159,7 +159,7 @@ export class MarkdownRenderer {
 export class MermaidRenderer {
   render(chain: ThoughtChain): string {
     const lines: string[] = [];
-    
+
     lines.push('```mermaid');
     lines.push('flowchart TD');
     lines.push('    %% 节点样式');
@@ -174,27 +174,27 @@ export class MermaidRenderer {
 
     let nodeId = 0;
     const idMap = new Map<string, string>();
-    
+
     const processNode = (node: any) => {
       const id = `node${nodeId++}`;
       const label = this.truncate(node.content, 30);
       const title = this.getTitle(node.type);
       idMap.set(node.id, id);
-      
+
       lines.push(`    ${id}["${title}: ${label}"]:::${node.type}`);
-      
+
       for (const child of node.children || []) {
         const childId = processNode(child);
         lines.push(`    ${id} --> ${childId}`);
       }
-      
+
       return id;
     };
 
     processNode(chain.root);
-    
+
     lines.push('```');
-    
+
     return lines.join('\n');
   }
 
@@ -223,14 +223,14 @@ export class MermaidRenderer {
 export class MindMapRenderer {
   render(chain: ThoughtChain): string {
     const lines: string[] = [];
-    
+
     lines.push('# 思维导图\n');
-    
+
     const renderTree = (node: any, prefix: string, isLast: boolean) => {
       const connector = isLast ? '└── ' : '├── ';
       const title = this.getTitle(node.type);
       lines.push(`${prefix}${connector}${title}: ${this.truncate(node.content, 40)}`);
-      
+
       const childPrefix = prefix + (isLast ? '    ' : '│   ');
       const children = node.children || [];
       children.forEach((child: any, index: number) => {
@@ -239,7 +239,7 @@ export class MindMapRenderer {
     };
 
     renderTree(chain.root, '', true);
-    
+
     return lines.join('\n');
   }
 

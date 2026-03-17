@@ -21,14 +21,10 @@ export class ThoughtChainOperations {
     confidence: number,
     model?: string
   ): ThoughtNode | null {
-    return this.core.addNode(
-      chainId,
-      targetNodeId,
-      'reflection',
-      reflection,
-      '反思审查',
-      { confidence, model }
-    );
+    return this.core.addNode(chainId, targetNodeId, 'reflection', reflection, '反思审查', {
+      confidence,
+      model,
+    });
   }
 
   /**

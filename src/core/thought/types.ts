@@ -2,14 +2,14 @@
  * 思维链核心类型定义
  */
 
-export type ThoughtType = 
-  | 'requirement'    // 需求理解
-  | 'analysis'       // 分析
-  | 'decomposition'  // 拆解
-  | 'task'           // 任务
-  | 'action'         // 行动
-  | 'reflection'     // 反思
-  | 'synthesis';     // 综合
+export type ThoughtType =
+  | 'requirement' // 需求理解
+  | 'analysis' // 分析
+  | 'decomposition' // 拆解
+  | 'task' // 任务
+  | 'action' // 行动
+  | 'reflection' // 反思
+  | 'synthesis'; // 综合
 
 export interface ThoughtNode {
   /** 节点唯一ID */

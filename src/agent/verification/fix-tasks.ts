@@ -17,7 +17,7 @@ export function generateFixTasks(failedChecks: VerificationCheck[]): any[] {
           title: 'Fix Code Quality Issues',
           description: 'Address code quality issues identified in the report',
           type: 'code',
-          priority: 'medium'
+          priority: 'medium',
         });
         break;
       case 'Test Coverage':
@@ -25,7 +25,7 @@ export function generateFixTasks(failedChecks: VerificationCheck[]): any[] {
           title: 'Add Unit Tests',
           description: 'Increase test coverage to at least 70%',
           type: 'test',
-          priority: 'medium'
+          priority: 'medium',
         });
         break;
       case 'Dependencies':
@@ -33,7 +33,7 @@ export function generateFixTasks(failedChecks: VerificationCheck[]): any[] {
           title: 'Install Dependencies',
           description: 'Run npm install to install missing dependencies',
           type: 'shell',
-          priority: 'high'
+          priority: 'high',
         });
         break;
     }

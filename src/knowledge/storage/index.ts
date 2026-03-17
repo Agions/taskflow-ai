@@ -5,7 +5,13 @@
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { VectorStore, DocumentChunk, RetrievedChunk, RetrievalOptions, IndexStatus } from '../types';
+import {
+  VectorStore,
+  DocumentChunk,
+  RetrievedChunk,
+  RetrievalOptions,
+  IndexStatus,
+} from '../types';
 import { EmbeddingManager } from '../embedding';
 import { StoredChunk } from './types';
 import { DataPersistence } from './persistence';
@@ -98,7 +104,7 @@ export class VectorStoreManager {
       totalChunks,
       indexedAt: new Date(),
       lastUpdated: new Date(),
-      size
+      size,
     };
   }
 

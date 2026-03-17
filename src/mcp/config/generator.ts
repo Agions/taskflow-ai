@@ -22,7 +22,7 @@ export interface EditorConfig {
  */
 export function generateCursorConfig(options: MCPConfigOptions): EditorConfig {
   const { packageName, packageVersion, apiKey, env = {} } = options;
-  
+
   return {
     name: 'Cursor',
     configPath: '~/.cursor/mcp.json',
@@ -32,7 +32,9 @@ export function generateCursorConfig(options: MCPConfigOptions): EditorConfig {
           command: 'npx',
           args: ['-y', `${packageName}${packageVersion ? `@${packageVersion}` : ''}`],
           env: {
-            ...(apiKey ? { [apiKey.startsWith('TASKFLOW_') ? apiKey : 'TASKFLOW_API_KEY']: `{{${apiKey}}}` } : {}),
+            ...(apiKey
+              ? { [apiKey.startsWith('TASKFLOW_') ? apiKey : 'TASKFLOW_API_KEY']: `{{${apiKey}}}` }
+              : {}),
             ...env,
           },
         },
@@ -46,7 +48,7 @@ export function generateCursorConfig(options: MCPConfigOptions): EditorConfig {
  */
 export function generateClaudeDesktopConfig(options: MCPConfigOptions): EditorConfig {
   const { packageName, packageVersion, apiKey, env = {} } = options;
-  
+
   return {
     name: 'Claude Desktop',
     configPath: '~/Library/Application Support/Claude/claude_desktop_config.json',
@@ -70,7 +72,7 @@ export function generateClaudeDesktopConfig(options: MCPConfigOptions): EditorCo
  */
 export function generateVSCodeConfig(options: MCPConfigOptions): EditorConfig {
   const { packageName, packageVersion, apiKey, env = {} } = options;
-  
+
   return {
     name: 'VSCode',
     configPath: '~/.vscode/extensions/<your-extension>/mcp.json',
@@ -94,7 +96,7 @@ export function generateVSCodeConfig(options: MCPConfigOptions): EditorConfig {
  */
 export function generateWindsurfConfig(options: MCPConfigOptions): EditorConfig {
   const { packageName, packageVersion, apiKey, env = {} } = options;
-  
+
   return {
     name: 'Windsurf',
     configPath: '~/.windsurf/mcp.json',
@@ -118,7 +120,7 @@ export function generateWindsurfConfig(options: MCPConfigOptions): EditorConfig 
  */
 export function generateTraeConfig(options: MCPConfigOptions): EditorConfig {
   const { packageName, packageVersion, apiKey, env = {} } = options;
-  
+
   return {
     name: 'Trae',
     configPath: '~/.trae/mcp.json',
@@ -142,18 +144,18 @@ export function generateTraeConfig(options: MCPConfigOptions): EditorConfig {
  */
 export function generateZedConfig(options: MCPConfigOptions): EditorConfig {
   const { packageName, packageVersion, apiKey, env = {} } = options;
-  
+
   return {
     name: 'Zed',
     configPath: '~/.zed/settings.json',
     config: {
-      "assistant": {
-        "version": "1.0.0",
-        "mcp": {
+      assistant: {
+        version: '1.0.0',
+        mcp: {
           [packageName]: {
-            "command": "npx",
-            "args": ["-y", `${packageName}${packageVersion ? `@${packageVersion}` : ''}`],
-            "env": {
+            command: 'npx',
+            args: ['-y', `${packageName}${packageVersion ? `@${packageVersion}` : ''}`],
+            env: {
               ...(apiKey ? { TASKFLOW_API_KEY: `{{${apiKey}}}` } : {}),
               ...env,
             },
@@ -192,6 +194,6 @@ ${JSON.stringify(config.config, null, 2)}
 `;
     return yaml;
   }
-  
+
   return JSON.stringify(config.config, null, 2);
 }

@@ -17,13 +17,7 @@ export interface ActionHistory {
 /**
  * 操作类型
  */
-export type ActionType =
-  | 'plan'
-  | 'execute'
-  | 'verify'
-  | 'fix'
-  | 'approve'
-  | 'reject';
+export type ActionType = 'plan' | 'execute' | 'verify' | 'fix' | 'approve' | 'reject';
 
 /**
  * Agent 事件

@@ -29,26 +29,23 @@ export class SearchReplaceTool {
   /**
    * 搜索文件
    */
-  async search(
-    pattern: string,
-    options: SearchReplaceOptions = {}
-  ): Promise<SearchResult[]> {
+  async search(pattern: string, options: SearchReplaceOptions = {}): Promise<SearchResult[]> {
     const fs = await import('fs/promises');
     const path = await import('path');
-    
+
     const results: SearchResult[] = [];
     const extensions = options.extensions || ['ts', 'js', 'tsx', 'jsx', 'md', 'json'];
     const exclude = options.exclude || ['node_modules', '.git', 'dist'];
-    
+
     const searchPaths = options.paths || [process.cwd()];
-    
+
     for (const searchPath of searchPaths) {
-      await this.scanDirectory(searchPath, extensions, exclude, async (file) => {
+      await this.scanDirectory(searchPath, extensions, exclude, async file => {
         const content = await fs.readFile(file, 'utf-8');
         const lines = content.split('\n');
-        
+
         const matches: SearchResult['matches'] = [];
-        
+
         let regex: RegExp;
         try {
           const flags = (options.caseSensitive ? '' : 'i') + (options.useRegex ? 'g' : 'g');
@@ -58,7 +55,7 @@ export class SearchReplaceTool {
           this.logger.warn(`无效的正则表达式: ${pattern}`);
           return;
         }
-        
+
         for (let i = 0; i < lines.length; i++) {
           if (regex.test(lines[i])) {
             matches.push({
@@ -68,7 +65,7 @@ export class SearchReplaceTool {
             regex.lastIndex = 0; // 重置正则状态
           }
         }
-        
+
         if (matches.length > 0) {
           results.push({
             file: path.resolve(file),
@@ -77,9 +74,9 @@ export class SearchReplaceTool {
         }
       });
     }
-    
+
     this.logger.info(`搜索完成，找到 ${results.length} 个匹配文件`);
-    
+
     return results;
   }
 
@@ -96,17 +93,17 @@ export class SearchReplaceTool {
     errors: string[];
   }> {
     const results = await this.search(pattern, options);
-    
+
     const fs = await import('fs/promises');
     let filesModified = 0;
     let replacements = 0;
     const errors: string[] = [];
-    
+
     for (const result of results) {
       try {
         const content = await fs.readFile(result.file, 'utf-8');
         let newContent = content;
-        
+
         let regex: RegExp;
         try {
           const flags = (options.caseSensitive ? '' : 'i') + 'g';
@@ -116,12 +113,12 @@ export class SearchReplaceTool {
           errors.push(`无效正则: ${result.file}`);
           continue;
         }
-        
+
         const matches = content.match(regex);
         if (matches) {
           replacements += matches.length;
           newContent = content.replace(regex, replacement);
-          
+
           await fs.writeFile(result.file, newContent);
           filesModified++;
         }
@@ -129,9 +126,9 @@ export class SearchReplaceTool {
         errors.push(`处理失败: ${result.file} - ${error}`);
       }
     }
-    
+
     this.logger.info(`替换完成，修改 ${filesModified} 个文件，${replacements} 处`);
-    
+
     return { filesModified, replacements, errors };
   }
 
@@ -146,15 +143,15 @@ export class SearchReplaceTool {
   ): Promise<void> {
     const fs = await import('fs/promises');
     const path = await import('path');
-    
+
     try {
       const entries = await fs.readdir(dir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
-        
+
         if (exclude.includes(entry.name)) continue;
-        
+
         if (entry.isDirectory()) {
           await this.scanDirectory(fullPath, extensions, exclude, callback);
         } else {
@@ -164,8 +161,7 @@ export class SearchReplaceTool {
           }
         }
       }
-    } catch {
-    }
+    } catch {}
   }
 }
 

@@ -98,7 +98,7 @@ export const memoryTools: ToolDefinition[] = [
       },
       required: ['key', 'value'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const key = input.key as string;
       const value = input.value as string;
       const ttl = input.ttl as number | undefined;
@@ -136,7 +136,7 @@ export const memoryTools: ToolDefinition[] = [
       },
       required: ['key'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const key = input.key as string;
       const session = input.session as boolean;
 
@@ -148,9 +148,9 @@ export const memoryTools: ToolDefinition[] = [
         value = globalMemory.get(key);
       }
 
-      return { 
-        success: value !== undefined, 
-        key, 
+      return {
+        success: value !== undefined,
+        key,
         value: value !== undefined ? JSON.stringify(value) : null,
         exists: value !== undefined,
       };
@@ -169,7 +169,7 @@ export const memoryTools: ToolDefinition[] = [
       },
       required: ['key'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const key = input.key as string;
       const session = input.session as boolean;
 
@@ -195,7 +195,7 @@ export const memoryTools: ToolDefinition[] = [
         session: { type: 'boolean', description: '是否列出会话内存', default: false },
       },
     },
-    handler: async (input) => {
+    handler: async input => {
       const session = input.session as boolean;
 
       let keys: string[];
@@ -220,7 +220,7 @@ export const memoryTools: ToolDefinition[] = [
         session: { type: 'boolean', description: '是否仅清空会话内存', default: false },
       },
     },
-    handler: async (input) => {
+    handler: async input => {
       const session = input.session as boolean;
 
       if (session) {

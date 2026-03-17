@@ -2,22 +2,17 @@
  * 工作流核心类型定义
  */
 
-export type StepType = 
-  | 'thought'      // 思维分析
-  | 'task'         // 任务执行
-  | 'tool'         // 工具调用
-  | 'condition'    // 条件分支
-  | 'parallel'     // 并行执行
-  | 'loop'         // 循环执行
-  | 'input'        // 输入
-  | 'output';      // 输出
+export type StepType =
+  | 'thought' // 思维分析
+  | 'task' // 任务执行
+  | 'tool' // 工具调用
+  | 'condition' // 条件分支
+  | 'parallel' // 并行执行
+  | 'loop' // 循环执行
+  | 'input' // 输入
+  | 'output'; // 输出
 
-export type StepStatus = 
-  | 'pending' 
-  | 'running' 
-  | 'completed' 
-  | 'failed' 
-  | 'skipped';
+export type StepStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped';
 
 export interface WorkflowStep {
   /** 步骤 ID */

@@ -14,7 +14,10 @@ interface UpdateOptions {
 /**
  * 执行 update 命令
  */
-export async function executeUpdate(packageName: string | undefined, options: UpdateOptions): Promise<void> {
+export async function executeUpdate(
+  packageName: string | undefined,
+  options: UpdateOptions
+): Promise<void> {
   const spinner = ora('Checking for updates...').start();
 
   try {
@@ -26,7 +29,7 @@ export async function executeUpdate(packageName: string | undefined, options: Up
     if (packageName) {
       spinner.text = `Updating ${packageName}...`;
       const result = await installer.update(packageName, {
-        global: options.global
+        global: options.global,
       });
 
       if (result.success) {
@@ -59,7 +62,6 @@ export async function executeUpdate(packageName: string | undefined, options: Up
         }
       }
     }
-
   } catch (error) {
     spinner.fail(`Update failed: ${error instanceof Error ? error.message : String(error)}`);
   }

@@ -11,7 +11,7 @@ import {
   RetrievalOptions,
   QAResult,
   KnowledgeContext,
-  KnowledgeStats
+  KnowledgeStats,
 } from '../types';
 import { EmbeddingManager } from '../embedding';
 import { VectorStoreManager } from '../storage';
@@ -65,14 +65,14 @@ export class KnowledgeRetrievalEngine {
       topK: options.topK || 5,
       threshold: options.threshold || 0.6,
       filters: options.filters,
-      rerank: options.rerank ?? true
+      rerank: options.rerank ?? true,
     });
 
     return {
       chunks,
       query,
       totalResults: chunks.length,
-      latency: Date.now() - startTime
+      latency: Date.now() - startTime,
     };
   }
 
@@ -81,13 +81,16 @@ export class KnowledgeRetrievalEngine {
     return this.qaProcessor.answer(question, retrievalResult.chunks);
   }
 
-  async getKnowledgeContext(query: string, options: RetrievalOptions = {}): Promise<KnowledgeContext> {
+  async getKnowledgeContext(
+    query: string,
+    options: RetrievalOptions = {}
+  ): Promise<KnowledgeContext> {
     const result = await this.retrieve(query, options);
 
     return {
       relevantDocs: result.chunks,
       summary: this.generateSummary(result.chunks),
-      suggestions: this.generateSuggestions(result.chunks, query)
+      suggestions: this.generateSuggestions(result.chunks, query),
     };
   }
 
@@ -148,7 +151,7 @@ export class KnowledgeRetrievalEngine {
       queries: 0,
       avgLatency: 0,
       topTags,
-      documentTypes: documentTypes as any
+      documentTypes: documentTypes as any,
     };
   }
 
@@ -164,10 +167,10 @@ export class KnowledgeRetrievalEngine {
         title: path.basename(filePath),
         source: filePath,
         type: path.extname(filePath).slice(1) as import('../types').DocumentType,
-        tags: []
+        tags: [],
       },
       createdAt: stats.birthtime,
-      updatedAt: stats.mtime
+      updatedAt: stats.mtime,
     };
   }
 

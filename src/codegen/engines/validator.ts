@@ -45,7 +45,7 @@ export class CodeValidator {
       name: 'component-structure',
       passed: hasExport || hasDefaultExport,
       message: hasExport ? 'Component has export' : 'Component missing export',
-      severity: 'error'
+      severity: 'error',
     };
   }
 
@@ -55,8 +55,11 @@ export class CodeValidator {
     return {
       name: 'unused-imports',
       passed: unusedImports.length === 0,
-      message: unusedImports.length > 0 ? `Unused imports: ${unusedImports.join(', ')}` : 'No unused imports',
-      severity: 'warning'
+      message:
+        unusedImports.length > 0
+          ? `Unused imports: ${unusedImports.join(', ')}`
+          : 'No unused imports',
+      severity: 'warning',
     };
   }
 
@@ -67,7 +70,7 @@ export class CodeValidator {
       name: 'test-coverage',
       passed: hasTests,
       message: hasTests ? 'Tests found' : 'No tests found',
-      severity: 'warning'
+      severity: 'warning',
     };
   }
 

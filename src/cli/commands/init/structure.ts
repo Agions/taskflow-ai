@@ -40,7 +40,9 @@ export async function saveConfig(config: TaskFlowConfig): Promise<void> {
 /**
  * 创建示例文件
  */
-export async function createExampleFiles(projectName: string = DEFAULT_CONFIG.projectName): Promise<void> {
+export async function createExampleFiles(
+  projectName: string = DEFAULT_CONFIG.projectName
+): Promise<void> {
   const examplePRD = `# 示例PRD文档
 
 ## 项目概述

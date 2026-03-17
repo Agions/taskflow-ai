@@ -2,21 +2,16 @@
  * Agent 核心类型定义
  */
 
-export type AgentStatus = 
-  | 'idle' 
-  | 'thinking' 
-  | 'executing' 
-  | 'waiting' 
+export type AgentStatus =
+  | 'idle'
+  | 'thinking'
+  | 'executing'
+  | 'waiting'
   | 'reflecting'
-  | 'completed' 
+  | 'completed'
   | 'failed';
 
-export type AgentCapability = 
-  | 'reasoning' 
-  | 'code' 
-  | 'search' 
-  | 'tool_use' 
-  | 'collaboration';
+export type AgentCapability = 'reasoning' | 'code' | 'search' | 'tool_use' | 'collaboration';
 
 export interface Agent {
   /** Agent ID */

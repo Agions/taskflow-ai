@@ -33,7 +33,10 @@ export function mcpCommand(program: Command) {
     .action(async () => {
       console.log(chalk.cyan('📊 MCP服务器状态:'));
       console.log(chalk.gray('  传输模式: ') + chalk.green('stdio (标准输入输出)'));
-      console.log(chalk.gray('  兼容编辑器: ') + chalk.white('Trae, Cursor, Claude Desktop, Windsurf, VSCode, Zed'));
+      console.log(
+        chalk.gray('  兼容编辑器: ') +
+          chalk.white('Trae, Cursor, Claude Desktop, Windsurf, VSCode, Zed')
+      );
       console.log(chalk.gray('  状态: ') + chalk.yellow('通过 taskflow mcp start 启动'));
     });
 
@@ -48,11 +51,15 @@ export function mcpCommand(program: Command) {
   mcpCmd
     .command('init')
     .description('初始化MCP配置 (生成编辑器配置文件)')
-    .option('-e, --editor <editor>', '指定编辑器 (cursor|claude-desktop|vscode|windsurf|trae|zed|all)', 'all')
+    .option(
+      '-e, --editor <editor>',
+      '指定编辑器 (cursor|claude-desktop|vscode|windsurf|trae|zed|all)',
+      'all'
+    )
     .option('-o, --output <path>', '输出目录', process.cwd())
     .option('-p, --package <name>', '包名', 'taskflow-ai')
     .option('-v, --version <version>', '版本', 'latest')
-    .action(async (options) => {
+    .action(async options => {
       try {
         await generateEditorConfig(options);
       } catch (error) {
@@ -66,7 +73,7 @@ export function mcpCommand(program: Command) {
     .command('tools')
     .description('列出所有可用的MCP工具')
     .option('-c, --category <category>', '按分类筛选')
-    .action(async (options) => {
+    .action(async options => {
       try {
         await listTools(options);
       } catch (error) {
@@ -93,7 +100,6 @@ async function startMCPServer(_options: any) {
 
     const mcpServer = new MCPServer(mcpSettings, config);
     await mcpServer.start();
-
   } catch (error) {
     console.error(chalk.red('启动失败:'), error);
     throw error;
@@ -111,11 +117,14 @@ async function generateEditorConfig(options: any) {
   console.log(chalk.gray(`  版本: ${packageVersion}`));
   console.log(chalk.gray(`  输出: ${outputDir}\n`));
 
-  const configs = editor === 'all' 
-    ? generateAllConfigs({ packageName, packageVersion })
-    : [generateAllConfigs({ packageName, packageVersion }).find(c => 
-        c.name.toLowerCase().replace(/\s+/g, '-') === editor.toLowerCase()
-      )].filter(Boolean);
+  const configs =
+    editor === 'all'
+      ? generateAllConfigs({ packageName, packageVersion })
+      : [
+          generateAllConfigs({ packageName, packageVersion }).find(
+            c => c.name.toLowerCase().replace(/\s+/g, '-') === editor.toLowerCase()
+          ),
+        ].filter(Boolean);
 
   if (configs.length === 0) {
     console.log(chalk.red(`未找到编辑器: ${editor}`));
@@ -125,12 +134,12 @@ async function generateEditorConfig(options: any) {
 
   for (const config of configs) {
     if (!config) continue;
-    
+
     const fileName = getConfigFileName(config.name);
     const filePath = path.join(outputDir, fileName);
-    
+
     const content = exportConfig(config);
-    
+
     // 读取现有配置（如果存在）
     let existingConfig: any = {};
     try {
@@ -142,9 +151,9 @@ async function generateEditorConfig(options: any) {
 
     // 合并配置
     const mergedConfig = mergeConfig(existingConfig, config.config);
-    
+
     await fs.writeFile(filePath, JSON.stringify(mergedConfig, null, 2));
-    
+
     console.log(chalk.green(`✅ ${config.name}: ${filePath}`));
   }
 
@@ -155,12 +164,12 @@ async function generateEditorConfig(options: any) {
 
 function getConfigFileName(editorName: string): string {
   const map: Record<string, string> = {
-    'Cursor': 'mcp.cursor.json',
+    Cursor: 'mcp.cursor.json',
     'Claude Desktop': 'mcp.claude-desktop.json',
-    'VSCode': 'mcp.vscode.json',
-    'Windsurf': 'mcp.windsurf.json',
-    'Trae': 'mcp.trae.json',
-    'Zed': 'mcp.zed.json',
+    VSCode: 'mcp.vscode.json',
+    Windsurf: 'mcp.windsurf.json',
+    Trae: 'mcp.trae.json',
+    Zed: 'mcp.zed.json',
   };
   return map[editorName] || 'mcp.json';
 }
@@ -168,7 +177,7 @@ function getConfigFileName(editorName: string): string {
 function mergeConfig(existing: any, newConfig: any): any {
   // 深度合并配置
   const result = { ...existing };
-  
+
   for (const key of Object.keys(newConfig)) {
     if (key === 'mcpServers') {
       result.mcpServers = {
@@ -179,18 +188,18 @@ function mergeConfig(existing: any, newConfig: any): any {
       result[key] = newConfig[key];
     }
   }
-  
+
   return result;
 }
 
 async function listTools(options: any) {
   const { toolRegistry } = await import('../../mcp/tools/registry');
-  
+
   // 注册所有工具
   toolRegistry.registerBuiltinTools();
-  
+
   let tools = toolRegistry.getAllTools();
-  
+
   // 筛选分类
   if (options.category) {
     tools = tools.filter(t => t.category === options.category);
@@ -205,7 +214,7 @@ async function listTools(options: any) {
   }
 
   console.log(chalk.cyan('\n📦 MCP 工具列表\n'));
-  
+
   for (const [category, categoryTools] of Object.entries(byCategory)) {
     console.log(chalk.yellow(`\n${category} (${categoryTools.length})`));
     for (const tool of categoryTools) {

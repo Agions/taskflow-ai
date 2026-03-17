@@ -28,7 +28,7 @@ export class PackageSearcher {
       packages: sorted.slice(0, limit),
       total: sorted.length,
       page: 1,
-      pageSize: limit
+      pageSize: limit,
     };
   }
 
@@ -38,9 +38,9 @@ export class PackageSearcher {
         params: {
           text: options.query,
           size: options.limit || 20,
-          from: 0
+          from: 0,
         },
-        timeout: 10000
+        timeout: 10000,
       });
 
       return response.data.objects?.map((obj: any) => this.mapToToolPackage(obj.package)) || [];
@@ -71,8 +71,8 @@ export class PackageSearcher {
         rating: 0,
         reviews: 0,
         verified: false,
-        official: false
-      }
+        official: false,
+      },
     };
   }
 
@@ -99,7 +99,11 @@ export class PackageSearcher {
         sorted.sort((a, b) => a.name.localeCompare(b.name));
         break;
       case 'updated':
-        sorted.sort((a, b) => new Date(b.metadata?.updatedAt || 0).getTime() - new Date(a.metadata?.updatedAt || 0).getTime());
+        sorted.sort(
+          (a, b) =>
+            new Date(b.metadata?.updatedAt || 0).getTime() -
+            new Date(a.metadata?.updatedAt || 0).getTime()
+        );
         break;
     }
 

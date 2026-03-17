@@ -27,7 +27,7 @@ export class AgentStateMachine {
   ) {
     const machineContext: MachineContext = {
       ...context,
-      config
+      config,
     };
 
     const machine = createAgentMachine(

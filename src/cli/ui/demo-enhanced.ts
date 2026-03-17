@@ -98,10 +98,7 @@ async function demo() {
     category: 'Project',
     emoji: '🚀',
     usage: 'taskflow init [name]',
-    examples: [
-      'taskflow init my-project',
-      'taskflow init --template typescript',
-    ],
+    examples: ['taskflow init my-project', 'taskflow init --template typescript'],
     options: [
       { flags: '-t, --template <name>', description: '使用模板' },
       { flags: '-f, --force', description: '强制覆盖' },
@@ -165,36 +162,36 @@ async function demo() {
       completed: 12,
       inProgress: 5,
       pending: 2,
-      blocked: 1
+      blocked: 1,
     },
-    lastUpdated: '2024-01-15 10:30:00'
+    lastUpdated: '2024-01-15 10:30:00',
   });
 
   dashboard.system({
     nodeVersion: 'v20.11.0',
     platform: 'linux',
     memory: { used: 512, total: 2048 },
-    uptime: '2d 4h 30m'
+    uptime: '2d 4h 30m',
   });
 
   dashboard.tasks([
     { id: '1', name: '重构代码', status: 'in-progress', priority: 'high', assignee: 'dev1' },
     { id: '2', name: '编写文档', status: 'pending', priority: 'medium' },
     { id: '3', name: '修复 Bug', status: 'completed', priority: 'high', assignee: 'dev2' },
-    { id: '4', name: '性能优化', status: 'blocked', priority: 'low' }
+    { id: '4', name: '性能优化', status: 'blocked', priority: 'low' },
   ]);
 
   dashboard.timeline([
     { time: '10:30:00', event: '项目初始化完成', status: 'success' },
     { time: '10:25:30', event: '开始解析 PRD', status: 'info' },
     { time: '10:20:15', event: '检测到配置问题', status: 'warning' },
-    { time: '10:15:00', event: '连接服务器失败', status: 'error' }
+    { time: '10:15:00', event: '连接服务器失败', status: 'error' },
   ]);
 
   dashboard.stats([
     { label: '任务总数', value: 20, change: 5 },
     { label: '完成率', value: '75%', change: 10, unit: '%' },
-    { label: '平均耗时', value: '2.5h', change: -0.5, unit: 'h' }
+    { label: '平均耗时', value: '2.5h', change: -0.5, unit: 'h' },
   ]);
 
   await sleep(500);

@@ -32,7 +32,10 @@ export class PackageCache {
 
   async save(pkg: ToolPackage): Promise<void> {
     await fs.ensureDir(this.cacheDir);
-    const cachePath = path.join(this.cacheDir, `${pkg.name.replace('/', '__')}@${pkg.version}.json`);
+    const cachePath = path.join(
+      this.cacheDir,
+      `${pkg.name.replace('/', '__')}@${pkg.version}.json`
+    );
     await fs.writeJson(cachePath, pkg, { spaces: 2 });
     this.cache.set(`${pkg.name}@${pkg.version}`, pkg);
   }

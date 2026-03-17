@@ -4,11 +4,7 @@
  */
 
 import { Logger } from '../../utils/logger';
-import {
-  ToolDefinition,
-  ToolRegistration,
-  ToolCategory
-} from './types';
+import { ToolDefinition, ToolRegistration, ToolCategory } from './types';
 import { TOOL_CATEGORIES, getCategory } from './categories';
 
 export * from './types';
@@ -28,10 +24,10 @@ export class ToolRegistry {
       this.categories.set(cat.id, { ...cat, tools: [] });
     }
     // 添加默认分类
-    this.categories.set('custom', { 
-      id: 'custom', 
-      name: 'Custom', 
-      description: '自定义工具', 
+    this.categories.set('custom', {
+      id: 'custom',
+      name: 'Custom',
+      description: '自定义工具',
       tools: [],
     });
   }
@@ -58,8 +54,17 @@ export class ToolRegistry {
   private async loadTools(toolModule: string): Promise<void> {
     try {
       const modules = await import(toolModule);
-      const toolArrays = ['fileTools', 'shellTools', 'taskTools', 'httpTools', 'databaseTools', 'vectorTools', 'gitTools', 'memoryTools'];
-      
+      const toolArrays = [
+        'fileTools',
+        'shellTools',
+        'taskTools',
+        'httpTools',
+        'databaseTools',
+        'vectorTools',
+        'gitTools',
+        'memoryTools',
+      ];
+
       for (const arrayName of toolArrays) {
         if (modules[arrayName]) {
           for (const tool of modules[arrayName]) {
@@ -67,7 +72,7 @@ export class ToolRegistry {
           }
         }
       }
-      
+
       // 检查默认导出
       if (modules.default) {
         const tools = Array.isArray(modules.default) ? modules.default : [modules.default];
@@ -181,10 +186,11 @@ export class ToolRegistry {
    */
   search(query: string): ToolDefinition[] {
     const q = query.toLowerCase();
-    return this.getAllTools().filter(tool => 
-      tool.name.toLowerCase().includes(q) ||
-      tool.description.toLowerCase().includes(q) ||
-      tool.tags?.some(tag => tag.toLowerCase().includes(q))
+    return this.getAllTools().filter(
+      tool =>
+        tool.name.toLowerCase().includes(q) ||
+        tool.description.toLowerCase().includes(q) ||
+        tool.tags?.some(tag => tag.toLowerCase().includes(q))
     );
   }
 }

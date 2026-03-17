@@ -37,7 +37,9 @@ export async function executeIndex(docPath: string, options: IndexOptions): Prom
 
     if (stats.isDirectory()) {
       const indexResult = await engine.indexDirectory(resolvedPath);
-      spinner.succeed(chalk.green(`Indexed ${indexResult.indexed} documents (${indexResult.failed} failed)`));
+      spinner.succeed(
+        chalk.green(`Indexed ${indexResult.indexed} documents (${indexResult.failed} failed)`)
+      );
     } else {
       const doc = {
         id: `doc-${Date.now()}`,
@@ -46,16 +48,15 @@ export async function executeIndex(docPath: string, options: IndexOptions): Prom
           title: path.basename(resolvedPath),
           source: resolvedPath,
           type: 'markdown' as const,
-          tags: []
+          tags: [],
         },
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       await engine.indexDocument(doc);
       spinner.succeed(chalk.green('Document indexed'));
     }
-
   } catch (error) {
     spinner.fail(`Indexing failed: ${error instanceof Error ? error.message : String(error)}`);
   }

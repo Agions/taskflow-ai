@@ -10,7 +10,7 @@ import {
   CodeGenerationResult,
   CodegenConfig,
   SyncConfig,
-  GenerationStats
+  GenerationStats,
 } from '../types';
 import { TemplateManager } from '../templates';
 import { FileGenerator } from './file-generator';
@@ -36,7 +36,7 @@ export class CodeGenerationEngine {
       defaultLanguage: 'typescript',
       autoFormat: true,
       autoLint: true,
-      ...config
+      ...config,
     };
     this.templateManager = new TemplateManager(this.config.templatesDir);
     this.fileGenerator = new FileGenerator();
@@ -67,7 +67,7 @@ export class CodeGenerationEngine {
         this.fileGenerator.generateMainFile(spec, mainContent),
         ...(spec.hasStyles ? [this.fileGenerator.generateStyleFile(spec)] : []),
         this.fileGenerator.generateTestFile(spec),
-        this.fileGenerator.generateIndexFile(spec)
+        this.fileGenerator.generateIndexFile(spec),
       ];
 
       const qualityChecks = await this.validator.checkCodeQuality(files);
@@ -84,28 +84,30 @@ export class CodeGenerationEngine {
         metadata: {
           generatedAt: new Date(),
           templateId: template.id,
-          variables: context
-        }
+          variables: context,
+        },
       };
 
       const stats: GenerationStats = {
         totalFiles: files.length,
         totalLines: files.reduce((sum, f) => sum + f.content.split('\n').length, 0),
         duration: Date.now() - startTime,
-        templatesUsed: [template.id]
+        templatesUsed: [template.id],
       };
 
-      console.log(`✅ Generated ${component.name} (${stats.totalLines} lines, ${stats.duration}ms)`);
+      console.log(
+        `✅ Generated ${component.name} (${stats.totalLines} lines, ${stats.duration}ms)`
+      );
 
       return {
         success: true,
         component,
-        warnings: warnings.length > 0 ? warnings : undefined
+        warnings: warnings.length > 0 ? warnings : undefined,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -124,7 +126,7 @@ export class CodeGenerationEngine {
       props: spec.props || [],
       hasStyles: spec.hasStyles,
       framework: spec.framework,
-      language: spec.language
+      language: spec.language,
     };
   }
 }

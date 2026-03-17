@@ -48,7 +48,7 @@ export class PackageInstaller {
           success: false,
           package: {} as ToolPackage,
           installedTools: [],
-          error: `Package not found: ${packageName}`
+          error: `Package not found: ${packageName}`,
         };
       }
 
@@ -84,7 +84,7 @@ export class PackageInstaller {
         success: false,
         package: {} as ToolPackage,
         installedTools: [],
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -112,7 +112,12 @@ export class PackageInstaller {
     try {
       const latestVersion = await this.registryManager.getLatestVersion(packageName);
       if (!latestVersion) {
-        return { success: false, package: {} as ToolPackage, installedTools: [], error: 'No version found' };
+        return {
+          success: false,
+          package: {} as ToolPackage,
+          installedTools: [],
+          error: 'No version found',
+        };
       }
 
       await this.uninstall(packageName, options);
@@ -122,7 +127,7 @@ export class PackageInstaller {
         success: false,
         package: {} as ToolPackage,
         installedTools: [],
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }

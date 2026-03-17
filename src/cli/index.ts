@@ -121,11 +121,7 @@ program.on('--help', () => {
 
 // 未知命令处理
 program.on('command:*', operands => {
-  ui.error(
-    '未知命令',
-    `命令 "${operands[0]}" 不存在`,
-    '使用 "taskflow --help" 查看可用命令'
-  );
+  ui.error('未知命令', `命令 "${operands[0]}" 不存在`, '使用 "taskflow --help" 查看可用命令');
   process.exit(1);
 });
 
@@ -140,10 +136,7 @@ async function main() {
       await program.parseAsync();
     }
   } catch (error) {
-    ui.error(
-      '执行错误',
-      error instanceof Error ? error.message : String(error)
-    );
+    ui.error('执行错误', error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
@@ -154,7 +147,7 @@ process.on('uncaughtException', error => {
   process.exit(1);
 });
 
-process.on('unhandledRejection', (reason) => {
+process.on('unhandledRejection', reason => {
   ui.error('未处理的Promise拒绝', String(reason));
   process.exit(1);
 });

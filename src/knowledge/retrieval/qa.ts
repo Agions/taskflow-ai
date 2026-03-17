@@ -17,14 +17,12 @@ export class QAProcessor {
       answer,
       sources,
       confidence,
-      latency: Date.now() - startTime
+      latency: Date.now() - startTime,
     };
   }
 
   private buildContext(chunks: RetrievedChunk[]): string {
-    return chunks
-      .map((result, index) => `[${index + 1}] ${result.chunk.content}`)
-      .join('\n\n');
+    return chunks.map((result, index) => `[${index + 1}] ${result.chunk.content}`).join('\n\n');
   }
 
   private generateAnswer(question: string, context: string): string {
@@ -44,7 +42,7 @@ export class QAProcessor {
           title: (result.chunk.metadata as any).title || 'Unknown',
           content: result.chunk.content,
           score: result.score,
-          metadata: result.chunk.metadata
+          metadata: result.chunk.metadata,
         });
       }
     }

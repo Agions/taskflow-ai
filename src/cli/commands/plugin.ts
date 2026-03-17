@@ -24,7 +24,7 @@ program
     }
 
     console.log(chalk.bold('\n📦 已安装插件:\n'));
-    
+
     for (const plugin of plugins) {
       console.log(`  ${chalk.cyan(plugin.name)} v${plugin.version}`);
       console.log(`    ID: ${plugin.id}`);
@@ -45,9 +45,9 @@ program
   .argument('<pluginId>', '插件 ID')
   .action(async (pluginId: string) => {
     console.log(chalk.cyan(`\n加载插件: ${pluginId}\n`));
-    
+
     const result = await pluginManager.load(pluginId);
-    
+
     if (result.success) {
       console.log(chalk.green(`✅ 插件加载成功: ${result.plugin?.name}`));
     } else {
@@ -64,7 +64,7 @@ program
   .argument('<pluginId>', '插件 ID')
   .action(async (pluginId: string) => {
     const success = await pluginManager.unload(pluginId);
-    
+
     if (success) {
       console.log(chalk.green(`✅ 插件已卸载: ${pluginId}`));
     } else {
@@ -80,10 +80,10 @@ program
   .description('初始化插件系统')
   .action(async () => {
     console.log(chalk.cyan('\n初始化插件系统...\n'));
-    
+
     await pluginManager.initialize();
     await pluginManager.loadAll();
-    
+
     console.log(chalk.green(`✅ 插件系统已初始化`));
     console.log(`   已加载 ${pluginManager.count()} 个插件`);
   });

@@ -33,7 +33,7 @@ export async function executeSearch(query: string, options: SearchCommandOptions
       verified: options.verified,
       official: options.official,
       sortBy: options.sort as 'downloads' | 'rating' | 'updated' | 'name',
-      limit: parseInt(options.limit)
+      limit: parseInt(options.limit),
     };
 
     const result = await registryManager.search(searchOptions);
@@ -52,13 +52,14 @@ export async function executeSearch(query: string, options: SearchCommandOptions
 
       console.log(`${chalk.bold(pkg.name)}${official}${verified}`);
       console.log(`  ${chalk.gray(pkg.description)}`);
-      console.log(`  ${chalk.yellow('v' + pkg.version)} | ${chalk.cyan(pkg.metadata.downloads + ' downloads')} | ${chalk.magenta(pkg.author)}`);
+      console.log(
+        `  ${chalk.yellow('v' + pkg.version)} | ${chalk.cyan(pkg.metadata.downloads + ' downloads')} | ${chalk.magenta(pkg.author)}`
+      );
       console.log(`  ${chalk.gray('Categories: ' + pkg.categories.join(', '))}`);
       console.log();
     }
 
     console.log(chalk.gray(`Showing ${result.packages.length} of ${result.total} results`));
-
   } catch (error) {
     spinner.fail(`Search failed: ${error instanceof Error ? error.message : String(error)}`);
   }

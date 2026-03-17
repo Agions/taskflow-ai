@@ -57,19 +57,24 @@ export class HelpDisplay {
    */
   showMainHelp(programName: string, version: string, description: string): void {
     // Logo
-    console.log('\n' + animations.gradientText(
-      `  ╔═══════════════════════════════════════╗
+    console.log(
+      '\n' +
+        animations.gradientText(
+          `  ╔═══════════════════════════════════════╗
   ║     ⚡ ${programName} v${version} ⚡          ║
   ╚═══════════════════════════════════════╝`,
-      'brand'
-    ));
+          'brand'
+        )
+    );
 
     // 描述
     console.log('\n' + theme.info(description) + '\n');
 
     // 使用方式
     console.log(theme.highlight('📖 使用方式:'));
-    console.log(`  ${theme.primary('$')} ${programName} ${theme.muted('<command>')} ${theme.muted('[options]')}\n`);
+    console.log(
+      `  ${theme.primary('$')} ${programName} ${theme.muted('<command>')} ${theme.muted('[options]')}\n`
+    );
 
     // 按分类显示命令
     console.log(theme.highlight('🚀 可用命令:\n'));
@@ -89,12 +94,22 @@ export class HelpDisplay {
 
     // 快速开始
     console.log(theme.highlight('⚡ 快速开始:'));
-    console.log(`  ${theme.primary('$')} ${programName} init          ${theme.muted('# 初始化项目')}`);
-    console.log(`  ${theme.primary('$')} ${programName} status        ${theme.muted('# 查看状态')}`);
-    console.log(`  ${theme.primary('$')} ${programName} --help        ${theme.muted('# 显示帮助')}\n`);
+    console.log(
+      `  ${theme.primary('$')} ${programName} init          ${theme.muted('# 初始化项目')}`
+    );
+    console.log(
+      `  ${theme.primary('$')} ${programName} status        ${theme.muted('# 查看状态')}`
+    );
+    console.log(
+      `  ${theme.primary('$')} ${programName} --help        ${theme.muted('# 显示帮助')}\n`
+    );
 
     // 更多信息
-    console.log(theme.muted('  使用 ') + theme.primary(`${programName} <command> --help`) + theme.muted(' 查看命令详情\n'));
+    console.log(
+      theme.muted('  使用 ') +
+        theme.primary(`${programName} <command> --help`) +
+        theme.muted(' 查看命令详情\n')
+    );
   }
 
   /**
@@ -109,17 +124,17 @@ export class HelpDisplay {
 
     // 命令标题
     const emoji = cmd.emoji || '⚡';
-    console.log('\n' + boxen(
-      `${emoji} ${theme.highlight(cmd.name)}\n${theme.info(cmd.description)}`,
-      {
-        padding: 1,
-        margin: 1,
-        borderStyle: 'round',
-        borderColor: 'cyan',
-        title: theme.primary(' COMMAND '),
-        titleAlignment: 'center',
-      }
-    ));
+    console.log(
+      '\n' +
+        boxen(`${emoji} ${theme.highlight(cmd.name)}\n${theme.info(cmd.description)}`, {
+          padding: 1,
+          margin: 1,
+          borderStyle: 'round',
+          borderColor: 'cyan',
+          title: theme.primary(' COMMAND '),
+          titleAlignment: 'center',
+        })
+    );
 
     // 别名
     if (cmd.aliases && cmd.aliases.length > 0) {
@@ -182,8 +197,10 @@ export class HelpDisplay {
     const lowerQuery = query.toLowerCase();
 
     for (const cmd of this.commands.values()) {
-      if (cmd.name.toLowerCase().includes(lowerQuery) ||
-          cmd.description.toLowerCase().includes(lowerQuery)) {
+      if (
+        cmd.name.toLowerCase().includes(lowerQuery) ||
+        cmd.description.toLowerCase().includes(lowerQuery)
+      ) {
         results.push(cmd);
       }
     }
@@ -193,7 +210,9 @@ export class HelpDisplay {
       return;
     }
 
-    console.log(`\n${theme.highlight('🔍 搜索结果:')} ${theme.info(`找到 ${results.length} 个命令`)}\n`);
+    console.log(
+      `\n${theme.highlight('🔍 搜索结果:')} ${theme.info(`找到 ${results.length} 个命令`)}\n`
+    );
 
     results.forEach(cmd => {
       const emoji = cmd.emoji || '▸';
@@ -274,18 +293,20 @@ export function showQuickHelp(commands: Array<{ name: string; desc: string }>): 
  * 显示错误帮助
  */
 export function showErrorHelp(error: string, suggestion?: string): void {
-  console.log(boxen(
-    `${theme.error('❌ ' + error)}\n\n` +
-    (suggestion ? `${theme.info('💡 建议: ' + suggestion)}` : ''),
-    {
-      padding: 1,
-      margin: 1,
-      borderStyle: 'round',
-      borderColor: 'red',
-      title: theme.error(' ERROR '),
-      titleAlignment: 'left',
-    }
-  ));
+  console.log(
+    boxen(
+      `${theme.error('❌ ' + error)}\n\n` +
+        (suggestion ? `${theme.info('💡 建议: ' + suggestion)}` : ''),
+      {
+        padding: 1,
+        margin: 1,
+        borderStyle: 'round',
+        borderColor: 'red',
+        title: theme.error(' ERROR '),
+        titleAlignment: 'left',
+      }
+    )
+  );
 }
 
 /**
@@ -302,17 +323,16 @@ export function showSuccessHelp(message: string, nextSteps?: string[]): void {
     });
   }
 
-  console.log(boxen(
-    content.join('\n'),
-    {
+  console.log(
+    boxen(content.join('\n'), {
       padding: 1,
       margin: 1,
       borderStyle: 'round',
       borderColor: 'green',
       title: theme.success(' SUCCESS '),
       titleAlignment: 'left',
-    }
-  ));
+    })
+  );
 }
 
 // 导出所有帮助组件

@@ -6,7 +6,6 @@
 import fs from 'fs-extra';
 import { Logger } from '../../utils/logger';
 
-
 export class WordParser {
   private logger = Logger.getInstance('WordParser');
 

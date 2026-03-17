@@ -18,7 +18,7 @@ export class CodeSyncer {
       backup: true,
       dryRun: false,
       ignorePatterns: ['node_modules', '.git', 'dist', 'build'],
-      ...config
+      ...config,
     };
 
     const syncedFiles: string[] = [];
@@ -31,7 +31,7 @@ export class CodeSyncer {
           continue;
         }
 
-        if (syncConfig.backup && await fs.pathExists(targetPath)) {
+        if (syncConfig.backup && (await fs.pathExists(targetPath))) {
           const backupPath = `${targetPath}.backup-${Date.now()}`;
           await fs.copy(targetPath, backupPath);
         }
@@ -57,7 +57,7 @@ export class CodeSyncer {
       return {
         success: false,
         syncedFiles,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }

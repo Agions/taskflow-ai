@@ -3,15 +3,15 @@
  * 自主任务执行、反思、多 Agent 协作
  */
 
-import { 
-  Agent, 
-  AgentTask, 
-  AgentExecution, 
+import {
+  Agent,
+  AgentTask,
+  AgentExecution,
   AgentStep,
   AgentStatus,
   GoalParserResult,
   ReflectionResult,
-  MemoryItem 
+  MemoryItem,
 } from './types';
 import { Logger } from '../../utils/logger';
 import { toolRegistry } from '../../mcp/tools/registry';
@@ -63,7 +63,7 @@ export class AgentCore {
 
     try {
       const parsedGoal = await this.parseGoal(task.goal || task.description);
-      
+
       this.addStep(execution, {
         step: execution.steps.length + 1,
         type: 'thought',
@@ -79,23 +79,22 @@ export class AgentCore {
       }
 
       const reflection = await this.reflect(execution);
-      
+
       if (!reflection.success && reflection.shouldRetry) {
         this.logger.info('反思建议重试');
       }
 
       execution.status = 'completed';
       execution.finishedAt = Date.now();
-      
+
       task.status = 'completed';
       task.finishedAt = Date.now();
-
     } catch (error) {
       execution.status = 'failed';
       execution.finishedAt = Date.now();
       task.status = 'failed';
       task.error = error instanceof Error ? error.message : String(error);
-      
+
       this.logger.error('任务执行失败', error);
     }
 
@@ -107,7 +106,7 @@ export class AgentCore {
    */
   private async executeSubgoal(execution: AgentExecution, subgoal: string): Promise<void> {
     execution.status = 'executing';
-    
+
     this.addStep(execution, {
       step: execution.steps.length + 1,
       type: 'thought',
@@ -116,7 +115,7 @@ export class AgentCore {
     });
 
     const shouldAct = this.shouldUseTool(subgoal);
-    
+
     if (shouldAct && this.agent.tools.length > 0) {
       const toolName = this.selectTool(subgoal);
       if (toolName) {
@@ -146,8 +145,8 @@ export class AgentCore {
    * 执行工具
    */
   private async executeTool(
-    execution: AgentExecution, 
-    toolName: string, 
+    execution: AgentExecution,
+    toolName: string,
     input: Record<string, unknown>
   ): Promise<void> {
     const startTime = Date.now();
@@ -163,7 +162,7 @@ export class AgentCore {
 
     try {
       const result = await toolRegistry.execute(toolName, input);
-      
+
       const lastStep = execution.steps[execution.steps.length - 1];
       lastStep.toolResult = result;
       lastStep.duration = Date.now() - startTime;
@@ -174,7 +173,6 @@ export class AgentCore {
         content: `工具返回结果: ${JSON.stringify(result).substring(0, 100)}...`,
         timestamp: Date.now(),
       });
-
     } catch (error) {
       this.addStep(execution, {
         step: execution.steps.length + 1,
@@ -204,8 +202,9 @@ export class AgentCore {
     const improvements: string[] = [];
     const learnedLessons: string[] = [];
 
-    const hasFailure = execution.steps.some(s => s.type === 'observation' && 
-      s.content.includes('失败'));
+    const hasFailure = execution.steps.some(
+      s => s.type === 'observation' && s.content.includes('失败')
+    );
 
     if (hasFailure) {
       issues.push('存在执行失败的步骤');
@@ -266,7 +265,18 @@ export class AgentCore {
   }
 
   private shouldUseTool(context: string): boolean {
-    const toolKeywords = ['查找', '搜索', '获取', '创建', '修改', '删除', '执行', 'run', 'get', 'create'];
+    const toolKeywords = [
+      '查找',
+      '搜索',
+      '获取',
+      '创建',
+      '修改',
+      '删除',
+      '执行',
+      'run',
+      'get',
+      'create',
+    ];
     return toolKeywords.some(k => context.toLowerCase().includes(k));
   }
 
@@ -281,7 +291,10 @@ export class AgentCore {
   }
 
   private extractSubgoals(goal: string): string[] {
-    return goal.split(/[,，]/).map(s => s.trim()).filter(s => s);
+    return goal
+      .split(/[,，]/)
+      .map(s => s.trim())
+      .filter(s => s);
   }
 
   private extractSuccessCriteria(goal: string): string[] {

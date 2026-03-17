@@ -21,7 +21,7 @@ export class WorkflowParser {
 
     try {
       let spec: WorkflowSpec;
-      
+
       if (format === 'yaml') {
         spec = parseYAML(content);
       } else {

@@ -62,7 +62,7 @@ export function validateStepId(workflow: Workflow, stepId: string): boolean {
 export function validateDependencies(workflow: Workflow, stepId: string): string[] {
   const errors: string[] = [];
   const step = workflow.steps.find(s => s.id === stepId);
-  
+
   if (!step) {
     errors.push(`步骤不存在: ${stepId}`);
     return errors;
@@ -70,10 +70,8 @@ export function validateDependencies(workflow: Workflow, stepId: string): string
 
   const config = step.config as any;
   if (config?.dependsOn) {
-    const deps = Array.isArray(config.dependsOn) 
-      ? config.dependsOn 
-      : [config.dependsOn];
-    
+    const deps = Array.isArray(config.dependsOn) ? config.dependsOn : [config.dependsOn];
+
     for (const dep of deps) {
       if (!validateStepId(workflow, dep)) {
         errors.push(`依赖的步骤不存在: ${dep}`);

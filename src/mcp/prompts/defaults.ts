@@ -30,10 +30,16 @@ export const defaultPrompts: MCPPrompt[] = [
     arguments: [
       { name: 'projectName', description: '项目名称', type: 'string', required: true },
       { name: 'projectDescription', description: '项目描述', type: 'string', required: true },
-      { name: 'requirements', description: '需求列表', type: 'array', required: false, default: [] }
+      {
+        name: 'requirements',
+        description: '需求列表',
+        type: 'array',
+        required: false,
+        default: [],
+      },
     ],
     category: 'planning',
-    version: '1.0.0'
+    version: '1.0.0',
   },
   {
     name: 'code_review',
@@ -52,10 +58,16 @@ export const defaultPrompts: MCPPrompt[] = [
 5. 改进建议`,
     arguments: [
       { name: 'code', description: '代码内容', type: 'string', required: true },
-      { name: 'language', description: '编程语言', type: 'string', required: false, default: 'typescript' }
+      {
+        name: 'language',
+        description: '编程语言',
+        type: 'string',
+        required: false,
+        default: 'typescript',
+      },
     ],
     category: 'code',
-    version: '1.0.0'
+    version: '1.0.0',
   },
   {
     name: 'bug_analysis',
@@ -79,9 +91,9 @@ export const defaultPrompts: MCPPrompt[] = [
     arguments: [
       { name: 'error', description: '错误信息', type: 'string', required: true },
       { name: 'stackTrace', description: '堆栈跟踪', type: 'string', required: false },
-      { name: 'context', description: '上下文信息', type: 'string', required: false }
+      { name: 'context', description: '上下文信息', type: 'string', required: false },
     ],
     category: 'debug',
-    version: '1.0.0'
-  }
+    version: '1.0.0',
+  },
 ];

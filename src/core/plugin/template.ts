@@ -91,19 +91,23 @@ export class TemplateManager {
       name: 'PRD 转代码工作流',
       description: '从 PRD 文档生成代码的完整工作流',
       category: 'workflow',
-      content: JSON.stringify({
-        name: '{{workflow_name}}',
-        version: '1.0.0',
-        description: '{{description}}',
-        triggers: [{ type: 'manual' }],
-        variables: {},
-        steps: [
-          { id: 'parse', name: '解析 PRD', type: 'thought' },
-          { id: 'decompose', name: '任务拆分', type: 'task', depends_on: ['parse'] },
-          { id: 'generate', name: '生成代码', type: 'tool', depends_on: ['decompose'] },
-          { id: 'review', name: '代码审查', type: 'thought', depends_on: ['generate'] },
-        ],
-      }, null, 2),
+      content: JSON.stringify(
+        {
+          name: '{{workflow_name}}',
+          version: '1.0.0',
+          description: '{{description}}',
+          triggers: [{ type: 'manual' }],
+          variables: {},
+          steps: [
+            { id: 'parse', name: '解析 PRD', type: 'thought' },
+            { id: 'decompose', name: '任务拆分', type: 'task', depends_on: ['parse'] },
+            { id: 'generate', name: '生成代码', type: 'tool', depends_on: ['decompose'] },
+            { id: 'review', name: '代码审查', type: 'thought', depends_on: ['generate'] },
+          ],
+        },
+        null,
+        2
+      ),
     });
 
     this.register({
@@ -111,17 +115,18 @@ export class TemplateManager {
       name: '功能开发任务',
       description: '标准的功能开发任务模板',
       category: 'task',
-      content: JSON.stringify({
-        title: '{{title}}',
-        description: '{{description}}',
-        type: 'development',
-        priority: 'medium',
-        estimatedHours: 8,
-        acceptanceCriteria: [
-          '{{criteria_1}}',
-          '{{criteria_2}}',
-        ],
-      }, null, 2),
+      content: JSON.stringify(
+        {
+          title: '{{title}}',
+          description: '{{description}}',
+          type: 'development',
+          priority: 'medium',
+          estimatedHours: 8,
+          acceptanceCriteria: ['{{criteria_1}}', '{{criteria_2}}'],
+        },
+        null,
+        2
+      ),
     });
 
     this.register({
@@ -129,17 +134,18 @@ export class TemplateManager {
       name: 'Bug 修复任务',
       description: 'Bug 修复任务模板',
       category: 'task',
-      content: JSON.stringify({
-        title: '修复: {{bug_title}}',
-        description: '{{bug_description}}',
-        type: 'development',
-        priority: 'high',
-        estimatedHours: 4,
-        acceptanceCriteria: [
-          'Bug 已修复',
-          '相关测试通过',
-        ],
-      }, null, 2),
+      content: JSON.stringify(
+        {
+          title: '修复: {{bug_title}}',
+          description: '{{bug_description}}',
+          type: 'development',
+          priority: 'high',
+          estimatedHours: 4,
+          acceptanceCriteria: ['Bug 已修复', '相关测试通过'],
+        },
+        null,
+        2
+      ),
     });
   }
 

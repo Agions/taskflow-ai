@@ -93,7 +93,10 @@ export class SearchManager {
   /**
    * 合并结果
    */
-  private mergeResults(vectorResults: RetrievedChunk[], keywordResults: RetrievedChunk[]): RetrievedChunk[] {
+  private mergeResults(
+    vectorResults: RetrievedChunk[],
+    keywordResults: RetrievedChunk[]
+  ): RetrievedChunk[] {
     const merged = new Map<string, RetrievedChunk>();
 
     for (const result of vectorResults) {

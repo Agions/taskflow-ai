@@ -40,7 +40,7 @@ program
     const config = await loadConfig();
 
     const models = config?.aiModels?.filter((m: any) => m.enabled) || [];
-    
+
     if (models.length > 0) {
       try {
         await analyzeWithAI(manager, prompt, options.model);
@@ -76,14 +76,8 @@ program
  */
 function analyzeLocally(manager: ThoughtChainManager, prompt: string): void {
   const chain = manager.createChain(prompt);
-  
-  manager.addNode(
-    chain.id,
-    chain.root.id,
-    'analysis',
-    '分析用户输入',
-    '理解需求内容'
-  );
+
+  manager.addNode(chain.id, chain.root.id, 'analysis', '分析用户输入', '理解需求内容');
 
   manager.addNode(
     chain.id,
@@ -93,21 +87,9 @@ function analyzeLocally(manager: ThoughtChainManager, prompt: string): void {
     '将复杂问题分解为可管理的部分'
   );
 
-  manager.addNode(
-    chain.id,
-    chain.root.id,
-    'task',
-    '生成具体任务列表',
-    '创建可执行的任务项'
-  );
+  manager.addNode(chain.id, chain.root.id, 'task', '生成具体任务列表', '创建可执行的任务项');
 
-  manager.addNode(
-    chain.id,
-    chain.root.id,
-    'synthesis',
-    '分析完成',
-    '输出分析结果'
-  );
+  manager.addNode(chain.id, chain.root.id, 'synthesis', '分析完成', '输出分析结果');
 }
 
 /**
@@ -119,7 +101,7 @@ async function analyzeWithAI(
   _preferredModel?: string
 ): Promise<void> {
   analyzeLocally(manager, prompt);
-  
+
   console.log(chalk.gray('(AI 分析模块待完善...)'));
 }
 
@@ -139,7 +121,7 @@ program
     }
 
     console.log(chalk.bold('\n📜 分析历史:\n'));
-    
+
     chains.forEach((chain, index) => {
       const date = new Date(chain.createdAt).toLocaleString();
       const input = chain.input.substring(0, 50);
@@ -159,7 +141,7 @@ program
   .option('-f, --format <format>', '格式 (mermaid|mindmap)', 'mermaid')
   .action((chainId: string | undefined, options) => {
     const manager = getManager();
-    
+
     let targetChain;
     if (chainId) {
       targetChain = manager.getChain(chainId);

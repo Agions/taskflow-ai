@@ -10,13 +10,13 @@ export class GitHubWorkflowGenerator {
       name: config.name,
       on: this.generateTriggers(config.triggers),
       permissions: this.generatePermissions(config.permissions),
-      jobs: {}
+      jobs: {},
     };
 
     if (config.concurrency) {
       workflow.concurrency = {
         group: config.concurrency.group,
-        'cancel-in-progress': config.concurrency.cancelInProgress
+        'cancel-in-progress': config.concurrency.cancelInProgress,
       };
     }
 
@@ -38,18 +38,18 @@ export class GitHubWorkflowGenerator {
       if (trigger.type === 'push') {
         result.push = {
           branches: trigger.branches || ['main'],
-          paths: trigger.paths
+          paths: trigger.paths,
         };
       } else if (trigger.type === 'pull_request') {
         result.pull_request = {
           branches: trigger.branches || ['main'],
-          types: trigger.types || ['opened', 'synchronize', 'reopened']
+          types: trigger.types || ['opened', 'synchronize', 'reopened'],
         };
       } else if (trigger.type === 'schedule') {
         result.schedule = [{ cron: trigger.cron }];
       } else if (trigger.type === 'workflow_dispatch') {
         result.workflow_dispatch = {
-          inputs: trigger.inputs
+          inputs: trigger.inputs,
         };
       }
     }
@@ -62,7 +62,7 @@ export class GitHubWorkflowGenerator {
       return {
         contents: 'read',
         actions: 'read',
-        checks: 'write'
+        checks: 'write',
       };
     }
     return permissions;
@@ -72,7 +72,7 @@ export class GitHubWorkflowGenerator {
     const job: any = {
       name: stage.name,
       'runs-on': stage.runsOn || 'ubuntu-latest',
-      steps: []
+      steps: [],
     };
 
     if (stage.needs) {

@@ -16,7 +16,7 @@ interface ListOptions {
  */
 export async function executeList(options: ListOptions): Promise<void> {
   const workflowDir = path.resolve(options.dir);
-  
+
   if (!(await fs.pathExists(workflowDir))) {
     console.log(chalk.yellow('工作流目录不存在'));
     return;
@@ -31,14 +31,14 @@ export async function executeList(options: ListOptions): Promise<void> {
   }
 
   console.log(chalk.bold('\n📋 工作流列表:\n'));
-  
+
   for (const file of workflows) {
     const filePath = path.join(workflowDir, file);
     try {
       const content = await fs.readFile(filePath, 'utf-8');
       const format = file.endsWith('.yaml') ? 'yaml' : 'json';
       const workflow = getParser().parse(content, format as any);
-      
+
       console.log(`  ${chalk.cyan(workflow.name)} (v${workflow.version})`);
       console.log(`    文件: ${file}`);
       console.log(`    步骤: ${workflow.steps.length}`);

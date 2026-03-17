@@ -17,7 +17,7 @@ export class GitHubConfigValidator {
     return {
       valid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
@@ -26,7 +26,7 @@ export class GitHubConfigValidator {
       errors.push({
         field: 'triggers',
         message: 'At least one trigger is required',
-        code: 'MISSING_TRIGGERS'
+        code: 'MISSING_TRIGGERS',
       });
     }
   }
@@ -36,7 +36,7 @@ export class GitHubConfigValidator {
       errors.push({
         field: 'stages',
         message: 'At least one stage is required',
-        code: 'MISSING_STAGES'
+        code: 'MISSING_STAGES',
       });
     }
   }
@@ -47,7 +47,7 @@ export class GitHubConfigValidator {
         errors.push({
           field: `secrets.${secret}`,
           message: 'Secret names must be uppercase with underscores',
-          code: 'INVALID_SECRET_NAME'
+          code: 'INVALID_SECRET_NAME',
         });
       }
     }
@@ -58,7 +58,7 @@ export class GitHubConfigValidator {
       warnings.push({
         field: 'env.GITHUB_TOKEN',
         message: 'GITHUB_TOKEN not set, some features may not work',
-        code: 'MISSING_TOKEN'
+        code: 'MISSING_TOKEN',
       });
     }
   }

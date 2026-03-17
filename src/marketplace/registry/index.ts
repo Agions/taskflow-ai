@@ -37,7 +37,7 @@ export class RegistryManager {
       name: 'taskflow-official',
       url: 'https://registry.taskflow.ai',
       type: 'npm',
-      packages: []
+      packages: [],
     });
 
     await this.cache.load();
@@ -83,7 +83,9 @@ export class RegistryManager {
     return this.fetcher.getLatestVersion(name);
   }
 
-  async checkUpdates(installedPackages: string[]): Promise<Array<{ name: string; current: string; latest: string }>> {
+  async checkUpdates(
+    installedPackages: string[]
+  ): Promise<Array<{ name: string; current: string; latest: string }>> {
     return this.fetcher.checkUpdates(installedPackages);
   }
 

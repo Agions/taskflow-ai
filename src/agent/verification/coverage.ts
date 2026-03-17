@@ -19,7 +19,7 @@ export class CoverageChecker {
           passed: true,
           message: `Test coverage: ${report.overall.toFixed(1)}%`,
           severity: 'info',
-          details: report
+          details: report,
         };
       }
 
@@ -28,14 +28,14 @@ export class CoverageChecker {
         passed: false,
         message: `Test coverage too low: ${report.overall.toFixed(1)}% (minimum: 70%)`,
         severity: 'warning',
-        details: report
+        details: report,
       };
     } catch (error) {
       return {
         name: 'Test Coverage',
         passed: false,
         message: `Failed to check test coverage: ${error}`,
-        severity: 'error'
+        severity: 'error',
       };
     }
   }
@@ -59,7 +59,7 @@ export class CoverageChecker {
                 statements: (data as any).statements?.pct || 0,
                 branches: (data as any).branches?.pct || 0,
                 functions: (data as any).functions?.pct || 0,
-                lines: (data as any).lines?.pct || 0
+                lines: (data as any).lines?.pct || 0,
               });
             }
           }

@@ -46,12 +46,16 @@ function generateHTMLReport(charts: any[], options: any): string {
 </head>
 <body>
   <h1>TaskFlow 可视化报告</h1>
-  ${charts.map(chart => `
+  ${charts
+    .map(
+      chart => `
     <div class="chart">
       <h2>${chart.title}</h2>
       <p>类型: ${chart.type}</p>
     </div>
-  `).join('')}
+  `
+    )
+    .join('')}
 </body>
 </html>`;
 }
@@ -60,8 +64,12 @@ function generateSVGReport(charts: any[], options: any): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">
   <text x="400" y="30" text-anchor="middle" font-size="20">TaskFlow Report</text>
-  ${charts.map((chart, i) => `
+  ${charts
+    .map(
+      (chart, i) => `
     <text x="50" y="${80 + i * 50}" font-size="16">${chart.title}</text>
-  `).join('')}
+  `
+    )
+    .join('')}
 </svg>`;
 }

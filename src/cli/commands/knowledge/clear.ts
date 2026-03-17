@@ -37,7 +37,6 @@ export async function executeClear(options: ClearOptions): Promise<void> {
     await vectorStore.clear();
 
     spinner.succeed(chalk.green('Knowledge base cleared'));
-
   } catch (error) {
     spinner.fail(`Failed to clear: ${error instanceof Error ? error.message : String(error)}`);
   }

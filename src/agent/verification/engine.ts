@@ -52,7 +52,7 @@ export class VerificationEngine {
     return {
       checks,
       allPassed,
-      fixTasks: allPassed ? undefined : generateFixTasks(failedChecks)
+      fixTasks: allPassed ? undefined : generateFixTasks(failedChecks),
     };
   }
 

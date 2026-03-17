@@ -134,7 +134,7 @@ export class PluginManager {
    */
   private async loadPackageJson(pluginPath: string): Promise<any | null> {
     const packageJsonPath = path.join(pluginPath, 'package.json');
-    
+
     if (!(await fs.pathExists(packageJsonPath))) {
       return null;
     }

@@ -73,9 +73,8 @@ export class Autocomplete {
   previous(): string | null {
     if (this.filteredSuggestions.length === 0) return null;
 
-    this.selectedIndex = this.selectedIndex <= 0
-      ? this.filteredSuggestions.length - 1
-      : this.selectedIndex - 1;
+    this.selectedIndex =
+      this.selectedIndex <= 0 ? this.filteredSuggestions.length - 1 : this.selectedIndex - 1;
 
     return this.filteredSuggestions[this.selectedIndex];
   }
@@ -103,9 +102,7 @@ export class Autocomplete {
         displayText = this.highlightMatchText(suggestion, this.currentInput);
       }
 
-      const styledText = isSelected
-        ? theme.highlight(displayText)
-        : theme.info(displayText);
+      const styledText = isSelected ? theme.highlight(displayText) : theme.info(displayText);
 
       return `${prefix}${styledText}`;
     });
@@ -179,7 +176,9 @@ export class LivePreview {
       const title = this.options.title ? ` ${this.options.title} ` : '';
 
       output = [
-        theme.muted(`┌${border.slice(0, Math.floor((width - title.length) / 2))}${title}${border.slice(0, Math.ceil((width - title.length) / 2))}┐`),
+        theme.muted(
+          `┌${border.slice(0, Math.floor((width - title.length) / 2))}${title}${border.slice(0, Math.ceil((width - title.length) / 2))}┐`
+        ),
         ...truncated.map(l => theme.muted('│') + ' ' + l.padEnd(width - 1) + theme.muted('│')),
         theme.muted(`└${border}┘`),
       ].join('\n');
@@ -235,8 +234,10 @@ export class SmartHints {
     const lowerQuery = query.toLowerCase();
 
     for (const hint of this.hints.values()) {
-      if (hint.command.toLowerCase().includes(lowerQuery) ||
-          hint.description.toLowerCase().includes(lowerQuery)) {
+      if (
+        hint.command.toLowerCase().includes(lowerQuery) ||
+        hint.description.toLowerCase().includes(lowerQuery)
+      ) {
         results.push(hint);
       }
     }
@@ -318,7 +319,7 @@ export class InteractiveInput {
    */
   private setupEventHandlers(): void {
     // Tab 键自动补全
-    this.rl.on('line', (input) => {
+    this.rl.on('line', input => {
       this.currentInput = input;
       if (this.options.onSubmit) {
         this.options.onSubmit(input);
@@ -345,8 +346,8 @@ export class InteractiveInput {
    * 开始输入
    */
   async question(prompt?: string): Promise<string> {
-    return new Promise((resolve) => {
-      this.rl.question(prompt || this.options.prompt || '> ', (answer) => {
+    return new Promise(resolve => {
+      this.rl.question(prompt || this.options.prompt || '> ', answer => {
         resolve(answer);
       });
     });

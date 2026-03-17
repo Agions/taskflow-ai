@@ -30,7 +30,7 @@ export async function executeAsk(question: string, options: AskOptions): Promise
 
     const { engine } = result;
     const answerResult = await engine.answer(question, {
-      topK: parseInt(options.topK)
+      topK: parseInt(options.topK),
     });
 
     spinner.stop();
@@ -47,8 +47,11 @@ export async function executeAsk(question: string, options: AskOptions): Promise
     }
 
     console.log();
-    console.log(chalk.gray(`Confidence: ${(answerResult.confidence * 100).toFixed(1)}% | Latency: ${answerResult.latency}ms`));
-
+    console.log(
+      chalk.gray(
+        `Confidence: ${(answerResult.confidence * 100).toFixed(1)}% | Latency: ${answerResult.latency}ms`
+      )
+    );
   } catch (error) {
     spinner.fail(`Failed to get answer: ${error instanceof Error ? error.message : String(error)}`);
   }

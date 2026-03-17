@@ -31,7 +31,7 @@ export function parsePRD(content: string, filePath: string): PRDDocument {
       createdAt: new Date(),
       updatedAt: new Date(),
       version: '1.0.0',
-      tags: []
-    }
+      tags: [],
+    },
   };
 }

@@ -48,7 +48,6 @@ export async function executeValidate(options: ValidateOptions): Promise<void> {
         console.log(`  • ${warning.field}: ${warning.message}`);
       }
     }
-
   } catch (error) {
     spinner.fail(`Validation failed: ${error instanceof Error ? error.message : String(error)}`);
   }

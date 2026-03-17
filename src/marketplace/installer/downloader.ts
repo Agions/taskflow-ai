@@ -27,7 +27,9 @@ export class PackageDownloader {
       if (extractedDir) {
         const files = await fs.readdir(extractedDir);
         for (const file of files) {
-          await fs.move(path.join(extractedDir, file), path.join(targetDir, file), { overwrite: true });
+          await fs.move(path.join(extractedDir, file), path.join(targetDir, file), {
+            overwrite: true,
+          });
         }
       }
     } finally {

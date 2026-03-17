@@ -29,7 +29,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
 
   try {
     const configManager = new ConfigManager(process.cwd());
-    const projectConfig = await configManager.loadConfig() || createDefaultConfig();
+    const projectConfig = (await configManager.loadConfig()) || createDefaultConfig();
 
     spinner.succeed(`PRD loaded: ${options.prd.title}`);
 
@@ -39,7 +39,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
       autoFix: options.mode === 'autonomous',
       approvalRequired: options.mode === 'supervised' ? ['file_write', 'shell_exec'] : [],
       continueOnError: options.continueOnError,
-      timeout: options.timeout
+      timeout: options.timeout,
     };
 
     console.log(chalk.blue('\n⚙️  Agent Configuration:'));
@@ -56,19 +56,16 @@ export async function runAgent(options: RunOptions): Promise<void> {
       prd: options.prd,
       projectConfig,
       availableTools: [],
-      constraints: options.constraints
+      constraints: options.constraints,
     };
 
     const aiService = new MockAIService();
     const planningEngine = new PlanningEngine(aiService);
-    const mcpServer = new MCPServer(
-      { serverName: 'agent', version: '1.0.0' },
-      projectConfig
-    );
+    const mcpServer = new MCPServer({ serverName: 'agent', version: '1.0.0' }, projectConfig);
     const executionEngine = new ExecutionEngine(mcpServer, {
       config: agentConfig as unknown as Record<string, unknown>,
       projectPath: process.cwd(),
-      workspacePath: path.join(process.cwd(), '.taskflow', 'workspace')
+      workspacePath: path.join(process.cwd(), '.taskflow', 'workspace'),
     });
     const verificationEngine = new VerificationEngine(process.cwd());
 
@@ -84,16 +81,16 @@ export async function runAgent(options: RunOptions): Promise<void> {
 
     agent.start();
     agent.send({ type: 'START' });
-    
+
     // Wait for completion
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       agent.onStateChange((state: any) => {
         if (state === 'completed' || state === 'failed') {
           resolve();
         }
       });
     });
-    
+
     const success = (agent.getState() as any) === 'completed';
 
     if (success) {
@@ -123,18 +120,18 @@ function createDefaultConfig(): any {
       capabilities: [
         { name: 'tools', version: '1.0', description: 'Tool support', enabled: true },
         { name: 'resources', version: '1.0', description: 'Resource support', enabled: true },
-        { name: 'prompts', version: '1.0', description: 'Prompt support', enabled: true }
+        { name: 'prompts', version: '1.0', description: 'Prompt support', enabled: true },
       ],
       security: {
         authRequired: false,
         allowedOrigins: [],
         rateLimit: { enabled: true, maxRequests: 100, windowMs: 60000 },
-        sandbox: { enabled: true, timeout: 30000, memoryLimit: 512 }
+        sandbox: { enabled: true, timeout: 30000, memoryLimit: 512 },
       },
       tools: [],
-      resources: []
+      resources: [],
     },
     outputFormats: ['markdown'],
-    plugins: []
+    plugins: [],
   };
 }

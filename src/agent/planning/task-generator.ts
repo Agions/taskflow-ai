@@ -17,7 +17,7 @@ export class TaskGenerator {
     try {
       const response = await this.ai.complete(prompt, {
         temperature: 0.4,
-        maxTokens: 3000
+        maxTokens: 3000,
       });
       const taskData = this.parseTaskResponse(response);
       return this.enrichTasks(taskData, prd);
@@ -73,27 +73,29 @@ Generate tasks in JSON format:
       dependencies: data.dependencies || [],
       metadata: {
         source: prd.title,
-        tags: []
+        tags: [],
       },
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
     }));
   }
 
   private getDefaultTasks(prd: PRDDocument): Task[] {
     const now = new Date();
-    return [{
-      id: 'task-1',
-      title: `Implement ${prd.title}`,
-      description: prd.description || 'Implementation task',
-      type: 'code',
-      status: 'pending',
-      priority: 'high',
-      estimate: 4,
-      dependencies: [],
-      metadata: { source: prd.title, tags: [] },
-      createdAt: now,
-      updatedAt: now
-    }];
+    return [
+      {
+        id: 'task-1',
+        title: `Implement ${prd.title}`,
+        description: prd.description || 'Implementation task',
+        type: 'code',
+        status: 'pending',
+        priority: 'high',
+        estimate: 4,
+        dependencies: [],
+        metadata: { source: prd.title, tags: [] },
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
   }
 }

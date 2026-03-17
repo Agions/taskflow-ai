@@ -19,7 +19,7 @@ export class CodeQualityChecker {
           passed: true,
           message: `Code quality score: ${report.score}/100`,
           severity: 'info',
-          details: report
+          details: report,
         };
       }
 
@@ -28,14 +28,14 @@ export class CodeQualityChecker {
         passed: false,
         message: `Code quality score too low: ${report.score}/100 (minimum: 80)`,
         severity: 'warning',
-        details: report
+        details: report,
       };
     } catch (error) {
       return {
         name: 'Code Quality',
         passed: false,
         message: `Failed to check code quality: ${error}`,
-        severity: 'error'
+        severity: 'error',
       };
     }
   }
@@ -46,7 +46,9 @@ export class CodeQualityChecker {
 
     const srcPath = path.join(this.projectPath, 'src');
     if (await fs.pathExists(srcPath)) {
-      await this.scanDirectory(srcPath, issues, (lines) => { totalLines += lines; });
+      await this.scanDirectory(srcPath, issues, lines => {
+        totalLines += lines;
+      });
     }
 
     const baseScore = 100;
@@ -60,12 +62,16 @@ export class CodeQualityChecker {
       metrics: {
         linesOfCode: totalLines,
         complexity: Math.floor(totalLines / 100),
-        maintainability: score
-      }
+        maintainability: score,
+      },
     };
   }
 
-  private async scanDirectory(dir: string, issues: CodeIssue[], onLines: (n: number) => void): Promise<void> {
+  private async scanDirectory(
+    dir: string,
+    issues: CodeIssue[],
+    onLines: (n: number) => void
+  ): Promise<void> {
     const entries = await fs.readdir(dir, { withFileTypes: true });
 
     for (const entry of entries) {
@@ -87,7 +93,7 @@ export class CodeQualityChecker {
               line: i + 1,
               message: 'Unexpected console.log',
               severity: 'warning',
-              rule: 'no-console'
+              rule: 'no-console',
             });
           }
 
@@ -97,7 +103,7 @@ export class CodeQualityChecker {
               line: i + 1,
               message: 'TODO/FIXME found',
               severity: 'info',
-              rule: 'todo'
+              rule: 'todo',
             });
           }
         }

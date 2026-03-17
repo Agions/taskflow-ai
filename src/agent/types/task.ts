@@ -24,23 +24,12 @@ export interface Task {
 /**
  * 任务类型
  */
-export type TaskType =
-  | 'code'
-  | 'file'
-  | 'shell'
-  | 'analysis'
-  | 'design'
-  | 'test';
+export type TaskType = 'code' | 'file' | 'shell' | 'analysis' | 'design' | 'test';
 
 /**
  * 任务状态
  */
-export type TaskStatus =
-  | 'pending'
-  | 'in-progress'
-  | 'completed'
-  | 'failed'
-  | 'blocked';
+export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'failed' | 'blocked';
 
 /**
  * 任务优先级

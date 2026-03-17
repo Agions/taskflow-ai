@@ -27,20 +27,20 @@ export async function executeInit(options: InitOptions): Promise<void> {
         provider: 'openai',
         dimensions: parseInt(options.dimensions),
         maxTokens: 8192,
-        batchSize: 100
+        batchSize: 100,
       },
       vectorStore: {
         name: 'default',
         type: options.store as 'lancedb' | 'chroma' | 'pinecone' | 'weaviate' | 'qdrant',
         connection: {
           path: path.join(process.cwd(), '.taskflow', 'knowledge'),
-          collection: 'documents'
-        }
+          collection: 'documents',
+        },
       },
       chunkSize: 1000,
       chunkOverlap: 200,
       indexName: 'default',
-      autoIndex: true
+      autoIndex: true,
     };
 
     await saveConfig(config);
@@ -55,8 +55,9 @@ export async function executeInit(options: InitOptions): Promise<void> {
     console.log(chalk.blue(`\nConfiguration saved`));
     console.log(chalk.gray(`Embedding model: ${config.embeddingModel.name}`));
     console.log(chalk.gray(`Vector store: ${config.vectorStore.type}`));
-
   } catch (error) {
-    spinner.fail(`Initialization failed: ${error instanceof Error ? error.message : String(error)}`);
+    spinner.fail(
+      `Initialization failed: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }

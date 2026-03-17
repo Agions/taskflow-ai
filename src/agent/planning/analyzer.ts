@@ -17,7 +17,7 @@ export class RequirementAnalyzer {
     try {
       const response = await this.ai.complete(prompt, {
         temperature: 0.3,
-        maxTokens: 2000
+        maxTokens: 2000,
       });
       return this.parseAnalysisResponse(response);
     } catch (error) {
@@ -55,16 +55,18 @@ Provide analysis in JSON format:
 
   private getDefaultAnalysis(prd: Partial<PRDDocument>): RequirementAnalysis {
     return {
-      features: [{
-        name: prd.title || 'Main Feature',
-        description: prd.description || 'Main feature implementation',
-        complexity: 'medium',
-        priority: 'high',
-        dependencies: []
-      }],
+      features: [
+        {
+          name: prd.title || 'Main Feature',
+          description: prd.description || 'Main feature implementation',
+          complexity: 'medium',
+          priority: 'high',
+          dependencies: [],
+        },
+      ],
       risks: [],
       technicalConstraints: [],
-      complexity: 'medium'
+      complexity: 'medium',
     };
   }
 }

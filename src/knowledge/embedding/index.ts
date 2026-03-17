@@ -4,11 +4,7 @@
  */
 
 import axios from 'axios';
-import {
-  EmbeddingModel,
-  Document,
-  DocumentChunk
-} from '../types';
+import { EmbeddingModel, Document, DocumentChunk } from '../types';
 
 export class EmbeddingManager {
   private model: EmbeddingModel;
@@ -20,7 +16,7 @@ export class EmbeddingManager {
       provider: model?.provider || 'openai',
       dimensions: model?.dimensions || 1536,
       maxTokens: model?.maxTokens || 8192,
-      batchSize: model?.batchSize || 100
+      batchSize: model?.batchSize || 100,
     };
   }
 
@@ -62,9 +58,7 @@ export class EmbeddingManager {
 
     for (let i = 0; i < texts.length; i += this.model.batchSize) {
       const batch = texts.slice(i, i + this.model.batchSize);
-      const batchResults = await Promise.all(
-        batch.map(text => this.embed(text))
-      );
+      const batchResults = await Promise.all(batch.map(text => this.embed(text)));
       results.push(...batchResults);
     }
 
@@ -78,7 +72,7 @@ export class EmbeddingManager {
     const embedding = await this.embed(doc.content);
     return {
       ...doc,
-      embedding
+      embedding,
     };
   }
 
@@ -91,7 +85,7 @@ export class EmbeddingManager {
 
     return chunks.map((chunk, index) => ({
       ...chunk,
-      embedding: embeddings[index]
+      embedding: embeddings[index],
     }));
   }
 
@@ -136,14 +130,14 @@ export class EmbeddingManager {
         {
           input: text,
           model: this.model.name,
-          dimensions: this.model.dimensions
+          dimensions: this.model.dimensions,
         },
         {
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
           },
-          timeout: 30000
+          timeout: 30000,
         }
       );
 
@@ -176,10 +170,10 @@ export class EmbeddingManager {
         { inputs: text },
         {
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
           },
-          timeout: 30000
+          timeout: 30000,
         }
       );
 
@@ -216,7 +210,7 @@ export class EmbeddingManager {
     let hash = 0;
     for (let i = 0; i < text.length; i++) {
       const char = text.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return hash.toString();

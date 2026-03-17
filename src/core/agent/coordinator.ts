@@ -135,14 +135,14 @@ export class MultiAgentCoordinator {
           if (agent) {
             const exec = await agent.execute(task);
             executions.push(exec);
-            
+
             if (exec.status === 'failed') break;
           }
         }
         break;
 
       case 'parallel': {
-        const promises = agentIds.map(async (agentId) => {
+        const promises = agentIds.map(async agentId => {
           const agent = this.agents.get(agentId);
           if (agent) {
             return agent.execute(task);
@@ -170,16 +170,13 @@ export class MultiAgentCoordinator {
   /**
    * 协作任务
    */
-  async collaborate(
-    task: AgentTask,
-    agentIds: string[]
-  ): Promise<AgentExecution[]> {
+  async collaborate(task: AgentTask, agentIds: string[]): Promise<AgentExecution[]> {
     this.logger.info(`启动协作任务`);
 
     const subtasks = this.decomposeTask(task);
-    
+
     const distributions: TaskDistribution[] = [];
-    
+
     for (let i = 0; i < agentIds.length; i++) {
       const subtask = subtasks[i % subtasks.length];
       distributions.push({
@@ -190,7 +187,7 @@ export class MultiAgentCoordinator {
     }
 
     const executions: AgentExecution[] = [];
-    
+
     for (const dist of distributions) {
       const agent = this.agents.get(dist.agents[0]);
       if (agent) {
@@ -204,7 +201,7 @@ export class MultiAgentCoordinator {
     }
 
     const aggregated = this.aggregateResults(executions);
-    
+
     this.broadcast('coordinator', `任务完成: ${aggregated}`);
 
     return executions;
@@ -215,7 +212,7 @@ export class MultiAgentCoordinator {
    */
   private decomposeTask(task: AgentTask): AgentTask[] {
     const parts = task.description.split(/[;.；]/).filter(s => s.trim());
-    
+
     return parts.map((part, index) => ({
       ...task,
       id: `${task.id}-sub${index}`,

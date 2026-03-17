@@ -15,7 +15,11 @@ interface InstallOptions {
 /**
  * 执行 install 命令
  */
-export async function executeInstall(packageName: string, version: string | undefined, options: InstallOptions): Promise<void> {
+export async function executeInstall(
+  packageName: string,
+  version: string | undefined,
+  options: InstallOptions
+): Promise<void> {
   const spinner = ora(`Installing ${packageName}...`).start();
 
   try {
@@ -25,7 +29,7 @@ export async function executeInstall(packageName: string, version: string | unde
     const installer = new PackageInstaller(registryManager);
     const result = await installer.install(packageName, version, {
       global: options.global,
-      save: options.save !== false
+      save: options.save !== false,
     });
 
     if (result.success) {
@@ -47,7 +51,6 @@ export async function executeInstall(packageName: string, version: string | unde
     } else {
       spinner.fail(chalk.red(`Installation failed: ${result.error}`));
     }
-
   } catch (error) {
     spinner.fail(`Installation failed: ${error instanceof Error ? error.message : String(error)}`);
   }

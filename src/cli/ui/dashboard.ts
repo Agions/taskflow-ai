@@ -42,14 +42,14 @@ export function projectDashboard(project: ProjectStatus): void {
     active: theme.success,
     completed: theme.primary,
     paused: theme.warning,
-    error: theme.error
+    error: theme.error,
   }[project.status];
 
   const statusIcon = {
     active: '▶',
     completed: '✓',
     paused: '⏸',
-    error: '✗'
+    error: '✗',
   }[project.status];
 
   // 进度条
@@ -63,7 +63,7 @@ export function projectDashboard(project: ProjectStatus): void {
     `${theme.success('●')} ${project.tasks.completed} 完成`,
     `${theme.warning('●')} ${project.tasks.inProgress} 进行中`,
     `${theme.info('●')} ${project.tasks.pending} 待处理`,
-    `${theme.error('●')} ${project.tasks.blocked} 阻塞`
+    `${theme.error('●')} ${project.tasks.blocked} 阻塞`,
   ].join('  ');
 
   const content = [
@@ -74,17 +74,19 @@ export function projectDashboard(project: ProjectStatus): void {
     '',
     taskSummary,
     '',
-    theme.muted(`最后更新: ${project.lastUpdated}`)
+    theme.muted(`最后更新: ${project.lastUpdated}`),
   ].join('\n');
 
-  console.log(boxen(content, {
-    padding: 1,
-    margin: 1,
-    borderStyle: 'round',
-    borderColor: 'cyan',
-    title: theme.primary(' PROJECT STATUS '),
-    titleAlignment: 'center'
-  }));
+  console.log(
+    boxen(content, {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'cyan',
+      title: theme.primary(' PROJECT STATUS '),
+      titleAlignment: 'center',
+    })
+  );
 }
 
 /**
@@ -94,7 +96,9 @@ export function systemDashboard(system: SystemStatus): void {
   const memoryPercent = Math.round((system.memory.used / system.memory.total) * 100);
   const memoryBarWidth = 20;
   const memoryFilled = Math.round((memoryPercent / 100) * memoryBarWidth);
-  const memoryBar = theme.warning('█'.repeat(memoryFilled)) + theme.muted('░'.repeat(memoryBarWidth - memoryFilled));
+  const memoryBar =
+    theme.warning('█'.repeat(memoryFilled)) +
+    theme.muted('░'.repeat(memoryBarWidth - memoryFilled));
 
   const content = [
     `Node.js: ${theme.info(system.nodeVersion)}`,
@@ -103,29 +107,33 @@ export function systemDashboard(system: SystemStatus): void {
     `内存: [${memoryBar}] ${memoryPercent}%`,
     `      ${theme.muted(`${system.memory.used}MB / ${system.memory.total}MB`)}`,
     '',
-    `运行时间: ${theme.info(system.uptime)}`
+    `运行时间: ${theme.info(system.uptime)}`,
   ].join('\n');
 
-  console.log(boxen(content, {
-    padding: 1,
-    margin: 1,
-    borderStyle: 'round',
-    borderColor: 'blue',
-    title: theme.secondary(' SYSTEM INFO '),
-    titleAlignment: 'center'
-  }));
+  console.log(
+    boxen(content, {
+      padding: 1,
+      margin: 1,
+      borderStyle: 'round',
+      borderColor: 'blue',
+      title: theme.secondary(' SYSTEM INFO '),
+      titleAlignment: 'center',
+    })
+  );
 }
 
 /**
  * 显示任务列表
  */
-export function taskList(tasks: Array<{
-  id: string;
-  name: string;
-  status: 'completed' | 'in-progress' | 'pending' | 'blocked';
-  priority: 'high' | 'medium' | 'low';
-  assignee?: string;
-}>): void {
+export function taskList(
+  tasks: Array<{
+    id: string;
+    name: string;
+    status: 'completed' | 'in-progress' | 'pending' | 'blocked';
+    priority: 'high' | 'medium' | 'low';
+    assignee?: string;
+  }>
+): void {
   if (tasks.length === 0) {
     console.log(theme.muted('暂无任务'));
     return;
@@ -139,13 +147,13 @@ export function taskList(tasks: Array<{
       completed: theme.success('✓'),
       'in-progress': theme.warning('◐'),
       pending: theme.muted('○'),
-      blocked: theme.error('✗')
+      blocked: theme.error('✗'),
     }[task.status];
 
     const priorityColor = {
       high: theme.error,
       medium: theme.warning,
-      low: theme.info
+      low: theme.info,
     }[task.priority];
 
     const priorityTag = priorityColor(`[${task.priority.toUpperCase()}]`);
@@ -160,11 +168,13 @@ export function taskList(tasks: Array<{
 /**
  * 显示时间线
  */
-export function timeline(events: Array<{
-  time: string;
-  event: string;
-  status: 'success' | 'info' | 'warning' | 'error';
-}>): void {
+export function timeline(
+  events: Array<{
+    time: string;
+    event: string;
+    status: 'success' | 'info' | 'warning' | 'error';
+  }>
+): void {
   console.log('\n' + theme.highlight('◆ 最近活动'));
   console.log(theme.muted('─'.repeat(60)));
 
@@ -177,14 +187,14 @@ export function timeline(events: Array<{
       success: theme.success,
       info: theme.info,
       warning: theme.warning,
-      error: theme.error
+      error: theme.error,
     }[event.status];
 
     const icon = {
       success: '✓',
       info: 'ℹ',
       warning: '⚠',
-      error: '✗'
+      error: '✗',
     }[event.status];
 
     console.log(`  ${theme.muted(connector)} ${statusColor(icon)} ${theme.info(event.event)}`);
@@ -197,18 +207,21 @@ export function timeline(events: Array<{
 /**
  * 显示统计卡片
  */
-export function statCards(stats: Array<{
-  label: string;
-  value: string | number;
-  change?: number;
-  unit?: string;
-}>): void {
+export function statCards(
+  stats: Array<{
+    label: string;
+    value: string | number;
+    change?: number;
+    unit?: string;
+  }>
+): void {
   const cards = stats.map(stat => {
-    const changeStr = stat.change !== undefined
-      ? stat.change >= 0
-        ? theme.success(`+${stat.change}${stat.unit || ''}`)
-        : theme.error(`${stat.change}${stat.unit || ''}`)
-      : '';
+    const changeStr =
+      stat.change !== undefined
+        ? stat.change >= 0
+          ? theme.success(`+${stat.change}${stat.unit || ''}`)
+          : theme.error(`${stat.change}${stat.unit || ''}`)
+        : '';
 
     return boxen(
       `${theme.muted(stat.label)}\n${theme.highlight(String(stat.value))} ${changeStr}`,
@@ -216,7 +229,7 @@ export function statCards(stats: Array<{
         padding: { left: 2, right: 2, top: 1, bottom: 1 },
         borderStyle: 'round',
         borderColor: 'gray',
-        dimBorder: true
+        dimBorder: true,
       }
     );
   });
@@ -232,7 +245,7 @@ export const dashboard = {
   system: systemDashboard,
   tasks: taskList,
   timeline,
-  stats: statCards
+  stats: statCards,
 };
 
 export default dashboard;

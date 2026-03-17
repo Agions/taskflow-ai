@@ -7,8 +7,11 @@ import { spawn } from 'child_process';
 import * as vm from 'vm';
 
 // JavaScript 沙箱执行
-async function executeJavaScript(code: string, timeout: number = 5000): Promise<{ output: string; error?: string }> {
-  return new Promise((resolve) => {
+async function executeJavaScript(
+  code: string,
+  timeout: number = 5000
+): Promise<{ output: string; error?: string }> {
+  return new Promise(resolve => {
     const timeoutId = setTimeout(() => {
       resolve({ output: '', error: 'Execution timeout' });
     }, timeout);
@@ -43,9 +46,9 @@ async function executeJavaScript(code: string, timeout: number = 5000): Promise<
 
       vm.createContext(context);
       const outputs: string[] = [];
-      
+
       const result = vm.runInContext(code, context, { timeout });
-      
+
       if (result !== undefined) {
         outputs.push(String(result));
       }
@@ -60,17 +63,24 @@ async function executeJavaScript(code: string, timeout: number = 5000): Promise<
 }
 
 // Python 执行
-async function executePython(code: string, timeout: number = 30000): Promise<{ output: string; error?: string }> {
-  return new Promise((resolve) => {
+async function executePython(
+  code: string,
+  timeout: number = 30000
+): Promise<{ output: string; error?: string }> {
+  return new Promise(resolve => {
     const child = spawn('python3', ['-c', code]);
 
     let stdout = '';
     let stderr = '';
 
-    child.stdout?.on('data', (data: Buffer) => { stdout += data.toString(); });
-    child.stderr?.on('data', (data: Buffer) => { stderr += data.toString(); });
+    child.stdout?.on('data', (data: Buffer) => {
+      stdout += data.toString();
+    });
+    child.stderr?.on('data', (data: Buffer) => {
+      stderr += data.toString();
+    });
 
-    child.on('close', (code) => {
+    child.on('close', code => {
       if (code === 0) {
         resolve({ output: stdout });
       } else {
@@ -78,7 +88,7 @@ async function executePython(code: string, timeout: number = 30000): Promise<{ o
       }
     });
 
-    child.on('error', (error) => {
+    child.on('error', error => {
       resolve({ output: '', error: error.message });
     });
 
@@ -90,17 +100,24 @@ async function executePython(code: string, timeout: number = 30000): Promise<{ o
 }
 
 // Node.js 执行 (子进程)
-async function executeNode(code: string, timeout: number = 30000): Promise<{ output: string; error?: string }> {
-  return new Promise((resolve) => {
+async function executeNode(
+  code: string,
+  timeout: number = 30000
+): Promise<{ output: string; error?: string }> {
+  return new Promise(resolve => {
     const child = spawn('node', ['-e', code]);
 
     let stdout = '';
     let stderr = '';
 
-    child.stdout?.on('data', (data: Buffer) => { stdout += data.toString(); });
-    child.stderr?.on('data', (data: Buffer) => { stderr += data.toString(); });
+    child.stdout?.on('data', (data: Buffer) => {
+      stdout += data.toString();
+    });
+    child.stderr?.on('data', (data: Buffer) => {
+      stderr += data.toString();
+    });
 
-    child.on('close', (code) => {
+    child.on('close', code => {
       if (code === 0) {
         resolve({ output: stdout });
       } else {
@@ -108,7 +125,7 @@ async function executeNode(code: string, timeout: number = 30000): Promise<{ out
       }
     });
 
-    child.on('error', (error) => {
+    child.on('error', error => {
       resolve({ output: '', error: error.message });
     });
 
@@ -127,18 +144,18 @@ export const codeTools: ToolDefinition[] = [
       type: 'object',
       properties: {
         code: { type: 'string', description: '要执行的代码' },
-        language: { 
-          type: 'string', 
+        language: {
+          type: 'string',
           description: '语言: javascript, python, node',
-          enum: ['javascript', 'python', 'node', 'js']
+          enum: ['javascript', 'python', 'node', 'js'],
         },
         timeout: { type: 'number', description: '超时时间(毫秒)', default: 5000 },
       },
       required: ['code', 'language'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const code = input.code as string;
-      const language = (input.language as string || 'javascript').toLowerCase();
+      const language = ((input.language as string) || 'javascript').toLowerCase();
       const timeout = (input.timeout as number) || 5000;
 
       let result: { output: string; error?: string };
@@ -180,7 +197,7 @@ export const codeTools: ToolDefinition[] = [
       },
       required: ['code'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const code = input.code as string;
       const timeout = (input.timeout as number) || 3000;
 
@@ -207,7 +224,7 @@ export const codeTools: ToolDefinition[] = [
       },
       required: ['code'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const code = input.code as string;
       const timeout = (input.timeout as number) || 10000;
 
@@ -230,17 +247,17 @@ export const codeTools: ToolDefinition[] = [
       type: 'object',
       properties: {
         code: { type: 'string', description: '要测试的代码' },
-        language: { 
-          type: 'string', 
+        language: {
+          type: 'string',
           description: '语言',
-          enum: ['javascript', 'python', 'node']
+          enum: ['javascript', 'python', 'node'],
         },
       },
       required: ['code', 'language'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const code = input.code as string;
-      const language = (input.language as string || 'javascript').toLowerCase();
+      const language = ((input.language as string) || 'javascript').toLowerCase();
 
       let available = false;
       let error: string | undefined;

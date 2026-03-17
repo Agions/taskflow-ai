@@ -34,7 +34,6 @@ export async function executeTrigger(options: TriggerOptions): Promise<void> {
     const runId = 'pending';
 
     spinner.succeed(chalk.green(`Pipeline triggered: ${runId}`));
-
   } catch (error) {
     spinner.fail(`Failed to trigger: ${error instanceof Error ? error.message : String(error)}`);
   }

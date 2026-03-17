@@ -22,12 +22,12 @@ export const filesystemTools: ToolDefinition[] = [
       },
       required: ['path'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const path = await import('path');
       const fs = await import('fs/promises');
       const fullPath = path.resolve(input.path as string);
       const entries = await fs.readdir(fullPath, { withFileTypes: true });
-      const result = entries.map((entry) => ({
+      const result = entries.map(entry => ({
         name: entry.name,
         isDirectory: entry.isDirectory(),
         isFile: entry.isFile(),
@@ -55,7 +55,7 @@ export const filesystemTools: ToolDefinition[] = [
       },
       required: ['path'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const path = await import('path');
       const fs = await import('fs/promises');
       const fullPath = path.resolve(input.path as string);
@@ -83,14 +83,14 @@ export const filesystemTools: ToolDefinition[] = [
       },
       required: ['path'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const path = await import('path');
       const fs = await import('fs/promises');
       const fullPath = path.resolve(input.path as string);
       const options = (input.options as object) || {};
-      await fs.rm(fullPath, { 
+      await fs.rm(fullPath, {
         recursive: (options as any)?.recursive ?? false,
-        force: (options as any)?.force ?? false 
+        force: (options as any)?.force ?? false,
       });
       return { success: true, path: fullPath };
     },
@@ -115,16 +115,16 @@ export const filesystemTools: ToolDefinition[] = [
       },
       required: ['src', 'dest'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const path = await import('path');
       const fs = await import('fs/promises');
       const srcPath = path.resolve(input.src as string);
       const destPath = path.resolve(input.dest as string);
       const options = (input.options as object) || {};
-      
+
       const srcStat = await fs.stat(srcPath);
       if (srcStat.isDirectory()) {
-        await fs.cp(srcPath, destPath, { 
+        await fs.cp(srcPath, destPath, {
           recursive: (options as any)?.recursive ?? true,
         });
       } else {
@@ -155,7 +155,7 @@ export const filesystemTools: ToolDefinition[] = [
       },
       required: ['src', 'dest'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const path = await import('path');
       const fs = await import('fs/promises');
       const srcPath = path.resolve(input.src as string);
@@ -176,7 +176,7 @@ export const filesystemTools: ToolDefinition[] = [
       },
       required: ['path'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const path = await import('path');
       const fs = await import('fs/promises');
       const fullPath = path.resolve(input.path as string);
@@ -206,7 +206,7 @@ export const filesystemTools: ToolDefinition[] = [
       },
       required: ['path'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const path = await import('path');
       const fs = await import('fs/promises');
       const fullPath = path.resolve(input.path as string);
@@ -230,7 +230,7 @@ export const filesystemTools: ToolDefinition[] = [
       },
       required: ['path'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const path = await import('path');
       const fs = await import('fs/promises');
       const fullPath = path.resolve(input.path as string);
@@ -258,7 +258,7 @@ export const filesystemTools: ToolDefinition[] = [
       },
       required: ['path', 'data'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const path = await import('path');
       const fs = await import('fs/promises');
       const fullPath = path.resolve(input.path as string);
@@ -288,39 +288,39 @@ export const filesystemTools: ToolDefinition[] = [
       },
       required: ['pattern'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const path = await import('path');
       const fs = await import('fs/promises');
       const options = (input.options as object) || {};
       const cwd = (options as any)?.cwd || process.cwd();
       const absolute = (options as any)?.absolute ?? true;
-      
+
       // 简单的 glob 实现
       const pattern = input.pattern as string;
       const baseDir = path.resolve(cwd);
-      
+
       // 解析 pattern
       const regexPattern = pattern
         .replace(/\*\*/g, '{{GLOBSTAR}}')
         .replace(/\*/g, '[^/]*')
         .replace(/\{\{GLOBSTAR\}\}/g, '.*')
         .replace(/\?/g, '[^/]');
-      
+
       const regex = new RegExp(`^${regexPattern}$`);
-      
+
       const matches: string[] = [];
-      
+
       async function walk(dir: string): Promise<void> {
         try {
           const entries = await fs.readdir(dir, { withFileTypes: true });
           for (const entry of entries) {
             const fullPath = path.join(dir, entry.name);
             const relativePath = path.relative(baseDir, fullPath);
-            
+
             if (regex.test(relativePath) || regex.test(entry.name)) {
               matches.push(absolute ? fullPath : relativePath);
             }
-            
+
             if (entry.isDirectory()) {
               await walk(fullPath);
             }
@@ -329,9 +329,9 @@ export const filesystemTools: ToolDefinition[] = [
           // 忽略权限错误
         }
       }
-      
+
       await walk(baseDir);
-      
+
       return { pattern: input.pattern, matches, count: matches.length };
     },
     category: 'filesystem',

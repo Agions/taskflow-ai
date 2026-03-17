@@ -2,7 +2,12 @@
  * DeepSeek 适配器
  */
 
-import { BaseAdapter, ChatCompletionOptions, ChatCompletionResponse, StreamChunk } from '../adapter';
+import {
+  BaseAdapter,
+  ChatCompletionOptions,
+  ChatCompletionResponse,
+  StreamChunk,
+} from '../adapter';
 import { ModelConfig, PROVIDER_ENDPOINTS } from '../types';
 
 export class DeepSeekAdapter extends BaseAdapter {
@@ -44,13 +49,14 @@ export class DeepSeekAdapter extends BaseAdapter {
     return {
       id: response.id,
       model: response.model,
-      choices: response.choices.map((choice) => ({
+      choices: response.choices.map(choice => ({
         index: choice.index,
         message: {
           role: choice.message.role as 'assistant',
           content: choice.message.content,
         },
-        finish_reason: choice.finish_reason as ChatCompletionResponse['choices'][0]['finish_reason'],
+        finish_reason:
+          choice.finish_reason as ChatCompletionResponse['choices'][0]['finish_reason'],
       })),
       usage: response.usage,
       created: response.created,
@@ -91,7 +97,7 @@ export class DeepSeekAdapter extends BaseAdapter {
       for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed || !trimmed.startsWith('data: ')) continue;
-        
+
         if (trimmed === 'data: [DONE]') return;
 
         try {
@@ -104,8 +110,7 @@ export class DeepSeekAdapter extends BaseAdapter {
               finish_reason: choice.finish_reason,
             })),
           };
-        } catch {
-        }
+        } catch {}
       }
     }
   }

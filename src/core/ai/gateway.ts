@@ -78,15 +78,16 @@ export class ModelGateway {
   /** 添加模型 */
   addModel(config: ModelConfig): void {
     this.models.set(config.id, config);
-    
+
     const adapter = this.createAdapter(config);
     if (adapter) {
       this.adapters.set(config.id, adapter);
     }
 
     if (config.enabled) {
-      this.enabledModels = [...this.enabledModels.filter(m => m.id !== config.id), config]
-        .sort((a, b) => a.priority - b.priority);
+      this.enabledModels = [...this.enabledModels.filter(m => m.id !== config.id), config].sort(
+        (a, b) => a.priority - b.priority
+      );
     }
   }
 
@@ -103,8 +104,9 @@ export class ModelGateway {
     if (config) {
       config.enabled = enabled;
       if (enabled) {
-        this.enabledModels = [...this.enabledModels.filter(m => m.id !== modelId), config]
-          .sort((a, b) => a.priority - b.priority);
+        this.enabledModels = [...this.enabledModels.filter(m => m.id !== modelId), config].sort(
+          (a, b) => a.priority - b.priority
+        );
       } else {
         this.enabledModels = this.enabledModels.filter(m => m.id !== modelId);
       }
@@ -167,10 +169,7 @@ export class ModelGateway {
     };
 
     if (request.systemPrompt) {
-      options.messages = [
-        { role: 'system', content: request.systemPrompt },
-        ...options.messages,
-      ];
+      options.messages = [{ role: 'system', content: request.systemPrompt }, ...options.messages];
     }
 
     let lastError: Error | null = null;
@@ -179,7 +178,7 @@ export class ModelGateway {
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       try {
         const response = await adapter.complete(options);
-        
+
         const cost = adapter.estimateCost(
           response.usage?.prompt_tokens || 0,
           response.usage?.completion_tokens || 0
@@ -194,10 +193,10 @@ export class ModelGateway {
         };
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        
+
         if (attempt < this.maxRetries && this.enableFallback) {
           await this.sleep(this.retryDelay * (attempt + 1));
-          
+
           const fallbackModels = this.enabledModels.filter(m => m.priority > model.priority);
           if (fallbackModels.length > 0) {
             const newModel = fallbackModels[0];
@@ -235,18 +234,18 @@ export class ModelGateway {
     };
 
     if (request.systemPrompt) {
-      options.messages = [
-        { role: 'system', content: request.systemPrompt },
-        ...options.messages,
-      ];
+      options.messages = [{ role: 'system', content: request.systemPrompt }, ...options.messages];
     }
 
     yield* adapter.stream(options as Omit<ChatCompletionOptions, 'model'> & { stream: true });
   }
 
   /** 测试所有模型连接 */
-  async testAll(): Promise<Array<{ modelId: string; success: boolean; latency: number; error?: string }>> {
-    const results: Array<{ modelId: string; success: boolean; latency: number; error?: string }> = [];
+  async testAll(): Promise<
+    Array<{ modelId: string; success: boolean; latency: number; error?: string }>
+  > {
+    const results: Array<{ modelId: string; success: boolean; latency: number; error?: string }> =
+      [];
 
     for (const [modelId, adapter] of this.adapters) {
       const result = await adapter.test();
@@ -263,7 +262,7 @@ export class ModelGateway {
   getModelInfo(modelId: string) {
     const config = this.models.get(modelId);
     const registry = MODEL_REGISTRY[modelId];
-    
+
     return {
       ...config,
       ...registry,

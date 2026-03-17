@@ -3,7 +3,14 @@
  * CI/CD 流水线集成实现
  */
 
-import { CIProvider, PipelineConfig, GitHubActionsConfig, ValidationResult, WorkflowTemplate, BuildReport } from '../types';
+import {
+  CIProvider,
+  PipelineConfig,
+  GitHubActionsConfig,
+  ValidationResult,
+  WorkflowTemplate,
+  BuildReport,
+} from '../types';
 import { GitHubConfigValidator } from './validator';
 import { GitHubWorkflowGenerator } from './workflow-generator';
 import { GitHubApiClient } from './api-client';
@@ -46,7 +53,11 @@ export class GitHubActionsIntegration {
     await this.fileManager.writeWorkflow(name, content);
   }
 
-  async triggerPipeline(workflowId: string, ref: string, inputs?: Record<string, string>): Promise<void> {
+  async triggerPipeline(
+    workflowId: string,
+    ref: string,
+    inputs?: Record<string, string>
+  ): Promise<void> {
     await this.apiClient.triggerWorkflow(workflowId, ref, inputs);
   }
 

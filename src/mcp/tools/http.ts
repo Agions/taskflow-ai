@@ -12,28 +12,28 @@ export const httpTools: ToolDefinition[] = [
       type: 'object',
       properties: {
         url: { type: 'string', description: '请求 URL' },
-        method: { 
-          type: 'string', 
+        method: {
+          type: 'string',
           description: 'HTTP 方法',
           enum: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
         },
-        headers: { 
-          type: 'object', 
+        headers: {
+          type: 'object',
           description: '请求头',
           additionalProperties: { type: 'string' },
         },
-        body: { 
-          type: 'object', 
-          description: '请求体 (JSON)' 
+        body: {
+          type: 'object',
+          description: '请求体 (JSON)',
         },
         query: {
           type: 'object',
           description: 'URL 查询参数',
           additionalProperties: { type: 'string' },
         },
-        timeout: { 
-          type: 'number', 
-          description: '超时时间 (毫秒)' 
+        timeout: {
+          type: 'number',
+          description: '超时时间 (毫秒)',
         },
         followRedirects: {
           type: 'boolean',
@@ -42,9 +42,9 @@ export const httpTools: ToolDefinition[] = [
       },
       required: ['url'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const urlObj = new URL(input.url as string);
-      
+
       // 添加查询参数
       if (input.query) {
         Object.entries(input.query as Record<string, string>).forEach(([key, value]) => {
@@ -58,7 +58,10 @@ export const httpTools: ToolDefinition[] = [
       };
 
       // 添加请求体
-      if (input.body && !['GET', 'HEAD'].includes((input.method as string)?.toUpperCase() || 'GET')) {
+      if (
+        input.body &&
+        !['GET', 'HEAD'].includes((input.method as string)?.toUpperCase() || 'GET')
+      ) {
         options.body = JSON.stringify(input.body);
         const headers = options.headers as Record<string, string>;
         if (!headers['Content-Type']) {
@@ -84,7 +87,7 @@ export const httpTools: ToolDefinition[] = [
         // 解析响应体
         let data: unknown;
         const contentType = response.headers.get('content-type') || '';
-        
+
         if (contentType.includes('application/json')) {
           try {
             data = await response.json();
@@ -128,19 +131,19 @@ export const httpTools: ToolDefinition[] = [
           description: 'URL 查询参数',
           additionalProperties: { type: 'string' },
         },
-        headers: { 
-          type: 'object', 
+        headers: {
+          type: 'object',
           description: '请求头',
           additionalProperties: { type: 'string' },
         },
-        timeout: { 
-          type: 'number', 
-          description: '超时时间 (毫秒)' 
+        timeout: {
+          type: 'number',
+          description: '超时时间 (毫秒)',
         },
       },
       required: ['url'],
     },
-    handler: async (input) => {
+    handler: async input => {
       // 复用 http_request 的逻辑
       const httpRequestTool = httpTools.find(t => t.name === 'http_request');
       return httpRequestTool?.handler({
@@ -158,28 +161,28 @@ export const httpTools: ToolDefinition[] = [
       type: 'object',
       properties: {
         url: { type: 'string', description: '请求 URL' },
-        body: { 
-          type: 'object', 
-          description: '请求体 (JSON)' 
+        body: {
+          type: 'object',
+          description: '请求体 (JSON)',
         },
         query: {
           type: 'object',
           description: 'URL 查询参数',
           additionalProperties: { type: 'string' },
         },
-        headers: { 
-          type: 'object', 
+        headers: {
+          type: 'object',
           description: '请求头',
           additionalProperties: { type: 'string' },
         },
-        timeout: { 
-          type: 'number', 
-          description: '超时时间 (毫秒)' 
+        timeout: {
+          type: 'number',
+          description: '超时时间 (毫秒)',
         },
       },
       required: ['url', 'body'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const httpRequestTool = httpTools.find(t => t.name === 'http_request');
       return httpRequestTool?.handler({
         ...input,
@@ -197,17 +200,17 @@ export const httpTools: ToolDefinition[] = [
       properties: {
         url: { type: 'string', description: '文件 URL' },
         path: { type: 'string', description: '保存路径' },
-        timeout: { 
-          type: 'number', 
-          description: '超时时间 (毫秒)' 
+        timeout: {
+          type: 'number',
+          description: '超时时间 (毫秒)',
         },
       },
       required: ['url', 'path'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const path = await import('path');
       const fs = await import('fs/promises');
-      
+
       const response = await fetch(input.url as string);
       if (!response.ok) {
         throw new Error(`下载失败: ${response.status} ${response.statusText}`);
@@ -215,15 +218,15 @@ export const httpTools: ToolDefinition[] = [
 
       const arrayBuffer = await response.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      
+
       const fullPath = path.resolve(input.path as string);
-      
+
       // 确保目录存在
       const dir = path.dirname(fullPath);
       await fs.mkdir(dir, { recursive: true });
-      
+
       await fs.writeFile(fullPath, buffer);
-      
+
       return {
         success: true,
         path: fullPath,

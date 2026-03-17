@@ -32,7 +32,9 @@ export async function executeReport(runId: string): Promise<void> {
 
     console.log(chalk.blue('\nBuild Report\n'));
     console.log(`Status: ${report.status.toUpperCase()}`);
-    console.log(`Stages: ${report.summary.successfulStages}/${report.summary.totalStages} successful`);
+    console.log(
+      `Stages: ${report.summary.successfulStages}/${report.summary.totalStages} successful`
+    );
     console.log(`Duration: ${(report.summary.totalDuration / 1000).toFixed(1)}s`);
 
     if (report.stages.length > 0) {
@@ -44,7 +46,6 @@ export async function executeReport(runId: string): Promise<void> {
     }
 
     console.log();
-
   } catch (error) {
     spinner.fail(`Failed to get report: ${error instanceof Error ? error.message : String(error)}`);
   }

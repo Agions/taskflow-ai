@@ -17,7 +17,7 @@ export const fileTools: ToolDefinition[] = [
       },
       required: ['path'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const fs = await import('fs/promises');
       const path = await import('path');
       const content = await fs.readFile(input.path as string, 'utf-8');
@@ -45,7 +45,7 @@ export const fileTools: ToolDefinition[] = [
       },
       required: ['path', 'content'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const fs = await import('fs/promises');
       const path = await import('path');
       const mode = (input.mode as string) || 'write';
@@ -72,7 +72,7 @@ export const fileTools: ToolDefinition[] = [
       },
       required: ['path', 'oldText', 'newText'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const fs = await import('fs/promises');
       const path = await import('path');
       const fullPath = path.resolve(input.path as string);
@@ -104,7 +104,7 @@ export const shellTools: ToolDefinition[] = [
       },
       required: ['command'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const { execSync } = await import('child_process');
       const result = execSync(input.command as string, {
         cwd: (input.cwd as string) || process.cwd(),
@@ -131,7 +131,7 @@ export const taskTools: ToolDefinition[] = [
       },
       required: ['title'],
     },
-    handler: async (input) => {
+    handler: async input => {
       return {
         id: `task-${Date.now()}`,
         title: input.title,
@@ -146,8 +146,4 @@ export const taskTools: ToolDefinition[] = [
   },
 ];
 
-export const allBuiltInTools: ToolDefinition[] = [
-  ...fileTools,
-  ...shellTools,
-  ...taskTools,
-];
+export const allBuiltInTools: ToolDefinition[] = [...fileTools, ...shellTools, ...taskTools];

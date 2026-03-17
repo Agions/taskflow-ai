@@ -34,7 +34,7 @@ export async function executeQuery(query: string, options: QueryOptions): Promis
     const searchResult = await engine.retrieve(query, {
       topK: parseInt(options.topK),
       threshold: parseFloat(options.threshold),
-      rerank: options.rerank
+      rerank: options.rerank,
     });
 
     spinner.stop();
@@ -44,15 +44,20 @@ export async function executeQuery(query: string, options: QueryOptions): Promis
       return;
     }
 
-    console.log(chalk.blue(`\nFound ${searchResult.chunks.length} relevant documents (${searchResult.latency}ms):\n`));
+    console.log(
+      chalk.blue(
+        `\nFound ${searchResult.chunks.length} relevant documents (${searchResult.latency}ms):\n`
+      )
+    );
 
     for (let i = 0; i < searchResult.chunks.length; i++) {
       const chunk = searchResult.chunks[i];
-      console.log(`${chalk.bold(`${i + 1}. ${(chunk.chunk.metadata as any).title}`)} ${chalk.yellow(`(${chunk.score.toFixed(3)})`)}`);
+      console.log(
+        `${chalk.bold(`${i + 1}. ${(chunk.chunk.metadata as any).title}`)} ${chalk.yellow(`(${chunk.score.toFixed(3)})`)}`
+      );
       console.log(chalk.gray(chunk.chunk.content.slice(0, 200) + '...'));
       console.log();
     }
-
   } catch (error) {
     spinner.fail(`Query failed: ${error instanceof Error ? error.message : String(error)}`);
   }

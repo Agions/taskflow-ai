@@ -27,7 +27,6 @@ export async function executeSync(registryName: string | undefined): Promise<voi
       }
       spinner.succeed(chalk.green(`Synced ${registries.length} registries`));
     }
-
   } catch (error) {
     spinner.fail(`Sync failed: ${error instanceof Error ? error.message : String(error)}`);
   }

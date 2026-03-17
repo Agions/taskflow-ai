@@ -10,10 +10,8 @@ import path from 'path';
 export const doctorCommand = {
   name: 'doctor',
   description: '诊断并修复常见问题',
-  options: [
-    { flags: '-f, --fix', description: '自动修复问题' },
-  ],
-  
+  options: [{ flags: '-f, --fix', description: '自动修复问题' }],
+
   async action(options: { fix?: boolean }) {
     console.log(chalk.cyan.bold('\n🔍 TaskFlow AI 诊断中...\n'));
 
@@ -98,5 +96,5 @@ export const doctorCommand = {
         });
       }
     }
-  }
+  },
 };

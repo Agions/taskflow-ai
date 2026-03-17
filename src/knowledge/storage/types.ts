@@ -2,7 +2,13 @@
  * 向量存储类型定义
  */
 
-import { DocumentChunk, RetrievedChunk, RetrievalOptions, FilterCondition, IndexStatus } from '../types';
+import {
+  DocumentChunk,
+  RetrievedChunk,
+  RetrievalOptions,
+  FilterCondition,
+  IndexStatus,
+} from '../types';
 
 /**
  * 存储的文档块（带时间戳）

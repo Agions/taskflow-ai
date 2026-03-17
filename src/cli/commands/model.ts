@@ -31,14 +31,14 @@ program
   .action(async () => {
     const gw = await getGateway();
     const models = gw.getModels();
-    
+
     if (models.length === 0) {
       console.log(chalk.yellow('未配置任何模型'));
       return;
     }
 
     console.log(chalk.bold('\n📦 已配置模型:\n'));
-    
+
     const enabledModels = models.filter(m => m.enabled);
     const disabledModels = models.filter(m => !m.enabled);
 
@@ -72,9 +72,9 @@ program
   .option('-u, --base-url <url>', 'API 基础 URL')
   .option('--priority <n>', '优先级', '10')
   .option('--enabled', '是否启用', 'true')
-  .action(async (options) => {
-    const config = await loadConfig() || {} as TaskFlowConfig;
-    
+  .action(async options => {
+    const config = (await loadConfig()) || ({} as TaskFlowConfig);
+
     const newModel: ModelConfig = {
       id: options.id,
       provider: options.provider,
@@ -97,7 +97,7 @@ program
     }
 
     await saveConfig(config);
-    
+
     gateway = null;
   });
 
@@ -108,9 +108,9 @@ program
   .command('remove')
   .description('移除模型')
   .requiredOption('-i, --id <id>', '模型 ID')
-  .action(async (options) => {
+  .action(async options => {
     const config = await loadConfig();
-    
+
     if (!config?.aiModels) {
       console.log(chalk.yellow('没有配置模型'));
       return;
@@ -124,9 +124,9 @@ program
 
     config.aiModels.splice(index, 1);
     await saveConfig(config);
-    
+
     console.log(chalk.green(`已移除模型: ${options.id}`));
-    
+
     gateway = null;
   });
 
@@ -137,10 +137,10 @@ program
   .command('enable')
   .description('启用模型')
   .requiredOption('-i, --id <id>', '模型 ID')
-  .action(async (options) => {
+  .action(async options => {
     const config = await loadConfig();
     const model = config?.aiModels?.find((m: any) => m.id === options.id);
-    
+
     if (!model) {
       console.log(chalk.red(`未找到模型: ${options.id}`));
       return;
@@ -148,7 +148,7 @@ program
 
     model.enabled = true;
     if (config) await saveConfig(config);
-    
+
     console.log(chalk.green(`已启用模型: ${options.id}`));
     gateway = null;
   });
@@ -157,10 +157,10 @@ program
   .command('disable')
   .description('禁用模型')
   .requiredOption('-i, --id <id>', '模型 ID')
-  .action(async (options) => {
+  .action(async options => {
     const config = await loadConfig();
     const model = config?.aiModels?.find((m: any) => m.id === options.id);
-    
+
     if (!model) {
       console.log(chalk.red(`未找到模型: ${options.id}`));
       return;
@@ -168,7 +168,7 @@ program
 
     model.enabled = false;
     if (config) await saveConfig(config);
-    
+
     console.log(chalk.yellow(`已禁用模型: ${options.id}`));
     gateway = null;
   });
@@ -180,16 +180,14 @@ program
   .command('test')
   .description('测试所有模型的连接')
   .option('-i, --id <id>', '只测试指定模型')
-  .action(async (options) => {
+  .action(async options => {
     const gw = await getGateway();
-    
+
     console.log(chalk.bold('\n🔄 测试模型连接...\n'));
-    
+
     const results = await gw.testAll();
-    const filteredResults = options.id 
-      ? results.filter(r => r.modelId === options.id)
-      : results;
-    
+    const filteredResults = options.id ? results.filter(r => r.modelId === options.id) : results;
+
     filteredResults.forEach(result => {
       if (result.success) {
         console.log(chalk.green(`✓ ${result.modelId}: 成功 (${result.latency}ms)`));
@@ -197,7 +195,7 @@ program
         console.log(chalk.red(`✗ ${result.modelId}: 失败 - ${result.error}`));
       }
     });
-    
+
     console.log();
   });
 
@@ -211,12 +209,12 @@ program
   .option('-s, --strategy <strategy>', '路由策略 (smart|cost|speed|priority)', 'smart')
   .action(async (message, options) => {
     const gw = await getGateway();
-    
+
     const result = await gw.complete({
       messages: [{ role: 'user', content: message }],
       strategy: options.strategy as any,
     });
-    
+
     console.log(chalk.bold('\n🧠 路由决策结果:\n'));
     console.log(`  模型: ${chalk.cyan(result.model.id)}`);
     console.log(`  提供商: ${result.model.provider}`);
@@ -234,25 +232,27 @@ program
   .command('benchmark')
   .description('对比不同路由策略')
   .argument('<message>', '测试消息')
-  .action(async (message) => {
+  .action(async message => {
     const gw = await getGateway();
     const strategies = ['smart', 'cost', 'speed', 'priority'] as const;
-    
+
     console.log(chalk.bold('\n📊 路由策略基准测试:\n'));
-    
+
     for (const strategy of strategies) {
       try {
         const result = await gw.complete({
           messages: [{ role: 'user', content: message }],
           strategy,
         });
-        
-        console.log(`${chalk.cyan(strategy.padEnd(8))} | ${result.model.id.padEnd(20)} | ${result.latency}ms`);
+
+        console.log(
+          `${chalk.cyan(strategy.padEnd(8))} | ${result.model.id.padEnd(20)} | ${result.latency}ms`
+        );
       } catch (_e) {
         console.log(`${chalk.cyan(strategy.padEnd(8))} | ${chalk.red('Failed')}`);
       }
     }
-    
+
     console.log();
   });
 

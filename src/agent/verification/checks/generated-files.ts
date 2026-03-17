@@ -19,7 +19,7 @@ export async function verifyGeneratedFiles(result: ExecutionResult): Promise<Ver
       name: 'Generated Files',
       passed: true,
       message: 'No files to verify',
-      severity: 'info'
+      severity: 'info',
     };
   }
 
@@ -42,7 +42,7 @@ export async function verifyGeneratedFiles(result: ExecutionResult): Promise<Ver
       name: 'Generated Files',
       passed: true,
       message: `${allArtifacts.length} files generated and verified`,
-      severity: 'info'
+      severity: 'info',
     };
   }
 
@@ -58,6 +58,6 @@ export async function verifyGeneratedFiles(result: ExecutionResult): Promise<Ver
     name: 'Generated Files',
     passed: false,
     message: `File issues: ${issues.join(', ')}`,
-    severity: 'error'
+    severity: 'error',
   };
 }

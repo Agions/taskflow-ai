@@ -12,7 +12,7 @@ export async function verifyTaskCompletion(result: ExecutionResult): Promise<Ver
       name: 'Task Completion',
       passed: true,
       message: `All ${result.results.length} tasks completed successfully`,
-      severity: 'info'
+      severity: 'info',
     };
   }
 
@@ -20,6 +20,6 @@ export async function verifyTaskCompletion(result: ExecutionResult): Promise<Ver
     name: 'Task Completion',
     passed: false,
     message: `${failedTasks.length} tasks failed: ${failedTasks.map(t => t.taskId).join(', ')}`,
-    severity: 'error'
+    severity: 'error',
   };
 }

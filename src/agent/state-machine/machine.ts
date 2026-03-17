@@ -22,18 +22,20 @@ export const createAgentMachine = (
     context,
     states: {
       idle: {
-        on: { START: 'planning' }
+        on: { START: 'planning' },
       },
 
       planning: {
         invoke: {
           src: fromPromise(async ({ input }: { input: { context: MachineContext } }) => {
-            return planningEngine.createPlan(input.context.requirements?.map(r => r.description).join('\n') || '');
+            return planningEngine.createPlan(
+              input.context.requirements?.map(r => r.description).join('\n') || ''
+            );
           }),
           input: ({ context }: { context: MachineContext }) => ({ context }),
           onDone: { target: 'executing', actions: { type: 'setTaskPlan' } },
-          onError: { target: 'failed', actions: { type: 'setError' } }
-        }
+          onError: { target: 'failed', actions: { type: 'setError' } },
+        },
       },
 
       executing: {
@@ -43,8 +45,8 @@ export const createAgentMachine = (
           }),
           input: ({ context }: { context: MachineContext }) => ({ context }),
           onDone: { target: 'verifying', actions: { type: 'setExecutionResult' } },
-          onError: { target: 'failed', actions: { type: 'setError' } }
-        }
+          onError: { target: 'failed', actions: { type: 'setError' } },
+        },
       },
 
       verifying: {
@@ -54,27 +56,33 @@ export const createAgentMachine = (
           }),
           input: ({ context }: { context: MachineContext }) => ({ context }),
           onDone: [
-            { target: 'completed', guard: ({ context }: any) => context.verificationResult?.allPassed },
-            { target: 'planning', guard: ({ context }: any) => context.retryCount < (agentConfig.maxRetries || 3) }
+            {
+              target: 'completed',
+              guard: ({ context }: any) => context.verificationResult?.allPassed,
+            },
+            {
+              target: 'planning',
+              guard: ({ context }: any) => context.retryCount < (agentConfig.maxRetries || 3),
+            },
           ],
-          onError: { target: 'failed', actions: { type: 'setError' } }
-        }
+          onError: { target: 'failed', actions: { type: 'setError' } },
+        },
       },
 
       awaitingApproval: {
         on: {
           APPROVED: 'executing',
-          REJECTED: 'failed'
-        }
+          REJECTED: 'failed',
+        },
       },
 
       completed: {
-        type: 'final'
+        type: 'final',
       },
 
       failed: {
-        type: 'final'
-      }
-    }
+        type: 'final',
+      },
+    },
   });
 };

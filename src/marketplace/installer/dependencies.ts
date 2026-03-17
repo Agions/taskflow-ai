@@ -15,7 +15,7 @@ export class DependencyManager {
     const tree: DependencyTree = {
       name: pkg.name,
       version: pkg.version,
-      dependencies: []
+      dependencies: [],
     };
 
     for (const [depName, depVersion] of Object.entries(pkg.dependencies || {})) {
@@ -24,7 +24,7 @@ export class DependencyManager {
         tree.dependencies.push({
           name: dep.name,
           version: dep.version,
-          dependencies: []
+          dependencies: [],
         });
       }
     }
@@ -36,7 +36,10 @@ export class DependencyManager {
     console.log(`  📦 Installing dependency: ${pkg.name}@${pkg.version}`);
   }
 
-  async installNpmDependencies(pkgDir: string, dependencies: Record<string, string>): Promise<void> {
+  async installNpmDependencies(
+    pkgDir: string,
+    dependencies: Record<string, string>
+  ): Promise<void> {
     const nodeModulesPath = path.join(pkgDir, 'node_modules');
 
     if (await fs.pathExists(nodeModulesPath)) {
@@ -55,7 +58,7 @@ export class DependencyManager {
       execSync('npm install --production', {
         cwd: pkgDir,
         stdio: 'ignore',
-        timeout: 120000
+        timeout: 120000,
       });
     } catch (error) {
       console.warn('  ⚠️  Failed to install npm dependencies:', error);

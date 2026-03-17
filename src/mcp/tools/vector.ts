@@ -74,7 +74,7 @@ class InMemoryVectorStore {
     const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
     const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
     const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
-    
+
     if (magnitudeA === 0 || magnitudeB === 0) return 0;
     return dotProduct / (magnitudeA * magnitudeB);
   }
@@ -93,7 +93,7 @@ export const vectorTools: ToolDefinition[] = [
         dimension: { type: 'number', description: '向量维度 (默认 1536)' },
       },
     },
-    handler: async (input) => {
+    handler: async input => {
       const dimension = (input.dimension as number) || 1536;
       vectorStore.setDimension(dimension);
       return { success: true, dimension };
@@ -108,17 +108,17 @@ export const vectorTools: ToolDefinition[] = [
       type: 'object',
       properties: {
         id: { type: 'string', description: '唯一ID' },
-        vector: { 
-          type: 'array', 
+        vector: {
+          type: 'array',
           description: '向量数组',
-          items: { type: 'number' }
+          items: { type: 'number' },
         },
         text: { type: 'string', description: '原始文本' },
         metadata: { type: 'object', description: '元数据' },
       },
       required: ['id', 'vector', 'text'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const result = vectorStore.add({
         id: input.id as string,
         vector: input.vector as number[],
@@ -136,10 +136,10 @@ export const vectorTools: ToolDefinition[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        query: { 
-          type: 'array', 
+        query: {
+          type: 'array',
           description: '查询向量',
-          items: { type: 'number' }
+          items: { type: 'number' },
         },
         k: { type: 'number', description: '返回数量 (默认 5)' },
         filter: { type: 'object', description: '元数据过滤' },
@@ -147,24 +147,20 @@ export const vectorTools: ToolDefinition[] = [
       },
       required: ['query'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const k = (input.k as number) || 5;
       const filter = input.filter as Record<string, any> | undefined;
       const includeMetadata = (input.includeMetadata as boolean) ?? true;
-      
-      const results = vectorStore.search(
-        input.query as number[],
-        k,
-        filter
-      );
-      
+
+      const results = vectorStore.search(input.query as number[], k, filter);
+
       return {
         success: true,
         results: results.map(r => ({
           id: r.id,
           text: r.text,
           metadata: includeMetadata ? r.metadata : undefined,
-        }))
+        })),
       };
     },
     category: 'vector',
@@ -180,16 +176,16 @@ export const vectorTools: ToolDefinition[] = [
       },
       required: ['id'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const entry = vectorStore.get(input.id as string);
       if (!entry) {
         return { success: false, error: 'Not found' };
       }
-      return { 
-        success: true, 
+      return {
+        success: true,
         id: entry.id,
         text: entry.text,
-        metadata: entry.metadata 
+        metadata: entry.metadata,
       };
     },
     category: 'vector',
@@ -205,7 +201,7 @@ export const vectorTools: ToolDefinition[] = [
       },
       required: ['id'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const deleted = vectorStore.delete(input.id as string);
       return { success: deleted };
     },

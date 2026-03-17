@@ -6,11 +6,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import Handlebars from 'handlebars';
-import {
-  CodeTemplate,
-  TemplateContext,
-  ComponentSpec
-} from '../types';
+import { CodeTemplate, TemplateContext, ComponentSpec } from '../types';
 import { builtInTemplates } from './built-in';
 
 // 注册 Handlebars 辅助函数
@@ -18,7 +14,7 @@ Handlebars.registerHelper('kebabCase', (str: string) => {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 });
 
-Handlebars.registerHelper('unless', function(this: any, conditional: any, options: any) {
+Handlebars.registerHelper('unless', function (this: any, conditional: any, options: any) {
   if (!conditional) {
     return options.fn(this);
   }
@@ -41,7 +37,7 @@ export class TemplateManager {
   }
 
   async loadCustomTemplates(): Promise<void> {
-    if (!await fs.pathExists(this.templatesDir)) {
+    if (!(await fs.pathExists(this.templatesDir))) {
       return;
     }
 
@@ -122,15 +118,17 @@ export class TemplateManager {
       return undefined;
     }
 
-    return candidates.find(t => {
-      if (spec.hasState && t.id.includes('hook')) {
+    return (
+      candidates.find(t => {
+        if (spec.hasState && t.id.includes('hook')) {
+          return true;
+        }
+        if (!spec.hasState && t.id.includes('functional')) {
+          return true;
+        }
         return true;
-      }
-      if (!spec.hasState && t.id.includes('functional')) {
-        return true;
-      }
-      return true;
-    }) || candidates[0];
+      }) || candidates[0]
+    );
   }
 }
 

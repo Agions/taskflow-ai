@@ -36,12 +36,16 @@ export class DocumentScanner {
   }
 
   private shouldExcludeDir(name: string, excludePatterns: string[]): boolean {
-    return excludePatterns.some(pattern =>
-      minimatch(name, pattern) || minimatch(name, pattern.replace('/**', ''))
+    return excludePatterns.some(
+      pattern => minimatch(name, pattern) || minimatch(name, pattern.replace('/**', ''))
     );
   }
 
-  private shouldIncludeFile(filePath: string, includePatterns: string[], excludePatterns: string[]): boolean {
+  private shouldIncludeFile(
+    filePath: string,
+    includePatterns: string[],
+    excludePatterns: string[]
+  ): boolean {
     const relativePath = path.relative(process.cwd(), filePath);
 
     if (excludePatterns.some(pattern => minimatch(relativePath, pattern))) {

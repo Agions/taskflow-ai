@@ -8,7 +8,10 @@ import { promisify } from 'util';
 
 const execAsync = promisify(execSync);
 
-async function gitExec(args: string[], cwd: string): Promise<{ stdout: string; stderr: string; code: number }> {
+async function gitExec(
+  args: string[],
+  cwd: string
+): Promise<{ stdout: string; stderr: string; code: number }> {
   try {
     const stdout = execSync(`git ${args.join(' ')}`, {
       cwd,
@@ -34,10 +37,10 @@ export const gitTools: ToolDefinition[] = [
         cwd: { type: 'string', description: '仓库目录' },
       },
     },
-    handler: async (input) => {
+    handler: async input => {
       const cwd = (input.cwd as string) || process.cwd();
       const result = await gitExec(['status', '--porcelain'], cwd);
-      
+
       if (result.code !== 0) {
         return { success: false, error: result.stderr };
       }
@@ -50,7 +53,7 @@ export const gitTools: ToolDefinition[] = [
       for (const file of files) {
         const status = file.substring(0, 2);
         const filename = file.substring(3);
-        
+
         if (status.includes('?')) {
           untracked.push(filename);
         } else if (status.includes('M')) {
@@ -86,32 +89,32 @@ export const gitTools: ToolDefinition[] = [
       properties: {
         cwd: { type: 'string', description: '仓库目录' },
         maxCount: { type: 'number', description: '最大提交数', default: 10 },
-        format: { 
-          type: 'string', 
+        format: {
+          type: 'string',
           description: '输出格式',
-          default: '%H|%an|%ae|%at|%s' 
+          default: '%H|%an|%ae|%at|%s',
         },
       },
     },
-    handler: async (input) => {
+    handler: async input => {
       const cwd = (input.cwd as string) || process.cwd();
       const maxCount = (input.maxCount as number) || 10;
       const format = (input.format as string) || '%H|%an|%ae|%at|%s';
-      
-      const result = await gitExec([
-        'log',
-        `--max-count=${maxCount}`,
-        `--format=${format}`,
-      ], cwd);
+
+      const result = await gitExec(['log', `--max-count=${maxCount}`, `--format=${format}`], cwd);
 
       if (result.code !== 0) {
         return { success: false, error: result.stderr };
       }
 
-      const commits = result.stdout.trim().split('\n').filter(Boolean).map(line => {
-        const [hash, author, email, timestamp, message] = line.split('|');
-        return { hash, author, email, timestamp: parseInt(timestamp), message };
-      });
+      const commits = result.stdout
+        .trim()
+        .split('\n')
+        .filter(Boolean)
+        .map(line => {
+          const [hash, author, email, timestamp, message] = line.split('|');
+          return { hash, author, email, timestamp: parseInt(timestamp), message };
+        });
 
       return { success: true, commits };
     },
@@ -128,20 +131,22 @@ export const gitTools: ToolDefinition[] = [
         all: { type: 'boolean', description: '显示所有分支', default: true },
       },
     },
-    handler: async (input) => {
+    handler: async input => {
       const cwd = (input.cwd as string) || process.cwd();
       const all = input.all !== false;
-      
+
       const args = ['branch'];
       if (all) args.push('-a');
-      
+
       const result = await gitExec(args, cwd);
 
       if (result.code !== 0) {
         return { success: false, error: result.stderr };
       }
 
-      const branches = result.stdout.trim().split('\n')
+      const branches = result.stdout
+        .trim()
+        .split('\n')
         .map(b => b.replace(/^\*?\s*/, '').trim())
         .filter(Boolean);
 
@@ -168,7 +173,7 @@ export const gitTools: ToolDefinition[] = [
       },
       required: ['message'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const cwd = (input.cwd as string) || process.cwd();
       const message = input.message as string;
       const all = input.all !== false;
@@ -208,7 +213,7 @@ export const gitTools: ToolDefinition[] = [
         cached: { type: 'boolean', description: '同 staged', default: false },
       },
     },
-    handler: async (input) => {
+    handler: async input => {
       const cwd = (input.cwd as string) || process.cwd();
       const file = input.file as string;
       const staged = (input.staged as boolean) || (input.cached as boolean);
@@ -240,7 +245,7 @@ export const gitTools: ToolDefinition[] = [
         force: { type: 'boolean', description: '强制推送', default: false },
       },
     },
-    handler: async (input) => {
+    handler: async input => {
       const cwd = (input.cwd as string) || process.cwd();
       const remote = (input.remote as string) || 'origin';
       const branch = input.branch as string;
@@ -273,7 +278,7 @@ export const gitTools: ToolDefinition[] = [
         rebase: { type: 'boolean', description: '使用 rebase', default: false },
       },
     },
-    handler: async (input) => {
+    handler: async input => {
       const cwd = (input.cwd as string) || process.cwd();
       const remote = (input.remote as string) || 'origin';
       const branch = input.branch as string;

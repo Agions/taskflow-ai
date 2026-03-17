@@ -51,7 +51,7 @@ export abstract class BaseRouter {
 
   protected extractContext(messages: any[]): RoutingContext {
     const lastMessage = messages[messages.length - 1]?.content?.toLowerCase() || '';
-    
+
     let taskType: RoutingContext['taskType'];
     let complexity: RoutingContext['complexity'] = 'medium';
 

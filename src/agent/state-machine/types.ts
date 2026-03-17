@@ -2,7 +2,14 @@
  * 状态机类型定义
  */
 
-import { AgentContext, AgentConfig, TaskPlan, ExecutionResult, VerificationResult, Requirement } from '../types';
+import {
+  AgentContext,
+  AgentConfig,
+  TaskPlan,
+  ExecutionResult,
+  VerificationResult,
+  Requirement,
+} from '../types';
 
 export interface MachineContext extends AgentContext {
   error?: Error;

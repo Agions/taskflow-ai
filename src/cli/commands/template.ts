@@ -17,8 +17,8 @@ program
   .command('list')
   .description('列出可用模板')
   .option('-c, --category <category>', '分类 (prd|workflow|task)')
-  .action((options) => {
-    const templates = options.category 
+  .action(options => {
+    const templates = options.category
       ? templateManager.list(options.category)
       : templateManager.list();
 
@@ -35,7 +35,7 @@ program
       if (list.length === 0) continue;
 
       console.log(chalk.bold(`\n📋 ${cat.toUpperCase()} 模板:\n`));
-      
+
       for (const t of list) {
         console.log(`  ${chalk.cyan(t.name)}`);
         console.log(`    ID: ${t.id}`);
@@ -52,14 +52,19 @@ program
   .description('使用模板创建文件')
   .argument('<templateId>', '模板 ID')
   .option('-o, --output <file>', '输出文件')
-  .option('-v, --variable <key=value>', '模板变量', (val: string, memo: Record<string, string>) => {
-    const [key, value] = val.split('=');
-    memo[key] = value;
-    return memo;
-  }, {} as Record<string, string>)
+  .option(
+    '-v, --variable <key=value>',
+    '模板变量',
+    (val: string, memo: Record<string, string>) => {
+      const [key, value] = val.split('=');
+      memo[key] = value;
+      return memo;
+    },
+    {} as Record<string, string>
+  )
   .action(async (templateId: string, options) => {
     const template = templateManager.get(templateId);
-    
+
     if (!template) {
       console.log(chalk.red(`模板不存在: ${templateId}`));
       return;
@@ -97,7 +102,7 @@ program
     }
 
     console.log(chalk.bold(`\n🔍 搜索结果 (${results.length}):\n`));
-    
+
     for (const t of results) {
       console.log(`  ${chalk.cyan(t.name)} [${t.category}]`);
       console.log(`    ${t.description || '-'}\n`);
@@ -114,7 +119,7 @@ program
   .option('-d, --dir <dir>', '输出目录', './templates')
   .action(async (templateId: string, options) => {
     const success = await templateManager.saveToFile(templateId, options.dir);
-    
+
     if (success) {
       console.log(chalk.green(`✅ 模板已导出`));
     } else {

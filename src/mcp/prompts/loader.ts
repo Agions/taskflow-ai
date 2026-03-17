@@ -61,9 +61,11 @@ export class PromptLoader {
    * 验证提示格式
    */
   private validatePrompt(prompt: any): prompt is MCPPrompt {
-    return prompt &&
+    return (
+      prompt &&
       typeof prompt.name === 'string' &&
       typeof prompt.template === 'string' &&
-      Array.isArray(prompt.arguments);
+      Array.isArray(prompt.arguments)
+    );
   }
 }

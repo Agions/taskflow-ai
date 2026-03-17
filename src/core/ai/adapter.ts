@@ -75,17 +75,21 @@ export abstract class BaseAdapter {
   abstract complete(options: Omit<ChatCompletionOptions, 'model'>): Promise<ChatCompletionResponse>;
 
   /** 流式聊天请求 */
-  async *stream(options: Omit<ChatCompletionOptions, 'model'> & { stream: true }): AsyncGenerator<StreamChunk> {
+  async *stream(
+    options: Omit<ChatCompletionOptions, 'model'> & { stream: true }
+  ): AsyncGenerator<StreamChunk> {
     const response = await this.complete({ ...options, stream: true } as ChatCompletionOptions);
-    
+
     for (const choice of response.choices) {
       yield {
         id: response.id,
-        choices: [{
-          index: choice.index,
-          delta: choice.message,
-          finish_reason: choice.finish_reason || undefined,
-        }],
+        choices: [
+          {
+            index: choice.index,
+            delta: choice.message,
+            finish_reason: choice.finish_reason || undefined,
+          },
+        ],
       };
     }
   }
@@ -100,10 +104,10 @@ export abstract class BaseAdapter {
       } as Omit<ChatCompletionOptions, 'model'>);
       return { success: true, latency: Date.now() - start };
     } catch (error) {
-      return { 
-        success: false, 
-        latency: Date.now() - start, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+      return {
+        success: false,
+        latency: Date.now() - start,
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -121,11 +125,11 @@ export abstract class BaseAdapter {
 
   /** 估算成本 */
   estimateCost(inputTokens: number, outputTokens: number): number {
-    const inputCost = this.config.costPer1MInput 
-      ? (inputTokens / 1_000_000) * this.config.costPer1MInput 
+    const inputCost = this.config.costPer1MInput
+      ? (inputTokens / 1_000_000) * this.config.costPer1MInput
       : 0;
-    const outputCost = this.config.costPer1MOutput 
-      ? (outputTokens / 1_000_000) * this.config.costPer1MOutput 
+    const outputCost = this.config.costPer1MOutput
+      ? (outputTokens / 1_000_000) * this.config.costPer1MOutput
       : 0;
     return inputCost + outputCost;
   }

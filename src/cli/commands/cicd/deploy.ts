@@ -46,11 +46,10 @@ export async function executeDeploy(options: DeployOptions): Promise<void> {
 
     spinner.succeed(chalk.green('CI/CD workflow deployed'));
     console.log(chalk.blue(`\nWorkflow file: .github/workflows/${config.workflowFile}`));
-    console.log(chalk.yellow('\nDon\'t forget to:'));
+    console.log(chalk.yellow("\nDon't forget to:"));
     console.log('  1. Commit the workflow file');
     console.log('  2. Push to remote');
     console.log('  3. Set required secrets in GitHub repository settings');
-
   } catch (error) {
     spinner.fail(`Deployment failed: ${error instanceof Error ? error.message : String(error)}`);
   }

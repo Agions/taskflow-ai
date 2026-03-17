@@ -3,21 +3,16 @@
  * 定义所有模型相关的类型接口
  */
 
-export type ProviderType = 
-  | 'deepseek' 
-  | 'openai' 
-  | 'anthropic' 
-  | 'zhipu'      // 智谱 AI
-  | 'qwen'       // 通义千问
-  | 'ERNIE'      // 文心一言
-  | 'moonshot';  // 月之暗面
+export type ProviderType =
+  | 'deepseek'
+  | 'openai'
+  | 'anthropic'
+  | 'zhipu' // 智谱 AI
+  | 'qwen' // 通义千问
+  | 'ERNIE' // 文心一言
+  | 'moonshot'; // 月之暗面
 
-export type ModelCapability = 
-  | 'chat' 
-  | 'reasoning' 
-  | 'code' 
-  | 'vision' 
-  | 'function_calling';
+export type ModelCapability = 'chat' | 'reasoning' | 'code' | 'vision' | 'function_calling';
 
 export interface ModelConfig {
   /** 模型唯一标识 */
@@ -75,7 +70,7 @@ export const MODEL_REGISTRY: Record<string, ModelInfo> = {
     costPer1MInput: 0.5,
     costPer1MOutput: 2,
   },
-  
+
   'gpt-4o': {
     id: 'gpt-4o',
     provider: 'openai',
@@ -94,7 +89,7 @@ export const MODEL_REGISTRY: Record<string, ModelInfo> = {
     costPer1MInput: 0.15,
     costPer1MOutput: 0.6,
   },
-  'o1': {
+  o1: {
     id: 'o1',
     provider: 'openai',
     name: 'OpenAI o1',
@@ -112,7 +107,7 @@ export const MODEL_REGISTRY: Record<string, ModelInfo> = {
     costPer1MInput: 3,
     costPer1MOutput: 12,
   },
-  
+
   'claude-3-5-sonnet': {
     id: 'claude-3-5-sonnet',
     provider: 'anthropic',
@@ -131,7 +126,7 @@ export const MODEL_REGISTRY: Record<string, ModelInfo> = {
     costPer1MInput: 15,
     costPer1MOutput: 75,
   },
-  
+
   'glm-4': {
     id: 'glm-4',
     provider: 'zhipu',
@@ -150,7 +145,7 @@ export const MODEL_REGISTRY: Record<string, ModelInfo> = {
     costPer1MInput: 0.1,
     costPer1MOutput: 0.1,
   },
-  
+
   'qwen-turbo': {
     id: 'qwen-turbo',
     provider: 'qwen',

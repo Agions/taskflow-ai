@@ -13,21 +13,21 @@ export class DependencyChecker {
     const nodeModulesPath = path.join(this.projectPath, 'node_modules');
     const packageJsonPath = path.join(this.projectPath, 'package.json');
 
-    if (!await fs.pathExists(packageJsonPath)) {
+    if (!(await fs.pathExists(packageJsonPath))) {
       return {
         name: 'Dependencies',
         passed: true,
         message: 'No package.json found',
-        severity: 'info'
+        severity: 'info',
       };
     }
 
-    if (!await fs.pathExists(nodeModulesPath)) {
+    if (!(await fs.pathExists(nodeModulesPath))) {
       return {
         name: 'Dependencies',
         passed: false,
         message: 'node_modules not found. Run npm install',
-        severity: 'error'
+        severity: 'error',
       };
     }
 
@@ -35,7 +35,7 @@ export class DependencyChecker {
       name: 'Dependencies',
       passed: true,
       message: 'Dependencies installed',
-      severity: 'info'
+      severity: 'info',
     };
   }
 }

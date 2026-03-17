@@ -21,7 +21,7 @@ export class DocumentChunker {
         content: content,
         metadata: this.createMetadata(doc, 0, 0, content.length),
         embedding: [],
-        index: 0
+        index: 0,
       });
       return chunks;
     }
@@ -39,7 +39,7 @@ export class DocumentChunker {
         content: chunkContent,
         metadata: this.createMetadata(doc, chunkIndex, position, end),
         embedding: [],
-        index: chunkIndex
+        index: chunkIndex,
       });
 
       position = end - this.chunkOverlap;
@@ -59,7 +59,7 @@ export class DocumentChunker {
       end,
       overlap: this.chunkOverlap,
       tokenCount: end - start,
-      totalChunks: Math.ceil(doc.content.length / (this.chunkSize - this.chunkOverlap))
+      totalChunks: Math.ceil(doc.content.length / (this.chunkSize - this.chunkOverlap)),
     };
   }
 }

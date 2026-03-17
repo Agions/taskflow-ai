@@ -14,11 +14,11 @@ export const statsCommand = {
     { flags: '-v, --verbose', description: '显示详细信息' },
     { flags: '-j, --json', description: '输出 JSON 格式' },
   ],
-  
+
   async action(options: { verbose?: boolean; json?: boolean }) {
     try {
       const stats = collectStats(options.verbose || false);
-      
+
       if (options.json) {
         console.log(JSON.stringify(stats, null, 2));
       } else {
@@ -27,7 +27,7 @@ export const statsCommand = {
     } catch (error) {
       console.error(chalk.red('获取统计信息失败:'), error);
     }
-  }
+  },
 };
 
 interface ProjectStats {
@@ -55,26 +55,29 @@ function collectStats(verbose: boolean): ProjectStats {
     files: { total: 0, code: 0, comments: 0, blank: 0 },
     lines: { code: 0, comments: 0, blank: 0 },
     languages: [],
-    size: { src: '', node_modules: '', dist: '' }
+    size: { src: '', node_modules: '', dist: '' },
   };
 
   try {
     const srcCount = execSync('find src -type f | wc -l', { encoding: 'utf8' }).trim();
     stats.files.total = parseInt(srcCount) || 0;
-    
-    const codeCount = execSync('find src -name "*.ts" -o -name "*.tsx" | wc -l', { encoding: 'utf8' }).trim();
+
+    const codeCount = execSync('find src -name "*.ts" -o -name "*.tsx" | wc -l', {
+      encoding: 'utf8',
+    }).trim();
     stats.files.code = parseInt(codeCount) || 0;
-  } catch (e) {
-  }
+  } catch (e) {}
 
   try {
-    const lines = execSync('find src -name "*.ts" -o -name "*.tsx" | xargs wc -l 2>/dev/null | tail -1', { encoding: 'utf8' }).trim();
+    const lines = execSync(
+      'find src -name "*.ts" -o -name "*.tsx" | xargs wc -l 2>/dev/null | tail -1',
+      { encoding: 'utf8' }
+    ).trim();
     const match = lines.match(/(\d+)\s+total/);
     if (match) {
       stats.lines.code = parseInt(match[1]) || 0;
     }
-  } catch (e) {
-  }
+  } catch (e) {}
 
   try {
     const srcSize = execSync('du -sh src 2>/dev/null | cut -f1', { encoding: 'utf8' }).trim();
@@ -95,13 +98,27 @@ function collectStats(verbose: boolean): ProjectStats {
 
 function printStats(stats: ProjectStats) {
   console.log(chalk.cyan.bold('\n📊 项目统计\n'));
-  
+
   console.log(chalk.gray('┌─────────────────────────────────────┐'));
-  console.log(chalk.gray('│') + chalk.white(' 文件统计                              ') + chalk.gray('│'));
+  console.log(
+    chalk.gray('│') + chalk.white(' 文件统计                              ') + chalk.gray('│')
+  );
   console.log(chalk.gray('├─────────────────────────────────────┤'));
-  console.log(chalk.gray('│') + `  总文件数: ${chalk.yellow(stats.files.total.toString().padEnd(20))}` + chalk.gray('│'));
-  console.log(chalk.gray('│') + `  代码文件: ${chalk.green(stats.files.code.toString().padEnd(20))}` + chalk.gray('│'));
-  console.log(chalk.gray('│') + `  代码行数: ${chalk.blue(stats.lines.code.toString().padEnd(20))}` + chalk.gray('│'));
+  console.log(
+    chalk.gray('│') +
+      `  总文件数: ${chalk.yellow(stats.files.total.toString().padEnd(20))}` +
+      chalk.gray('│')
+  );
+  console.log(
+    chalk.gray('│') +
+      `  代码文件: ${chalk.green(stats.files.code.toString().padEnd(20))}` +
+      chalk.gray('│')
+  );
+  console.log(
+    chalk.gray('│') +
+      `  代码行数: ${chalk.blue(stats.lines.code.toString().padEnd(20))}` +
+      chalk.gray('│')
+  );
   console.log(chalk.gray('└─────────────────────────────────────┘\n'));
 
   console.log(chalk.cyan('📁 目录大小:'));

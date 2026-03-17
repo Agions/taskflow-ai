@@ -71,10 +71,8 @@ export function resolveDependencies(workflow: Workflow): void {
 
     const config = step.config as any;
     if (config?.dependsOn) {
-      const deps = Array.isArray(config.dependsOn) 
-        ? config.dependsOn 
-        : [config.dependsOn];
-      
+      const deps = Array.isArray(config.dependsOn) ? config.dependsOn : [config.dependsOn];
+
       for (const dep of deps) {
         const depStep = stepMap.get(dep);
         if (depStep) {

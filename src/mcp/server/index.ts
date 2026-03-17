@@ -103,7 +103,10 @@ export class MCPServer {
     return this.isRunning;
   }
 
-  async callTool(name: string, args: any): Promise<{ success: boolean; data?: any; error?: string }> {
+  async callTool(
+    name: string,
+    args: any
+  ): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
       const result = await this.toolExecutor.execute(name, args);
       return { success: true, data: result };

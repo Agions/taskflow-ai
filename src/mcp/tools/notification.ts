@@ -5,7 +5,10 @@
 import { ToolDefinition, PermissionLevel } from './types';
 
 // Slack Webhook
-async function sendSlackWebhook(webhookUrl: string, message: SlackMessage): Promise<{ success: boolean; error?: string }> {
+async function sendSlackWebhook(
+  webhookUrl: string,
+  message: SlackMessage
+): Promise<{ success: boolean; error?: string }> {
   try {
     const response = await fetch(webhookUrl, {
       method: 'POST',
@@ -31,7 +34,10 @@ interface SlackMessage {
 }
 
 // Discord Webhook
-async function sendDiscordWebhook(webhookUrl: string, message: DiscordMessage): Promise<{ success: boolean; error?: string }> {
+async function sendDiscordWebhook(
+  webhookUrl: string,
+  message: DiscordMessage
+): Promise<{ success: boolean; error?: string }> {
   try {
     const response = await fetch(webhookUrl, {
       method: 'POST',
@@ -66,14 +72,14 @@ export const notificationTools: ToolDefinition[] = [
       properties: {
         webhookUrl: { type: 'string', description: 'Slack Webhook URL' },
         message: { type: 'string', description: '消息内容' },
-        blocks: { 
-          type: 'array', 
+        blocks: {
+          type: 'array',
           description: 'Slack Block Kit 消息块',
         },
       },
       required: ['webhookUrl', 'message'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const webhookUrl = input.webhookUrl as string;
       const message = input.message as string;
       const blocks = input.blocks as unknown[] | undefined;
@@ -97,8 +103,8 @@ export const notificationTools: ToolDefinition[] = [
       properties: {
         webhookUrl: { type: 'string', description: 'Discord Webhook URL' },
         message: { type: 'string', description: '消息内容' },
-        embeds: { 
-          type: 'array', 
+        embeds: {
+          type: 'array',
           description: 'Discord Embed 消息',
         },
         username: { type: 'string', description: '自定义用户名' },
@@ -106,7 +112,7 @@ export const notificationTools: ToolDefinition[] = [
       },
       required: ['webhookUrl', 'message'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const webhookUrl = input.webhookUrl as string;
       const message = input.message as string;
       const embeds = input.embeds as unknown[] | undefined;
@@ -142,7 +148,7 @@ export const notificationTools: ToolDefinition[] = [
       },
       required: ['from', 'to', 'subject', 'body'],
     },
-    handler: async (input) => {
+    handler: async input => {
       // 简单的 nodemailer 封装
       // 实际使用时需要 nodemailer 包
       const { from, to, subject, body } = input;
@@ -150,7 +156,8 @@ export const notificationTools: ToolDefinition[] = [
       // 返回配置信息，实际发送需要环境变量配置
       return {
         success: false,
-        error: 'Email notification requires SMTP configuration. Set environment variables: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS',
+        error:
+          'Email notification requires SMTP configuration. Set environment variables: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS',
         configRequired: {
           from,
           to,
@@ -169,22 +176,22 @@ export const notificationTools: ToolDefinition[] = [
       type: 'object',
       properties: {
         url: { type: 'string', description: 'Webhook URL' },
-        method: { 
-          type: 'string', 
+        method: {
+          type: 'string',
           description: 'HTTP 方法',
           enum: ['POST', 'PUT', 'GET'],
-          default: 'POST'
+          default: 'POST',
         },
-        headers: { 
-          type: 'object', 
+        headers: {
+          type: 'object',
           description: '请求头',
-          additionalProperties: { type: 'string' }
+          additionalProperties: { type: 'string' },
         },
         body: { type: 'string', description: '请求体' },
       },
       required: ['url', 'method'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const url = input.url as string;
       const method = (input.method as string) || 'POST';
       const headers = (input.headers as Record<string, string>) || {};

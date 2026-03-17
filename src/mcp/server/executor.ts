@@ -28,10 +28,30 @@ export class MCPToolExecutor {
     }
 
     const allowedCommands = [
-      'ls', 'cat', 'grep', 'find', 'head', 'tail', 'wc',
-      'git', 'npm', 'node', 'npx', 'tsc', 'eslint', 'prettier',
-      'mkdir', 'touch', 'rm', 'cp', 'mv', 'echo',
-      'pwd', 'whoami', 'date', 'which',
+      'ls',
+      'cat',
+      'grep',
+      'find',
+      'head',
+      'tail',
+      'wc',
+      'git',
+      'npm',
+      'node',
+      'npx',
+      'tsc',
+      'eslint',
+      'prettier',
+      'mkdir',
+      'touch',
+      'rm',
+      'cp',
+      'mv',
+      'echo',
+      'pwd',
+      'whoami',
+      'date',
+      'which',
     ];
 
     const cmdBase = command.trim().split(' ')[0];

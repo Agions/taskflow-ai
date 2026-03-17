@@ -51,7 +51,6 @@ async function main() {
 
     const mcpServer = new MCPServer(mcpSettings, effectiveConfig);
     await mcpServer.start();
-
   } catch (error) {
     console.error('MCP Server Error:', error);
     process.exit(1);

@@ -17,7 +17,7 @@ export async function verifyTaskCompletion(result: ExecutionResult): Promise<Ver
       name: 'Task Completion',
       passed: true,
       message: 'No tasks to verify',
-      severity: 'info'
+      severity: 'info',
     };
   }
 
@@ -26,10 +26,8 @@ export async function verifyTaskCompletion(result: ExecutionResult): Promise<Ver
   return {
     name: 'Task Completion',
     passed,
-    message: passed
-      ? `All ${total} tasks completed`
-      : `${completed}/${total} tasks completed`,
-    severity: passed ? 'info' : 'error'
+    message: passed ? `All ${total} tasks completed` : `${completed}/${total} tasks completed`,
+    severity: passed ? 'info' : 'error',
   };
 }
 
@@ -44,7 +42,7 @@ export async function verifyGeneratedFiles(result: ExecutionResult): Promise<Ver
       name: 'Generated Files',
       passed: true,
       message: 'No files generated',
-      severity: 'info'
+      severity: 'info',
     };
   }
 
@@ -55,6 +53,6 @@ export async function verifyGeneratedFiles(result: ExecutionResult): Promise<Ver
     name: 'Generated Files',
     passed,
     message: `${validFiles.length}/${files.length} files valid`,
-    severity: passed ? 'info' : 'warning'
+    severity: passed ? 'info' : 'warning',
   };
 }

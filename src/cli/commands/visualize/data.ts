@@ -8,14 +8,12 @@ import fs from 'fs-extra';
 export async function findDataFiles(cwd: string = process.cwd()): Promise<string[]> {
   const dataDir = path.join(cwd, '.taskflow', 'data');
 
-  if (!await fs.pathExists(dataDir)) {
+  if (!(await fs.pathExists(dataDir))) {
     return [];
   }
 
   const files = await fs.readdir(dataDir);
-  return files
-    .filter(f => f.endsWith('.json'))
-    .map(f => path.join(dataDir, f));
+  return files.filter(f => f.endsWith('.json')).map(f => path.join(dataDir, f));
 }
 
 export async function loadProjectData(files: string[]): Promise<any> {

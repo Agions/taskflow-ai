@@ -27,7 +27,7 @@ export class PackageFetcher {
             version,
             changelog: '',
             publishedAt: manifest.time[version] || new Date(),
-            deprecated: (pkg as any).deprecated
+            deprecated: (pkg as any).deprecated,
           }));
         }
       } catch (error) {}
@@ -47,7 +47,9 @@ export class PackageFetcher {
     return null;
   }
 
-  async checkUpdates(installedPackages: string[]): Promise<Array<{ name: string; current: string; latest: string }>> {
+  async checkUpdates(
+    installedPackages: string[]
+  ): Promise<Array<{ name: string; current: string; latest: string }>> {
     const updates: Array<{ name: string; current: string; latest: string }> = [];
 
     for (const pkgName of installedPackages) {
@@ -62,7 +64,11 @@ export class PackageFetcher {
     return updates;
   }
 
-  private async fetchPackage(registry: Registry, name: string, version?: string): Promise<ToolPackage | null> {
+  private async fetchPackage(
+    registry: Registry,
+    name: string,
+    version?: string
+  ): Promise<ToolPackage | null> {
     const manifest = await this.fetchManifest(registry, name);
     if (!manifest) return null;
 
@@ -79,7 +85,7 @@ export class PackageFetcher {
     try {
       const encodedName = name.replace('/', '%2F');
       const response = await axios.get(`${registry.url}/${encodedName}`, {
-        timeout: 10000
+        timeout: 10000,
       });
       return response.data;
     } catch {

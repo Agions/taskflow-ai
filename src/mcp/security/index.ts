@@ -117,8 +117,9 @@ export class SecurityManager {
    * 检查权限
    */
   checkPermission(context: SecurityContext, requiredPermission: string): boolean {
-    return context.permissions.includes(requiredPermission) || 
-           context.permissions.includes('admin');
+    return (
+      context.permissions.includes(requiredPermission) || context.permissions.includes('admin')
+    );
   }
 
   /**

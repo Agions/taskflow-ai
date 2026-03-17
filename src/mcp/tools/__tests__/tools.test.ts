@@ -64,13 +64,15 @@ describe('MCP Tools', () => {
     it('should have http_request tool', () => {
       const httpRequest = httpTools.find(t => t.name === 'http_request');
       expect(httpRequest).toBeDefined();
-      expect(httpRequest?.inputSchema.properties.url).toBeDefined();
-      expect(httpRequest?.inputSchema.properties.method).toBeDefined();
+      const schema = httpRequest?.inputSchema as any;
+      expect(schema.properties.url).toBeDefined();
+      expect(schema.properties.method).toBeDefined();
     });
 
     it('should support common HTTP methods', () => {
       const httpRequest = httpTools.find(t => t.name === 'http_request');
-      const methods = httpRequest?.inputSchema.properties.method.enum as string[];
+      const schema = httpRequest?.inputSchema as any;
+      const methods = schema.properties.method.enum as string[];
       expect(methods).toContain('GET');
       expect(methods).toContain('POST');
       expect(methods).toContain('PUT');
@@ -87,8 +89,9 @@ describe('MCP Tools', () => {
     it('should have query tool', () => {
       const queryTool = databaseTools.find(t => t.name === 'db_query');
       expect(queryTool).toBeDefined();
-      expect(queryTool?.inputSchema.properties.dbPath).toBeDefined();
-      expect(queryTool?.inputSchema.properties.sql).toBeDefined();
+      const schema = queryTool?.inputSchema as any;
+      expect(schema.properties.dbPath).toBeDefined();
+      expect(schema.properties.sql).toBeDefined();
     });
   });
 
@@ -118,7 +121,8 @@ describe('MCP Tools', () => {
     it('should support multiple languages', () => {
       const executeTool = codeTools.find(t => t.name === 'code_execute');
       expect(executeTool).toBeDefined();
-      const languages = executeTool?.inputSchema.properties.language.enum as string[];
+      const schema = executeTool?.inputSchema as any;
+      const languages = schema.properties.language.enum as string[];
       expect(languages).toContain('javascript');
       expect(languages).toContain('python');
       expect(languages).toContain('node');
@@ -151,7 +155,8 @@ describe('MCP Tools', () => {
     it('should have exec tool', () => {
       const execTool = shellTools.find(t => t.name === 'shell_exec');
       expect(execTool).toBeDefined();
-      expect(execTool?.inputSchema.properties.command).toBeDefined();
+      const schema = execTool?.inputSchema as any;
+      expect(schema.properties.command).toBeDefined();
     });
   });
 
@@ -168,10 +173,10 @@ describe('MCP Tools', () => {
         ...codeTools,
         ...gitTools,
       ];
-      
+
       const names = allTools.map(t => t.name);
       const uniqueNames = new Set(names);
-      
+
       expect(names.length).toBe(uniqueNames.size);
     });
 
@@ -183,10 +188,11 @@ describe('MCP Tools', () => {
         ...codeTools,
         ...gitTools,
       ];
-      
+
       for (const tool of allTools) {
-        expect(tool.inputSchema.type).toBe('object');
-        expect(tool.inputSchema.properties).toBeDefined();
+        const schema = tool.inputSchema as any;
+        expect(schema.type).toBe('object');
+        expect(schema.properties).toBeDefined();
       }
     });
   });

@@ -26,7 +26,10 @@ export class ConfigBackupManager {
     }
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const backupPath = path.join(this.operations.getConfigDir(), `${CONFIG_FILE}.backup.${timestamp}`);
+    const backupPath = path.join(
+      this.operations.getConfigDir(),
+      `${CONFIG_FILE}.backup.${timestamp}`
+    );
 
     await fs.copy(this.operations.getConfigPath(), backupPath);
     return backupPath;
@@ -59,7 +62,7 @@ export class ConfigBackupManager {
    */
   async listBackups(): Promise<{ path: string; created: Date; size: number }[]> {
     const configDir = this.operations.getConfigDir();
-    
+
     if (!(await fs.pathExists(configDir))) {
       return [];
     }
@@ -87,7 +90,7 @@ export class ConfigBackupManager {
    */
   async cleanupOldBackups(keepCount: number = 5): Promise<number> {
     const backups = await this.listBackups();
-    
+
     if (backups.length <= keepCount) {
       return 0;
     }

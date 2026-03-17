@@ -3,13 +3,7 @@
  * 负责管理工作流的执行流程
  */
 
-import { 
-  Workflow, 
-  WorkflowExecution, 
-  WorkflowStep, 
-  StepStatus,
-  ExecutionResult 
-} from './types';
+import { Workflow, WorkflowExecution, WorkflowStep, StepStatus, ExecutionResult } from './types';
 import { createExecutor, ExecutionContext } from './executor';
 import { Logger } from '../../utils/logger';
 
@@ -31,7 +25,7 @@ export class WorkflowEngine {
    */
   async execute(workflow: Workflow, input?: Record<string, unknown>): Promise<ExecutionResult> {
     const startTime = Date.now();
-    
+
     const context: ExecutionContext = {
       variables: { ...workflow.variables, ...input },
       outputs: {},
@@ -61,7 +55,7 @@ export class WorkflowEngine {
       const stepMap = new Map(workflow.steps.map(s => [s.id, s]));
 
       const startSteps = this.findStartSteps(workflow);
-      
+
       await this.executeSteps(stepMap, startSteps, context, execution);
 
       execution.status = 'completed';
@@ -106,7 +100,7 @@ export class WorkflowEngine {
 
     execution.status = 'paused';
     execution.pausedAt = execution.currentStep;
-    
+
     this.logger.info(`工作流已暂停: ${executionId}`);
     return true;
   }
@@ -121,7 +115,7 @@ export class WorkflowEngine {
     }
 
     this.logger.info(`恢复工作流: ${executionId}`);
-    
+
     return {
       success: false,
       execution,
@@ -190,7 +184,7 @@ export class WorkflowEngine {
         const nextSteps = step.next
           .map(id => stepMap.get(id))
           .filter((s): s is WorkflowStep => s !== undefined);
-        
+
         await this.executeSteps(stepMap, nextSteps, context, execution);
       }
     }
@@ -201,13 +195,11 @@ export class WorkflowEngine {
    */
   private findStartSteps(workflow: Workflow): WorkflowStep[] {
     const dependentSteps = new Set<string>();
-    
+
     for (const step of workflow.steps) {
       const config = step.config as any;
       if (config?.dependsOn) {
-        const deps = Array.isArray(config.dependsOn) 
-          ? config.dependsOn 
-          : [config.dependsOn];
+        const deps = Array.isArray(config.dependsOn) ? config.dependsOn : [config.dependsOn];
         deps.forEach((d: string) => dependentSteps.add(d));
       }
     }
@@ -266,15 +258,15 @@ export class ParallelExecutor {
 
     for (let i = 0; i < steps.length; i += maxConcurrency) {
       const batch = steps.slice(i, i + maxConcurrency);
-      
-      const promises = batch.map(async (step) => {
+
+      const promises = batch.map(async step => {
         const executor = createExecutor(step, context);
         const result = await executor.execute();
         return { stepId: step.id, result };
       });
 
       const batchResults = await Promise.all(promises);
-      
+
       for (const { stepId, result } of batchResults) {
         results.set(stepId, {
           success: result.success,

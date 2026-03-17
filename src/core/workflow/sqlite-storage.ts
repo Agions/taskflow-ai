@@ -22,7 +22,7 @@ export class SQLiteStorage implements StorageBackend {
     try {
       const Database = require('better-sqlite3');
       this.db = new Database(this.dbPath);
-      
+
       this.db.exec(`
         CREATE TABLE IF NOT EXISTS workflows (
           id TEXT PRIMARY KEY,
@@ -67,8 +67,15 @@ export class SQLiteStorage implements StorageBackend {
       INSERT OR REPLACE INTO workflows (id, name, version, description, definition, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
-    stmt.run(workflow.id, workflow.name, workflow.version, workflow.description,
-      JSON.stringify(workflow), Date.now(), Date.now());
+    stmt.run(
+      workflow.id,
+      workflow.name,
+      workflow.version,
+      workflow.description,
+      JSON.stringify(workflow),
+      Date.now(),
+      Date.now()
+    );
   }
 
   async getWorkflow(id: string): Promise<any | null> {
@@ -81,7 +88,9 @@ export class SQLiteStorage implements StorageBackend {
 
   async listWorkflows(): Promise<any[]> {
     await this.initialize();
-    const stmt = this.db.prepare('SELECT id, name, version, description, created_at FROM workflows ORDER BY updated_at DESC');
+    const stmt = this.db.prepare(
+      'SELECT id, name, version, description, created_at FROM workflows ORDER BY updated_at DESC'
+    );
     return stmt.all();
   }
 
@@ -98,10 +107,19 @@ export class SQLiteStorage implements StorageBackend {
       (id, workflow_id, status, current_step, variables, outputs, step_statuses, error, started_at, finished_at, paused_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
-    stmt.run(execution.id, execution.workflowId, execution.status, execution.currentStep || null,
-      JSON.stringify(execution.variables), JSON.stringify(execution.outputs),
-      JSON.stringify(execution.stepStatuses), execution.error || null,
-      execution.startedAt, execution.finishedAt || null, execution.pausedAt || null);
+    stmt.run(
+      execution.id,
+      execution.workflowId,
+      execution.status,
+      execution.currentStep || null,
+      JSON.stringify(execution.variables),
+      JSON.stringify(execution.outputs),
+      JSON.stringify(execution.stepStatuses),
+      execution.error || null,
+      execution.startedAt,
+      execution.finishedAt || null,
+      execution.pausedAt || null
+    );
   }
 
   async getExecution(id: string): Promise<WorkflowExecution | null> {
@@ -115,7 +133,9 @@ export class SQLiteStorage implements StorageBackend {
   async listExecutions(workflowId?: string, limit: number = 50): Promise<WorkflowExecution[]> {
     await this.initialize();
     if (workflowId) {
-      const stmt = this.db.prepare('SELECT * FROM executions WHERE workflow_id = ? ORDER BY started_at DESC LIMIT ?');
+      const stmt = this.db.prepare(
+        'SELECT * FROM executions WHERE workflow_id = ? ORDER BY started_at DESC LIMIT ?'
+      );
       return (stmt.all(workflowId, limit) as any[]).map(row => this.rowToExecution(row));
     } else {
       const stmt = this.db.prepare('SELECT * FROM executions ORDER BY started_at DESC LIMIT ?');
@@ -135,11 +155,17 @@ export class SQLiteStorage implements StorageBackend {
 
   private rowToExecution(row: any): WorkflowExecution {
     return {
-      id: row.id, workflowId: row.workflow_id, status: row.status,
+      id: row.id,
+      workflowId: row.workflow_id,
+      status: row.status,
       currentStep: row.current_step || undefined,
-      variables: JSON.parse(row.variables || '{}'), outputs: JSON.parse(row.outputs || '{}'),
-      stepStatuses: JSON.parse(row.step_statuses || '{}'), error: row.error || undefined,
-      startedAt: row.started_at, finishedAt: row.finished_at || undefined, pausedAt: row.paused_at || undefined,
+      variables: JSON.parse(row.variables || '{}'),
+      outputs: JSON.parse(row.outputs || '{}'),
+      stepStatuses: JSON.parse(row.step_statuses || '{}'),
+      error: row.error || undefined,
+      startedAt: row.started_at,
+      finishedAt: row.finished_at || undefined,
+      pausedAt: row.paused_at || undefined,
     };
   }
 

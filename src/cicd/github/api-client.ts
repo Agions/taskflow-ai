@@ -15,12 +15,16 @@ export class GitHubApiClient {
 
   private getHeaders() {
     return {
-      'Authorization': `Bearer ${this.token}`,
-      'Accept': 'application/vnd.github.v3+json'
+      Authorization: `Bearer ${this.token}`,
+      Accept: 'application/vnd.github.v3+json',
     };
   }
 
-  async triggerWorkflow(workflowId: string, ref: string, inputs?: Record<string, string>): Promise<void> {
+  async triggerWorkflow(
+    workflowId: string,
+    ref: string,
+    inputs?: Record<string, string>
+  ): Promise<void> {
     await axios.post(
       `${this.baseUrl}/repos/${this.repository}/actions/workflows/${workflowId}/dispatches`,
       { ref, inputs },
@@ -44,14 +48,12 @@ export class GitHubApiClient {
 
   async getBuildReport(runId: string): Promise<BuildReport> {
     const [runResponse, jobsResponse] = await Promise.all([
-      axios.get(
-        `${this.baseUrl}/repos/${this.repository}/actions/runs/${runId}`,
-        { headers: this.getHeaders() }
-      ),
-      axios.get(
-        `${this.baseUrl}/repos/${this.repository}/actions/runs/${runId}/jobs`,
-        { headers: this.getHeaders() }
-      )
+      axios.get(`${this.baseUrl}/repos/${this.repository}/actions/runs/${runId}`, {
+        headers: this.getHeaders(),
+      }),
+      axios.get(`${this.baseUrl}/repos/${this.repository}/actions/runs/${runId}/jobs`, {
+        headers: this.getHeaders(),
+      }),
     ]);
 
     const run = runResponse.data;
@@ -72,9 +74,9 @@ export class GitHubApiClient {
         totalDuration: jobs.reduce((sum, j) => sum + (j.duration || 0), 0),
         testsPassed: 0,
         testsFailed: 0,
-        coverage: 0
+        coverage: 0,
       },
-      artifacts: []
+      artifacts: [],
     };
   }
 
@@ -83,16 +85,19 @@ export class GitHubApiClient {
       name: job.name,
       status: this.mapStatus(job.status, job.conclusion),
       duration: job.duration || 0,
-      jobs: [{
-        name: job.name,
-        status: this.mapStatus(job.status, job.conclusion),
-        duration: job.duration || 0,
-        steps: job.steps?.map((step: any) => ({
-          name: step.name,
-          status: this.mapStatus(step.status, step.conclusion),
-          duration: 0
-        })) || []
-      }]
+      jobs: [
+        {
+          name: job.name,
+          status: this.mapStatus(job.status, job.conclusion),
+          duration: job.duration || 0,
+          steps:
+            job.steps?.map((step: any) => ({
+              name: step.name,
+              status: this.mapStatus(step.status, step.conclusion),
+              duration: 0,
+            })) || [],
+        },
+      ],
     };
   }
 
@@ -119,10 +124,9 @@ export class GitHubApiClient {
   }
 
   async listSecrets(): Promise<string[]> {
-    const response = await axios.get(
-      `${this.baseUrl}/repos/${this.repository}/actions/secrets`,
-      { headers: this.getHeaders() }
-    );
+    const response = await axios.get(`${this.baseUrl}/repos/${this.repository}/actions/secrets`, {
+      headers: this.getHeaders(),
+    });
     return response.data.secrets.map((s: any) => s.name);
   }
 
@@ -138,7 +142,7 @@ export class GitHubApiClient {
       `${this.baseUrl}/repos/${this.repository}/actions/secrets/${name}`,
       {
         encrypted_value: encryptedValue,
-        key_id: publicKey.key_id
+        key_id: publicKey.key_id,
       },
       { headers: this.getHeaders() }
     );

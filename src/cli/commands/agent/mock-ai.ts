@@ -14,7 +14,7 @@ export class MockAIService {
             priority: 'high',
             estimate: 2,
             dependencies: [],
-            tags: ['setup']
+            tags: ['setup'],
           },
           {
             title: 'Implement Feature',
@@ -24,7 +24,7 @@ export class MockAIService {
             estimate: 8,
             dependencies: [],
             outputPath: 'src/feature/index.ts',
-            tags: ['core', 'feature']
+            tags: ['core', 'feature'],
           },
           {
             title: 'Add Tests',
@@ -33,22 +33,24 @@ export class MockAIService {
             priority: 'medium',
             estimate: 4,
             dependencies: ['T002'],
-            tags: ['test']
-          }
-        ]
+            tags: ['test'],
+          },
+        ],
       });
     }
 
     if (prompt.includes('analyze')) {
       return JSON.stringify({
-        features: [{
-          name: 'Core Feature',
-          description: 'Main feature implementation',
-          complexity: 'medium',
-          dependencies: []
-        }],
+        features: [
+          {
+            name: 'Core Feature',
+            description: 'Main feature implementation',
+            complexity: 'medium',
+            dependencies: [],
+          },
+        ],
         technicalConstraints: ['TypeScript', 'React'],
-        risks: []
+        risks: [],
       });
     }
 

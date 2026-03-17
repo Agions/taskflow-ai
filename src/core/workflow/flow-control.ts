@@ -26,12 +26,9 @@ export interface StepResult {
 export class ConditionExecutor {
   private logger = Logger.getInstance('ConditionExecutor');
 
-  async execute(
-    step: WorkflowStep,
-    context: ExecutionContext
-  ): Promise<StepResult> {
+  async execute(step: WorkflowStep, context: ExecutionContext): Promise<StepResult> {
     const startTime = Date.now();
-    
+
     if (!step.condition || !step.branches || step.branches.length === 0) {
       return {
         success: false,
@@ -43,8 +40,9 @@ export class ConditionExecutor {
 
     this.logger.info(`评估条件: ${step.condition} = ${conditionValue}`);
 
-    let selectedBranch = step.branches.find(b => b.id === 'true' && conditionValue) ||
-                        step.branches.find(b => b.id === 'false' && !conditionValue);
+    let selectedBranch =
+      step.branches.find(b => b.id === 'true' && conditionValue) ||
+      step.branches.find(b => b.id === 'false' && !conditionValue);
 
     if (!selectedBranch) {
       selectedBranch = step.branches[0];
@@ -122,15 +120,15 @@ export class ParallelFlowExecutor {
 
     for (let i = 0; i < steps.length; i += max) {
       const batch = steps.slice(i, i + max);
-      
-      const promises = batch.map(async (step) => {
+
+      const promises = batch.map(async step => {
         const executor = createExecutor(step, context);
         const result = await executor.execute();
         return { stepId: step.id, result };
       });
 
       const batchResults = await Promise.all(promises);
-      
+
       for (const { stepId, result } of batchResults) {
         results[stepId] = result;
       }
@@ -152,12 +150,9 @@ export class ParallelFlowExecutor {
 export class LoopExecutor {
   private logger = Logger.getInstance('LoopExecutor');
 
-  async execute(
-    step: WorkflowStep,
-    context: ExecutionContext
-  ): Promise<StepResult> {
+  async execute(step: WorkflowStep, context: ExecutionContext): Promise<StepResult> {
     const startTime = Date.now();
-    
+
     const maxIterations = (step.config as any).maxIterations || 10;
     const condition = (step.config as any).loopCondition;
     const delay = (step.config as any).delay || 0;
@@ -174,7 +169,7 @@ export class LoopExecutor {
 
       const executor = createExecutor(step, context);
       const result = await executor.execute();
-      
+
       results.push(result);
 
       if (!result.success) {
@@ -199,7 +194,11 @@ export class LoopExecutor {
     };
   }
 
-  private evaluateCondition(condition: string, context: ExecutionContext, iteration: number): boolean {
+  private evaluateCondition(
+    condition: string,
+    context: ExecutionContext,
+    iteration: number
+  ): boolean {
     if (condition === '{{done}}') {
       return false;
     }

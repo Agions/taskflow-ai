@@ -101,7 +101,7 @@ export class MCPResourceManager {
     const fileName = uri.replace('/files/', '');
     const filePath = path.join(this.dataDir, fileName);
 
-    if (!await fs.pathExists(filePath)) {
+    if (!(await fs.pathExists(filePath))) {
       throw new Error(`File not found: ${fileName}`);
     }
 

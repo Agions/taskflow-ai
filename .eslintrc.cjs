@@ -3,7 +3,6 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'prettier'
   ],
   plugins: ['@typescript-eslint'],
   parserOptions: {
@@ -25,10 +24,10 @@ module.exports = {
       varsIgnorePattern: '^_' 
     }],
     'no-console': 'off',
-    'no-unused-vars': 'off', // 使用 @typescript-eslint/no-unused-vars 替代
+    'no-unused-vars': 'off',
     'prefer-const': 'error',
     'no-var': 'error',
     'eqeqeq': ['error', 'always', { 'null': 'ignore' }],
   },
   ignorePatterns: ['dist', 'node_modules', 'coverage', '*.js', '*.d.ts'],
-}; 
+};

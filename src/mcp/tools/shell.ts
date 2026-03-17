@@ -18,16 +18,16 @@ export const shellTools: ToolDefinition[] = [
         command: { type: 'string', description: '要执行的命令' },
         cwd: { type: 'string', description: '工作目录' },
         timeout: { type: 'number', description: '超时时间(秒)', default: 30 },
-        env: { 
-          type: 'object', 
+        env: {
+          type: 'object',
           description: '环境变量',
-          additionalProperties: { type: 'string' }
+          additionalProperties: { type: 'string' },
         },
         shell: { type: 'string', description: '使用的 shell', default: '/bin/bash' },
       },
       required: ['command'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const command = input.command as string;
       const cwd = (input.cwd as string) || process.cwd();
       const timeout = ((input.timeout as number) || 30) * 1000;
@@ -44,7 +44,7 @@ export const shellTools: ToolDefinition[] = [
           encoding: 'utf-8',
           maxBuffer: 10 * 1024 * 1024, // 10MB
         });
-        
+
         return {
           success: true,
           output: result,
@@ -76,22 +76,22 @@ export const shellTools: ToolDefinition[] = [
       properties: {
         command: { type: 'string', description: '要执行的命令' },
         cwd: { type: 'string', description: '工作目录' },
-        env: { 
-          type: 'object', 
+        env: {
+          type: 'object',
           description: '环境变量',
-          additionalProperties: { type: 'string' }
+          additionalProperties: { type: 'string' },
         },
         shell: { type: 'string', description: '使用的 shell' },
       },
       required: ['command'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const command = input.command as string;
       const cwd = (input.cwd as string) || process.cwd();
       const shell = (input.shell as string) || '/bin/bash';
       const env = { ...process.env, ...(input.env as Record<string, string>) };
 
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         const child = spawn(command, [], {
           cwd,
           shell,
@@ -101,15 +101,15 @@ export const shellTools: ToolDefinition[] = [
         let stdout = '';
         let stderr = '';
 
-        child.stdout?.on('data', (data) => {
+        child.stdout?.on('data', data => {
           stdout += data.toString();
         });
 
-        child.stderr?.on('data', (data) => {
+        child.stderr?.on('data', data => {
           stderr += data.toString();
         });
 
-        child.on('close', (code) => {
+        child.on('close', code => {
           resolve({
             success: code === 0,
             output: stdout,
@@ -119,7 +119,7 @@ export const shellTools: ToolDefinition[] = [
           });
         });
 
-        child.on('error', (error) => {
+        child.on('error', error => {
           resolve({
             success: false,
             error: error.message,
@@ -142,7 +142,7 @@ export const shellTools: ToolDefinition[] = [
       },
       required: ['command'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const command = `command -v ${input.command}`;
       try {
         execSync(command, { encoding: 'utf-8' });
@@ -165,7 +165,7 @@ export const shellTools: ToolDefinition[] = [
       },
       required: ['pid'],
     },
-    handler: async (input) => {
+    handler: async input => {
       const pid = input.pid as number;
       const signal = (input.signal as string) || 'SIGTERM';
 

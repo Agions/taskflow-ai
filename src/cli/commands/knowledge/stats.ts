@@ -48,8 +48,9 @@ export async function executeStats(): Promise<void> {
     }
 
     console.log();
-
   } catch (error) {
-    spinner.fail(`Failed to get statistics: ${error instanceof Error ? error.message : String(error)}`);
+    spinner.fail(
+      `Failed to get statistics: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }

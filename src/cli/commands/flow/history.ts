@@ -21,12 +21,15 @@ export async function executeHistory(options: HistoryOptions): Promise<void> {
   }
 
   console.log(chalk.bold('\n📜 执行历史:\n'));
-  
+
   for (const exec of executions.slice(-10).reverse()) {
-    const statusColor = exec.status === 'completed' ? chalk.green : 
-                       exec.status === 'failed' ? chalk.red : 
-                       chalk.yellow;
-    
+    const statusColor =
+      exec.status === 'completed'
+        ? chalk.green
+        : exec.status === 'failed'
+          ? chalk.red
+          : chalk.yellow;
+
     console.log(`  ${chalk.cyan(exec.id)}`);
     console.log(`    状态: ${statusColor(exec.status)}`);
     console.log(`    开始: ${new Date(exec.startedAt).toLocaleString()}`);

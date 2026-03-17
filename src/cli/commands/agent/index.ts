@@ -22,7 +22,7 @@ export const agentCommand = new Command('agent')
   .option('--timeout <ms>', 'Task timeout in milliseconds', '30000')
   .option('--dry-run', 'Simulate execution without making changes')
   .option('--continue-on-error', 'Continue execution even if tasks fail')
-  .action(async (options) => {
+  .action(async options => {
     const ora = (await import('ora')).default;
     const spinner = ora('Initializing AI Agent...').start();
 
@@ -33,7 +33,7 @@ export const agentCommand = new Command('agent')
       }
 
       const prdPath = path.resolve(options.prd);
-      if (!await fs.pathExists(prdPath)) {
+      if (!(await fs.pathExists(prdPath))) {
         spinner.fail(`PRD file not found: ${prdPath}`);
         process.exit(1);
       }
@@ -50,7 +50,7 @@ export const agentCommand = new Command('agent')
         timeout: parseInt(options.timeout),
         continueOnError: options.continueOnError || false,
         dryRun: options.dryRun || false,
-        constraints: options.constraint || []
+        constraints: options.constraint || [],
       });
     } catch (error) {
       spinner.fail('Agent execution failed');

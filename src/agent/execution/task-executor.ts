@@ -55,7 +55,7 @@ export class TaskExecutor {
         success: true,
         output: code,
         duration: Date.now() - startTime,
-        artifacts: [fullPath]
+        artifacts: [fullPath],
       };
     }
 
@@ -69,7 +69,7 @@ export class TaskExecutor {
 
       const result = await this.mcpServer.callTool('file_write', {
         path: fullPath,
-        content: task.description
+        content: task.description,
       });
 
       return {
@@ -77,7 +77,7 @@ export class TaskExecutor {
         success: result.success,
         output: result.data as string,
         duration: Date.now() - startTime,
-        artifacts: result.success ? [fullPath] : undefined
+        artifacts: result.success ? [fullPath] : undefined,
       };
     }
 
@@ -88,7 +88,7 @@ export class TaskExecutor {
     try {
       const { stdout, stderr } = await execAsync(task.description, {
         cwd: this.context.projectPath,
-        timeout: 300000
+        timeout: 300000,
       });
 
       return {
@@ -96,28 +96,28 @@ export class TaskExecutor {
         success: true,
         output: stdout,
         error: stderr || undefined,
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       };
     } catch (error) {
       return {
         taskId: task.id,
         success: false,
         error: error instanceof Error ? error.message : String(error),
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       };
     }
   }
 
   private async executeAnalysisTask(task: Task, startTime: number): Promise<TaskResult> {
     const result = await this.mcpServer.callTool('project_analyze', {
-      path: this.context.projectPath
+      path: this.context.projectPath,
     });
 
     return {
       taskId: task.id,
       success: result.success,
       output: JSON.stringify(result.data, null, 2),
-      duration: Date.now() - startTime
+      duration: Date.now() - startTime,
     };
   }
 
@@ -126,7 +126,7 @@ export class TaskExecutor {
       taskId: task.id,
       success: true,
       output: `Design task completed: ${task.title}`,
-      duration: Date.now() - startTime
+      duration: Date.now() - startTime,
     };
   }
 
@@ -135,7 +135,7 @@ export class TaskExecutor {
       taskId: task.id,
       success: true,
       output: `Test task completed: ${task.title}`,
-      duration: Date.now() - startTime
+      duration: Date.now() - startTime,
     };
   }
 

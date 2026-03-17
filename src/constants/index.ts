@@ -2,11 +2,9 @@
  * TaskFlow AI 常量定义
  */
 
-
 export const APP_NAME = 'TaskFlow AI';
 export const APP_VERSION = '2.0.0';
 export const APP_DESCRIPTION = '智能PRD文档解析与任务管理助手';
-
 
 export const CONFIG_DIR = '.taskflow';
 export const CONFIG_FILE = 'config.json';
@@ -17,7 +15,6 @@ export const PLUGINS_DIR = 'plugins';
 
 export const DEFAULT_OUTPUT_DIR = 'output';
 export const DEFAULT_REPORTS_DIR = 'reports';
-
 
 export const SUPPORTED_PRD_FORMATS = [
   '.md',
@@ -38,7 +35,6 @@ export const SUPPORTED_OUTPUT_FORMATS = [
   'csv',
   'excel',
 ] as const;
-
 
 export const AI_PROVIDERS = {
   DEEPSEEK: 'deepseek',
@@ -67,7 +63,6 @@ export const AI_MODEL_ENDPOINTS = {
   [AI_PROVIDERS.MOONSHOT]: 'https://api.moonshot.cn/v1',
   [AI_PROVIDERS.SPARK]: 'https://spark-api.xf-yun.com/v1.1',
 };
-
 
 export const MCP_CONFIG = {
   DEFAULT_PORT: 3000,
@@ -99,7 +94,6 @@ export const MCP_RESOURCES = {
   STATUS: '/status',
   HEALTH: '/health',
 } as const;
-
 
 export const TASK_TYPES = {
   FRONTEND: 'frontend',
@@ -136,7 +130,6 @@ export const COMPLEXITY_LEVELS = {
   EPIC: 'epic',
 } as const;
 
-
 export const CHART_TYPES = {
   GANTT: 'gantt',
   BURNDOWN: 'burndown',
@@ -164,7 +157,6 @@ export const DEFAULT_COLORS = [
   '#EC4899', // Pink
   '#6B7280', // Gray
 ];
-
 
 export const ERROR_CODES = {
   CONFIG_NOT_FOUND: 'CONFIG_NOT_FOUND',
@@ -234,7 +226,6 @@ export const DEFAULT_CONFIG = {
   plugins: [],
 };
 
-
 export const CLI_COLORS = {
   PRIMARY: '#3B82F6',
   SUCCESS: '#10B981',
@@ -254,7 +245,6 @@ export const CLI_SYMBOLS = {
   BULLET: '•',
 };
 
-
 export const REGEX_PATTERNS = {
   EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   URL: /^https?:\/\/.+/,
@@ -263,7 +253,6 @@ export const REGEX_PATTERNS = {
   PROJECT_NAME: /^[a-zA-Z0-9-_\s]+$/,
 };
 
-
 export const PERFORMANCE = {
   CACHE_TTL: 60 * 60 * 1000, // 1小时
   MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
@@ -271,7 +260,6 @@ export const PERFORMANCE = {
   DEBOUNCE_DELAY: 300,
   THROTTLE_DELAY: 1000,
 };
-
 
 export const ENV_VARS = {
   NODE_ENV: 'NODE_ENV',

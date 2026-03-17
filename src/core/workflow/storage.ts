@@ -15,7 +15,10 @@ export { MemoryStorage } from './memory-storage';
 /**
  * 存储工厂
  */
-export function createStorage(type: 'sqlite' | 'memory', options?: { dbPath?: string }): StorageBackend {
+export function createStorage(
+  type: 'sqlite' | 'memory',
+  options?: { dbPath?: string }
+): StorageBackend {
   switch (type) {
     case 'sqlite':
       return new SQLiteStorage(options?.dbPath);

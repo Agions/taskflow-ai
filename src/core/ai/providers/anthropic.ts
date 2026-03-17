@@ -7,7 +7,13 @@ import { ModelConfig, PROVIDER_ENDPOINTS } from '../types';
 
 interface ClaudeMessage {
   role: 'user' | 'assistant';
-  content: string | Array<{ type: string; text?: string; source?: { type: string; media_type: string; data: string } }>;
+  content:
+    | string
+    | Array<{
+        type: string;
+        text?: string;
+        source?: { type: string; media_type: string; data: string };
+      }>;
 }
 
 interface ClaudeRequest {
@@ -64,7 +70,12 @@ export class AnthropicAdapter extends BaseAdapter {
     return converted;
   }
 
-  async complete(options: { messages: ChatMessage[]; temperature?: number; max_tokens?: number; top_p?: number }): Promise<{
+  async complete(options: {
+    messages: ChatMessage[];
+    temperature?: number;
+    max_tokens?: number;
+    top_p?: number;
+  }): Promise<{
     id: string;
     model: string;
     choices: Array<{
@@ -92,22 +103,26 @@ export class AnthropicAdapter extends BaseAdapter {
 
     const response = await this.request<ClaudeResponse>('/messages', requestBody);
 
-    const content = response.content
-      .map(c => c.text || '')
-      .join('');
+    const content = response.content.map(c => c.text || '').join('');
 
     return {
       id: response.id,
       model: response.model,
-      choices: [{
-        index: 0,
-        message: {
-          role: 'assistant',
-          content,
+      choices: [
+        {
+          index: 0,
+          message: {
+            role: 'assistant',
+            content,
+          },
+          finish_reason:
+            response.stop_reason === 'end_turn'
+              ? 'stop'
+              : response.stop_reason === 'max_tokens'
+                ? 'length'
+                : null,
         },
-        finish_reason: response.stop_reason === 'end_turn' ? 'stop' : 
-                       response.stop_reason === 'max_tokens' ? 'length' : null,
-      }],
+      ],
       usage: {
         prompt_tokens: response.usage.input_tokens,
         completion_tokens: response.usage.output_tokens,
@@ -118,7 +133,9 @@ export class AnthropicAdapter extends BaseAdapter {
   }
 
   async *stream(
-    options: { messages: ChatMessage[]; temperature?: number; max_tokens?: number } & { stream: true }
+    options: { messages: ChatMessage[]; temperature?: number; max_tokens?: number } & {
+      stream: true;
+    }
   ): AsyncGenerator<StreamChunk> {
     const systemMessages = options.messages.filter(m => m.role === 'system');
     const otherMessages = options.messages.filter(m => m.role !== 'system');
@@ -166,29 +183,32 @@ export class AnthropicAdapter extends BaseAdapter {
         try {
           const data = JSON.parse(line.slice(6));
           finalId = data.id;
-          
+
           if (data.type === 'content_block_delta') {
             yield {
               id: data.id,
-              choices: [{
-                index: 0,
-                delta: {
-                  content: data.delta?.text || '',
+              choices: [
+                {
+                  index: 0,
+                  delta: {
+                    content: data.delta?.text || '',
+                  },
                 },
-              }],
+              ],
             };
           } else if (data.type === 'message_delta') {
             yield {
               id: data.id,
-              choices: [{
-                index: 0,
-                delta: {},
-                finish_reason: data.delta?.stop_reason || 'stop',
-              }],
+              choices: [
+                {
+                  index: 0,
+                  delta: {},
+                  finish_reason: data.delta?.stop_reason || 'stop',
+                },
+              ],
             };
           }
-        } catch {
-        }
+        } catch {}
       }
     }
   }

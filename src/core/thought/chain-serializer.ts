@@ -83,11 +83,15 @@ export class ThoughtChainSerializer {
    * 序列化为 JSON 格式
    */
   toJSON(chain: ThoughtChain): string {
-    return JSON.stringify({
-      id: chain.id,
-      createdAt: chain.createdAt,
-      metadata: chain.metadata,
-      steps: this.toSteps(chain),
-    }, null, 2);
+    return JSON.stringify(
+      {
+        id: chain.id,
+        createdAt: chain.createdAt,
+        metadata: chain.metadata,
+        steps: this.toSteps(chain),
+      },
+      null,
+      2
+    );
   }
 }

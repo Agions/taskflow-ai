@@ -10,7 +10,7 @@ export interface ToolDefinition {
   category?: string;
   tags?: string[];
   version?: string;
-  
+
   // 增强字段
   auth?: AuthConfig;
   rateLimit?: RateLimitConfig;
@@ -18,7 +18,10 @@ export interface ToolDefinition {
   examples?: ToolExample[];
 }
 
-export type ToolHandler = (input: Record<string, unknown>, context?: ToolContext) => Promise<unknown>;
+export type ToolHandler = (
+  input: Record<string, unknown>,
+  context?: ToolContext
+) => Promise<unknown>;
 
 export interface ToolContext {
   workspace?: string;

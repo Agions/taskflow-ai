@@ -69,14 +69,14 @@ export async function configureAIModels(): Promise<AIModelConfig[]> {
         type: 'input',
         name: 'apiKey',
         message: 'API密钥:',
-        validate: input => input.trim() ? true : 'API密钥不能为空',
+        validate: input => (input.trim() ? true : 'API密钥不能为空'),
       },
       {
         type: 'input',
         name: 'modelName',
         message: '模型名称:',
         default: DEFAULT_MODELS[provider],
-        validate: input => input.trim() ? true : '模型名称不能为空',
+        validate: input => (input.trim() ? true : '模型名称不能为空'),
       },
       {
         type: 'list',
