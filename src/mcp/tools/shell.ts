@@ -1,0 +1,183 @@
+/**
+ * Shell 工具 - 命令执行
+ */
+
+import { ToolDefinition, PermissionLevel } from './types';
+import { execSync, spawn } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(execSync);
+
+export const shellTools: ToolDefinition[] = [
+  {
+    name: 'shell_exec',
+    description: '执行 shell 命令',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        command: { type: 'string', description: '要执行的命令' },
+        cwd: { type: 'string', description: '工作目录' },
+        timeout: { type: 'number', description: '超时时间(秒)', default: 30 },
+        env: { 
+          type: 'object', 
+          description: '环境变量',
+          additionalProperties: { type: 'string' }
+        },
+        shell: { type: 'string', description: '使用的 shell', default: '/bin/bash' },
+      },
+      required: ['command'],
+    },
+    handler: async (input) => {
+      const command = input.command as string;
+      const cwd = (input.cwd as string) || process.cwd();
+      const timeout = ((input.timeout as number) || 30) * 1000;
+      const shell = (input.shell as string) || '/bin/bash';
+      const env = { ...process.env, ...(input.env as Record<string, string>) };
+
+      try {
+        const startTime = Date.now();
+        const result = execSync(command, {
+          cwd,
+          timeout,
+          shell,
+          env,
+          encoding: 'utf-8',
+          maxBuffer: 10 * 1024 * 1024, // 10MB
+        });
+        
+        return {
+          success: true,
+          output: result,
+          command,
+          cwd,
+          duration: Date.now() - startTime,
+        };
+      } catch (error: any) {
+        return {
+          success: false,
+          output: error.stdout || '',
+          error: error.message,
+          stderr: error.stderr || '',
+          command,
+          cwd,
+          exitCode: error.status || 1,
+        };
+      }
+    },
+    category: 'shell',
+    tags: ['shell', 'exec', 'command'],
+    permissions: [PermissionLevel.EXECUTE],
+  },
+  {
+    name: 'shell_exec_async',
+    description: '异步执行 shell 命令 (长时间运行)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        command: { type: 'string', description: '要执行的命令' },
+        cwd: { type: 'string', description: '工作目录' },
+        env: { 
+          type: 'object', 
+          description: '环境变量',
+          additionalProperties: { type: 'string' }
+        },
+        shell: { type: 'string', description: '使用的 shell' },
+      },
+      required: ['command'],
+    },
+    handler: async (input) => {
+      const command = input.command as string;
+      const cwd = (input.cwd as string) || process.cwd();
+      const shell = (input.shell as string) || '/bin/bash';
+      const env = { ...process.env, ...(input.env as Record<string, string>) };
+
+      return new Promise((resolve) => {
+        const child = spawn(command, [], {
+          cwd,
+          shell,
+          env,
+        });
+
+        let stdout = '';
+        let stderr = '';
+
+        child.stdout?.on('data', (data) => {
+          stdout += data.toString();
+        });
+
+        child.stderr?.on('data', (data) => {
+          stderr += data.toString();
+        });
+
+        child.on('close', (code) => {
+          resolve({
+            success: code === 0,
+            output: stdout,
+            stderr,
+            exitCode: code,
+            pid: child.pid,
+          });
+        });
+
+        child.on('error', (error) => {
+          resolve({
+            success: false,
+            error: error.message,
+            pid: child.pid,
+          });
+        });
+      });
+    },
+    category: 'shell',
+    tags: ['shell', 'exec', 'async', 'background'],
+    permissions: [PermissionLevel.EXECUTE],
+  },
+  {
+    name: 'shell_test',
+    description: '测试命令是否可用',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        command: { type: 'string', description: '要测试的命令' },
+      },
+      required: ['command'],
+    },
+    handler: async (input) => {
+      const command = `command -v ${input.command}`;
+      try {
+        execSync(command, { encoding: 'utf-8' });
+        return { available: true, command: input.command };
+      } catch {
+        return { available: false, command: input.command };
+      }
+    },
+    category: 'shell',
+    tags: ['shell', 'test', 'which'],
+  },
+  {
+    name: 'shell_kill',
+    description: '终止进程',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        pid: { type: 'number', description: '进程 ID' },
+        signal: { type: 'string', description: '信号 (SIGTERM/SIGKILL)', default: 'SIGTERM' },
+      },
+      required: ['pid'],
+    },
+    handler: async (input) => {
+      const pid = input.pid as number;
+      const signal = (input.signal as string) || 'SIGTERM';
+
+      try {
+        process.kill(pid, signal);
+        return { success: true, pid, signal };
+      } catch (error: any) {
+        return { success: false, error: error.message, pid };
+      }
+    },
+    category: 'shell',
+    tags: ['shell', 'kill', 'process'],
+    permissions: [PermissionLevel.EXECUTE],
+  },
+];

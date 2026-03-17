@@ -9,10 +9,7 @@ import {
   ToolRegistration,
   ToolCategory
 } from './types';
-import { defaultCategories, categoryMap } from './categories';
-import { allBuiltInTools } from './built-in';
-import { filesystemTools } from './filesystem';
-import { httpTools } from './http';
+import { TOOL_CATEGORIES, getCategory } from './categories';
 
 export * from './types';
 
@@ -20,27 +17,66 @@ export class ToolRegistry {
   private logger = Logger.getInstance('ToolRegistry');
   private tools: Map<string, ToolRegistration> = new Map();
   private categories: Map<string, ToolCategory> = new Map();
+  private initialized = false;
 
   constructor() {
-    this.initBuiltinCategories();
-    this.registerBuiltinTools();
+    this.initCategories();
   }
 
-  private initBuiltinCategories(): void {
-    for (const cat of defaultCategories) {
-      this.categories.set(cat.name.toLowerCase().replace(/\s+/g, '-'), cat);
+  private initCategories(): void {
+    for (const cat of TOOL_CATEGORIES) {
+      this.categories.set(cat.id, { ...cat, tools: [] });
     }
+    // 添加默认分类
+    this.categories.set('custom', { 
+      id: 'custom', 
+      name: 'Custom', 
+      description: '自定义工具', 
+      tools: [],
+    });
   }
 
-  private registerBuiltinTools(): void {
-    for (const tool of allBuiltInTools) {
-      this.register(tool);
-    }
-    for (const tool of filesystemTools) {
-      this.register(tool);
-    }
-    for (const tool of httpTools) {
-      this.register(tool);
+  /**
+   * 注册所有内置工具
+   * 延迟加载以避免循环依赖
+   */
+  registerBuiltinTools(): void {
+    if (this.initialized) return;
+    this.initialized = true;
+
+    // 动态导入所有工具
+    this.loadTools('./built-in');
+    this.loadTools('./filesystem');
+    this.loadTools('./http');
+    this.loadTools('./database');
+    this.loadTools('./vector');
+    this.loadTools('./shell');
+    this.loadTools('./git');
+    this.loadTools('./memory');
+  }
+
+  private async loadTools(toolModule: string): Promise<void> {
+    try {
+      const modules = await import(toolModule);
+      const toolArrays = ['fileTools', 'shellTools', 'taskTools', 'httpTools', 'databaseTools', 'vectorTools', 'gitTools', 'memoryTools'];
+      
+      for (const arrayName of toolArrays) {
+        if (modules[arrayName]) {
+          for (const tool of modules[arrayName]) {
+            this.register(tool);
+          }
+        }
+      }
+      
+      // 检查默认导出
+      if (modules.default) {
+        const tools = Array.isArray(modules.default) ? modules.default : [modules.default];
+        for (const tool of tools) {
+          this.register(tool);
+        }
+      }
+    } catch (error) {
+      // 工具模块不存在，跳过
     }
   }
 
@@ -53,6 +89,7 @@ export class ToolRegistry {
 
     this.tools.set(tool.name, registration);
 
+    // 添加到分类
     const categoryKey = tool.category || 'custom';
     const category = this.categories.get(categoryKey);
     if (category && !category.tools.includes(tool.name)) {
@@ -66,7 +103,8 @@ export class ToolRegistry {
     const reg = this.tools.get(name);
     if (!reg) return false;
 
-    const category = this.categories.get(reg.tool.category || 'custom');
+    const categoryKey = reg.tool.category || 'custom';
+    const category = this.categories.get(categoryKey);
     if (category) {
       category.tools = category.tools.filter(t => t !== name);
     }
@@ -103,8 +141,8 @@ export class ToolRegistry {
     }
   }
 
-  listByCategory(category: string): ToolDefinition[] {
-    const cat = this.categories.get(category);
+  listByCategory(categoryId: string): ToolDefinition[] {
+    const cat = this.categories.get(categoryId);
     if (!cat) return [];
     return cat.tools
       .map(name => this.tools.get(name)?.tool)
@@ -112,7 +150,7 @@ export class ToolRegistry {
   }
 
   listCategories(): ToolCategory[] {
-    return Array.from(this.categories.values());
+    return Array.from(this.categories.values()).filter(c => c.tools.length > 0);
   }
 
   getStats(): {
@@ -136,6 +174,18 @@ export class ToolRegistry {
       byCategory,
       mostUsed: mostUsed.slice(0, 10),
     };
+  }
+
+  /**
+   * 搜索工具
+   */
+  search(query: string): ToolDefinition[] {
+    const q = query.toLowerCase();
+    return this.getAllTools().filter(tool => 
+      tool.name.toLowerCase().includes(q) ||
+      tool.description.toLowerCase().includes(q) ||
+      tool.tags?.some(tag => tag.toLowerCase().includes(q))
+    );
   }
 }
 
