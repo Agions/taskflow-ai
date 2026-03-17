@@ -4,9 +4,13 @@
  * 构建脚本 - 使用 TypeScript Compiler
  */
 
-const { execSync } = require('child_process');
-const path = require('path');
-const fs = require('fs');
+import { execSync } from 'child_process';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 console.log('🚀 TaskFlow AI 构建...\n');
 
@@ -22,7 +26,7 @@ try {
 
   // 使用 TypeScript 编译
   console.log('📦 编译 TypeScript...');
-  execSync('tsc', { cwd: rootDir, stdio: 'inherit' });
+  execSync('npx tsc', { cwd: rootDir, stdio: 'inherit' });
 
   // 创建 bin 目录和入口文件
   const binDir = path.join(rootDir, 'bin');
@@ -35,7 +39,7 @@ try {
   // 创建主入口文件
   if (fs.existsSync(cliIndexPath)) {
     const binContent = `#!/usr/bin/env node
-require('./dist/cli/index.js');
+require('./cli/index.js');
 `;
     fs.writeFileSync(distIndexPath, binContent);
     fs.writeFileSync(binIndexPath, binContent);
