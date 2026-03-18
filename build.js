@@ -17,6 +17,8 @@ console.log('🚀 TaskFlow AI 构建...\n');
 const rootDir = process.cwd();
 const distDir = path.join(rootDir, 'dist');
 
+const startTime = Date.now();
+
 try {
   // 清理旧的构建文件
   if (fs.existsSync(distDir)) {
@@ -24,9 +26,9 @@ try {
     fs.rmSync(distDir, { recursive: true, force: true });
   }
 
-  // 使用 TypeScript 编译
+  // 使用 TypeScript 编译 (使用 build 配置)
   console.log('📦 编译 TypeScript...');
-  execSync('npx tsc', { cwd: rootDir, stdio: 'inherit' });
+  execSync('npx tsc -p tsconfig.build.json', { cwd: rootDir, stdio: 'inherit' });
 
   // 创建 bin 目录和入口文件
   const binDir = path.join(rootDir, 'bin');
@@ -65,9 +67,12 @@ require('./cli/index.js');
   };
 
   const totalSize = getDirectorySize(distDir);
+  const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
+  
   console.log(`\n✅ 构建完成!`);
   console.log(`   输出目录: dist/`);
   console.log(`   总大小: ${(totalSize / 1024).toFixed(2)} KB`);
+  console.log(`   耗时: ${elapsedTime}s`);
 
 } catch (error) {
   console.error('\n❌ 构建失败:', error.message);
