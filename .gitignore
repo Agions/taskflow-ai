@@ -69,7 +69,11 @@ dev-debug.log
 *.sln
 *.sw?
 # OS specific
-.vitepress/cache/
+# Docs build
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# node_modules is already covered above
 # Task files
 # tasks.json
 # tasks/
