@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import { nav, sidebar, themeConfig, head, vite, markdown } from './config'
+import { nav, sidebar, themeConfig, head, vite, markdown } from './config-internal'
 
 export default defineConfig({
   title: 'TaskFlow AI',
