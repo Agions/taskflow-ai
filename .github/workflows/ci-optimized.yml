@@ -13,9 +13,9 @@ env:
   NODE_VERSION: '20'
 
 jobs:
-  # 安装依赖并缓存
-  setup:
-    name: Setup
+  # 类型检查
+  type-check:
+    name: Type Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,47 +30,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-
-  # 类型检查
-  type-check:
-    name: Type Check
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Restore cache
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-      
-      - name: Install dependencies
-        run: npm ci
-      
       - name: Type check
         run: npm run type-check
 
   # 代码检查
   lint:
     name: Lint
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Restore cache
-        uses: actions/cache@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
       
       - name: Install dependencies
         run: npm ci
@@ -81,17 +56,16 @@ jobs:
   # 格式检查
   format:
     name: Format Check
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Restore cache
-        uses: actions/cache@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
       
       - name: Install dependencies
         run: npm ci
@@ -102,17 +76,16 @@ jobs:
   # 测试
   test:
     name: Test
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Restore cache
-        uses: actions/cache@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
       
       - name: Install dependencies
         run: npm ci
@@ -129,11 +102,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Restore cache
-        uses: actions/cache@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
       
       - name: Install dependencies
         run: npm ci
@@ -151,17 +124,19 @@ jobs:
   # 安全扫描
   security:
     name: Security Audit
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Restore cache
-        uses: actions/cache@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
       
       - name: Security audit
         run: |
