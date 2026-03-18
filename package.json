@@ -5,7 +5,6 @@
   "logo": "assets/logo.svg",
   "main": "dist/cli/index.js",
   "types": "dist/cli/index.d.ts",
-  "type": "module",
   "bin": {
     "taskflow": "bin/index.js",
     "taskflow-ai": "bin/index.js"

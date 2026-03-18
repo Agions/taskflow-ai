@@ -152,9 +152,7 @@ process.on('unhandledRejection', reason => {
   process.exit(1);
 });
 
-// 运行主程序
-if (require.main === module) {
-  main();
-}
+// 运行主程序 - 支持直接运行和 require 两种方式
+main();
 
 export default program;

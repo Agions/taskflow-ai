@@ -40,10 +40,15 @@ try {
 
   // 创建主入口文件
   if (fs.existsSync(cliIndexPath)) {
+    // bin/index.js - 位于 bin/ 目录，需要 ../dist/cli/index.js
     const binContent = `#!/usr/bin/env node
+require('../dist/cli/index.js');
+`;
+    // dist/index.js - 位于 dist/ 目录，需要 ./cli/index.js
+    const distContent = `#!/usr/bin/env node
 require('./cli/index.js');
 `;
-    fs.writeFileSync(distIndexPath, binContent);
+    fs.writeFileSync(distIndexPath, distContent);
     fs.writeFileSync(binIndexPath, binContent);
     fs.chmodSync(binIndexPath, 0o755);
     fs.chmodSync(distIndexPath, 0o755);
