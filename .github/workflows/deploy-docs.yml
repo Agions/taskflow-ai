@@ -44,7 +44,7 @@ jobs:
       - name: Build documentation
         run: |
           cd docs
-          pnpm build
+          npm run build
         env:
           NODE_ENV: production
       
