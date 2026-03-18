@@ -1,0 +1,62 @@
+# Dependencies (already in node_modules)
+node_modules/
+
+# Build outputs
+dist/
+lib/
+
+# Development files
+.git/
+.github/
+.vscode/
+.idea/
+*.tsbuildinfo
+
+# Test & coverage
+coverage/
+tests/
+__tests__/
+*.test.ts
+*.spec.ts
+jest.config.*
+vitest.config.*
+
+# Docs
+docs/.vitepress/cache/
+docs/node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.*
+
+# Editor
+*.swp
+*.swo
+.DS_Store
+
+# Temporary
+tmp/
+temp/
+.cache/
+
+# Source (only publish compiled JS)
+src/
+*.ts
+*.tsx
+!*.d.ts
+
+# Configs (not needed in package)
+tsconfig*.json
+jest.setup.js
+build.js
+RELEASE.md
+
+# Misc
+reports/
+output/
+.taskflow/
