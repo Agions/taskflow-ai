@@ -1,6 +1,6 @@
 {
   "name": "taskflow-ai",
-  "version": "2.1.0",
+  "version": "2.1.6",
   "description": "TaskFlow AI - 智能PRD文档解析与任务管理助手，支持多模型AI协同、MCP编辑器集成，专为开发团队设计的CLI工具",
   "logo": "assets/logo.svg",
   "main": "dist/cli/index.js",
@@ -58,8 +58,6 @@
     "mcp:dev": "npm run build && node dist/mcp/stdio-server.js",
     "mcp:start": "npm run mcp",
     "verify": "npm run check && npm run build && npm run test",
-    "release": "release-it",
-    "release:dry": "release-it --dry-run",
     "postinstall": "node -e \"console.log('\\n🎉 TaskFlow AI 安装成功！\\n运行 taskflow --help 开始使用\\n')\""
   },
   "keywords": [
