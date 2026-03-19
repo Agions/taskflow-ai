@@ -194,10 +194,11 @@ export class ThoughtChainTimeline {
       case 'duration':
         return `+${timestamp - this.startTime}ms`;
       case 'relative':
-      default:
+      default: {
         const diff = timestamp - this.startTime;
         if (diff < 1000) return `${diff}ms`;
         return `${(diff / 1000).toFixed(1)}s`;
+      }
     }
   }
 
