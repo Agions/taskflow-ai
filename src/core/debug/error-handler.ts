@@ -141,16 +141,29 @@ export class ErrorHandler {
   classify(error: Error | string): ErrorType {
     const message = typeof error === 'string' ? error : error.message.toLowerCase();
 
-    if (message.includes('network') || message.includes('fetch') || message.includes('ECONNREFUSED')) {
+    if (
+      message.includes('network') ||
+      message.includes('fetch') ||
+      message.includes('ECONNREFUSED')
+    ) {
       return 'network';
     }
     if (message.includes('timeout') || message.includes('ETIMEDOUT')) {
       return 'timeout';
     }
-    if (message.includes('rate limit') || message.includes('429') || message.includes('too many requests')) {
+    if (
+      message.includes('rate limit') ||
+      message.includes('429') ||
+      message.includes('too many requests')
+    ) {
       return 'rate_limit';
     }
-    if (message.includes('auth') || message.includes('401') || message.includes('403') || message.includes('unauthorized')) {
+    if (
+      message.includes('auth') ||
+      message.includes('401') ||
+      message.includes('403') ||
+      message.includes('unauthorized')
+    ) {
       return 'auth';
     }
     if (message.includes('quota') || message.includes('402') || message.includes('insufficient')) {
@@ -237,7 +250,7 @@ export class ErrorHandler {
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /**
@@ -255,7 +268,9 @@ export class ErrorHandler {
     ];
 
     if (error.location) {
-      lines.push(`  位置:     ${error.location.file || 'unknown'}:${error.location.line}:${error.location.column}`);
+      lines.push(
+        `  位置:     ${error.location.file || 'unknown'}:${error.location.line}:${error.location.column}`
+      );
       if (error.location.function) {
         lines.push(`  函数:     ${error.location.function}`);
       }

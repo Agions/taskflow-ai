@@ -150,11 +150,7 @@ describe('ErrorHandler', () => {
         throw new Error('timeout');
       };
 
-      await handler.retryWithRecovery(
-        operation,
-        { maxRetries: 2 },
-        () => retryCount++
-      );
+      await handler.retryWithRecovery(operation, { maxRetries: 2 }, () => retryCount++);
 
       expect(retryCount).toBe(2);
     });

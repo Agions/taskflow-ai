@@ -28,12 +28,15 @@ export interface CostStats {
   failedRequests: number;
   avgCostPerRequest: number;
   avgDuration: number;
-  byModel: Record<string, {
-    count: number;
-    cost: number;
-    inputTokens: number;
-    outputTokens: number;
-  }>;
+  byModel: Record<
+    string,
+    {
+      count: number;
+      cost: number;
+      inputTokens: number;
+      outputTokens: number;
+    }
+  >;
 }
 
 export interface CostTrackerOptions {
@@ -102,9 +105,7 @@ export class CostTracker {
 
     // 检查是否超过阈值
     if (totalCost > this.requestThreshold) {
-      console.warn(
-        `⚠️ 高成本请求: ${model.name} - $${totalCost.toFixed(this.decimalPlaces)}`
-      );
+      console.warn(`⚠️ 高成本请求: ${model.name} - $${totalCost.toFixed(this.decimalPlaces)}`);
     }
 
     return entry;
@@ -249,16 +250,29 @@ export class CostTracker {
    */
   renderCompact(): string {
     const stats = this.getStats();
-    return `💰 $${stats.totalCost.toFixed(this.decimalPlaces)} | ${stats.totalRequests} 请求 | ` +
-      `${stats.totalInputTokens.toLocaleString()}+${stats.totalOutputTokens.toLocaleString()} tokens`;
+    return (
+      `💰 $${stats.totalCost.toFixed(this.decimalPlaces)} | ${stats.totalRequests} 请求 | ` +
+      `${stats.totalInputTokens.toLocaleString()}+${stats.totalOutputTokens.toLocaleString()} tokens`
+    );
   }
 
   /**
    * 导出为 CSV
    */
   toCSV(): string {
-    const headers = ['ID', '时间', '模型', '输入tokens', '输出tokens', '输入成本', '输出成本', '总成本', '耗时', '成功'];
-    const rows = this.entries.map((e) => [
+    const headers = [
+      'ID',
+      '时间',
+      '模型',
+      '输入tokens',
+      '输出tokens',
+      '输入成本',
+      '输出成本',
+      '总成本',
+      '耗时',
+      '成功',
+    ];
+    const rows = this.entries.map(e => [
       e.id,
       new Date(e.timestamp).toISOString(),
       e.modelName,
@@ -271,17 +285,21 @@ export class CostTracker {
       e.success ? '是' : '否',
     ]);
 
-    return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
   }
 
   /**
    * 导出为 JSON
    */
   toJSON(): string {
-    return JSON.stringify({
-      stats: this.getStats(),
-      entries: this.entries,
-    }, null, 2);
+    return JSON.stringify(
+      {
+        stats: this.getStats(),
+        entries: this.entries,
+      },
+      null,
+      2
+    );
   }
 
   /**

@@ -78,7 +78,7 @@ export class ThoughtChainTimeline {
       duration: node.metadata?.duration as number | undefined,
       confidence: node.confidence,
       model: node.model,
-      error: node.toolCalls?.some((t) => t.error) ? '包含错误' : undefined,
+      error: node.toolCalls?.some(t => t.error) ? '包含错误' : undefined,
     };
 
     const result: TimelineEvent[] = [event];
@@ -95,7 +95,7 @@ export class ThoughtChainTimeline {
   }
 
   private buildEventsFromSteps(steps: ReasoningStep[]): TimelineEvent[] {
-    return steps.map((step) => ({
+    return steps.map(step => ({
       id: `step-${step.step}`,
       timestamp: this.startTime + (step.duration || 0) * step.step,
       type: step.type,
@@ -141,7 +141,7 @@ export class ThoughtChainTimeline {
     const prefix = '  '.repeat(indent);
     const timeStr = this.formatTime(event.timestamp);
     const confStr = this.formatConfidence(event.confidence);
-    
+
     const lines = [
       `${prefix}├─ [${timeStr}] ${event.title} ${confStr}`,
       `${prefix}│  ${event.content}`,
@@ -180,9 +180,9 @@ export class ThoughtChainTimeline {
    */
   toProgressBar(): string {
     const total = this.events.length;
-    const completed = this.events.filter((e) => e.type === 'synthesis').length;
-    const errors = this.events.filter((e) => e.error).length;
-    
+    const completed = this.events.filter(e => e.type === 'synthesis').length;
+    const errors = this.events.filter(e => e.error).length;
+
     const bar = '█'.repeat(completed) + '░'.repeat(total - completed);
     return `🧠 [${bar}] ${completed}/${total} ${errors > 0 ? `❌ ${errors}` : ''}`;
   }

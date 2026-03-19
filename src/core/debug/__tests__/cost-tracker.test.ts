@@ -101,7 +101,9 @@ describe('CostTracker', () => {
 
       const csv = tracker.toCSV();
 
-      expect(csv).toContain('ID,时间,模型,输入tokens,输出tokens,输入成本,输出成本,总成本,耗时,成功');
+      expect(csv).toContain(
+        'ID,时间,模型,输入tokens,输出tokens,输入成本,输出成本,总成本,耗时,成功'
+      );
       expect(csv).toContain('GPT-4o');
     });
   });

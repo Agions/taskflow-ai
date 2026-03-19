@@ -56,7 +56,7 @@ describe('ThoughtChainTimeline', () => {
       const chain = createMockChain();
       const events = timeline.fromChain(chain);
 
-      const types = new Set(events.map((e) => e.type));
+      const types = new Set(events.map(e => e.type));
       expect(types.has('requirement')).toBe(true);
     });
 
@@ -66,9 +66,7 @@ describe('ThoughtChainTimeline', () => {
         root: createMockNode('r', 'requirement', 'root', [
           createMockNode('c1', 'analysis', 'c1', [
             createMockNode('c2', 'analysis', 'c2', [
-              createMockNode('c3', 'analysis', 'c3', [
-                createMockNode('c4', 'analysis', 'c4'),
-              ]),
+              createMockNode('c3', 'analysis', 'c3', [createMockNode('c4', 'analysis', 'c4')]),
             ]),
           ]),
         ]),
