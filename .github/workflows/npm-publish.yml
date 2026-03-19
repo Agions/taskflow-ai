@@ -196,6 +196,10 @@ jobs:
     needs: publish
     runs-on: ubuntu-latest
     if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.event.inputs.tag == 'latest')
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     
     steps:
       - name: Checkout
@@ -206,14 +210,19 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: docs/package-lock.json
       
       - name: Install dependencies
-        run: npm ci
+        run: |
+          cd docs
+          npm ci --prefer-offline
       
       - name: Build documentation
-        run: npm run docs:build
+        run: |
+          cd docs
+          npm run build
+        env:
+          NODE_ENV: production
       
       - name: Deploy documentation
-        run: npm run docs:deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/deploy-pages@v4

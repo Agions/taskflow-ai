@@ -26,8 +26,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -39,7 +37,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd docs
-          npm ci
+          npm ci --prefer-offline
       
       - name: Build documentation
         run: |
@@ -51,10 +49,12 @@ jobs:
       - name: Check build output
         run: |
           if [ ! -d "docs/.vitepress/dist" ]; then
-            echo "Error: Build output directory not found"
+            echo "❌ Error: Build output directory not found"
+            ls -la docs/.vitepress/
             exit 1
           fi
-          echo "Build output verified"
+          echo "✅ Build output verified"
+          ls -la docs/.vitepress/dist/
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -65,6 +65,10 @@ jobs:
     name: Deploy to GitHub Pages
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
     
     environment:
       name: github-pages
