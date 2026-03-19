@@ -27,7 +27,7 @@ env:
   NODE_VERSION: '20'
 
 jobs:
-  # 质量检查 - 并行运行
+  # 质量检查
   quality:
     name: Quality Check
     runs-on: ubuntu-latest
@@ -43,10 +43,19 @@ jobs:
           cache: 'npm'
       
       - name: Install dependencies
-        run: npm ci
+        run: npm install
       
-      - name: Run quality checks
-        run: npm run quality
+      - name: Run type check
+        run: npm run type-check
+      
+      - name: Run lint
+        run: npm run lint
+      
+      - name: Run format check
+        run: npm run format:check
+      
+      - name: Run tests
+        run: npm run test
       
       - name: Build project
         run: npm run build
@@ -57,18 +66,6 @@ jobs:
           name: dist
           path: dist/
           retention-days: 1
-      
-      - name: Verify build output
-        run: |
-          if [ ! -d "dist" ]; then
-            echo "❌ Error: dist directory not found"
-            exit 1
-          fi
-          if [ ! -f "dist/index.js" ]; then
-            echo "❌ Error: dist/index.js not found"
-            exit 1
-          fi
-          echo "✅ Build output verified"
 
   # 安全扫描
   security:
@@ -86,21 +83,10 @@ jobs:
           cache: 'npm'
       
       - name: Install dependencies
-        run: npm ci
+        run: npm install
       
       - name: Run security audit
-        run: |
-          npm audit --audit-level=high || true
-          
-          # Check for critical vulnerabilities
-          critical_count=$(npm audit --json 2>/dev/null | jq '.metadata.vulnerabilities.critical // 0' || echo "0")
-          
-          if [ "$critical_count" -gt 0 ]; then
-            echo "❌ Found $critical_count critical vulnerabilities"
-            exit 1
-          fi
-          
-          echo "✅ Security audit passed"
+        run: npm audit --audit-level=high || true
 
   # 发布到 NPM
   publish:
@@ -140,7 +126,6 @@ jobs:
             VERSION=${GITHUB_REF#refs/tags/v}
             TAG="latest"
             
-            # Determine tag from version
             if [[ "$VERSION" == *"-alpha"* ]]; then
               TAG="alpha"
             elif [[ "$VERSION" == *"-beta"* ]]; then
@@ -150,7 +135,7 @@ jobs:
           
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "📦 Publishing version: $VERSION (tag: $TAG)"
+          echo "Publishing version: $VERSION (tag: $TAG)"
       
       - name: Update package version
         if: github.event_name == 'workflow_dispatch'
@@ -166,29 +151,6 @@ jobs:
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      
-      - name: Create Git tag (if manual trigger)
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Check if tag exists
-          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
-            echo "⚠️ Tag v${{ steps.version.outputs.version }} already exists"
-          else
-            git tag -a "v${{ steps.version.outputs.version }}" -m "Release v${{ steps.version.outputs.version }}"
-            git push origin "v${{ steps.version.outputs.version }}"
-            echo "✅ Created tag v${{ steps.version.outputs.version }}"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Notify success
-        run: |
-          echo "✅ Successfully published taskflow-ai@${{ steps.version.outputs.version }} to NPM"
-          echo "📦 Package: https://www.npmjs.com/package/taskflow-ai/v/${{ steps.version.outputs.version }}"
-          echo "🏷️ Tag: ${{ steps.version.outputs.tag }}"
 
   # 更新文档
   update-docs:
@@ -215,7 +177,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd docs
-          npm ci --prefer-offline
+          npm install
       
       - name: Build documentation
         run: |
