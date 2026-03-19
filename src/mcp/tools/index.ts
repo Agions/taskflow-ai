@@ -21,6 +21,7 @@ export { shellTools as execShellTools } from './shell';
 export { gitTools } from './git';
 export { memoryTools } from './memory';
 export { codeTools } from './code';
+export { codeExecutorTools } from './code-executor';
 export { notificationTools } from './notification';
 
 // 配置生成器
