@@ -19,9 +19,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    name: Build Documentation
+  build-and-deploy:
+    name: Build and Deploy Documentation
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
       - name: Checkout
@@ -56,43 +59,19 @@ jobs:
         run: |
           cd docs
           pnpm install --frozen-lockfile
-      
+
       - name: Build documentation
         run: |
           cd docs
           pnpm run build
         env:
           NODE_ENV: production
-      
-      - name: Check build output
-        run: |
-          if [ ! -d "docs/.vitepress/dist" ]; then
-            echo "❌ Error: Build output directory not found"
-            ls -la docs/.vitepress/
-            exit 1
-          fi
-          echo "✅ Build output verified"
-          ls -la docs/.vitepress/dist/
-      
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/.vitepress/dist
 
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-      contents: read
-    
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
