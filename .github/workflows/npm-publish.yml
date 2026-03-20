@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to publish (e.g., 2.1.0)'
+        description: 'Version to publish (e.g., 2.1.7)'
         required: false
         type: string
 
@@ -64,14 +64,8 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Determine version
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.version
-        id: version
-        run: |
-          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-
-      - name: Update package version
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.version
+      - name: Update version
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.version != ''
         run: |
           pnpm version ${{ github.event.inputs.version }} --no-git-tag-version
 
