@@ -10,9 +10,7 @@ describe('Config Utilities', () => {
       const config = {
         projectName: 'test-project',
         version: '1.0.0',
-        aiModels: [
-          { provider: 'openai', modelName: 'gpt-4o', enabled: true },
-        ],
+        aiModels: [{ provider: 'openai', modelName: 'gpt-4o', enabled: true }],
       };
       const result = validateConfig(config);
       expect(result.valid).toBe(true);
