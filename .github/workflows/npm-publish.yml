@@ -7,184 +7,75 @@ on:
     inputs:
       version:
         description: 'Version to publish (e.g., 2.1.0)'
-        required: true
-        type: string
-      tag:
-        description: 'NPM tag (latest, beta, alpha)'
         required: false
-        default: 'latest'
-        type: choice
-        options:
-          - latest
-          - beta
-          - alpha
-
-permissions:
-  contents: write
-  id-token: write
-
-env:
-  NODE_VERSION: '22'
+        type: string
 
 jobs:
-  # 质量检查
-  quality:
-    name: Quality Check
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm install
-      
-      - name: Run type check
-        run: npm run type-check
-      
-      - name: Run lint
-        run: npm run lint
-      
-      - name: Run format check
-        run: npm run format:check
-      
-      - name: Run tests
-        run: npm run test
-      
-      - name: Build project
-        run: npm run build
-      
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-          retention-days: 1
-
-  # 安全扫描
-  security:
-    name: Security Audit
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm install
-      
-      - name: Run security audit
-        run: npm audit --audit-level=high || true
-
-  # 发布到 NPM
   publish:
-    name: Publish to NPM
-    needs: [quality, security]
+    name: Publish to npm
     runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          registry-url: 'https://registry.npmjs.org'
-          cache: 'npm'
-      
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
-      
-      - name: Install dependencies (for publish)
-        run: npm install --production
-      
-      - name: Determine version and tag
-        id: version
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-            TAG="${{ github.event.inputs.tag }}"
-          else
-            VERSION=${GITHUB_REF#refs/tags/v}
-            TAG="latest"
-            
-            if [[ "$VERSION" == *"-alpha"* ]]; then
-              TAG="alpha"
-            elif [[ "$VERSION" == *"-beta"* ]]; then
-              TAG="beta"
-            fi
-          fi
-          
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "Publishing version: $VERSION (tag: $TAG)"
-      
-      - name: Update package version
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          npm version ${{ steps.version.outputs.version }} --no-git-tag-version --allow-same-version
-      
-      - name: Publish to NPM
-        run: |
-          if [ "${{ steps.version.outputs.tag }}" == "latest" ]; then
-            npm publish --access public
-          else
-            npm publish --access public --tag ${{ steps.version.outputs.tag }}
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  # 更新文档
-  update-docs:
-    name: Update Documentation
-    needs: publish
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.event.inputs.tag == 'latest')
     permissions:
       contents: read
-      pages: write
+      packages: write
       id-token: write
-    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: docs/package-lock.json
-      
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm run type-check
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Format check
+        run: pnpm run format:check
+
+      - name: Test
+        run: pnpm run test
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Determine version
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.version
+        id: version
         run: |
-          cd docs
-          npm install
-      
-      - name: Build documentation
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+
+      - name: Update package version
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.version
         run: |
-          cd docs
-          npm run build
+          pnpm version ${{ github.event.inputs.version }} --no-git-tag-version
+
+      - name: Publish to npm
+        run: npm publish --access public
         env:
-          NODE_ENV: production
-      
-      - name: Deploy documentation
-        uses: actions/deploy-pages@v4
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
