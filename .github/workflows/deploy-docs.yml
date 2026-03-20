@@ -14,64 +14,34 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 jobs:
-  build-and-deploy:
-    name: Build and Deploy Documentation
+  deploy:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-          cache-dependency-path: docs/pnpm-lock.yaml
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
       
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('docs/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
+      - name: Install Pages Dependencies
         run: |
           cd docs
-          pnpm install --frozen-lockfile
-
-      - name: Build documentation
+          npm install
+      
+      - name: Build
         run: |
           cd docs
-          pnpm run build
-        env:
-          NODE_ENV: production
-
-      - name: Upload artifact
+          npm run build
+      
+      - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/.vitepress/dist
-
+      
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
