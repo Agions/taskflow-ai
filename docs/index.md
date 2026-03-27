@@ -45,23 +45,6 @@ features:
     details: 支持 Cursor、Windsurf、Trae、Claude Desktop，动态工具注册，企业级安全策略
 ---
 
-  - icon: ⚡
-    title: 工作流引擎
-    details: YAML/JSON 声明式工作流，顺序/并行/条件分支/循环执行，SQLite 状态持久化，完整错误处理
-
-  - icon: 🧩
-    title: 插件系统
-    details: 动态加载/卸载插件，钩子系统 (onInit, onTaskCreate 等)，内置 PRD/工作流/任务模板
-
-  - icon: 🤝
-    title: 多 Agent 协作
-    details: 自主目标执行，AI 反思机制，多 Agent 消息传递和任务分发，短期/长期记忆系统
-
-  - icon: 🔌
-    title: MCP 集成
-    details: 支持 Cursor、Windsurf、Trae、Claude Desktop，动态工具注册，企业级安全策略
----
-
 ## ⚡ 快速开始
 
 ### 安装

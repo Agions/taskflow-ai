@@ -112,13 +112,25 @@ export const sidebar = {
         { text: '开发者指南', link: '/development/developer-guide' },
         { text: '贡献指南', link: '/development/contributing' }
       ]
-    },
+    }
+  ],
+
+  '/testing/': [
     {
-      text: '🧪 测试与部署',
+      text: '🧪 测试指南',
       collapsed: false,
       items: [
-        { text: '测试指南', link: '/testing/' },
-        { text: '部署指南', link: '/deployment/' }
+        { text: '测试文档', link: '/testing/' }
+      ]
+    }
+  ],
+
+  '/deployment/': [
+    {
+      text: '🚀 部署指南',
+      collapsed: false,
+      items: [
+        { text: '部署文档', link: '/deployment/' }
       ]
     }
   ],
@@ -136,12 +148,12 @@ export const sidebar = {
     }
   ],
 
-  '/examples/': [
+  '/mcp/': [
     {
-      text: '📦 示例文档',
+      text: '🔌 MCP 集成',
       collapsed: false,
       items: [
-        { text: 'PRD 示例', link: '/examples/example-prd' }
+        { text: 'MCP 文档', link: '/mcp/' }
       ]
     }
   ]

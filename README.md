@@ -6,7 +6,7 @@
 
 **AI 思维流编排引擎**
 
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/Agions/taskflow-ai)
+[![Version](https://img.shields.io/badge/version-2.1.9-blue.svg)](https://github.com/Agions/taskflow-ai)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript)](https://www.typescriptlang.org/)

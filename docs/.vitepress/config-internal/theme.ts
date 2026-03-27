@@ -9,7 +9,8 @@ export const themeConfig = {
 
   // 社交链接
   socialLinks: [
-    { icon: 'github', link: 'https://github.com/agions/taskflow-ai' }
+    { icon: 'github', link: 'https://github.com/agions/taskflow-ai' },
+    { icon: { svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1.608l-9.9 4.02v10.392l9.9 4.372 9.9-4.372V5.628L12 1.608zm0 2.19l7.2 2.928v7.348L12 16.698l-7.2-2.624V6.726L12 3.798z"/></svg>' }, link: 'https://www.npmjs.com/package/taskflow-ai' }
   ],
 
   // 页脚

@@ -47,8 +47,9 @@ export const nav = [
       { text: '常见问题', link: '/faq' },
       { text: '故障排除', link: '/troubleshooting/common-issues' },
       { text: '更新日志', link: '/changelog' },
-      { text: '贡献指南', link: '/guide/contributing' },
-      { text: 'GitHub', link: 'https://github.com/agions/taskflow-ai' }
+      { text: '贡献指南', link: '/development/contributing' },
+      { text: 'GitHub', link: 'https://github.com/agions/taskflow-ai' },
+      { text: 'NPM', link: 'https://www.npmjs.com/package/taskflow-ai' }
     ]
   }
 ];
