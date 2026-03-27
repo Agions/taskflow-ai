@@ -1,0 +1,38 @@
+{
+  "name": "taskflow-ai-docs",
+  "version": "1.0.0",
+  "description": "TaskFlow AI Documentation Site",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview",
+    "serve": "vitepress serve",
+    "clean": "rm -rf .vitepress/dist .vitepress/cache"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.28"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agions/taskflow-ai.git",
+    "directory": "docs"
+  },
+  "homepage": "https://agions.github.io/taskflow-ai/",
+  "bugs": {
+    "url": "https://github.com/agions/taskflow-ai/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "taskflow",
+    "ai",
+    "documentation",
+    "vitepress",
+    "project-management",
+    "prd-parser"
+  ]
+}

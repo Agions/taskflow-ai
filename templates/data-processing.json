@@ -1,0 +1,103 @@
+{
+  "version": "1.0.0",
+  "meta": {
+    "name": "数据清洗工作流",
+    "description": "自动清洗、转换和验证数据",
+    "author": "TaskFlow AI",
+    "tags": ["数据处理", "ETL", "清洗"],
+    "category": "data",
+    "icon": "🧹"
+  },
+  "config": {
+    "timeout": 120000,
+    "retry": { "enabled": true, "maxAttempts": 2 }
+  },
+  "nodes": [
+    {
+      "id": "input",
+      "type": "input",
+      "data": { "label": "数据输入", "source": "file" }
+    },
+    {
+      "id": "read_file",
+      "type": "tool",
+      "data": {
+        "label": "读取文件",
+        "toolName": "fs_readJson"
+      }
+    },
+    {
+      "id": "validate",
+      "type": "transform",
+      "data": {
+        "label": "数据验证",
+        "expression": "const data = input; const errors = []; if (!data.length) errors.push('数据为空'); data.forEach((row, i) => { if (!row.id) errors.push(`行${i+1}: 缺少id`); if (!row.email?.includes('@')) errors.push(`行${i+1}: email格式错误`); }); return { valid: errors.length === 0, errors }"
+      }
+    },
+    {
+      "id": "check_errors",
+      "type": "condition",
+      "data": {
+        "label": "是否有错误",
+        "expression": "{{validate.valid}} === true"
+      }
+    },
+    {
+      "id": "log_error",
+      "type": "tool",
+      "data": {
+        "label": "记录错误",
+        "toolName": "shell_exec",
+        "inputMapping": { "command": "echo '{{validate.errors}}' >> error.log" }
+      }
+    },
+    {
+      "id": "dedupe",
+      "type": "transform",
+      "data": {
+        "label": "去重",
+        "expression": "const data = input; const seen = new Set(); return data.filter(row => { const key = row.id || JSON.stringify(row); if (seen.has(key)) return false; seen.add(key); return true; });"
+      }
+    },
+    {
+      "id": "normalize",
+      "type": "transform",
+      "data": {
+        "label": "数据规范化",
+        "expression": "return input.map(row => ({ ...row, name: row.name?.trim(), email: row.email?.toLowerCase(), createdAt: row.createdAt ? new Date(row.createdAt).toISOString() : null }));"
+      }
+    },
+    {
+      "id": "enrich",
+      "type": "transform",
+      "data": {
+        "label": "数据增强",
+        "expression": "return input.map(row => ({ ...row, status: row.status || 'active', processedAt: new Date().toISOString() }));"
+      }
+    },
+    {
+      "id": "write_output",
+      "type": "tool",
+      "data": {
+        "label": "写入结果",
+        "toolName": "fs_writeJson"
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "data": { "label": "处理完成" }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "input", "target": "read_file" },
+    { "id": "e2", "source": "read_file", "target": "validate" },
+    { "id": "e3", "source": "validate", "target": "check_errors" },
+    { "id": "e4", "source": "check_errors", "target": "log_error", "sourceHandle": "false", "label": "有错误" },
+    { "id": "e5", "source": "check_errors", "target": "dedupe", "sourceHandle": "true", "label": "无错误" },
+    { "id": "e6", "source": "dedupe", "target": "normalize" },
+    { "id": "e7", "source": "normalize", "target": "enrich" },
+    { "id": "e8", "source": "enrich", "target": "write_output" },
+    { "id": "e9", "source": "write_output", "target": "output" }
+  ]
+}

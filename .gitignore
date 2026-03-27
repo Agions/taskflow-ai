@@ -1,0 +1,79 @@
+# 依赖目录
+node_modules/
+
+# 构建输出
+dist/
+build/
+lib/
+examples/
+
+# 保留 bin 目录中的可执行文件
+# bin/ 目录包含重要的可执行文件，不应被忽略
+# 编译缓存
+*.tsbuildinfo
+# 日志文件
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 运行时数据
+.pnp.*
+.npm
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+# 环境变量文件 (包含敏感信息)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 保留环境变量示例文件
+!.env.example
+
+# 编辑器目录和文件
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+*.package-lock.json
+
+# 测试覆盖率
+coverage/
+
+# 临时文件
+tmp/
+temp/
+
+# 项目特定文件
+mcp.config.json
+.mcp/ 
+
+# Logs
+logs
+dev-debug.log
+# Dependency directories
+# Environment variables
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+# Docs build
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# node_modules is already covered above
+# Task files
+# tasks.json
+# tasks/

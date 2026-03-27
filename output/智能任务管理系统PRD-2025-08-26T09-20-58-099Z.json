@@ -1,0 +1,755 @@
+{
+  "document": {
+    "id": "prd-1756200058097",
+    "title": "智能任务管理系统PRD",
+    "version": "1.0.0",
+    "filePath": "/Users/zfkc/Desktop/04-AI工具/taskflow-ai/example-prd.md",
+    "content": "# 智能任务管理系统PRD\n\n## 项目概述\n\n本项目旨在开发一个智能任务管理系统，帮助团队更高效地管理项目任务和进度。\n\n## 功能需求\n\n### 1. 用户管理模块\n\n#### 1.1 用户注册与登录\n\n- 用户可以通过邮箱注册账号\n- 支持密码和第三方登录\n- 账号激活和密码重置功能\n\n#### 1.2 用户信息管理\n\n- 个人资料编辑\n- 头像上传\n- 权限管理\n\n### 2. 项目管理模块\n\n#### 2.1 项目创建\n\n- 创建新项目\n- 设置项目基本信息\n- 邀请团队成员\n\n#### 2.2 项目配置\n\n- 项目设置管理\n- 工作流配置\n- 通知设置\n\n### 3. 任务管理模块\n\n#### 3.1 任务创建与编辑\n\n- 创建任务\n- 设置任务优先级\n- 分配任务负责人\n- 设置截止日期\n\n#### 3.2 任务状态跟踪\n\n- 任务状态更新\n- 进度追踪\n- 评论和附件\n\n### 4. 数据分析模块\n\n#### 4.1 项目统计\n\n- 任务完成统计\n- 团队效率分析\n- 时间分析\n\n#### 4.2 可视化报告\n\n- 甘特图\n- 燃尽图\n- 进度图表\n\n## 技术需求\n\n### 前端技术栈\n\n- React 18+\n- TypeScript\n- Ant Design\n- Redux Toolkit\n\n### 后端技术栈\n\n- Node.js\n- Express\n- MongoDB\n- Redis\n\n### 部署要求\n\n- Docker容器化\n- CI/CD自动部署\n- 负载均衡\n- 监控告警\n\n## 验收标准\n\n- [ ] 用户可以成功注册并登录系统\n- [ ] 用户可以创建和管理项目\n- [ ] 任务可以正确创建、分配和跟踪\n- [ ] 数据统计和报告功能正常\n- [ ] 系统性能满足并发要求\n- [ ] 安全性通过渗透测试\n\n## 项目时间线\n\n- 第1-2周：需求分析和技术选型\n- 第3-4周：系统设计和架构\n- 第5-8周：前端开发\n- 第9-12周：后端开发\n- 第13-14周：集成测试\n- 第15-16周：部署和上线\n\n## 风险评估\n\n### 技术风险\n\n- 新技术学习成本\n- 第三方服务依赖\n- 性能优化挑战\n\n### 项目风险\n\n- 需求变更\n- 人员流动\n- 时间压力\n\n## 总结\n\n本项目将为团队提供一个高效、智能的任务管理解决方案，提升项目管理效率和团队协作能力。\n",
+    "metadata": {
+      "author": "Unknown",
+      "createDate": "2025-08-26T09:20:58.097Z",
+      "lastModified": "2025-08-26T09:20:58.097Z",
+      "tags": [],
+      "priority": "medium",
+      "complexity": "complex",
+      "estimatedHours": 128
+    },
+    "sections": [
+      {
+        "id": "section-1756200058097-0",
+        "title": "项目概述",
+        "type": "overview",
+        "content": "项目概述\n本项目旨在开发一个智能任务管理系统，帮助团队更高效地管理项目任务和进度。\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 0
+      },
+      {
+        "id": "section-1756200058097-1",
+        "title": "功能需求",
+        "type": "requirements",
+        "content": "功能需求\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 1
+      },
+      {
+        "id": "section-1756200058097-2",
+        "title": "1. 用户管理模块",
+        "type": "functional",
+        "content": "1. 用户管理模块\n1.1 用户注册与登录\n用户可以通过邮箱注册账号\n支持密码和第三方登录\n账号激活和密码重置功能\n1.2 用户信息管理\n个人资料编辑\n头像上传\n权限管理\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 2
+      },
+      {
+        "id": "section-1756200058097-3",
+        "title": "2. 项目管理模块",
+        "type": "functional",
+        "content": "2. 项目管理模块\n2.1 项目创建\n创建新项目\n设置项目基本信息\n邀请团队成员\n2.2 项目配置\n项目设置管理\n工作流配置\n通知设置\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 3
+      },
+      {
+        "id": "section-1756200058097-4",
+        "title": "3. 任务管理模块",
+        "type": "functional",
+        "content": "3. 任务管理模块\n3.1 任务创建与编辑\n创建任务\n设置任务优先级\n分配任务负责人\n设置截止日期\n3.2 任务状态跟踪\n任务状态更新\n进度追踪\n评论和附件\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 4
+      },
+      {
+        "id": "section-1756200058097-5",
+        "title": "4. 数据分析模块",
+        "type": "functional",
+        "content": "4. 数据分析模块\n4.1 项目统计\n任务完成统计\n团队效率分析\n时间分析\n4.2 可视化报告\n甘特图\n燃尽图\n进度图表\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 5
+      },
+      {
+        "id": "section-1756200058097-6",
+        "title": "技术需求",
+        "type": "requirements",
+        "content": "技术需求\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 6
+      },
+      {
+        "id": "section-1756200058097-7",
+        "title": "前端技术栈",
+        "type": "technical",
+        "content": "前端技术栈\nReact 18+\nTypeScript\nAnt Design\nRedux Toolkit\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 7
+      },
+      {
+        "id": "section-1756200058097-8",
+        "title": "后端技术栈",
+        "type": "technical",
+        "content": "后端技术栈\nNode.js\nExpress\nMongoDB\nRedis\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 8
+      },
+      {
+        "id": "section-1756200058097-9",
+        "title": "部署要求",
+        "type": "functional",
+        "content": "部署要求\nDocker容器化\nCI/CD自动部署\n负载均衡\n监控告警\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 9
+      },
+      {
+        "id": "section-1756200058097-10",
+        "title": "验收标准",
+        "type": "acceptance",
+        "content": "验收标准\n[ ] 用户可以成功注册并登录系统\n[ ] 用户可以创建和管理项目\n[ ] 任务可以正确创建、分配和跟踪\n[ ] 数据统计和报告功能正常\n[ ] 系统性能满足并发要求\n[ ] 安全性通过渗透测试\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 10
+      },
+      {
+        "id": "section-1756200058097-11",
+        "title": "项目时间线",
+        "type": "functional",
+        "content": "项目时间线\n第1-2周：需求分析和技术选型\n第3-4周：系统设计和架构\n第5-8周：前端开发\n第9-12周：后端开发\n第13-14周：集成测试\n第15-16周：部署和上线\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 11
+      },
+      {
+        "id": "section-1756200058097-12",
+        "title": "风险评估",
+        "type": "functional",
+        "content": "风险评估\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 12
+      },
+      {
+        "id": "section-1756200058097-13",
+        "title": "技术风险",
+        "type": "technical",
+        "content": "技术风险\n新技术学习成本\n第三方服务依赖\n性能优化挑战\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 13
+      },
+      {
+        "id": "section-1756200058097-14",
+        "title": "项目风险",
+        "type": "functional",
+        "content": "项目风险\n需求变更\n人员流动\n时间压力\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 14
+      },
+      {
+        "id": "section-1756200058097-15",
+        "title": "总结",
+        "type": "functional",
+        "content": "总结\n本项目将为团队提供一个高效、智能的任务管理解决方案，提升项目管理效率和团队协作能力。\n",
+        "requirements": [],
+        "dependencies": [],
+        "order": 15
+      }
+    ],
+    "createdAt": "2025-08-26T09:20:58.097Z",
+    "updatedAt": "2025-08-26T09:20:58.097Z"
+  },
+  "tasks": [
+    {
+      "id": "task-1756200058098-0",
+      "title": "实现项目概述",
+      "description": "项目概述\n本项目旨在开发一个智能任务管理系统，帮助团队更高效地管理项目任务和进度。\n",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 8,
+      "dependencies": [],
+      "tags": [],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-1",
+      "title": "实现功能需求",
+      "description": "功能需求\n",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 8,
+      "dependencies": [],
+      "tags": [],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-2-backend",
+      "title": "实现1. 用户管理模块后端API",
+      "description": "开发1. 用户管理模块相关的后端接口和业务逻辑",
+      "type": "backend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 16,
+      "dependencies": [],
+      "tags": [
+        "api",
+        "backend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-2-frontend",
+      "title": "实现1. 用户管理模块前端功能",
+      "description": "开发1. 用户管理模块的前端界面和交互逻辑",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 12,
+      "dependencies": [
+        "task-1756200058098-2-backend"
+      ],
+      "tags": [
+        "ui",
+        "frontend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-4-backend",
+      "title": "实现2. 项目管理模块后端API",
+      "description": "开发2. 项目管理模块相关的后端接口和业务逻辑",
+      "type": "backend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 16,
+      "dependencies": [],
+      "tags": [
+        "api",
+        "backend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-4-frontend",
+      "title": "实现2. 项目管理模块前端功能",
+      "description": "开发2. 项目管理模块的前端界面和交互逻辑",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 12,
+      "dependencies": [
+        "task-1756200058098-4-backend"
+      ],
+      "tags": [
+        "ui",
+        "frontend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-6-backend",
+      "title": "实现3. 任务管理模块后端API",
+      "description": "开发3. 任务管理模块相关的后端接口和业务逻辑",
+      "type": "backend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 16,
+      "dependencies": [],
+      "tags": [
+        "api",
+        "backend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-6-frontend",
+      "title": "实现3. 任务管理模块前端功能",
+      "description": "开发3. 任务管理模块的前端界面和交互逻辑",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 12,
+      "dependencies": [
+        "task-1756200058098-6-backend"
+      ],
+      "tags": [
+        "ui",
+        "frontend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-8-backend",
+      "title": "实现4. 数据分析模块后端API",
+      "description": "开发4. 数据分析模块相关的后端接口和业务逻辑",
+      "type": "backend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 16,
+      "dependencies": [],
+      "tags": [
+        "api",
+        "backend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-8-frontend",
+      "title": "实现4. 数据分析模块前端功能",
+      "description": "开发4. 数据分析模块的前端界面和交互逻辑",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 12,
+      "dependencies": [
+        "task-1756200058098-8-backend"
+      ],
+      "tags": [
+        "ui",
+        "frontend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-10",
+      "title": "实现技术需求",
+      "description": "技术需求\n",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 8,
+      "dependencies": [],
+      "tags": [],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-11-architecture",
+      "title": "设计前端技术栈技术架构",
+      "description": "设计和规划前端技术栈的技术实现方案",
+      "type": "research",
+      "status": "todo",
+      "priority": "high",
+      "complexity": "complex",
+      "estimatedHours": 8,
+      "dependencies": [],
+      "tags": [
+        "architecture",
+        "design"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-12-architecture",
+      "title": "设计后端技术栈技术架构",
+      "description": "设计和规划后端技术栈的技术实现方案",
+      "type": "research",
+      "status": "todo",
+      "priority": "high",
+      "complexity": "complex",
+      "estimatedHours": 8,
+      "dependencies": [],
+      "tags": [
+        "architecture",
+        "design"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-13-backend",
+      "title": "实现部署要求后端API",
+      "description": "开发部署要求相关的后端接口和业务逻辑",
+      "type": "backend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 16,
+      "dependencies": [],
+      "tags": [
+        "api",
+        "backend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-13-frontend",
+      "title": "实现部署要求前端功能",
+      "description": "开发部署要求的前端界面和交互逻辑",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 12,
+      "dependencies": [
+        "task-1756200058098-13-backend"
+      ],
+      "tags": [
+        "ui",
+        "frontend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-15",
+      "title": "实现验收标准",
+      "description": "验收标准\n[ ] 用户可以成功注册并登录系统\n[ ] 用户可以创建和管理项目\n[ ] 任务可以正确创建、分配和跟踪\n[ ] 数据统计和报告功能正常\n[ ] 系统性能满足并发要求\n[ ] 安全性通过渗透测试\n",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 8,
+      "dependencies": [],
+      "tags": [],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-16-backend",
+      "title": "实现项目时间线后端API",
+      "description": "开发项目时间线相关的后端接口和业务逻辑",
+      "type": "backend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 16,
+      "dependencies": [],
+      "tags": [
+        "api",
+        "backend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-16-frontend",
+      "title": "实现项目时间线前端功能",
+      "description": "开发项目时间线的前端界面和交互逻辑",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 12,
+      "dependencies": [
+        "task-1756200058098-16-backend"
+      ],
+      "tags": [
+        "ui",
+        "frontend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-18-backend",
+      "title": "实现风险评估后端API",
+      "description": "开发风险评估相关的后端接口和业务逻辑",
+      "type": "backend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 16,
+      "dependencies": [],
+      "tags": [
+        "api",
+        "backend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-18-frontend",
+      "title": "实现风险评估前端功能",
+      "description": "开发风险评估的前端界面和交互逻辑",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 12,
+      "dependencies": [
+        "task-1756200058098-18-backend"
+      ],
+      "tags": [
+        "ui",
+        "frontend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-20-architecture",
+      "title": "设计技术风险技术架构",
+      "description": "设计和规划技术风险的技术实现方案",
+      "type": "research",
+      "status": "todo",
+      "priority": "high",
+      "complexity": "complex",
+      "estimatedHours": 8,
+      "dependencies": [],
+      "tags": [
+        "architecture",
+        "design"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-21-backend",
+      "title": "实现项目风险后端API",
+      "description": "开发项目风险相关的后端接口和业务逻辑",
+      "type": "backend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 16,
+      "dependencies": [],
+      "tags": [
+        "api",
+        "backend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-21-frontend",
+      "title": "实现项目风险前端功能",
+      "description": "开发项目风险的前端界面和交互逻辑",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 12,
+      "dependencies": [
+        "task-1756200058098-21-backend"
+      ],
+      "tags": [
+        "ui",
+        "frontend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-23-backend",
+      "title": "实现总结后端API",
+      "description": "开发总结相关的后端接口和业务逻辑",
+      "type": "backend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 16,
+      "dependencies": [],
+      "tags": [
+        "api",
+        "backend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "task-1756200058098-23-frontend",
+      "title": "实现总结前端功能",
+      "description": "开发总结的前端界面和交互逻辑",
+      "type": "frontend",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 12,
+      "dependencies": [
+        "task-1756200058098-23-backend"
+      ],
+      "tags": [
+        "ui",
+        "frontend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "common-1756200058098-database",
+      "title": "数据库设计和实现",
+      "description": "设计数据库表结构并实现数据访问层",
+      "type": "database",
+      "status": "todo",
+      "priority": "high",
+      "complexity": "medium",
+      "estimatedHours": 16,
+      "dependencies": [],
+      "tags": [
+        "database",
+        "backend"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "common-1756200058098-testing",
+      "title": "编写测试用例",
+      "description": "编写单元测试和集成测试",
+      "type": "testing",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 12,
+      "dependencies": [
+        "task-1756200058098-0",
+        "task-1756200058098-1",
+        "task-1756200058098-2-backend",
+        "task-1756200058098-2-frontend",
+        "task-1756200058098-4-backend",
+        "task-1756200058098-4-frontend",
+        "task-1756200058098-6-backend",
+        "task-1756200058098-6-frontend",
+        "task-1756200058098-8-backend",
+        "task-1756200058098-8-frontend",
+        "task-1756200058098-10",
+        "task-1756200058098-13-backend",
+        "task-1756200058098-13-frontend",
+        "task-1756200058098-15",
+        "task-1756200058098-16-backend",
+        "task-1756200058098-16-frontend",
+        "task-1756200058098-18-backend",
+        "task-1756200058098-18-frontend",
+        "task-1756200058098-21-backend",
+        "task-1756200058098-21-frontend",
+        "task-1756200058098-23-backend",
+        "task-1756200058098-23-frontend",
+        "common-1756200058098-database"
+      ],
+      "tags": [
+        "testing",
+        "quality"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "common-1756200058098-documentation",
+      "title": "编写项目文档",
+      "description": "编写API文档、用户手册和部署指南",
+      "type": "documentation",
+      "status": "todo",
+      "priority": "low",
+      "complexity": "simple",
+      "estimatedHours": 8,
+      "dependencies": [],
+      "tags": [
+        "documentation"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    },
+    {
+      "id": "common-1756200058098-deployment",
+      "title": "部署和发布",
+      "description": "配置生产环境并部署应用",
+      "type": "deployment",
+      "status": "todo",
+      "priority": "medium",
+      "complexity": "medium",
+      "estimatedHours": 6,
+      "dependencies": [
+        "common-1756200058098-testing"
+      ],
+      "tags": [
+        "deployment",
+        "devops"
+      ],
+      "subtasks": [],
+      "progress": 0,
+      "createdAt": "2025-08-26T09:20:58.098Z",
+      "updatedAt": "2025-08-26T09:20:58.098Z"
+    }
+  ],
+  "summary": {
+    "totalTasks": 29,
+    "totalHours": 350,
+    "generatedAt": "2025-08-26T09:20:58.099Z"
+  }
+}
