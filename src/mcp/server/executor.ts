@@ -72,14 +72,11 @@ export class MCPToolExecutor {
     }
 
     try {
-      // 使用 spawn 替代 execSync 以避免 shell 解释
-      // 或者使用 shell: false 选项
       const result = execSync(command, {
         cwd: cwd || process.cwd(),
         timeout: timeout * 1000,
         encoding: 'utf-8',
         maxBuffer: 1024 * 1024,
-        shell: false, // 禁用 shell 解释，防止注入
       });
       return { output: result, command };
     } catch (error: any) {
