@@ -2,21 +2,28 @@ import { defineConfig } from 'vitepress'
 import { nav, sidebar, themeConfig, head, vite, markdown } from './config-internal'
 
 export default defineConfig({
+  // 站点信息
   title: 'TaskFlow AI',
+  titleTemplate: ':title | TaskFlow AI',
   description: 'TaskFlow AI - 智能PRD文档解析与任务管理助手，专为开发团队设计的AI驱动任务编排工具',
 
-  // GitHub Pages 优化配置
+  // 部署配置
   base: '/taskflow-ai/',
   lang: 'zh-CN',
+  
+  // 构建配置
   cleanUrls: false,
   ignoreDeadLinks: true,
   lastUpdated: true,
-
-  // 确保资源正确加载
+  
+  // 资源配置
   assetsDir: 'assets',
   cacheDir: '.vitepress/cache',
 
   // 主题配置
+  themeConfig,
+
+  // 导航和侧边栏
   themeConfig: {
     ...themeConfig,
     nav,
@@ -29,11 +36,30 @@ export default defineConfig({
   // 头部配置
   head,
 
-  // Markdown配置
+  // Markdown 配置
   markdown,
 
   // 站点地图
   sitemap: {
-    hostname: 'https://agions.github.io/taskflow-ai/'
+    hostname: 'https://agions.github.io/taskflow-ai/',
+    lastmodDateOnly: true
+  },
+
+  // 多语言支持 (预留)
+  locales: {
+    root: {
+      label: '简体中文',
+      lang: 'zh-CN'
+    }
+  },
+
+  // 构建钩子
+  transformHead({ pageData }) {
+    const frontmatter = pageData.frontmatter
+    if (frontmatter.title) {
+      return [
+        ['title', `${frontmatter.title} | TaskFlow AI`]
+      ]
+    }
   }
 })

@@ -1,8 +1,10 @@
 /**
  * 侧边栏配置
+ * 清晰的层次结构，便于导航
  */
 
 export const sidebar = {
+  // 指南
   '/guide/': [
     {
       text: '🚀 快速入门',
@@ -33,6 +35,7 @@ export const sidebar = {
     }
   ],
 
+  // API 参考
   '/api/': [
     {
       text: '📚 API 概览',
@@ -66,6 +69,7 @@ export const sidebar = {
     }
   ],
 
+  // 编辑器配置
   '/editor-config/': [
     {
       text: '🔌 编辑器集成',
@@ -78,6 +82,7 @@ export const sidebar = {
     }
   ],
 
+  // 用户指南
   '/user-guide/': [
     {
       text: '📖 用户手册',
@@ -91,6 +96,7 @@ export const sidebar = {
     }
   ],
 
+  // 技术参考
   '/reference/': [
     {
       text: '📙 技术参考',
@@ -104,6 +110,7 @@ export const sidebar = {
     }
   ],
 
+  // 开发文档
   '/development/': [
     {
       text: '💻 开发文档',
@@ -115,6 +122,7 @@ export const sidebar = {
     }
   ],
 
+  // 测试
   '/testing/': [
     {
       text: '🧪 测试指南',
@@ -125,6 +133,7 @@ export const sidebar = {
     }
   ],
 
+  // 部署
   '/deployment/': [
     {
       text: '🚀 部署指南',
@@ -135,6 +144,7 @@ export const sidebar = {
     }
   ],
 
+  // 故障排除
   '/troubleshooting/': [
     {
       text: '🔧 故障排除',
@@ -148,6 +158,7 @@ export const sidebar = {
     }
   ],
 
+  // MCP
   '/mcp/': [
     {
       text: '🔌 MCP 集成',

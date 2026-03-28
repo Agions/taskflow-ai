@@ -1,0 +1,373 @@
+/**
+ * TaskFlow AI 文档自定义样式
+ * 专业、现代、清晰
+ */
+
+/* ========== 品牌色彩 ========== */
+:root {
+  /* 主色调 - 科技蓝 */
+  --tf-primary: #3b82f6;
+  --tf-primary-light: #60a5fa;
+  --tf-primary-dark: #2563eb;
+  
+  /* 辅助色 */
+  --tf-success: #10b981;
+  --tf-warning: #f59e0b;
+  --tf-error: #ef4444;
+  --tf-info: #06b6d4;
+  
+  /* 中性色 */
+  --tf-gray-50: #f9fafb;
+  --tf-gray-100: #f3f4f6;
+  --tf-gray-200: #e5e7eb;
+  --tf-gray-300: #d1d5db;
+  --tf-gray-400: #9ca3af;
+  --tf-gray-500: #6b7280;
+  --tf-gray-600: #4b5563;
+  --tf-gray-700: #374151;
+  --tf-gray-800: #1f2937;
+  --tf-gray-900: #111827;
+  
+  /* 渐变 */
+  --tf-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  --tf-gradient-hero: linear-gradient(180deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+}
+
+/* 暗色主题 */
+.dark {
+  --tf-primary: #60a5fa;
+  --tf-primary-light: #93c5fd;
+  --tf-primary-dark: #3b82f6;
+}
+
+/* ========== 首页 Hero 样式 ========== */
+.VPHero {
+  padding-bottom: 4rem !important;
+}
+
+.VPHero .name {
+  background: var(--tf-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.VPHero .tagline {
+  color: var(--tf-gray-600) !important;
+  font-size: 1.25rem !important;
+}
+
+.VPHero .image-bg {
+  background: var(--tf-gradient-hero) !important;
+}
+
+/* 特性卡片 */
+.VPFeature {
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  border: 1px solid var(--vp-c-divider) !important;
+}
+
+.VPFeature:hover {
+  border-color: var(--tf-primary) !important;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15) !important;
+  transform: translateY(-2px);
+}
+
+.VPFeature .icon {
+  font-size: 2rem !important;
+}
+
+/* ========== 导航栏 ========== */
+.VPNav {
+  backdrop-filter: blur(12px);
+}
+
+.VPNavBar {
+  border-bottom: 1px solid var(--vp-c-divider) !important;
+}
+
+.VPNavBarTitle .title {
+  font-weight: 700 !important;
+  background: var(--tf-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ========== 侧边栏 ========== */
+.VPSidebar {
+  border-right: 1px solid var(--vp-c-divider) !important;
+}
+
+.VPSidebarItem .text {
+  font-weight: 500;
+}
+
+.VPSidebarItem.is-active > .item > .link > .text {
+  color: var(--tf-primary) !important;
+}
+
+/* ========== 内容区域 ========== */
+.vp-doc {
+  max-width: 900px;
+}
+
+/* 标题样式 */
+.vp-doc h1 {
+  border-bottom: 2px solid var(--tf-primary);
+  padding-bottom: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.vp-doc h2 {
+  border-bottom: 1px solid var(--vp-c-divider);
+  padding-bottom: 0.3rem;
+  margin-top: 2.5rem;
+}
+
+.vp-doc h3 {
+  margin-top: 2rem;
+}
+
+/* 链接样式 */
+.vp-doc a {
+  color: var(--tf-primary);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.vp-doc a:hover {
+  border-bottom-color: var(--tf-primary);
+}
+
+/* ========== 代码块 ========== */
+.vp-doc [class*='language-'] {
+  border-radius: 12px !important;
+  margin: 1.5rem 0 !important;
+}
+
+.vp-doc [class*='language-'] code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-size: 0.9em !important;
+}
+
+/* 代码行号 */
+.vp-doc [class*='language-'] .line-numbers {
+  padding-right: 1rem;
+}
+
+/* 复制按钮 */
+.vp-code-group .tabs label {
+  border-radius: 8px 8px 0 0 !important;
+}
+
+/* ========== 提示框 ========== */
+.custom-block {
+  border-radius: 12px !important;
+  padding: 1.25rem !important;
+  margin: 1.5rem 0 !important;
+}
+
+.custom-block .custom-block-title {
+  font-weight: 600 !important;
+}
+
+/* Tip 提示 */
+.custom-block.tip {
+  border-color: var(--tf-primary) !important;
+  background: rgba(59, 130, 246, 0.08) !important;
+}
+
+.custom-block.tip .custom-block-title {
+  color: var(--tf-primary) !important;
+}
+
+/* Warning 警告 */
+.custom-block.warning {
+  border-color: var(--tf-warning) !important;
+  background: rgba(245, 158, 11, 0.08) !important;
+}
+
+.custom-block.warning .custom-block-title {
+  color: var(--tf-warning) !important;
+}
+
+/* Danger 危险 */
+.custom-block.danger {
+  border-color: var(--tf-error) !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+
+.custom-block.danger .custom-block-title {
+  color: var(--tf-error) !important;
+}
+
+/* Info 信息 */
+.custom-block.info {
+  border-color: var(--tf-info) !important;
+  background: rgba(6, 182, 212, 0.08) !important;
+}
+
+.custom-block.info .custom-block-title {
+  color: var(--tf-info) !important;
+}
+
+/* ========== 表格 ========== */
+.vp-doc table {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc th {
+  background: var(--vp-c-bg-soft);
+  font-weight: 600;
+}
+
+.vp-doc tr {
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc tr:last-child {
+  border-bottom: none;
+}
+
+/* ========== 徽章 ========== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0 0.25rem;
+}
+
+.badge.primary {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--tf-primary);
+}
+
+.badge.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--tf-success);
+}
+
+.badge.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--tf-warning);
+}
+
+.badge.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--tf-error);
+}
+
+/* ========== 卡片网格 ========== */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-soft);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  border-color: var(--tf-primary);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+}
+
+.card h3 {
+  margin-top: 0 !important;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--tf-primary);
+}
+
+/* ========== 步骤指南 ========== */
+.steps {
+  margin: 2rem 0;
+  padding-left: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.steps li {
+  position: relative;
+  padding-left: 3rem;
+  margin-bottom: 1.5rem;
+  counter-increment: step;
+}
+
+.steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--tf-gradient);
+  color: white;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+/* ========== 时间线 ========== */
+.timeline {
+  margin: 2rem 0;
+  padding-left: 2rem;
+  border-left: 2px solid var(--tf-primary);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -2.5rem;
+  top: 0.25rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--tf-primary);
+  border: 2px solid var(--vp-c-bg);
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 768px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .VPHero .tagline {
+    font-size: 1rem !important;
+  }
+}
+
+/* ========== 打印样式 ========== */
+@media print {
+  .VPNav,
+  .VPSidebar,
+  .VPFooter {
+    display: none !important;
+  }
+  
+  .VPContent {
+    padding: 0 !important;
+  }
+}
