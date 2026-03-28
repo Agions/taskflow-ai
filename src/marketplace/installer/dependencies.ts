@@ -7,6 +7,9 @@ import * as path from 'path';
 import { execSync } from 'child_process';
 import { ToolPackage, DependencyTree } from '../types';
 import { RegistryManager } from '../registry';
+import { getLogger } from '../../utils/logger';
+
+const logger = getLogger('marketplace:dependencies');
 
 export class DependencyManager {
   constructor(private registryManager: RegistryManager) {}
@@ -33,7 +36,7 @@ export class DependencyManager {
   }
 
   async installDependency(pkg: ToolPackage): Promise<void> {
-    console.log(`  📦 Installing dependency: ${pkg.name}@${pkg.version}`);
+    logger.info(`📦 Installing dependency: ${pkg.name}@${pkg.version}`);
   }
 
   async installNpmDependencies(
@@ -46,7 +49,7 @@ export class DependencyManager {
       return;
     }
 
-    console.log('  📦 Installing npm dependencies...');
+    logger.info('📦 Installing npm dependencies...');
 
     const packageJsonPath = path.join(pkgDir, 'package.json');
     const packageJson = await fs.readJson(packageJsonPath).catch(() => ({}));

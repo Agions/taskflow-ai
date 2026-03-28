@@ -9,6 +9,9 @@ import { RegistryManager } from '../registry';
 import { PackageDownloader } from './downloader';
 import { DependencyManager } from './dependencies';
 import { ConfigManager } from './config';
+import { getLogger } from '../../utils/logger';
+
+const logger = getLogger('marketplace:installer');
 
 export * from './downloader';
 export * from './dependencies';
@@ -40,7 +43,7 @@ export class PackageInstaller {
     const startTime = Date.now();
 
     try {
-      console.log(`📦 Installing ${packageName}${version ? `@${version}` : ''}...`);
+      logger.info(`📦 Installing ${packageName}${version ? `@${version}` : ''}...`);
 
       const pkg = await this.registryManager.getPackage(packageName, version);
       if (!pkg) {
@@ -76,7 +79,7 @@ export class PackageInstaller {
         await this.configManager.savePackage(pkg);
       }
 
-      console.log(`✅ Installed ${pkg.name}@${pkg.version} in ${Date.now() - startTime}ms`);
+      logger.info(`✅ Installed ${pkg.name}@${pkg.version} in ${Date.now() - startTime}ms`);
 
       return { success: true, package: pkg, installedTools };
     } catch (error) {
@@ -97,13 +100,13 @@ export class PackageInstaller {
       if (await fs.pathExists(pkgDir)) {
         await fs.remove(pkgDir);
         await this.configManager.removePackage(packageName);
-        console.log(`✅ Uninstalled ${packageName}`);
+        logger.info(`✅ Uninstalled ${packageName}`);
         return true;
       }
 
       return false;
     } catch (error) {
-      console.error(`❌ Failed to uninstall ${packageName}:`, error);
+      logger.error(`❌ Failed to uninstall ${packageName}:`, error);
       return false;
     }
   }
