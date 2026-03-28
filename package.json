@@ -196,6 +196,13 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
+  "overrides": {
+    "esbuild": "^0.25.0",
+    "vite": "^6.1.7",
+    "release-it": {
+      "undici": "^6.24.0"
+    }
+  },
   "release-it": {
     "git": {
       "commitMessage": "chore: release v${version}",
