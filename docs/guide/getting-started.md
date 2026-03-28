@@ -392,7 +392,7 @@ taskflow performance stats
 4. **获取帮助**：
    - [故障排除指南](../troubleshooting/common-issues.md) - 常见问题解决
    - [GitHub Issues](https://github.com/agions/taskflow-ai/issues) - 报告问题
-   - [讨论区](https://github.com/agions/taskflow-ai/discussions) - 社区交流
+   - [讨论区](https://github.com/Agions/taskflow-ai/issues) - 社区交流
 
 ## 💡 小贴士
 
@@ -404,7 +404,7 @@ taskflow performance stats
 ## 🤝 加入社区
 
 - **GitHub**: [Star 项目](https://github.com/agions/taskflow-ai) 支持我们
-- **讨论**: 参与 [GitHub Discussions](https://github.com/agions/taskflow-ai/discussions)
+- **讨论**: 参与 [GitHub Discussions](https://github.com/Agions/taskflow-ai/issues)
 - **贡献**: 查看 [贡献指南](../../CONTRIBUTING.md) 了解如何参与开发
 
 ---

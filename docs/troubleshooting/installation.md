@@ -315,7 +315,7 @@ taskflow doctor --export diagnosis.txt
 ### 联系支持
 - **GitHub Issues**: [提交问题](https://github.com/agions/taskflow-ai/issues)
 - **文档**: [查看文档](https://agions.github.io/taskflow-ai/)
-- **社区**: [讨论区](https://github.com/agions/taskflow-ai/discussions)
+- **社区**: [讨论区](https://github.com/Agions/taskflow-ai/issues)
 
 ## 📚 相关文档
 

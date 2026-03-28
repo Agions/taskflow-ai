@@ -129,7 +129,7 @@ npm install && npm run build</code></pre>
           <h4>💬 社区</h4>
           <ul>
             <li><a href="https://github.com/Agions/taskflow-ai/issues" target="_blank">问题反馈</a></li>
-            <li><a href="https://github.com/Agions/taskflow-ai/discussions" target="_blank">讨论区</a></li>
+            <li><a href="https://github.com/Agions/taskflow-ai/issues" target="_blank">讨论区</a></li>
             <li><a href="/development/contributing">贡献指南</a></li>
           </ul>
         </div>

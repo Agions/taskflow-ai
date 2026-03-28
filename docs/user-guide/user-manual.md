@@ -518,7 +518,7 @@ taskflow logs --tail 50
 
 #### 联系支持
 - **GitHub Issues**: [提交问题](https://github.com/agions/taskflow-ai/issues)
-- **讨论区**: [GitHub Discussions](https://github.com/agions/taskflow-ai/discussions)
+- **讨论区**: [GitHub Discussions](https://github.com/Agions/taskflow-ai/issues)
 - **文档**: [在线文档](https://agions.github.io/taskflow-ai)
 
 ## 更多资源

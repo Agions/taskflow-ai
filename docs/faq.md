@@ -324,7 +324,7 @@ A: 获取帮助的途径：
 
 1. **查看文档**：[在线文档](https://agions.github.io/taskflow-ai)
 2. **GitHub Issues**：[提交问题](https://github.com/agions/taskflow-ai/issues)
-3. **讨论区**：[GitHub Discussions](https://github.com/agions/taskflow-ai/discussions)
+3. **讨论区**：[GitHub Discussions](https://github.com/Agions/taskflow-ai/issues)
 4. **社区群组**：加入QQ群或微信群
 5. **邮件支持**：发送邮件到 1051736049@qq.com
 

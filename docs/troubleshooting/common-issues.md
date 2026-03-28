@@ -498,7 +498,7 @@ taskflow --version
 
 - **文档**: [https://agions.github.io/taskflow-ai](https://agions.github.io/taskflow-ai)
 - **GitHub Issues**: [https://github.com/agions/taskflow-ai/issues](https://github.com/agions/taskflow-ai/issues)
-- **讨论区**: [https://github.com/agions/taskflow-ai/discussions](https://github.com/agions/taskflow-ai/discussions)
+- **讨论区**: [https://github.com/Agions/taskflow-ai/issues](https://github.com/Agions/taskflow-ai/issues)
 
 ### 3. 社区支持
 

@@ -269,7 +269,7 @@ service.parsePRD(content, 'markdown');
 
 - 🐛 [提交Bug报告](https://github.com/agions/taskflow-ai/issues/new?template=bug_report.md)
 - 💡 [功能建议](https://github.com/agions/taskflow-ai/issues/new?template=feature_request.md)
-- 💬 [社区讨论](https://github.com/agions/taskflow-ai/discussions)
+- 💬 [社区讨论](https://github.com/Agions/taskflow-ai/issues)
 - 📧 [邮件联系](mailto:1051736049@qq.com)
 
 

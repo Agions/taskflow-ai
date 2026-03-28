@@ -119,7 +119,7 @@ docs/
 │   ├── architecture.md            # 架构设计
 │   ├── mcp-setup.md               # MCP 配置
 │   ├── mcp-integration.md         # MCP 集成
-started.md) · [查看示例](examples/example-prd.md) · [加入社区](https://github.com/Agions/taskflow-ai/discussions)
+started.md) · [查看示例](examples/example-prd.md) · [加入社区](https://github.com/Agions/taskflow-ai/issues)
 
 </div>
 推出)
@@ -136,7 +136,7 @@ started.md) · [查看示例](examples/example-prd.md) · [加入社区](https:/
 
 1. **报告问题**: 在 [GitHub Issues](https://github.com/Agions/taskflow-ai/issues) 提交
 2. **修改文档**: Fork 仓库，修改后提交 PR
-3. **参与讨论**: 在 [Discussions](https://github.com/Agions/taskflow-ai/discussions) 参与
+3. **参与讨论**: 在 [Discussions](https://github.com/Agions/taskflow-ai/issues) 参与
 
 ### 文档改进建议
 
@@ -187,7 +187,7 @@ taskflow.init();
 - 📦 [NPM 包](https://www.npmjs.com/package/taskflow-ai)
 
 ### 社区资源
-- 💬 [GitHub Discussions](https://github.com/Agions/taskflow-ai/discussions)
+- 💬 [GitHub Discussions](https://github.com/Agions/taskflow-ai/issues)
 - 🐛 [问题反馈](https://github.com/Agions/askflow-ai';
 
 const taskflow = new TaskFlow({

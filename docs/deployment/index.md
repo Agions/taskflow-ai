@@ -359,7 +359,7 @@ taskflow config validate
 
 - **文档**: https://agions.github.io/taskflow-ai/
 - **GitHub Issues**: https://github.com/Agions/taskflow-ai/issues
-- **讨论区**: https://github.com/Agions/taskflow-ai/discussions
+- **讨论区**: https://github.com/Agions/taskflow-ai/issues
 
 ## 📚 相关文档
 
