@@ -1,0 +1,191 @@
+# TaskFlow AI 多 Agent 协同开发配置
+
+## Agents 定义
+
+### 1. LogAgent - 日志专家
+
+```yaml
+name: LogAgent
+description: 统一日志系统，将 console 调用替换为 Logger
+capabilities:
+  - reasoning
+  - code
+  - tool_use
+tools:
+  - file_read
+  - file_write
+  - search
+  - replace
+priority: P0
+task_patterns:
+  - "console.log"
+  - "console.warn"
+  - "console.error"
+target_directories:
+  - src/core
+  - src/mcp
+  - src/agent
+  - src/knowledge
+  - src/utils
+exclude:
+  - src/cli/ui
+  - src/cli/commands
+```
+
+### 2. TypeAgent - 类型专家
+
+```yaml
+name: TypeAgent
+description: 分析并替换 :any 类型为具体类型
+capabilities:
+  - reasoning
+  - code
+tools:
+  - type_analyzer
+  - code_refactor
+  - context_builder
+priority: P0
+task_patterns:
+  - ": any"
+  - "any[]"
+  - "anyObject"
+target_files:
+  - src/marketplace/**/*.ts
+  - src/cli/commands/visualize/**/*.ts
+  - src/cicd/**/*.ts
+```
+
+### 3. RefactorAgent - 重构协调者
+
+```yaml
+name: RefactorAgent
+description: 协调整体重构进度，处理复杂依赖
+capabilities:
+  - reasoning
+  - collaboration
+  - code
+tools:
+  - git_operations
+  - dependency_analyzer
+  - conflict_resolver
+priority: P1
+```
+
+### 4. TestAgent - 测试专家
+
+```yaml
+name: TestAgent
+description: 增强测试覆盖，创建 E2E 测试
+capabilities:
+  - reasoning
+  - code
+  - tool_use
+tools:
+  - test_generator
+  - coverage_analyzer
+  - mock_creator
+priority: P1
+targets:
+  - increase_coverage: 86% → 95%
+  - add_e2e_tests: 10+ scenarios
+  - integration_tests: enhancement
+```
+
+### 5. DocAgent - 文档专家
+
+```yaml
+name: DocAgent
+description: 补充 API 文档，生成示例
+capabilities:
+  - reasoning
+  - collaboration
+tools:
+  - doc_parser
+  - example_generator
+  - api_doc_builder
+priority: P2
+```
+
+### 6. ReviewAgent - 审查专家
+
+```yaml
+name: ReviewAgent
+description: 代码审查，质量检查
+capabilities:
+  - reasoning
+  - code
+tools:
+  - linter
+  - security_scanner
+  - performance_analyzer
+  - quality_metrics
+priority: P2
+checks:
+  - eslint_errors
+  - typescript_strict
+  - security_vulnerabilities
+  - performance_regressions
+```
+
+## Collaboration Strategy
+
+**策略**: PARALLEL (并行执行)
+
+**阶段**:
+1. **阶段1** (2-3h): LogAgent + TypeAgent 并行工作
+   - 日志统一: 569 处 → 0
+   - 类型安全: 234 处 any → 50
+   
+2. **阶段2** (1-2h): RefactorAgent 协调 + TestAgent 工作
+   - 冲突解决
+   - E2E 测试生成
+   
+3. **阶段3** (30m): DocAgent + ReviewAgent
+   - API 文档完善
+   - 最终质量检查
+
+## Expected Outcomes
+
+| Metric | Before | After |
+|--------|--------|-------|
+| console calls | 569 | ~50 (only UI) |
+| :any usage | 234 | ~50 |
+| Test coverage | 86% | 95%+ |
+| E2E tests | 0 | 10+ |
+| Code quality | B | A |
+| Security | 0 vulns | 0 vulns |
+
+## Commands
+
+```bash
+# 创建 Agent 团队
+taskflow agent create --config agents/log-agent.yaml
+taskflow agent create --config agents/type-agent.yaml
+taskflow agent create --config agents/refactor-agent.yaml
+taskflow agent create --config agents/test-agent.yaml
+taskflow agent create --config agents/doc-agent.yaml
+taskflow agent create --config agents/review-agent.yaml
+
+# 启动协作会话
+taskflow agent collaborate \
+  --agents LogAgent,TypeAgent \
+  --strategy parallel \
+  --session-name "v2.1.11-refactor" \
+  --time-limit 3h
+
+# 监控
+taskflow agent list
+taskflow agent status <agent-id>
+taskflow agent logs --follow
+
+# 完成
+taskflow agent complete <agent-id>
+taskflow agent review --all
+```
+
+## Rollback Plan
+
+- 每个 Agent 工作前自动创建分支
+- 修改前备份原始文件
+- 失败时自动回滚到最近稳定状态
+- 人工审查后才合并

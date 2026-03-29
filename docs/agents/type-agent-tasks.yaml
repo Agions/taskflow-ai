@@ -1,0 +1,244 @@
+# TypeAgent - 类型安全优化任务清单
+
+## 目标
+
+将 TaskFlow AI 项目中的 `: any` 类型替换为具体、明确的类型定义。
+
+## 范围
+
+- ✅ **主要目标**: `src/marketplace/` (37 处)
+- ✅ **主要目标**: `src/cli/commands/visualize/` (25 处)
+- ✅ **次要目标**: `src/cicd/`, `src/codegen/`
+- ❌ **跳过**: 测试文件 (`__tests__`)
+- ❌ **保留**: 真正需要动态类型的极少数场景 (< 10 处)
+
+## 工作流程
+
+### 步骤1: 上下文分析 (每个文件 5-10 分钟)
+
+对于每个包含 `: any` 的文件:
+
+1. **读取完整文件**
+2. **分析类型用途**:
+   - 是函数参数？返回值？变量？
+   - 数据从哪来？到哪去？
+   - 实际运行时的类型是什么？
+3. **查找已有类型定义**: 
+   - 检查 `src/types/` 目录是否有可用类型
+   - 检查是否可复用接口/类型别名
+
+### 步骤2: 类型推断与定义
+
+根据实际使用情况，选择合适的类型:
+
+#### 选项 A: 使用现有类型
+
+```typescript
+// 发现是配置对象
+interface Config {
+  apiKey: string;
+  endpoint: string;
+  timeout?: number;
+}
+
+// 替换前
+function loadConfig(options: any) { }
+
+// 替换后  
+function loadConfig(options: Config) { }
+```
+
+#### 选项 B: 定义专用类型
+
+```typescript
+// 在文件顶部或附近定义
+interface ToolPackage {
+  name: string;
+  version: string;
+  description: string;
+  tools: ToolDefinition[];
+  dependencies: Record<string, string>;
+}
+
+// 替换
+function mapToToolPackage(pkg: any): ToolPackage
+```
+
+#### 选项 C: 使用泛型
+
+```typescript
+// 适用于数组/集合操作
+function processItems<T>(items: T[]): T[] {
+  return items.map(item => item);
+}
+
+// 替换
+function mapTools(tools: any[]): ToolPackage[]
+```
+
+#### 选项 D: 使用联合类型
+
+```typescript
+type TaskStatus = 'pending' | 'running' | 'completed' | 'failed';
+type Provider = 'deepseek' | 'openai' | 'anthropic' | 'zhipu';
+
+// 替换
+function setStatus(status: any): void
+```
+
+### 步骤3: 验证与测试
+
+1. **类型检查**: `npx tsc --noEmit`
+2. **运行相关测试**: 确保类型修改不影响行为
+3. **更新测试**: 如果测试用了 `any`，也需要改进
+
+## 具体文件指南
+
+### 1. `src/marketplace/registry/search.ts`
+
+**问题**: `response.data.objects?.map((obj: any) => ...)`
+
+**解决**:
+```typescript
+interface RegistryPackage {
+  name: string;
+  version: string;
+  description: string;
+  // ... 其他字段
+}
+
+function mapToToolPackage(pkg: any): ToolPackage {
+  // 明确参数类型
+}
+
+// 或使用泛型
+function mapObjects<T>(objects: any[], mapper: (obj: T) => any): T[]
+```
+
+### 2. `src/cli/commands/visualize/*.ts`
+
+这些文件广泛使用 `options: any`，需要:
+
+1. 定义统一的 `VisualizationOptions` 接口
+2. 定义 `ChartData`、`ChartOptions` 等类型
+3. 各图表函数使用具体类型
+
+```typescript
+interface VisualizationOptions {
+  format?: 'svg' | 'png' | 'html';
+  output?: string;
+  theme?: 'light' | 'dark';
+  width?: number;
+  height?: number;
+}
+
+interface ChartData {
+  type: string;
+  data: unknown[];
+  options?: Record<string, unknown>;
+}
+
+// 替换所有 `options: any`
+function generateGanttChart(data: any, options: VisualizationOptions): ChartData
+```
+
+### 3. `src/mcp/server/executor.ts`
+
+**问题**: `async function startMCPServer(_options: any)`
+
+**解决**: 
+```typescript
+interface MCPServerOptions {
+  port?: number;
+  host?: string;
+  transport?: 'stdio' | 'sse' | 'streamable-http';
+  logLevel?: LogLevel;
+}
+
+async function startMCPServer(options: MCPServerOptions = {}): Promise<void>
+```
+
+## 类型定义位置
+
+新类型应该放在:
+
+1. **模块相关类型** → 放在模块的 `types.ts` 或接口定义文件
+2. **公共类型** → 放到 `src/types/` 相应文件
+   - `src/types/task.ts` - 任务相关
+   - `src/types/config.ts` - 配置相关
+   - `src/types/agent.ts` - Agent 相关
+   - `src/types/visualization.ts` - 可视化相关 ✨新建
+
+## 类型推断工具
+
+使用 VS Code 或 VitePress 的智能提示:
+
+```typescript
+// 写一个 mock 值让 TS 推断
+const example = {
+  name: 'test',
+  version: '1.0.0',
+  tools: []
+};
+
+type ToolPackage = typeof example;
+```
+
+或使用 `satisfies` 操作符 (TS 4.9+):
+```typescript
+const pkg = {
+  name: '...',
+  version: '...',
+  // ...
+} satisfies ToolPackage;
+```
+
+## 不能消除的 any (极少数)
+
+以下场景可以保留 `any`:
+
+1. **第三方库 unknown 类型**: `import('some-lib')` 返回 any
+2. **完全动态数据**: JSON.parse() 的结果，且结构不确定
+3. **测试 mock**: Jest mock 函数
+4. **性能关键路径**: 类型检查开销大于收益 (需注释说明)
+
+但即使这些，也应考虑用 `unknown` 或 `Record<string, unknown>` 替代。
+
+## 质量检查清单
+
+每次修改一个文件后:
+
+- [ ] `npm run type-check` 无错误
+- [ ] `npm run lint` 无警告
+- [ ] 相关测试通过
+- [ ] 没有改变原有逻辑行为
+- [ ] 提交信息清晰: `refactor: improve type safety in <file>`
+
+## 批量策略
+
+建议每天处理 5-10 个文件:
+
+1. 早上: 选择 5 个高优先级文件
+2. 中午: 完成并提交
+3. 下午: 再处理 5 个
+4. 晚上: 运行全部检查和测试
+
+按此节奏，2-3 天可完成所有 P0/P1 文件。
+
+## 预估工作量
+
+| 目录 | any 数量 | 预估时间 | 难度 |
+|------|----------|----------|------|
+| src/marketplace/ | 37 | 3-4 小时 | 中 |
+| src/cli/commands/visualize/ | 25 | 2-3 小时 | 中 |
+| src/cicd/ | ~20 | 2 小时 | 低 |
+| src/codegen/ | ~20 | 2 小时 | 低 |
+| 其他 | ~50 | 3-4 小时 | 低-中 |
+| **总计** | **~150** | **12-15 小时** | - |
+
+注意: 234 处中约 80 处是测试文件或已弃用代码，实际工作量 ~150 处。
+
+---
+
+*Created for TypeAgent - TaskFlow AI Multi-Agent Development*  
+*Date: 2026-03-28*
