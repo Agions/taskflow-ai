@@ -8,7 +8,7 @@
 export interface VerificationResult {
   checks: VerificationCheck[];
   allPassed: boolean;
-  fixTasks?: any[];
+  fixTasks?: unknown[];
 }
 
 /**
@@ -74,7 +74,7 @@ export interface FileCoverage {
  * 验证引擎接口
  */
 export interface VerificationEngine {
-  verify(result: any): Promise<VerificationResult>;
+  verify(result: unknown): Promise<VerificationResult>;
   checkCodeQuality(files: string[]): Promise<CodeQualityReport>;
   checkTestCoverage(files: string[]): Promise<CoverageReport>;
 }

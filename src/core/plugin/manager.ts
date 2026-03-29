@@ -148,7 +148,7 @@ export class PluginManager {
    */
   private async importPlugin(
     pluginId: string,
-    packageJson: any,
+    packageJson: unknown,
     mainPath: string
   ): Promise<Plugin> {
     const plugin: Plugin = {
@@ -214,7 +214,7 @@ export class PluginManager {
   /**
    * 触发钩子
    */
-  async triggerHook<T>(hookName: string, ...args: any[]): Promise<T[]> {
+  async triggerHook<T>(hookName: string, ...args: unknown[]): Promise<T[]> {
     const handlers = this.hooks.get(hookName);
     if (!handlers) {
       return [];

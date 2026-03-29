@@ -95,7 +95,7 @@ export class MCPToolExecutor {
       structure: [],
     };
 
-    const scanDirectory = async (dirPath: string, currentDepth: number): Promise<any[]> => {
+    const scanDirectory = async (dirPath: string, currentDepth: number): Promise<unknown[]> => {
       if (currentDepth > depth) return [];
 
       const items: any[] = [];

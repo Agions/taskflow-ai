@@ -39,7 +39,7 @@ program
     const manager = getManager();
     const config = await loadConfig();
 
-    const models = config?.aiModels?.filter((m: any) => m.enabled) || [];
+    const models = config?.aiModels?.filter((m: unknown) => m.enabled) || [];
 
     if (models.length > 0) {
       try {

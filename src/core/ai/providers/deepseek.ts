@@ -104,7 +104,7 @@ export class DeepSeekAdapter extends BaseAdapter {
           const data = JSON.parse(trimmed.slice(6));
           yield {
             id: data.id,
-            choices: data.choices.map((choice: any) => ({
+            choices: data.choices.map((choice: unknown) => ({
               index: choice.index,
               delta: choice.delta,
               finish_reason: choice.finish_reason,

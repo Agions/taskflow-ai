@@ -34,7 +34,7 @@ export interface RoutingResult {
  * 路由规则
  */
 export interface RoutingRule {
-  match: (context: RoutingContext, messages: any[]) => boolean;
+  match: (context: RoutingContext, messages: unknown[]) => boolean;
   prefer: string[];
   weight: number;
 }
@@ -44,12 +44,12 @@ export interface RoutingRule {
  */
 export abstract class BaseRouter {
   abstract select(
-    messages: any[],
+    messages: unknown[],
     availableModels: ModelConfig[],
     preferredModel?: string
   ): Promise<RoutingResult>;
 
-  protected extractContext(messages: any[]): RoutingContext {
+  protected extractContext(messages: unknown[]): RoutingContext {
     const lastMessage = messages[messages.length - 1]?.content?.toLowerCase() || '';
 
     let taskType: RoutingContext['taskType'];

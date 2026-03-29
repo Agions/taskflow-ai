@@ -62,15 +62,24 @@ export const shellTools: ToolDefinition[] = [
           cwd,
           duration: Date.now() - startTime,
         };
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const err = error as { stdout?: string; stderr?: string; status?: number };
+        let errorMessage: string;
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        } else if (typeof err === 'object' && err !== null) {
+          errorMessage = err.stderr || String(error);
+        } else {
+          errorMessage = String(error);
+        }
         return {
           success: false,
-          output: error.stdout || '',
-          error: error.message,
-          stderr: error.stderr || '',
+          output: err.stdout || '',
+          error: errorMessage,
+          stderr: err.stderr || '',
           command,
           cwd,
-          exitCode: error.status || 1,
+          exitCode: err.status || 1,
         };
       }
     },
@@ -140,7 +149,7 @@ export const shellTools: ToolDefinition[] = [
         child.on('error', error => {
           resolve({
             success: false,
-            error: error.message,
+            error: (error instanceof Error ? error instanceof Error ? error.message : String(error) : String(error)),
             pid: child.pid,
           });
         });
@@ -192,7 +201,7 @@ export const shellTools: ToolDefinition[] = [
       try {
         process.kill(pid, signal);
         return { success: true, pid, signal };
-      } catch (error: any) {
+      } catch (error: unknown) {
         // ESRCH 表示进程不存在，EPERM 表示权限不足（这是我们想要的）
         if (error.code === 'EPERM') {
           return { success: false, error: '权限不足，无法终止该进程', pid };
@@ -200,7 +209,7 @@ export const shellTools: ToolDefinition[] = [
         if (error.code === 'ESRCH') {
           return { success: false, error: '进程不存在', pid };
         }
-        return { success: false, error: error.message, pid };
+        return { success: false, error: (error instanceof Error ? error instanceof Error ? error.message : String(error) : String(error)), pid };
       }
     },
     category: 'shell',

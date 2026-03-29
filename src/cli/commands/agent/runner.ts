@@ -84,7 +84,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
 
     // Wait for completion
     await new Promise<void>(resolve => {
-      agent.onStateChange((state: any) => {
+      agent.onStateChange((state: unknown) => {
         if (state === 'completed' || state === 'failed') {
           resolve();
         }

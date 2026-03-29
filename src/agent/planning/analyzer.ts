@@ -7,7 +7,7 @@ const logger = getLogger('module');
 import { PRDDocument, RequirementAnalysis, Feature, Risk } from '../types';
 
 interface AIService {
-  complete(prompt: string, options?: any): Promise<string>;
+  complete(prompt: string, options?: unknown): Promise<string>;
 }
 
 export class RequirementAnalyzer {

@@ -83,7 +83,7 @@ export function mcpCommand(program: Command) {
     });
 }
 
-async function startMCPServer(_options: any) {
+async function startMCPServer(_options: unknown) {
   try {
     const configManager = new ConfigManager();
     const config = await configManager.loadConfig();
@@ -106,7 +106,7 @@ async function startMCPServer(_options: any) {
   }
 }
 
-async function generateEditorConfig(options: any) {
+async function generateEditorConfig(options: unknown) {
   const editor = options.editor || 'all';
   const outputDir = options.output || process.cwd();
   const packageName = options.package || 'taskflow-ai';
@@ -174,7 +174,7 @@ function getConfigFileName(editorName: string): string {
   return map[editorName] || 'mcp.json';
 }
 
-function mergeConfig(existing: any, newConfig: any): any {
+function mergeConfig(existing: unknown, newConfig: unknown): any {
   // 深度合并配置
   const result = { ...existing };
 
@@ -192,7 +192,7 @@ function mergeConfig(existing: any, newConfig: any): any {
   return result;
 }
 
-async function listTools(options: any) {
+async function listTools(options: unknown) {
   const { toolRegistry } = await import('../../mcp/tools/registry');
 
   // 注册所有工具

@@ -40,7 +40,7 @@ export class AgentStateMachine {
 
     this.actor = createActor(machine);
 
-    this.actor.subscribe((state: any) => {
+    this.actor.subscribe((state: unknown) => {
       this.stateChangeCallbacks.forEach(cb => cb(state.value as AgentState));
     });
   }
@@ -49,7 +49,7 @@ export class AgentStateMachine {
     this.actor.start();
   }
 
-  send(event: any): void {
+  send(event: unknown): void {
     this.actor.send(event);
   }
 

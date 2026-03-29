@@ -18,11 +18,12 @@ async function gitExec(
       encoding: 'utf-8',
     });
     return { stdout, stderr: '', code: 0 };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { stdout?: string; stderr?: string; status?: number };
     return {
-      stdout: error.stdout || '',
-      stderr: error.stderr || '',
-      code: error.status || 1,
+      stdout: err.stdout || '',
+      stderr: err.stderr || '',
+      code: err.status || 1,
     };
   }
 }

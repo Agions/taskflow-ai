@@ -21,7 +21,7 @@ export class MCPResourceManager {
   private dataProviders: DataProviders;
 
   constructor(
-    private config: any,
+    private config: unknown,
     logger?: Logger
   ) {
     this.logger = logger || Logger.getInstance('MCPResourceManager');

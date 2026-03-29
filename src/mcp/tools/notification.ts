@@ -7,7 +7,7 @@ import { ToolDefinition, PermissionLevel } from './types';
 // Slack Webhook
 async function sendSlackWebhook(
   webhookUrl: string,
-  message: SlackMessage
+  message: { text?: string; blocks?: unknown[]; attachments?: unknown[] }
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const response = await fetch(webhookUrl, {
@@ -22,21 +22,15 @@ async function sendSlackWebhook(
     }
 
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
-}
-
-interface SlackMessage {
-  text?: string;
-  blocks?: unknown[];
-  attachments?: unknown[];
 }
 
 // Discord Webhook
 async function sendDiscordWebhook(
   webhookUrl: string,
-  message: DiscordMessage
+  message: { content?: string; embeds?: unknown[]; username?: string; avatar_url?: string }
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const response = await fetch(webhookUrl, {
@@ -51,16 +45,9 @@ async function sendDiscordWebhook(
     }
 
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
-}
-
-interface DiscordMessage {
-  content?: string;
-  embeds?: unknown[];
-  username?: string;
-  avatar_url?: string;
 }
 
 export const notificationTools: ToolDefinition[] = [
@@ -84,10 +71,8 @@ export const notificationTools: ToolDefinition[] = [
       const message = input.message as string;
       const blocks = input.blocks as unknown[] | undefined;
 
-      const payload: SlackMessage = { text: message };
-      if (blocks) {
-        payload.blocks = blocks;
-      }
+      const payload = { text: message };
+      if (blocks) payload.blocks = blocks;
 
       return sendSlackWebhook(webhookUrl, payload);
     },
@@ -119,7 +104,7 @@ export const notificationTools: ToolDefinition[] = [
       const username = input.username as string | undefined;
       const avatarUrl = input.avatarUrl as string | undefined;
 
-      const payload: DiscordMessage = { content: message };
+      const payload = { content: message };
       if (embeds) payload.embeds = embeds;
       if (username) payload.username = username;
       if (avatarUrl) payload.avatar_url = avatarUrl;
@@ -215,10 +200,10 @@ export const notificationTools: ToolDefinition[] = [
           statusText: response.statusText,
           response: responseText,
         };
-      } catch (error: any) {
+      } catch (error: unknown) {
         return {
           success: false,
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
         };
       }
     },

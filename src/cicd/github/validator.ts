@@ -6,8 +6,8 @@ import { PipelineConfig, ValidationResult } from '../types';
 
 export class GitHubConfigValidator {
   async validate(config: PipelineConfig): Promise<ValidationResult> {
-    const errors: any[] = [];
-    const warnings: any[] = [];
+    const errors: unknown[] = [];
+    const warnings: unknown[] = [];
 
     this.validateTriggers(config, errors);
     this.validateStages(config, errors);
@@ -21,7 +21,7 @@ export class GitHubConfigValidator {
     };
   }
 
-  private validateTriggers(config: PipelineConfig, errors: any[]): void {
+  private validateTriggers(config: PipelineConfig, errors: unknown[]): void {
     if (!config.triggers || config.triggers.length === 0) {
       errors.push({
         field: 'triggers',
@@ -31,7 +31,7 @@ export class GitHubConfigValidator {
     }
   }
 
-  private validateStages(config: PipelineConfig, errors: any[]): void {
+  private validateStages(config: PipelineConfig, errors: unknown[]): void {
     if (!config.stages || config.stages.length === 0) {
       errors.push({
         field: 'stages',
@@ -41,7 +41,7 @@ export class GitHubConfigValidator {
     }
   }
 
-  private validateSecrets(config: PipelineConfig, errors: any[]): void {
+  private validateSecrets(config: PipelineConfig, errors: unknown[]): void {
     for (const secret of config.secrets || []) {
       if (!/^[A-Z_][A-Z0-9_]*$/.test(secret)) {
         errors.push({
@@ -53,7 +53,7 @@ export class GitHubConfigValidator {
     }
   }
 
-  private validateEnvironment(_config: PipelineConfig, warnings: any[]): void {
+  private validateEnvironment(_config: PipelineConfig, warnings: unknown[]): void {
     if (!process.env.GITHUB_TOKEN) {
       warnings.push({
         field: 'env.GITHUB_TOKEN',

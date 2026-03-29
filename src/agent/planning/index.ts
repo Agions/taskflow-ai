@@ -9,7 +9,7 @@ import { TaskGenerator } from './task-generator';
 import { DependencyAnalyzer } from './dependency-analyzer';
 
 interface AIService {
-  complete(prompt: string, options?: any): Promise<string>;
+  complete(prompt: string, options?: unknown): Promise<string>;
 }
 
 export * from './analyzer';

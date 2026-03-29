@@ -32,7 +32,7 @@ export class GitHubApiClient {
     );
   }
 
-  async getWorkflowRuns(workflowId: string, branch?: string): Promise<any[]> {
+  async getWorkflowRuns(workflowId: string, branch?: string): Promise<unknown[]> {
     const params: any = {};
     if (branch) {
       params.branch = branch;
@@ -62,7 +62,7 @@ export class GitHubApiClient {
     return this.buildReport(run, jobs);
   }
 
-  private buildReport(run: any, jobs: any[]): BuildReport {
+  private buildReport(run: unknown, jobs: unknown[]): BuildReport {
     return {
       id: run.id.toString(),
       status: this.mapStatus(run.status, run.conclusion),
@@ -80,7 +80,7 @@ export class GitHubApiClient {
     };
   }
 
-  private buildStageReport(job: any): any {
+  private buildStageReport(job: unknown): any {
     return {
       name: job.name,
       status: this.mapStatus(job.status, job.conclusion),
@@ -91,7 +91,7 @@ export class GitHubApiClient {
           status: this.mapStatus(job.status, job.conclusion),
           duration: job.duration || 0,
           steps:
-            job.steps?.map((step: any) => ({
+            job.steps?.map((step: unknown) => ({
               name: step.name,
               status: this.mapStatus(step.status, step.conclusion),
               duration: 0,
@@ -127,7 +127,7 @@ export class GitHubApiClient {
     const response = await axios.get(`${this.baseUrl}/repos/${this.repository}/actions/secrets`, {
       headers: this.getHeaders(),
     });
-    return response.data.secrets.map((s: any) => s.name);
+    return response.data.secrets.map((s: unknown) => s.name);
   }
 
   async createOrUpdateSecret(name: string, value: string): Promise<void> {

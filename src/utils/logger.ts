@@ -100,9 +100,9 @@ export class Logger {
    * Error级别日志
    */
   error(message: string, error?: Error | any, ...args: any[]): void {
-    if (error instanceof Error) {
+    if ((error as Error) instanceof Error) {
       this.logger.error(message, { error: error.message, stack: error.stack, ...args });
-    } else if (error) {
+    } else if (error as Error) {
       this.logger.error(message, { error, ...args });
     } else {
       this.logger.error(message, ...args);
@@ -112,23 +112,23 @@ export class Logger {
   /**
    * 性能日志
    */
-  perf(operation: string, duration: number, details?: any): void {
+  perf(operation: string, duration: number, details?: Record<string, unknown>): void {
     this.logger.info(`Performance: ${operation} completed in ${duration}ms`, {
       operation,
       duration,
-      ...details,
+      ...(details || {}),
     });
   }
 
   /**
    * 审计日志
    */
-  audit(action: string, user: string, details?: any): void {
+  audit(action: string, user: string, details?: Record<string, unknown>): void {
     this.logger.info(`Audit: ${action} by ${user}`, {
       action,
       user,
       timestamp: new Date().toISOString(),
-      ...details,
+      ...(details || {}),
     });
   }
 

@@ -87,7 +87,7 @@ export interface GeneratedFile {
  * 规划引擎接口
  */
 export interface PlanningEngine {
-  plan(prd: any): Promise<any>;
-  analyzeRequirements(prd: any): Promise<any>;
-  estimateEffort(tasks: any[]): Promise<any[]>;
+  plan(prd: unknown): Promise<any>;
+  analyzeRequirements(prd: unknown): Promise<any>;
+  estimateEffort(tasks: unknown[]): Promise<unknown[]>;
 }

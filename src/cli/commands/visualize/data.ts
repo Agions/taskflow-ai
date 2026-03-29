@@ -37,7 +37,7 @@ export async function loadProjectData(files: string[]): Promise<any> {
   return allData;
 }
 
-export function showVisualizationStats(data: any): void {
+export function showVisualizationStats(data: unknown): void {
   const stats = {
     totalTasks: data.tasks.length,
     byType: {} as Record<string, number>,

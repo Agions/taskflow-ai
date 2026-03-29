@@ -52,7 +52,7 @@ export class SandboxManager {
         timeout: this.settings.timeout,
       });
     } catch (error: any) {
-      throw new Error(`沙箱执行失败: ${error.message}`);
+      throw new Error(`沙箱执行失败: ${(error instanceof Error ? error.message : String(error))}`);
     }
   }
 

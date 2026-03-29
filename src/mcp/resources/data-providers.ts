@@ -9,7 +9,7 @@ import { Logger } from '../../utils/logger';
 export class DataProviders {
   constructor(private logger: Logger) {}
 
-  async getTasksData(): Promise<any[]> {
+  async getTasksData(): Promise<unknown[]> {
     try {
       const possiblePaths = [
         path.join(process.cwd(), '.taskflow', 'data'),
@@ -70,7 +70,7 @@ export class DataProviders {
         const config = await fs.readJson(configPath);
         const safeConfig = { ...config };
         if (safeConfig.aiModels) {
-          safeConfig.aiModels = safeConfig.aiModels.map((model: any) => ({
+          safeConfig.aiModels = safeConfig.aiModels.map((model: unknown) => ({
             ...model,
             apiKey: model.apiKey ? '***' : undefined,
           }));
@@ -91,7 +91,7 @@ export class DataProviders {
       return {
         models: configData.aiModels || [],
         totalModels: configData.aiModels?.length || 0,
-        enabledModels: configData.aiModels?.filter((m: any) => m.enabled).length || 0,
+        enabledModels: configData.aiModels?.filter((m: unknown) => m.enabled).length || 0,
       };
     } catch (error) {
       this.logger.warn('获取模型数据失败:', error);
@@ -122,7 +122,7 @@ export class DataProviders {
           byStatus: this.groupBy(tasks, 'status'),
           byType: this.groupBy(tasks, 'type'),
           byPriority: this.groupBy(tasks, 'priority'),
-          totalHours: tasks.reduce((sum: number, task: any) => sum + (task.estimatedHours || 0), 0),
+          totalHours: tasks.reduce((sum: number, task: unknown) => sum + (task.estimatedHours || 0), 0),
         },
         projects: {
           total: 1,
@@ -137,7 +137,7 @@ export class DataProviders {
     }
   }
 
-  private groupBy(array: any[], field: string): Record<string, number> {
+  private groupBy(array: unknown[], field: string): Record<string, number> {
     return array.reduce((acc, item) => {
       const key = item[field] || 'unknown';
       acc[key] = (acc[key] || 0) + 1;

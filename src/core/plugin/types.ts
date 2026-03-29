@@ -45,10 +45,10 @@ export interface PluginHooks {
   onInit?: (context: PluginContext) => void | Promise<void>;
   onLoad?: (plugin: Plugin) => void | Promise<void>;
   onUnload?: (plugin: Plugin) => void | Promise<void>;
-  onTaskCreate?: (task: any) => any | Promise<any>;
-  onTaskUpdate?: (task: any) => any | Promise<any>;
-  onTaskComplete?: (task: any) => void | Promise<void>;
-  onWorkflowExecute?: (workflow: any, context: any) => void | Promise<void>;
+  onTaskCreate?: (task: unknown) => any | Promise<any>;
+  onTaskUpdate?: (task: unknown) => any | Promise<any>;
+  onTaskComplete?: (task: unknown) => void | Promise<void>;
+  onWorkflowExecute?: (workflow: unknown, context: unknown) => void | Promise<void>;
   onCommand?: (command: string, args: string[]) => string | void | Promise<string | void>;
 }
 
@@ -61,7 +61,7 @@ export interface PluginCommand {
 export interface PluginVisualization {
   name: string;
   type: string;
-  renderer: (data: any) => string;
+  renderer: (data: unknown) => string;
 }
 
 export interface PluginContext {

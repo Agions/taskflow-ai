@@ -5,15 +5,15 @@
 export interface ChartData {
   type: string;
   title: string;
-  data: any[];
+  data: unknown[];
   config: Record<string, any>;
 }
 
-export function generateGanttChart(data: any, options: any): ChartData {
+export function generateGanttChart(data: unknown, options: unknown): ChartData {
   return {
     type: 'gantt',
     title: '项目甘特图',
-    data: data.tasks.map((task: any) => ({
+    data: data.tasks.map((task: unknown) => ({
       id: task.id,
       name: task.title,
       start: new Date().toISOString().split('T')[0],
@@ -32,8 +32,8 @@ export function generateGanttChart(data: any, options: any): ChartData {
   };
 }
 
-export function generatePieChart(data: any, options: any): ChartData {
-  const taskTypes = data.tasks.reduce((acc: any, task: any) => {
+export function generatePieChart(data: unknown, options: unknown): ChartData {
+  const taskTypes = data.tasks.reduce((acc: unknown, task: unknown) => {
     acc[task.type] = (acc[task.type] || 0) + 1;
     return acc;
   }, {});
@@ -54,8 +54,8 @@ export function generatePieChart(data: any, options: any): ChartData {
   };
 }
 
-export function generateBarChart(data: any, options: any): ChartData {
-  const workloadByType = data.tasks.reduce((acc: any, task: any) => {
+export function generateBarChart(data: unknown, options: unknown): ChartData {
+  const workloadByType = data.tasks.reduce((acc: unknown, task: unknown) => {
     acc[task.type] = (acc[task.type] || 0) + (task.estimatedHours || 0);
     return acc;
   }, {});
@@ -76,11 +76,11 @@ export function generateBarChart(data: any, options: any): ChartData {
   };
 }
 
-export function generateTimelineChart(data: any, options: any): ChartData {
+export function generateTimelineChart(data: unknown, options: unknown): ChartData {
   return {
     type: 'timeline',
     title: '项目时间线',
-    data: data.tasks.map((task: any) => ({
+    data: data.tasks.map((task: unknown) => ({
       name: task.title,
       start: new Date().toISOString(),
       end: new Date(Date.now() + (task.estimatedHours || 8) * 60 * 60 * 1000).toISOString(),
@@ -95,11 +95,11 @@ export function generateTimelineChart(data: any, options: any): ChartData {
   };
 }
 
-export function generateKanbanChart(data: any, options: any): ChartData {
+export function generateKanbanChart(data: unknown, options: unknown): ChartData {
   const columns = ['todo', 'in-progress', 'review', 'done'];
   const kanbanData = columns.map(status => ({
     name: status,
-    tasks: data.tasks.filter((task: any) => task.status === status),
+    tasks: data.tasks.filter((task: unknown) => task.status === status),
   }));
 
   return {
@@ -114,7 +114,7 @@ export function generateKanbanChart(data: any, options: any): ChartData {
   };
 }
 
-export function generateCharts(data: any, options: any): ChartData[] {
+export function generateCharts(data: unknown, options: unknown): ChartData[] {
   const charts: ChartData[] = [];
 
   switch (options.type) {

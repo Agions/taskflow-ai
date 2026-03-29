@@ -55,9 +55,9 @@ async function executeJavaScript(
 
       clearTimeout(timeoutId);
       resolve({ output: outputs.join('\n') });
-    } catch (error: any) {
+    } catch (error: unknown) {
       clearTimeout(timeoutId);
-      resolve({ output: '', error: error.message });
+      resolve({ output: '', error: error instanceof Error ? error.message : String(error) });
     }
   });
 }
@@ -273,8 +273,8 @@ export const codeTools: ToolDefinition[] = [
           await executeJavaScript('console.log("test")', 5000);
           available = true;
         }
-      } catch (e: any) {
-        error = e.message;
+      } catch (e: unknown) {
+        error = e instanceof Error ? e.message : String(e);
       }
 
       return { available, language, error };

@@ -120,9 +120,10 @@ export const httpTools: ToolDefinition[] = [
           data,
           url: response.url,
         };
-      } catch (error: any) {
+      } catch (error: unknown) {
         clearTimeout(timeoutId);
-        throw new Error(`HTTP 请求失败: ${error.message}`);
+        const message = error instanceof Error ? error.message : String(error);
+        throw new Error(`HTTP 请求失败: ${message}`);
       }
     },
     category: 'http',

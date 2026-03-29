@@ -54,7 +54,7 @@ export class ConfigOperations {
       }
 
       return config;
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error.code === 'ENOENT') {
         return null;
       }
@@ -98,7 +98,7 @@ export class ConfigOperations {
 
       await fs.writeJson(this.configPath, configToSave, { spaces: 2 });
       await fs.chmod(this.configPath, 0o600);
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error?.name === 'TaskFlowError') {
         throw error;
       }

@@ -38,7 +38,7 @@ export class WorkflowStorage {
     this.backend = createStorage(config.type, { dbPath: config.dbPath });
   }
 
-  async saveWorkflow(workflow: any): Promise<void> {
+  async saveWorkflow(workflow: unknown): Promise<void> {
     return this.backend.saveWorkflow(workflow);
   }
 
@@ -46,7 +46,7 @@ export class WorkflowStorage {
     return this.backend.getWorkflow(id);
   }
 
-  async listWorkflows(): Promise<any[]> {
+  async listWorkflows(): Promise<unknown[]> {
     return this.backend.listWorkflows();
   }
 

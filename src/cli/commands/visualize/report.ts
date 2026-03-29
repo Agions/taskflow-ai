@@ -5,7 +5,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 
-export async function generateReport(charts: any[], options: any): Promise<string> {
+export async function generateReport(charts: unknown[], options: unknown): Promise<string> {
   const outputDir = path.resolve(options.output);
   await fs.ensureDir(outputDir);
 
@@ -33,7 +33,7 @@ export async function generateReport(charts: any[], options: any): Promise<strin
   return reportPath;
 }
 
-function generateHTMLReport(charts: any[], options: any): string {
+function generateHTMLReport(charts: unknown[], options: unknown): string {
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -60,7 +60,7 @@ function generateHTMLReport(charts: any[], options: any): string {
 </html>`;
 }
 
-function generateSVGReport(charts: any[], options: any): string {
+function generateSVGReport(charts: unknown[], options: unknown): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">
   <text x="400" y="30" text-anchor="middle" font-size="20">TaskFlow Report</text>

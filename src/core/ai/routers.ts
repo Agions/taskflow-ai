@@ -13,7 +13,7 @@ export class SmartRouter extends BaseRouter {
   private rules = DEFAULT_ROUTING_RULES;
 
   async select(
-    messages: any[],
+    messages: unknown[],
     availableModels: ModelConfig[],
     preferredModel?: string
   ): Promise<RoutingResult> {
@@ -63,7 +63,7 @@ export class SmartRouter extends BaseRouter {
  * 成本优化路由器
  */
 export class CostRouter extends BaseRouter {
-  async select(messages: any[], availableModels: ModelConfig[]): Promise<RoutingResult> {
+  async select(messages: unknown[], availableModels: ModelConfig[]): Promise<RoutingResult> {
     const sortedModels = [...availableModels].sort((a, b) => {
       const costA = a.costPer1MInput || 999;
       const costB = b.costPer1MInput || 999;
@@ -93,7 +93,7 @@ export class SpeedRouter extends BaseRouter {
     o1: 5000,
   };
 
-  async select(messages: any[], availableModels: ModelConfig[]): Promise<RoutingResult> {
+  async select(messages: unknown[], availableModels: ModelConfig[]): Promise<RoutingResult> {
     const sortedModels = [...availableModels].sort((a, b) => {
       const latencyA = this.estimatedLatency[a.id] || 1000;
       const latencyB = this.estimatedLatency[b.id] || 1000;
@@ -113,7 +113,7 @@ export class SpeedRouter extends BaseRouter {
  * 优先级路由器
  */
 export class PriorityRouter extends BaseRouter {
-  async select(messages: any[], availableModels: ModelConfig[]): Promise<RoutingResult> {
+  async select(messages: unknown[], availableModels: ModelConfig[]): Promise<RoutingResult> {
     const sortedModels = [...availableModels].sort((a, b) => a.priority - b.priority);
 
     return {
@@ -129,7 +129,7 @@ export class PriorityRouter extends BaseRouter {
  * 随机路由器
  */
 export class RandomRouter extends BaseRouter {
-  async select(messages: any[], availableModels: ModelConfig[]): Promise<RoutingResult> {
+  async select(messages: unknown[], availableModels: ModelConfig[]): Promise<RoutingResult> {
     const index = Math.floor(Math.random() * availableModels.length);
 
     return {

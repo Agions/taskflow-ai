@@ -176,13 +176,13 @@ export class KnowledgeRetrievalEngine {
     };
   }
 
-  private generateSummary(chunks: any[]): string {
+  private generateSummary(chunks: unknown[]): string {
     if (chunks.length === 0) return 'No relevant information found.';
     const contents = chunks.map(c => c.chunk.content);
     return contents.slice(0, 3).join(' ').slice(0, 500) + '...';
   }
 
-  private generateSuggestions(chunks: any[], query: string): string[] {
+  private generateSuggestions(chunks: unknown[], query: string): string[] {
     const suggestions: string[] = [];
     const keywords = query.toLowerCase().split(' ');
 

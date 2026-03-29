@@ -3,7 +3,7 @@
  */
 
 export class MockAIService {
-  async complete(prompt: string, options?: any): Promise<string> {
+  async complete(prompt: string, options?: unknown): Promise<string> {
     if (prompt.includes('task plan')) {
       return JSON.stringify({
         tasks: [

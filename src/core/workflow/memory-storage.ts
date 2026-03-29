@@ -12,7 +12,7 @@ export class MemoryStorage implements StorageBackend {
   private workflows: Map<string, any> = new Map();
   private executions: Map<string, WorkflowExecution> = new Map();
 
-  async saveWorkflow(workflow: any): Promise<void> {
+  async saveWorkflow(workflow: unknown): Promise<void> {
     this.workflows.set(workflow.id, workflow);
   }
 
@@ -20,7 +20,7 @@ export class MemoryStorage implements StorageBackend {
     return this.workflows.get(id) || null;
   }
 
-  async listWorkflows(): Promise<any[]> {
+  async listWorkflows(): Promise<unknown[]> {
     return Array.from(this.workflows.values());
   }
 

@@ -77,4 +77,4 @@ export class PromptRenderer {
   }
 }
 
-type HandlebarsTemplateDelegate = (context: any) => string;
+type HandlebarsTemplateDelegate = (context: unknown) => string;

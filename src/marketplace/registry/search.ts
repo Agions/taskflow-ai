@@ -45,13 +45,13 @@ export class PackageSearcher {
         timeout: 10000,
       });
 
-      return response.data.objects?.map((obj: any) => this.mapToToolPackage(obj.package)) || [];
+      return response.data.objects?.map((obj: unknown) => this.mapToToolPackage(obj.package)) || [];
     } catch {
       return [];
     }
   }
 
-  private mapToToolPackage(pkg: any): ToolPackage {
+  private mapToToolPackage(pkg: unknown): ToolPackage {
     return {
       id: pkg.name,
       name: pkg.name,

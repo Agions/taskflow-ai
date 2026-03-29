@@ -16,7 +16,7 @@ Handlebars.registerHelper('kebabCase', (str: string) => {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 });
 
-Handlebars.registerHelper('unless', function (this: any, conditional: any, options: any) {
+Handlebars.registerHelper('unless', function (this: unknown, conditional: unknown, options: unknown) {
   if (!conditional) {
     return options.fn(this);
   }

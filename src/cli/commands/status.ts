@@ -24,7 +24,7 @@ export function statusCommand(program: Command) {
     });
 }
 
-async function runStatus(options: any) {
+async function runStatus(options: unknown) {
   const spinner = ora('正在获取项目状态...').start();
 
   try {

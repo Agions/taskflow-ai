@@ -29,7 +29,7 @@ export function visualizeCommand(program: Command) {
     });
 }
 
-async function runVisualize(options: any) {
+async function runVisualize(options: unknown) {
   const spinner = ora('正在生成可视化报告...').start();
 
   try {

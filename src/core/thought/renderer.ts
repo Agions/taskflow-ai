@@ -48,7 +48,7 @@ export class TextRenderer {
     }> = [];
 
     let stepNum = 0;
-    const traverse = (node: any, depth: number) => {
+    const traverse = (node: unknown, depth: number) => {
       stepNum++;
       steps.push({
         step: stepNum,
@@ -109,7 +109,7 @@ export class MarkdownRenderer {
   }
 
   private extractSteps(
-    node: any,
+    node: unknown,
     depth: number,
     stepNum = { value: 0 }
   ): Array<{
@@ -120,7 +120,7 @@ export class MarkdownRenderer {
     confidence: number;
     depth: number;
   }> {
-    const steps: any[] = [];
+    const steps: unknown[] = [];
     stepNum.value++;
 
     steps.push({
@@ -175,7 +175,7 @@ export class MermaidRenderer {
     let nodeId = 0;
     const idMap = new Map<string, string>();
 
-    const processNode = (node: any) => {
+    const processNode = (node: unknown) => {
       const id = `node${nodeId++}`;
       const label = this.truncate(node.content, 30);
       const title = this.getTitle(node.type);
@@ -226,14 +226,14 @@ export class MindMapRenderer {
 
     lines.push('# 思维导图\n');
 
-    const renderTree = (node: any, prefix: string, isLast: boolean) => {
+    const renderTree = (node: unknown, prefix: string, isLast: boolean) => {
       const connector = isLast ? '└── ' : '├── ';
       const title = this.getTitle(node.type);
       lines.push(`${prefix}${connector}${title}: ${this.truncate(node.content, 40)}`);
 
       const childPrefix = prefix + (isLast ? '    ' : '│   ');
       const children = node.children || [];
-      children.forEach((child: any, index: number) => {
+      children.forEach((child: unknown, index: number) => {
         renderTree(child, childPrefix, index === children.length - 1);
       });
     };

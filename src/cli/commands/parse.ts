@@ -28,7 +28,7 @@ export function parseCommand(program: Command) {
     });
 }
 
-async function runParse(filePath: string, options: any) {
+async function runParse(filePath: string, options: unknown) {
   const spinner = ora('正在解析PRD文档...').start();
 
   try {
@@ -51,7 +51,7 @@ async function runParse(filePath: string, options: any) {
     const parser = new PRDParser(config);
     const prdDocument = await parser.parse(fullPath);
 
-    let tasks: any[] = [];
+    let tasks: unknown[] = [];
     if (options.tasks !== false) {
       spinner.text = '正在生成任务...';
       const taskGenerator = new TaskGenerator(config);
@@ -69,7 +69,7 @@ async function runParse(filePath: string, options: any) {
     console.log(
       chalk.gray('  预估工时: ') +
         chalk.white(
-          tasks.reduce((sum: number, task: any) => sum + task.estimatedHours, 0) + ' 小时'
+          tasks.reduce((sum: number, task: unknown) => sum + task.estimatedHours, 0) + ' 小时'
         )
     );
     console.log(chalk.gray('  输出文件: ') + chalk.blue(outputPath));
@@ -83,7 +83,7 @@ async function runParse(filePath: string, options: any) {
   }
 }
 
-async function saveResults(document: any, tasks: any[], options: any): Promise<string> {
+async function saveResults(document: unknown, tasks: unknown[], options: unknown): Promise<string> {
   const outputDir = path.resolve(options.output);
   await fs.ensureDir(outputDir);
 
@@ -95,7 +95,7 @@ async function saveResults(document: any, tasks: any[], options: any): Promise<s
     tasks,
     summary: {
       totalTasks: tasks.length,
-      totalHours: tasks.reduce((sum: number, task: any) => sum + task.estimatedHours, 0),
+      totalHours: tasks.reduce((sum: number, task: unknown) => sum + task.estimatedHours, 0),
       generatedAt: new Date().toISOString(),
     },
   };
@@ -115,7 +115,7 @@ async function saveResults(document: any, tasks: any[], options: any): Promise<s
   return outputPath;
 }
 
-function generateMarkdownReport(results: any): string {
+function generateMarkdownReport(results: unknown): string {
   const { document, tasks, summary } = results;
 
   return `# PRD解析报告
@@ -134,7 +134,7 @@ function generateMarkdownReport(results: any): string {
 
 ${tasks
   .map(
-    (task: any, index: number) => `
+    (task: unknown, index: number) => `
 ### ${index + 1}. ${task.title}
 
 - **类型**: ${task.type}

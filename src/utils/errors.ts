@@ -35,16 +35,16 @@ export function isTaskFlowError(error: any): error is TaskFlowError {
  */
 export function formatError(error: Error | TaskFlowError): string {
   if (isTaskFlowError(error)) {
-    return `[${error.type.toUpperCase()}:${error.code}] ${error.message}`;
+    return `[${error.type.toUpperCase()}:${error.code}] ${(error instanceof Error ? error.message : String(error))}`;
   }
 
-  return error.message || 'Unknown error';
+  return (error instanceof Error ? error.message : String(error)) || 'Unknown error';
 }
 
 /**
  * 错误重试装饰器
  */
-export function withRetry<T extends any[], R>(
+export function withRetry<T extends unknown[], R>(
   fn: (...args: T) => Promise<R>,
   maxRetries: number = 3,
   delay: number = 1000

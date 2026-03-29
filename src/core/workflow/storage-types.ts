@@ -8,9 +8,9 @@ import { WorkflowExecution } from './types';
  * 存储后端接口
  */
 export interface StorageBackend {
-  saveWorkflow(workflow: any): Promise<void>;
+  saveWorkflow(workflow: unknown): Promise<void>;
   getWorkflow(id: string): Promise<any | null>;
-  listWorkflows(): Promise<any[]>;
+  listWorkflows(): Promise<unknown[]>;
   deleteWorkflow(id: string): Promise<void>;
 
   saveExecution(execution: WorkflowExecution): Promise<void>;

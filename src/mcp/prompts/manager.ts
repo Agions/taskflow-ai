@@ -21,7 +21,7 @@ export class MCPPromptManager {
   private renderer: PromptRenderer;
 
   constructor(
-    private config: any,
+    private config: unknown,
     logger?: Logger
   ) {
     this.logger = logger || Logger.getInstance('MCPPromptManager');

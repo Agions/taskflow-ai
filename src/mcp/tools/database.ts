@@ -53,7 +53,7 @@ export const databaseTools: ToolDefinition[] = [
 
       try {
         const sql = input.sql as string;
-        const params = (input.params as any[]) || [];
+        const params = (input.params as unknown[]) || [];
 
         // 判断是 SELECT 还是 INSERT/UPDATE/DELETE
         const isSelect = sql.trim().toLowerCase().startsWith('select');
@@ -62,7 +62,7 @@ export const databaseTools: ToolDefinition[] = [
           const stmt = db.prepare(sql);
           if (params.length > 0) stmt.bind(params);
 
-          const rows: any[] = [];
+          const rows: unknown[] = [];
           while (stmt.step()) {
             rows.push(stmt.getAsObject());
           }
@@ -88,8 +88,8 @@ export const databaseTools: ToolDefinition[] = [
             changes: db.getRowsModified(),
           };
         }
-      } catch (error: any) {
-        return { success: false, error: error.message };
+      } catch (error: unknown) {
+        return { success: false, error: error instanceof Error ? (error instanceof Error ? error.message : String(error)) : String(error) };
       }
     },
     category: 'database',
@@ -184,8 +184,8 @@ export const databaseTools: ToolDefinition[] = [
           success: true,
           tables,
         };
-      } catch (error: any) {
-        return { success: false, error: error.message };
+      } catch (error: unknown) {
+        return { success: false, error: error instanceof Error ? (error instanceof Error ? error.message : String(error)) : String(error) };
       }
     },
     category: 'database',
@@ -209,7 +209,7 @@ export const databaseTools: ToolDefinition[] = [
         const table = input.table as string;
         const stmt = db.prepare(`PRAGMA table_info(${table})`);
 
-        const columns: any[] = [];
+        const columns: unknown[] = [];
         while (stmt.step()) {
           columns.push(stmt.getAsObject());
         }
@@ -220,8 +220,8 @@ export const databaseTools: ToolDefinition[] = [
           table,
           columns,
         };
-      } catch (error: any) {
-        return { success: false, error: error.message };
+      } catch (error: unknown) {
+        return { success: false, error: error instanceof Error ? (error instanceof Error ? error.message : String(error)) : String(error) };
       }
     },
     category: 'database',

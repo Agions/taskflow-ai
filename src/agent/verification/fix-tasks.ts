@@ -7,8 +7,8 @@ import { VerificationCheck } from '../types';
 /**
  * 根据失败的检查生成修复任务
  */
-export function generateFixTasks(failedChecks: VerificationCheck[]): any[] {
-  const fixTasks: any[] = [];
+export function generateFixTasks(failedChecks: VerificationCheck[]): unknown[] {
+  const fixTasks: unknown[] = [];
 
   for (const check of failedChecks) {
     switch (check.name) {

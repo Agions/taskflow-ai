@@ -31,7 +31,7 @@ export class GitHubWorkflowGenerator {
     return this.toYaml(workflow);
   }
 
-  private generateTriggers(triggers: any): any {
+  private generateTriggers(triggers: unknown): any {
     const result: any = {};
 
     for (const trigger of triggers) {
@@ -57,7 +57,7 @@ export class GitHubWorkflowGenerator {
     return result;
   }
 
-  private generatePermissions(permissions?: any): any {
+  private generatePermissions(permissions?: unknown): any {
     if (!permissions) {
       return {
         contents: 'read',
@@ -68,7 +68,7 @@ export class GitHubWorkflowGenerator {
     return permissions;
   }
 
-  private generateJob(stage: any, config: GitHubActionsConfig): any {
+  private generateJob(stage: unknown, config: GitHubActionsConfig): any {
     const job: any = {
       name: stage.name,
       'runs-on': stage.runsOn || 'ubuntu-latest',
@@ -90,7 +90,7 @@ export class GitHubWorkflowGenerator {
     return job;
   }
 
-  private generateStep(step: any, config: GitHubActionsConfig): any {
+  private generateStep(step: unknown, config: GitHubActionsConfig): any {
     const stepConfig: any = {};
 
     if (step.name) {
@@ -123,7 +123,7 @@ export class GitHubWorkflowGenerator {
     return stepConfig;
   }
 
-  private toYaml(obj: any, indent: number = 0): string {
+  private toYaml(obj: unknown, indent: number = 0): string {
     const spaces = '  '.repeat(indent);
     let yaml = '';
 

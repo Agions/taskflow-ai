@@ -30,7 +30,7 @@ export function createRouter(strategy: RouterStrategy): BaseRouter {
  * 批量路由测试
  */
 export async function benchmarkRouting(
-  messages: any[],
+  messages: unknown[],
   models: ModelConfig[]
 ): Promise<Record<RouterStrategy, RoutingResult>> {
   const strategies: RouterStrategy[] = ['smart', 'cost', 'speed', 'priority'];

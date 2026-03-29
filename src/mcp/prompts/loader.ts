@@ -60,7 +60,7 @@ export class PromptLoader {
   /**
    * 验证提示格式
    */
-  private validatePrompt(prompt: any): prompt is MCPPrompt {
+  private validatePrompt(prompt: unknown): prompt is MCPPrompt {
     return (
       prompt &&
       typeof prompt.name === 'string' &&

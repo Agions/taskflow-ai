@@ -61,7 +61,7 @@ export class SQLiteStorage implements StorageBackend {
     }
   }
 
-  async saveWorkflow(workflow: any): Promise<void> {
+  async saveWorkflow(workflow: unknown): Promise<void> {
     await this.initialize();
     const stmt = this.db.prepare(`
       INSERT OR REPLACE INTO workflows (id, name, version, description, definition, created_at, updated_at)
@@ -86,7 +86,7 @@ export class SQLiteStorage implements StorageBackend {
     return { ...JSON.parse(row.definition), createdAt: row.created_at, updatedAt: row.updated_at };
   }
 
-  async listWorkflows(): Promise<any[]> {
+  async listWorkflows(): Promise<unknown[]> {
     await this.initialize();
     const stmt = this.db.prepare(
       'SELECT id, name, version, description, created_at FROM workflows ORDER BY updated_at DESC'
@@ -136,10 +136,10 @@ export class SQLiteStorage implements StorageBackend {
       const stmt = this.db.prepare(
         'SELECT * FROM executions WHERE workflow_id = ? ORDER BY started_at DESC LIMIT ?'
       );
-      return (stmt.all(workflowId, limit) as any[]).map(row => this.rowToExecution(row));
+      return (stmt.all(workflowId, limit) as unknown[]).map(row => this.rowToExecution(row));
     } else {
       const stmt = this.db.prepare('SELECT * FROM executions ORDER BY started_at DESC LIMIT ?');
-      return (stmt.all(limit) as any[]).map(row => this.rowToExecution(row));
+      return (stmt.all(limit) as unknown[]).map(row => this.rowToExecution(row));
     }
   }
 
@@ -153,7 +153,7 @@ export class SQLiteStorage implements StorageBackend {
     stmt.run(id);
   }
 
-  private rowToExecution(row: any): WorkflowExecution {
+  private rowToExecution(row: unknown): WorkflowExecution {
     return {
       id: row.id,
       workflowId: row.workflow_id,

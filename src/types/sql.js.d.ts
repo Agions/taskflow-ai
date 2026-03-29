@@ -5,7 +5,7 @@ declare module 'sql.js' {
 
   export interface QueryExecResult {
     columns: string[];
-    values: any[][];
+    values: unknown[][];
   }
 
   export interface ParamsObject {
@@ -13,19 +13,19 @@ declare module 'sql.js' {
   }
 
   export interface Statement {
-    bind(params?: any[]): boolean;
+    bind(params?: unknown[]): boolean;
     step(): boolean;
     getAsObject(params?: ParamsObject): any;
-    get(params?: any[]): any[];
-    run(params?: any[]): void;
+    get(params?: unknown[]): unknown[];
+    run(params?: unknown[]): void;
     reset(): void;
     free(): boolean;
   }
 
   export class Database {
     constructor(data?: ArrayLike<number> | Buffer | null);
-    run(sql: string, params?: any[]): void;
-    exec(sql: string, params?: any[]): QueryExecResult[];
+    run(sql: string, params?: unknown[]): void;
+    exec(sql: string, params?: unknown[]): QueryExecResult[];
     prepare(sql: string): Statement;
     export(): Uint8Array;
     close(): void;

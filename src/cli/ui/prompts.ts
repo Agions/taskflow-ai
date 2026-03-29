@@ -165,8 +165,8 @@ export interface WizardStep {
   message: string;
   default?: any;
   choices?: { name: string; value: any }[];
-  validate?: (value: any) => boolean | string;
-  when?: (answers: any) => boolean;
+  validate?: (value: unknown) => boolean | string;
+  when?: (answers: unknown) => boolean;
 }
 
 /**
