@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 提示加载器
  */
@@ -6,6 +7,8 @@ import path from 'path';
 import fs from 'fs-extra';
 import { MCPPrompt } from './types';
 import { Logger } from '../../utils/logger';
+const logger = getLogger('mcp/prompts/loader');
+
 
 export class PromptLoader {
   constructor(

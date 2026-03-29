@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 向量存储工具 - 内存向量库
  */
 
 import { ToolDefinition } from './types';
+const logger = getLogger('mcp/tools/vector');
+
 
 // 内存向量存储
 interface VectorEntry {

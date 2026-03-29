@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('agent/types/history');
+
 /**
  * 历史记录相关类型
  */

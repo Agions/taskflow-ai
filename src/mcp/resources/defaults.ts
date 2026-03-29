@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 默认资源定义
  */
 
 import { MCPResource } from './types';
+const logger = getLogger('mcp/resources/defaults');
+
 
 export const defaultResources: MCPResource[] = [
   {

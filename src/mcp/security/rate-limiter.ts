@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 速率限制器
  */
 
 import { RateLimitData, SecuritySettings } from './types';
+const logger = getLogger('mcp/security/rate-limiter');
+
 
 /**
  * 速率限制器

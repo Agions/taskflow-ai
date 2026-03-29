@@ -1,3 +1,6 @@
+import { getLogger } from '../utils/logger';
+const logger = getLogger('codegen/types');
+
 /**
  * 代码生成类型定义
  * TaskFlow AI v3.0 - 代码生成与同步

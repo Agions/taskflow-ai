@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 向量存储管理器
  * 支持 LanceDB、Chroma 等向量数据库
@@ -39,7 +40,7 @@ export class VectorStoreManager {
   async initialize(): Promise<void> {
     await fs.ensureDir(this.dataDir);
     await this.loadData();
-    console.log(`✅ Vector store initialized: ${this.store.type}`);
+    logger.info(`✅ Vector store initialized: ${this.store.type}`);
   }
 
   /**
@@ -51,7 +52,7 @@ export class VectorStoreManager {
       this.data.set(chunk.id, storedChunk);
     }
     await this.persistence.saveData(this.data);
-    console.log(`✅ Added ${chunks.length} chunks to vector store`);
+    logger.info(`✅ Added ${chunks.length} chunks to vector store`);
   }
 
   /**
@@ -68,7 +69,7 @@ export class VectorStoreManager {
     }
 
     await this.persistence.saveData(this.data);
-    console.log(`✅ Deleted ${deleted} chunks for document ${documentId}`);
+    logger.info(`✅ Deleted ${deleted} chunks for document ${documentId}`);
   }
 
   /**
@@ -114,7 +115,7 @@ export class VectorStoreManager {
   async clear(): Promise<void> {
     this.data.clear();
     await this.persistence.deleteData();
-    console.log('🗑️  Vector store cleared');
+    logger.info('🗑️  Vector store cleared');
   }
 
   /**
@@ -125,7 +126,7 @@ export class VectorStoreManager {
     for (const chunk of data) {
       this.data.set(chunk.id, chunk);
     }
-    console.log(`📚 Loaded ${data.length} chunks from storage`);
+    logger.info(`📚 Loaded ${data.length} chunks from storage`);
   }
 }
 
@@ -133,3 +134,5 @@ export default VectorStoreManager;
 export * from './types';
 export { DataPersistence } from './persistence';
 export { SearchManager } from './search';
+const logger = getLogger('knowledge/storage/index');
+

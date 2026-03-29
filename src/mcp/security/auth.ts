@@ -1,9 +1,12 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 认证管理
  */
 
 import crypto from 'crypto';
 import { SecurityContext } from './types';
+const logger = getLogger('mcp/security/auth');
+
 
 /**
  * 认证管理器

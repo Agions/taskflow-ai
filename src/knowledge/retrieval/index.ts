@@ -43,17 +43,17 @@ export class KnowledgeRetrievalEngine {
 
   async initialize(): Promise<void> {
     await this.vectorStore.initialize();
-    console.log('✅ Knowledge retrieval engine initialized');
+    logger.info('✅ Knowledge retrieval engine initialized');
   }
 
   async indexDocument(doc: Document): Promise<void> {
-    console.log(`📄 Indexing document: ${doc.metadata.title}`);
+    logger.info(`📄 Indexing document: ${doc.metadata.title}`);
 
     const chunks = this.chunker.chunk(doc);
     const chunksWithEmbedding = await this.embeddingManager.embedChunks(chunks);
     await this.vectorStore.addChunks(chunksWithEmbedding);
 
-    console.log(`✅ Indexed ${chunks.length} chunks for ${doc.metadata.title}`);
+    logger.info(`✅ Indexed ${chunks.length} chunks for ${doc.metadata.title}`);
   }
 
   async deleteDocument(documentId: string): Promise<void> {
@@ -119,7 +119,7 @@ export class KnowledgeRetrievalEngine {
       }
     }
 
-    console.log(`✅ Indexed ${indexed} documents (${failed} failed)`);
+    logger.info(`✅ Indexed ${indexed} documents (${failed} failed)`);
     return { indexed, failed };
   }
 

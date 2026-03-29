@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 状态机定义
  */
@@ -8,6 +9,8 @@ import { PlanningEngine } from '../planning';
 import { ExecutionEngine } from '../execution';
 import { VerificationEngine } from '../verification/engine';
 import { AgentConfig } from '../types';
+const logger = getLogger('agent/state-machine/machine');
+
 
 export const createAgentMachine = (
   context: MachineContext,

@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 文件生成器
  */
@@ -57,5 +58,7 @@ export class FileGenerator {
 
   private generateTestContent(spec: ComponentSpec): string {
     return `import { render, screen } from '@testing-library/react';\nimport { ${spec.name} } from './${spec.name}';\n\ndescribe('${spec.name}', () => {\n  it('renders correctly', () => {\n    render(<${spec.name} />);\n    expect(screen.getByTestId('${spec.name.toLowerCase()}')).toBeInTheDocument();\n  });\n});\n`;
+const logger = getLogger('codegen/engines/file-generator');
+
   }
 }

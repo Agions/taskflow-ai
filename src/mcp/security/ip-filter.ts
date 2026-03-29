@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('mcp/security/ip-filter');
+
 /**
  * IP 过滤器
  */

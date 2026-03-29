@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * Shell 工具 - 命令执行
  */
@@ -6,6 +7,8 @@ import { ToolDefinition, PermissionLevel } from './types';
 import { execSync, spawn } from 'child_process';
 import { promisify } from 'util';
 import { validateCommand } from '../security/validator';
+const logger = getLogger('mcp/tools/shell');
+
 
 const execAsync = promisify(execSync);
 

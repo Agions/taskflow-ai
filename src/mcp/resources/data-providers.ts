@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 数据提供者
  */
@@ -5,6 +6,8 @@
 import path from 'path';
 import fs from 'fs-extra';
 import { Logger } from '../../utils/logger';
+const logger = getLogger('mcp/resources/data-providers');
+
 
 export class DataProviders {
   constructor(private logger: Logger) {}

@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 规划引擎
  * 使用 AI 分析 PRD 并生成任务计划
@@ -7,6 +8,8 @@ import { PRDDocument, TaskPlan, Task, Dependency } from '../types';
 import { RequirementAnalyzer } from './analyzer';
 import { TaskGenerator } from './task-generator';
 import { DependencyAnalyzer } from './dependency-analyzer';
+const logger = getLogger('agent/planning/index');
+
 
 interface AIService {
   complete(prompt: string, options?: unknown): Promise<string>;
@@ -28,7 +31,7 @@ export class PlanningEngine {
   }
 
   async plan(prd: PRDDocument): Promise<TaskPlan> {
-    console.log('🧠 Analyzing PRD with AI...');
+    logger.info('🧠 Analyzing PRD with AI...');
 
     const analysis = await this.analyzer.analyze(prd);
     const tasks = await this.taskGenerator.generate(prd, analysis);

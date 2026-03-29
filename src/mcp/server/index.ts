@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * MCP服务器核心实现 - 支持MCP协议标准 (stdio 传输方式)
  * 兼容 Trae, Cursor, Claude Desktop 等编辑器
@@ -8,6 +9,8 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { Logger } from '../../utils/logger';
 import { MCPRequestHandlers } from './handlers';
 import { MCPToolExecutor } from './executor';
+const logger = getLogger('mcp/server/index');
+
 
 export * from './handlers';
 export * from './executor';

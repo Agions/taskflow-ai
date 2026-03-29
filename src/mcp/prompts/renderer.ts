@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 提示渲染器
  */
@@ -5,6 +6,8 @@
 import Handlebars from 'handlebars';
 import { MCPPrompt, PromptRenderOptions } from './types';
 import { Logger } from '../../utils/logger';
+const logger = getLogger('mcp/prompts/renderer');
+
 
 export class PromptRenderer {
   private compiledCache: Map<string, HandlebarsTemplateDelegate> = new Map();

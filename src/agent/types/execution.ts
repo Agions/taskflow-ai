@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 执行相关类型
  */
 
 import { Task } from './task';
+const logger = getLogger('agent/types/execution');
+
 
 /**
  * 执行上下文

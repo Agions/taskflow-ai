@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 文档扫描器
  */
@@ -5,6 +6,8 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { minimatch } from 'minimatch';
+const logger = getLogger('knowledge/retrieval/scanner');
+
 
 export class DocumentScanner {
   async scan(

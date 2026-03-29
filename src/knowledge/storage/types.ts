@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 向量存储类型定义
  */
@@ -9,6 +10,8 @@ import {
   FilterCondition,
   IndexStatus,
 } from '../types';
+const logger = getLogger('knowledge/storage/types');
+
 
 /**
  * 存储的文档块（带时间戳）

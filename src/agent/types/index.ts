@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('agent/types/index');
+
 /**
  * Agent 类型定义
  * TaskFlow AI v3.0 - AI Agent 自主执行模式

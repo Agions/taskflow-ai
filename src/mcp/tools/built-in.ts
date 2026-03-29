@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 内置工具定义
  */
 
 import { ToolDefinition } from './types';
+const logger = getLogger('mcp/tools/built-in');
+
 
 export const fileTools: ToolDefinition[] = [
   {

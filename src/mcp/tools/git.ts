@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * Git 工具 - 版本控制操作
  */
@@ -5,6 +6,8 @@
 import { ToolDefinition } from './types';
 import { execSync } from 'child_process';
 import { promisify } from 'util';
+const logger = getLogger('mcp/tools/git');
+
 
 const execAsync = promisify(execSync);
 

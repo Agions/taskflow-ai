@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('mcp/security/validator');
+
 /**
  * 安全验证工具
  */

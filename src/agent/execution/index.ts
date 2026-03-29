@@ -36,7 +36,7 @@ export class ExecutionEngine {
   }
 
   async execute(plan: TaskPlan): Promise<ExecutionResult> {
-    console.log(`🚀 Starting execution of ${plan.tasks.length} tasks...`);
+    logger.info(`🚀 Starting execution of ${plan.tasks.length} tasks...`);
 
     const results: TaskResult[] = [];
     const startTime = Date.now();
@@ -45,11 +45,11 @@ export class ExecutionEngine {
 
     for (const task of sortedTasks) {
       if (this.abortController.signal.aborted) {
-        console.log('⏹️  Execution aborted');
+        logger.info('⏹️  Execution aborted');
         break;
       }
 
-      console.log(`\n📝 Task: ${task.title}`);
+      logger.info(`\n📝 Task: ${task.title}`);
 
       try {
         const result = await this.taskExecutor.execute(task, this.abortController.signal);
@@ -59,7 +59,7 @@ export class ExecutionEngine {
           logger.error(`   ❌ Failed: ${result.error}`);
           if (!plan.continueOnError) break;
         } else {
-          console.log(`   ✅ Completed in ${result.duration}ms`);
+          logger.info(`   ✅ Completed in ${result.duration}ms`);
         }
       } catch (error) {
         results.push({
@@ -74,11 +74,11 @@ export class ExecutionEngine {
 
     const summary = this.summaryCalculator.calculate(results);
 
-    console.log(`\n📊 Execution Summary:`);
-    console.log(
+    logger.info(`\n📊 Execution Summary:`);
+    logger.info(
       `   Total: ${summary.totalTasks} | Completed: ${summary.completedTasks} | Failed: ${summary.failedTasks}`
     );
-    console.log(`   Duration: ${(Date.now() - startTime) / 1000}s`);
+    logger.info(`   Duration: ${(Date.now() - startTime) / 1000}s`);
 
     const endTime = Date.now();
     return {

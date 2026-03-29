@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 验证引擎
  * 验证执行结果的质量和正确性
@@ -10,6 +11,8 @@ import { CoverageChecker } from './coverage';
 import { DependencyChecker } from './dependencies';
 import { TypeSafetyChecker } from './type-safety';
 import { generateFixTasks } from './fix-tasks';
+const logger = getLogger('agent/verification/engine');
+
 
 export class VerificationEngine {
   private projectPath: string;
@@ -27,7 +30,7 @@ export class VerificationEngine {
   }
 
   async verify(result: ExecutionResult): Promise<VerificationResult> {
-    console.log('🔍 Verifying execution results...');
+    logger.info('🔍 Verifying execution results...');
 
     const checks: VerificationCheck[] = [];
     checks.push(await verifyTaskCompletion(result));
@@ -40,12 +43,12 @@ export class VerificationEngine {
     const allPassed = checks.every(c => c.passed);
     const failedChecks = checks.filter(c => !c.passed);
 
-    console.log(`   ✅ ${checks.filter(c => c.passed).length}/${checks.length} checks passed`);
+    logger.info(`   ✅ ${checks.filter(c => c.passed).length}/${checks.length} checks passed`);
 
     if (!allPassed) {
-      console.log('   ⚠️ Failed checks:');
+      logger.info('   ⚠️ Failed checks:');
       failedChecks.forEach(c => {
-        console.log(`      - ${c.name}: ${c.message}`);
+        logger.info(`      - ${c.name}: ${c.message}`);
       });
     }
 

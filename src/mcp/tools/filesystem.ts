@@ -1,9 +1,12 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 文件系统工具 - 扩展的文件操作
  */
 
 import { ToolDefinition } from './types';
 import { validateFilePath } from '../security/validator';
+const logger = getLogger('mcp/tools/filesystem');
+
 
 export const filesystemTools: ToolDefinition[] = [
   {

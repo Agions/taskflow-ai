@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * MCP 工具执行器
  */
 
 import { execSync } from 'child_process';
+const logger = getLogger('mcp/server/executor');
+
 import path from 'path';
 import fs from 'fs-extra';
 

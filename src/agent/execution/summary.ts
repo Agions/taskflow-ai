@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 执行摘要计算器
  */
 
 import { TaskResult, ExecutionSummary } from '../types';
+const logger = getLogger('agent/execution/summary');
+
 
 export class SummaryCalculator {
   calculate(results: TaskResult[]): ExecutionSummary {

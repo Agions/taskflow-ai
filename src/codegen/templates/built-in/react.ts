@@ -1,3 +1,4 @@
+import { getLogger } from '../../../utils/logger';
 /**
  * React 内置模板
  */
@@ -112,6 +113,8 @@ export const reactHookTemplate: CodeTemplate = {
   language: 'typescript',
   version: '1.0.0',
   template: `import { useState, useEffect, useCallback } from 'react';
+const logger = getLogger('codegen/templates/built-in/react');
+
 
 {{#if description}}
 /**

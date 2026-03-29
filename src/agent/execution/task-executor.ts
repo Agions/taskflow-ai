@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 任务执行器
  */
@@ -9,6 +10,8 @@ import { promisify } from 'util';
 import { Task, TaskResult, ExecutionContext } from '../types';
 import { MCPServer } from '../../mcp/server';
 import { validateCommand } from '../../mcp/security/validator';
+const logger = getLogger('agent/execution/task-executor');
+
 
 const execAsync = promisify(exec);
 

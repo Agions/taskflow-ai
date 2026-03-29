@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 代码生成引擎
  * 根据组件规范生成代码
@@ -16,6 +17,8 @@ import { TemplateManager } from '../templates';
 import { FileGenerator } from './file-generator';
 import { CodeValidator } from './validator';
 import { CodeSyncer } from './sync';
+const logger = getLogger('codegen/engines/index');
+
 
 export * from './file-generator';
 export * from './validator';
@@ -95,7 +98,7 @@ export class CodeGenerationEngine {
         templatesUsed: [template.id],
       };
 
-      console.log(
+      logger.info(
         `✅ Generated ${component.name} (${stats.totalLines} lines, ${stats.duration}ms)`
       );
 

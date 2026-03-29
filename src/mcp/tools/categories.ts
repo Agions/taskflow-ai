@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 工具分类管理
  */
 
 import { ToolCategory } from './types';
+const logger = getLogger('mcp/tools/categories');
+
 
 // 工具分类定义
 export const TOOL_CATEGORIES: ToolCategory[] = [

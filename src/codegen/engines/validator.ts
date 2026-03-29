@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 代码验证器
  */
 
 import { ComponentSpec, CodeQualityCheck, GeneratedFile } from '../types';
+const logger = getLogger('codegen/engines/validator');
+
 
 export class CodeValidator {
   validateSpec(spec: ComponentSpec): void {

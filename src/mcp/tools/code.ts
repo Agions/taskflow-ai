@@ -1,9 +1,12 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 代码执行器工具 - 支持多语言代码执行
  */
 
 import { ToolDefinition, PermissionLevel } from './types';
 import { spawn } from 'child_process';
+const logger = getLogger('mcp/tools/code');
+
 import * as vm from 'vm';
 
 // JavaScript 沙箱执行
@@ -267,10 +270,10 @@ export const codeTools: ToolDefinition[] = [
           await executePython('print("test")', 5000);
           available = true;
         } else if (language === 'node') {
-          await executeNode('console.log("test")', 5000);
+          await executeNode('logger.info("test")', 5000);
           available = true;
         } else {
-          await executeJavaScript('console.log("test")', 5000);
+          await executeJavaScript('logger.info("test")', 5000);
           available = true;
         }
       } catch (e: unknown) {

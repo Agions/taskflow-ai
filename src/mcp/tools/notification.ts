@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 通知工具 - Slack, Discord, Email
  */
 
 import { ToolDefinition, PermissionLevel } from './types';
+const logger = getLogger('mcp/tools/notification');
+
 
 // Slack Webhook
 async function sendSlackWebhook(

@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 测试覆盖率检查
  */
@@ -5,6 +6,8 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { CoverageReport, FileCoverage, ExecutionResult, VerificationCheck } from '../types';
+const logger = getLogger('agent/verification/coverage');
+
 
 export class CoverageChecker {
   constructor(private projectPath: string) {}

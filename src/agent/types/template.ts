@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('agent/types/template');
+
 /**
  * 模板相关类型
  */

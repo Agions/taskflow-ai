@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 默认提示模板
  */
 
 import { MCPPrompt } from './types';
+const logger = getLogger('mcp/prompts/defaults');
+
 
 export const defaultPrompts: MCPPrompt[] = [
   {

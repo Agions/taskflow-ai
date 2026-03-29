@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 动态工具注册系统
  * 支持运行时注册和管理 MCP 工具
@@ -6,6 +7,8 @@
 import { Logger } from '../../utils/logger';
 import { ToolDefinition, ToolRegistration, ToolCategory } from './types';
 import { TOOL_CATEGORIES, getCategory } from './categories';
+const logger = getLogger('mcp/tools/registry');
+
 
 export * from './types';
 

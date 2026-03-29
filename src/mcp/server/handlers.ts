@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * MCP 请求处理器
  */
@@ -13,6 +14,8 @@ import {
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { toolRegistry } from '../tools/registry';
 import { Logger } from '../../utils/logger';
+const logger = getLogger('mcp/server/handlers');
+
 
 interface Config {
   aiModels?: Array<{ apiKey?: string; [key: string]: unknown }>;

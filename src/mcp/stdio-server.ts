@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { getLogger } from '../utils/logger';
 /**
  * MCP Stdio Server Entry Point
  * 用于编辑器集成的标准输入输出模式 MCP 服务器
@@ -6,6 +7,8 @@
 
 import { MCPServer } from './server';
 import { ConfigManager } from '../core/config';
+const logger = getLogger('mcp/stdio-server');
+
 
 async function main() {
   try {
@@ -52,7 +55,7 @@ async function main() {
     const mcpServer = new MCPServer(mcpSettings, effectiveConfig);
     await mcpServer.start();
   } catch (error) {
-    console.error('MCP Server Error:', error);
+    logger.error('MCP Server Error:', error);
     process.exit(1);
   }
 }

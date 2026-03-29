@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 任务拓扑排序器
  */
 
 import { Task, Dependency } from '../types';
+const logger = getLogger('agent/execution/sorter');
+
 
 export class TaskSorter {
   topologicalSort(tasks: Task[], dependencies: Dependency[]): Task[] {

@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * MCP安全管理器
  * 提供身份验证、权限控制和安全策略
@@ -217,3 +218,5 @@ export { RateLimiter } from './rate-limiter';
 export { IPFilter } from './ip-filter';
 export { SandboxManager } from './sandbox';
 export { validateCommand, validateUrl, validateFilePath, validateDownloadPath } from './validator';
+const logger = getLogger('mcp/security/index');
+

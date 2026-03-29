@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('mcp/config/generator');
+
 /**
  * MCP 配置文件生成器
  * 支持主流编辑器的自动配置

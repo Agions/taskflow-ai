@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('mcp/resources/types');
+
 /**
  * MCP资源类型定义
  */

@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 状态机类型定义
  */
@@ -10,6 +11,8 @@ import {
   VerificationResult,
   Requirement,
 } from '../types';
+const logger = getLogger('agent/state-machine/types');
+
 
 export interface MachineContext extends AgentContext {
   error?: Error;

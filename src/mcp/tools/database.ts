@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 数据库工具 - SQLite 支持 (使用 sql.js)
  */
 
 import { ToolDefinition } from './types';
+const logger = getLogger('mcp/tools/database');
+
 
 // SQL.js 数据库缓存
 const dbCache: Map<string, any> = new Map();

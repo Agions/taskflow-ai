@@ -1,9 +1,12 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 搜索替换工具
  * 支持批量搜索替换
  */
 
 import { Logger } from '../../utils/logger';
+const logger = getLogger('mcp/tools/search-replace');
+
 
 export interface SearchReplaceOptions {
   paths?: string[];

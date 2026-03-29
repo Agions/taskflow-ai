@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 向量存储搜索
  */
@@ -5,6 +6,8 @@
 import { DocumentChunk, RetrievedChunk, RetrievalOptions, FilterCondition } from '../types';
 import { EmbeddingManager } from '../embedding';
 import { StoredChunk } from './types';
+const logger = getLogger('knowledge/storage/search');
+
 
 /**
  * 搜索管理器
@@ -46,7 +49,7 @@ export class SearchManager {
     }
 
     const latency = Date.now() - startTime;
-    console.log(`🔍 Search completed: ${results.length} results in ${latency}ms`);
+    logger.info(`🔍 Search completed: ${results.length} results in ${latency}ms`);
 
     return results;
   }

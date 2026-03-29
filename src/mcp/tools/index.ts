@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * MCP 工具导出入口
  */
@@ -23,6 +24,8 @@ export { memoryTools } from './memory';
 export { codeTools } from './code';
 export { codeExecutorTools } from './code-executor';
 export { notificationTools } from './notification';
+const logger = getLogger('mcp/tools/index');
+
 
 // 配置生成器
 export * from '../config/generator';

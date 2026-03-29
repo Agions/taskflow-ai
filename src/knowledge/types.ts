@@ -1,3 +1,6 @@
+import { getLogger } from '../utils/logger';
+const logger = getLogger('knowledge/types');
+
 /**
  * RAG 知识库类型定义
  * TaskFlow AI v3.0 - RAG 知识库集成

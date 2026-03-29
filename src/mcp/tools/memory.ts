@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * Memory 工具 - 短期记忆与上下文管理
  */
 
 import { ToolDefinition } from './types';
+const logger = getLogger('mcp/tools/memory');
+
 
 // 内存存储
 interface MemoryItem {

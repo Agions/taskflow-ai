@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 验证检查函数
  */
 
 import { ExecutionResult, VerificationCheck } from '../types';
+const logger = getLogger('agent/verification/checks');
+
 
 /**
  * 验证任务完成

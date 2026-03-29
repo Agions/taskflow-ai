@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * MCP提示管理器
  * 管理AI提示模板和生成智能提示
@@ -10,6 +11,8 @@ import { MCPPrompt, PromptRenderOptions } from './types';
 import { defaultPrompts } from './defaults';
 import { PromptLoader } from './loader';
 import { PromptRenderer } from './renderer';
+const logger = getLogger('mcp/prompts/manager');
+
 
 export * from './types';
 

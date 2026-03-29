@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 代码同步器
  */
@@ -5,6 +6,8 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { GeneratedComponent, SyncConfig } from '../types';
+const logger = getLogger('codegen/engines/sync');
+
 
 export class CodeSyncer {
   constructor(private outputDir: string) {}
@@ -39,7 +42,7 @@ export class CodeSyncer {
         const exists = await fs.pathExists(targetPath);
 
         if (exists && syncConfig.strategy === 'skip') {
-          console.log(`⏭️  Skipped: ${file.path}`);
+          logger.info(`⏭️  Skipped: ${file.path}`);
           continue;
         }
 
@@ -49,7 +52,7 @@ export class CodeSyncer {
         }
 
         syncedFiles.push(file.path);
-        console.log(`✅ ${syncConfig.dryRun ? '[DRY RUN] ' : ''}Synced: ${file.path}`);
+        logger.info(`✅ ${syncConfig.dryRun ? '[DRY RUN] ' : ''}Synced: ${file.path}`);
       }
 
       return { success: true, syncedFiles };

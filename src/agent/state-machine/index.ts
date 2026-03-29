@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * Agent 状态机核心
  * 使用 XState v5 实现完整的 Agent 生命周期管理
@@ -10,6 +11,8 @@ import { ExecutionEngine } from '../execution';
 import { VerificationEngine } from '../verification/engine';
 import { createAgentMachine } from './machine';
 import { MachineContext } from './types';
+const logger = getLogger('agent/state-machine/index');
+
 
 export * from './types';
 export * from './machine';

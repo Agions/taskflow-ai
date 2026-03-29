@@ -1,9 +1,12 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 代码执行器工具
  * 支持多种编程语言的代码执行（安全版本）
  */
 
 import { MCPTool } from './types';
+const logger = getLogger('mcp/tools/code-executor');
+
 
 export interface CodeExecutorOptions {
   /** 最大执行时间 (ms) */

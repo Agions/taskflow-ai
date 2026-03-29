@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 依赖检查
  */
@@ -5,6 +6,8 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { ExecutionResult, VerificationCheck } from '../types';
+const logger = getLogger('agent/verification/dependencies');
+
 
 export class DependencyChecker {
   constructor(private projectPath: string) {}

@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 问答处理器
  */
 
 import { RetrievedChunk, QAResult, Source } from '../types';
+const logger = getLogger('knowledge/retrieval/qa');
+
 
 export class QAProcessor {
   async answer(question: string, chunks: RetrievedChunk[]): Promise<QAResult> {

@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 类型安全检查
  */
@@ -5,6 +6,8 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { ExecutionResult, VerificationCheck } from '../types';
+const logger = getLogger('agent/verification/type-safety');
+
 
 export class TypeSafetyChecker {
   constructor(private projectPath: string) {}

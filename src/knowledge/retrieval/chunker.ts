@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 文档分块器
  */
 
 import { Document, DocumentChunk, ChunkMetadata } from '../types';
+const logger = getLogger('knowledge/retrieval/chunker');
+
 
 export class DocumentChunker {
   constructor(

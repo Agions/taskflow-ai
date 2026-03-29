@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * MCP资源管理器
  * 管理项目中的各种资源，如任务、项目、配置等
@@ -10,6 +11,8 @@ import { MCPResource } from './types';
 import { defaultResources } from './defaults';
 import { ResourceScanner } from './scanner';
 import { DataProviders } from './data-providers';
+const logger = getLogger('mcp/resources/manager');
+
 
 export * from './types';
 

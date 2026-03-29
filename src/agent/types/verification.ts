@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('agent/types/verification');
+
 /**
  * 验证相关类型
  */

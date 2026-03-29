@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('agent/types/prd');
+
 /**
  * PRD 相关类型
  */

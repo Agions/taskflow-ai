@@ -1,8 +1,11 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 修复任务生成器
  */
 
 import { VerificationCheck } from '../types';
+const logger = getLogger('agent/verification/fix-tasks');
+
 
 /**
  * 根据失败的检查生成修复任务

@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('agent/types/task');
+
 /**
  * 任务相关类型
  */

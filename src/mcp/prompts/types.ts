@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('mcp/prompts/types');
+
 /**
  * MCP 提示类型定义
  */

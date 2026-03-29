@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('agent/types/tool');
+
 /**
  * 工具相关类型
  */

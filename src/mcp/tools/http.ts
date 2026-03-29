@@ -1,9 +1,12 @@
+import { getLogger } from '../../utils/logger';
 /**
  * HTTP 请求工具
  */
 
 import { ToolDefinition } from './types';
 import { validateUrl } from '../security/validator';
+const logger = getLogger('mcp/tools/http');
+
 
 export const httpTools: ToolDefinition[] = [
   {

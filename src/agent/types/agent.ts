@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * Agent 核心类型
  */
@@ -9,6 +10,8 @@ import { Tool } from './tool';
 import { ExecutionResult, ExecutionSummary } from './execution';
 import { VerificationResult, VerificationCheck } from './verification';
 import { ActionHistory } from './history';
+const logger = getLogger('agent/types/agent');
+
 
 /**
  * Agent 配置

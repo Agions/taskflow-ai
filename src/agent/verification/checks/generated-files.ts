@@ -1,9 +1,12 @@
+import { getLogger } from '../../../utils/logger';
 /**
  * 生成文件检查
  */
 
 import * as fs from 'fs-extra';
 import { ExecutionResult, VerificationCheck } from '../../types';
+const logger = getLogger('agent/verification/checks/generated-files');
+
 
 export async function verifyGeneratedFiles(result: ExecutionResult): Promise<VerificationCheck> {
   const allArtifacts: string[] = [];

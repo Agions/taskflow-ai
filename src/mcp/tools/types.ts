@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('mcp/tools/types');
+
 /**
  * 工具类型定义 - 增强版
  */

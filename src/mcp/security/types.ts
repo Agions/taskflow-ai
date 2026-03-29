@@ -1,3 +1,6 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('mcp/security/types');
+
 /**
  * MCP 安全类型定义
  */
