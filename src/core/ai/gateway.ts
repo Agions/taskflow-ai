@@ -1,3 +1,5 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('module');
 /**
  * 模型网关 - 统一入口
  * 负责模型管理、路由选择、请求发送
@@ -138,7 +140,7 @@ export class ModelGateway {
       case 'anthropic':
         return new AnthropicAdapter(config);
       default:
-        console.warn(`Unknown provider: ${config.provider}`);
+        logger.warn(`Unknown provider: ${config.provider}`);
         return null;
     }
   }

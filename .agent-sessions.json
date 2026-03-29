@@ -1,0 +1,12 @@
+{
+  "startedAt": "2026-03-29T03:11:01.424Z",
+  "totalAgents": 0,
+  "agents": [],
+  "commands": {
+    "list": "openclaw sessions list",
+    "monitor": "openclaw sessions list --activeMinutes 5",
+    "send": "openclaw sessions send <sessionId> \"progress?\"",
+    "history": "openclaw sessions history <sessionId> --limit 50",
+    "kill": "openclaw sessions kill <sessionId>"
+  }
+}

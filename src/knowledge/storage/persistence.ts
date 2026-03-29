@@ -1,3 +1,5 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('module');
 /**
  * 向量存储持久化
  */
@@ -44,7 +46,7 @@ export class DataPersistence {
     try {
       return await fs.readJson(dataFile);
     } catch (error) {
-      console.warn('Failed to load vector store data:', error);
+      logger.warn('Failed to load vector store data:', error);
       return [];
     }
   }

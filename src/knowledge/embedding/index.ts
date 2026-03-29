@@ -1,3 +1,5 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('module');
 /**
  * 嵌入模型管理器
  * 支持多种嵌入模型
@@ -120,7 +122,7 @@ export class EmbeddingManager {
   private async embedWithOpenAI(text: string): Promise<number[]> {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      console.warn('OPENAI_API_KEY not set, using fallback embedding');
+      logger.warn('OPENAI_API_KEY not set, using fallback embedding');
       return this.simpleEmbedding(text);
     }
 
@@ -143,7 +145,7 @@ export class EmbeddingManager {
 
       return response.data.data[0].embedding;
     } catch (error) {
-      console.warn('OpenAI embedding failed:', error);
+      logger.warn('OpenAI embedding failed:', error);
       return this.simpleEmbedding(text);
     }
   }
@@ -179,7 +181,7 @@ export class EmbeddingManager {
 
       return response.data[0];
     } catch (error) {
-      console.warn('HuggingFace embedding failed:', error);
+      logger.warn('HuggingFace embedding failed:', error);
       return this.simpleEmbedding(text);
     }
   }

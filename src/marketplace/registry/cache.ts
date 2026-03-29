@@ -1,3 +1,5 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('module');
 /**
  * 包缓存管理
  */
@@ -26,7 +28,7 @@ export class PackageCache {
         }
       }
     } catch (error) {
-      console.warn('Failed to load cache:', error);
+      logger.warn('Failed to load cache:', error);
     }
   }
 

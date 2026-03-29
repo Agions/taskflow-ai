@@ -64,7 +64,7 @@ export class DependencyManager {
         timeout: 120000,
       });
     } catch (error) {
-      console.warn('  ⚠️  Failed to install npm dependencies:', error);
+      logger.warn('  ⚠️  Failed to install npm dependencies:', error);
     }
   }
 }

@@ -1,3 +1,5 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('module');
 /**
  * 知识检索引擎
  * RAG (Retrieval-Augmented Generation) 实现
@@ -112,7 +114,7 @@ export class KnowledgeRetrievalEngine {
         await this.indexDocument(doc);
         indexed++;
       } catch (error) {
-        console.warn(`Failed to index ${file}:`, error);
+        logger.warn(`Failed to index ${file}:`, error);
         failed++;
       }
     }

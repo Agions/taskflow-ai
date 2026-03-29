@@ -1,3 +1,5 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('module');
 /**
  * 成本实时计算面板
  * 跟踪并显示 AI 调用的实时成本
@@ -105,7 +107,7 @@ export class CostTracker {
 
     // 检查是否超过阈值
     if (totalCost > this.requestThreshold) {
-      console.warn(`⚠️ 高成本请求: ${model.name} - $${totalCost.toFixed(this.decimalPlaces)}`);
+      logger.warn(`⚠️ 高成本请求: ${model.name} - $${totalCost.toFixed(this.decimalPlaces)}`);
     }
 
     return entry;

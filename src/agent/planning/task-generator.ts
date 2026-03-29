@@ -1,3 +1,5 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('module');
 /**
  * 任务生成器
  */
@@ -22,7 +24,7 @@ export class TaskGenerator {
       const taskData = this.parseTaskResponse(response);
       return this.enrichTasks(taskData, prd);
     } catch (error) {
-      console.error('Task generation failed:', error);
+      logger.error('Task generation failed:', error);
       return this.getDefaultTasks(prd);
     }
   }

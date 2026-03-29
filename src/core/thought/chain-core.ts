@@ -1,3 +1,5 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('module');
 /**
  * 思维链核心功能
  */
@@ -76,24 +78,24 @@ export class ThoughtChainCore {
   ): ThoughtNode | null {
     const chain = this.chains.get(chainId);
     if (!chain) {
-      console.error(`Chain not found: ${chainId}`);
+      logger.error(`Chain not found: ${chainId}`);
       return null;
     }
 
     if (chain.nodes.size >= this.options.maxNodes) {
-      console.warn('Max nodes reached');
+      logger.warn('Max nodes reached');
       return null;
     }
 
     const parent = chain.nodes.get(parentId);
     if (!parent) {
-      console.error(`Parent node not found: ${parentId}`);
+      logger.error(`Parent node not found: ${parentId}`);
       return null;
     }
 
     const depth = this.getNodeDepth(chain, parentId);
     if (depth >= this.options.maxDepth) {
-      console.warn('Max depth reached');
+      logger.warn('Max depth reached');
       return null;
     }
 

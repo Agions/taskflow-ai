@@ -1,3 +1,5 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('module');
 /**
  * 包搜索功能
  */
@@ -16,7 +18,7 @@ export class PackageSearcher {
         const packages = await this.searchRegistry(registry, options);
         results.push(...packages);
       } catch (error) {
-        console.warn(`Failed to search registry ${registry.name}:`, error);
+        logger.warn(`Failed to search registry ${registry.name}:`, error);
       }
     }
 

@@ -1,3 +1,5 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('module');
 /**
  * 代码模板管理器
  * 管理内置模板和自定义模板
@@ -49,7 +51,7 @@ export class TemplateManager {
           const template = await fs.readJson(templatePath);
           this.templates.set(template.id, template);
         } catch (error) {
-          console.warn(`Failed to load template: ${file}`, error);
+          logger.warn(`Failed to load template: ${file}`, error);
         }
       }
     }

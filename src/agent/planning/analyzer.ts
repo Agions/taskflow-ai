@@ -1,3 +1,5 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('module');
 /**
  * 需求分析器
  */
@@ -21,7 +23,7 @@ export class RequirementAnalyzer {
       });
       return this.parseAnalysisResponse(response);
     } catch (error) {
-      console.error('AI analysis failed:', error);
+      logger.error('AI analysis failed:', error);
       return this.getDefaultAnalysis(prd);
     }
   }

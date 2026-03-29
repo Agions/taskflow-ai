@@ -1,3 +1,5 @@
+import { getLogger } from '../../utils/logger';
+const logger = getLogger('module');
 /**
  * 执行引擎
  * 执行任务计划中的各项任务
@@ -54,7 +56,7 @@ export class ExecutionEngine {
         results.push(result);
 
         if (!result.success) {
-          console.error(`   ❌ Failed: ${result.error}`);
+          logger.error(`   ❌ Failed: ${result.error}`);
           if (!plan.continueOnError) break;
         } else {
           console.log(`   ✅ Completed in ${result.duration}ms`);
