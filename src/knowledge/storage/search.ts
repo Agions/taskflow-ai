@@ -172,9 +172,9 @@ export class SearchManager {
   /**
    * 获取字段值
    */
-  private getFieldValue(chunk: DocumentChunk, field: string): any {
+  private getFieldValue(chunk: DocumentChunk, field: string): unknown {
     const parts = field.split('.');
-    let value: any = chunk;
+    let value: unknown = chunk;
 
     for (const part of parts) {
       if (value && typeof value === 'object') {

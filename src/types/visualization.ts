@@ -13,7 +13,7 @@ export type OutputFormat = string;
 export interface VisualizationConfig {
   type: ChartType;
   title: string;
-  data: any;
+  data: unknown;
   options: ChartOptions;
 }
 

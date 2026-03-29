@@ -9,33 +9,46 @@ import { REGEX_PATTERNS } from '../constants';
 /**
  * 验证配置对象
  */
-export function validateConfig(config: any): { valid: boolean; errors?: string[] } {
+export function validateConfig(config: unknown): { valid: boolean; errors?: string[] } {
   const errors: string[] = [];
 
-  if (!config.projectName || typeof config.projectName !== 'string') {
+  // 类型守卫：检查 config 是否为有效对象
+  if (typeof config !== 'object' || config === null) {
+    errors.push('config must be an object');
+    return { valid: false, errors };
+  }
+
+  const cfg = config as Record<string, unknown>;
+
+  if (!cfg.projectName || typeof cfg.projectName !== 'string') {
     errors.push('projectName is required and must be a string');
   }
 
-  if (!config.version || !REGEX_PATTERNS.SEMVER.test(config.version)) {
+  if (!cfg.version || typeof cfg.version !== 'string' || !REGEX_PATTERNS.SEMVER.test(cfg.version)) {
     errors.push('version must be a valid semantic version');
   }
 
-  if (config.aiModels && Array.isArray(config.aiModels)) {
-    config.aiModels.forEach((model: any, index: number) => {
-      if (!model.provider || typeof model.provider !== 'string') {
+  if (cfg.aiModels && Array.isArray(cfg.aiModels)) {
+    cfg.aiModels.forEach((model: unknown, index: number) => {
+      if (typeof model !== 'object' || model === null) {
+        errors.push(`aiModels[${index}] must be an object`);
+        return;
+      }
+      const m = model as Record<string, unknown>;
+      if (!m.provider || typeof m.provider !== 'string') {
         errors.push(`aiModels[${index}].provider is required`);
       }
-      if (!model.modelName || typeof model.modelName !== 'string') {
+      if (!m.modelName || typeof m.modelName !== 'string') {
         errors.push(`aiModels[${index}].modelName is required`);
       }
-      if (typeof model.enabled !== 'boolean') {
+      if (typeof m.enabled !== 'boolean') {
         errors.push(`aiModels[${index}].enabled must be a boolean`);
       }
     });
   }
 
-  if (config.mcpSettings) {
-    const mcp = config.mcpSettings;
+  if (cfg.mcpSettings) {
+    const mcp = cfg.mcpSettings as Record<string, unknown>;
     if (typeof mcp.enabled !== 'boolean') {
       errors.push('mcpSettings.enabled must be a boolean');
     }
@@ -68,7 +81,7 @@ export async function decryptApiKeys(encryptedKey: string): Promise<string> {
   try {
     return Buffer.from(encryptedKey, 'base64').toString('utf-8');
   } catch {
-    return encryptedKey; // 如果解密失败，返回原始值
+    return encryptedKey;
   }
 }
 

@@ -14,12 +14,17 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { toolRegistry } from '../tools/registry';
 import { Logger } from '../../utils/logger';
 
+interface Config {
+  aiModels?: Array<{ apiKey?: string; [key: string]: unknown }>;
+  [key: string]: unknown;
+}
+
 export class MCPRequestHandlers {
   constructor(
     private server: Server,
     private logger: Logger,
-    private toolExecutor: (name: string, args: any) => Promise<any>,
-    private configProvider: () => any
+    private toolExecutor: (name: string, args: Record<string, unknown>) => Promise<unknown>,
+    private configProvider: () => Config
   ) {}
 
   setup(): void {
@@ -43,7 +48,6 @@ export class MCPRequestHandlers {
     this.server.setRequestHandler(CallToolRequestSchema, async request => {
       const { name, arguments: args } = request.params;
 
-      // 安全检查：只允许执行已注册的工具
       const registeredTool = toolRegistry?.getTool(name);
       if (!registeredTool) {
         this.logger.warn(`Attempted to call unregistered tool: ${name}`);
@@ -54,7 +58,7 @@ export class MCPRequestHandlers {
       }
 
       try {
-        const result = await this.toolExecutor(name, args);
+        const result = await this.toolExecutor(name, args as Record<string, unknown>);
         return {
           content: [
             {
@@ -63,9 +67,9 @@ export class MCPRequestHandlers {
             },
           ],
         };
-      } catch (error: any) {
+      } catch (error: unknown) {
         return {
-          content: [{ type: 'text', text: `Error: ${error.message}` }],
+          content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : String(error)}` }],
           isError: true,
         };
       }
@@ -132,15 +136,20 @@ export class MCPRequestHandlers {
     });
   }
 
-  private sanitizeConfig(config: any): any {
+  private sanitizeConfig(config: Config): Config {
     if (!config) return {};
-    const sanitized = { ...config };
-    if (sanitized.aiModels) {
-      sanitized.aiModels = sanitized.aiModels.map((model: any) => ({
-        ...model,
-        apiKey: model.apiKey ? '***' : undefined,
-      }));
+    
+    const sanitized = { ...config } as Config;
+    if (sanitized.aiModels && Array.isArray(sanitized.aiModels)) {
+      sanitized.aiModels = sanitized.aiModels.map(model => {
+        const m = model as { apiKey?: string } & Record<string, unknown>;
+        return {
+          ...m,
+          apiKey: m.apiKey ? '***' : undefined,
+        };
+      });
     }
+    
     return sanitized;
   }
 }

@@ -78,28 +78,28 @@ export class Logger {
   /**
    * Debug级别日志
    */
-  debug(message: string, ...args: any[]): void {
+  debug(message: string, ...args: unknown[]): void {
     this.logger.debug(message, ...args);
   }
 
   /**
    * Info级别日志
    */
-  info(message: string, ...args: any[]): void {
+  info(message: string, ...args: unknown[]): void {
     this.logger.info(message, ...args);
   }
 
   /**
    * Warning级别日志
    */
-  warn(message: string, ...args: any[]): void {
+  warn(message: string, ...args: unknown[]): void {
     this.logger.warn(message, ...args);
   }
 
   /**
    * Error级别日志
    */
-  error(message: string, error?: Error | any, ...args: any[]): void {
+  error(message: string, error?: Error | any, ...args: unknown[]): void {
     if ((error as Error) instanceof Error) {
       this.logger.error(message, { error: error.message, stack: error.stack, ...args });
     } else if (error as Error) {
@@ -156,19 +156,19 @@ class LoggerWithContext {
     private context: Record<string, any>
   ) {}
 
-  debug(message: string, ...args: any[]): void {
+  debug(message: string, ...args: unknown[]): void {
     this.logger.debug(message, this.context, ...args);
   }
 
-  info(message: string, ...args: any[]): void {
+  info(message: string, ...args: unknown[]): void {
     this.logger.info(message, this.context, ...args);
   }
 
-  warn(message: string, ...args: any[]): void {
+  warn(message: string, ...args: unknown[]): void {
     this.logger.warn(message, this.context, ...args);
   }
 
-  error(message: string, error?: Error | any, ...args: any[]): void {
+  error(message: string, error?: Error | any, ...args: unknown[]): void {
     this.logger.error(message, error, this.context, ...args);
   }
 }
@@ -177,11 +177,12 @@ class LoggerWithContext {
  * 性能监控装饰器
  */
 export function logPerformance(logger: Logger, operation?: string) {
-  return function (target: any, propertyName: string, descriptor: PropertyDescriptor) {
+  return function (target: { constructor?: { name?: string } }, propertyName: string, descriptor: PropertyDescriptor) {
     const method = descriptor.value;
-    const opName = operation || `${target.constructor.name}.${propertyName}`;
+    const targetName = target?.constructor?.name || 'unknown';
+    const opName = operation || `${targetName}.${propertyName}`;
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       const start = Date.now();
       try {
         const result = await method.apply(this, args);

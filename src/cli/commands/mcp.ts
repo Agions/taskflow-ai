@@ -141,7 +141,7 @@ async function generateEditorConfig(options: unknown) {
     const content = exportConfig(config);
 
     // 读取现有配置（如果存在）
-    let existingConfig: any = {};
+    let existingConfig: Record<string, unknown> = {};
     try {
       const existing = await fs.readFile(filePath, 'utf-8');
       existingConfig = JSON.parse(existing);
@@ -174,7 +174,7 @@ function getConfigFileName(editorName: string): string {
   return map[editorName] || 'mcp.json';
 }
 
-function mergeConfig(existing: unknown, newConfig: unknown): any {
+function mergeConfig(existing: unknown, newConfig: unknown): unknown {
   // 深度合并配置
   const result = { ...existing };
 

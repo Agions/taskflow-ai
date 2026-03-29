@@ -37,7 +37,7 @@ export interface PluginContext {
  */
 export interface PluginResult {
   success: boolean;
-  data?: any;
+  data?: unknown;
   error?: string;
   warnings?: string[];
 }

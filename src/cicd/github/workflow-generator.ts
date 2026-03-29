@@ -6,7 +6,7 @@ import { GitHubActionsConfig, WorkflowTemplate } from '../types';
 
 export class GitHubWorkflowGenerator {
   generate(config: GitHubActionsConfig): string {
-    const workflow: any = {
+    const workflow: unknown; = {
       name: config.name,
       on: this.generateTriggers(config.triggers),
       permissions: this.generatePermissions(config.permissions),
@@ -31,8 +31,8 @@ export class GitHubWorkflowGenerator {
     return this.toYaml(workflow);
   }
 
-  private generateTriggers(triggers: unknown): any {
-    const result: any = {};
+  private generateTriggers(triggers: unknown): unknown {
+    const result: unknown; = {};
 
     for (const trigger of triggers) {
       if (trigger.type === 'push') {
@@ -57,7 +57,7 @@ export class GitHubWorkflowGenerator {
     return result;
   }
 
-  private generatePermissions(permissions?: unknown): any {
+  private generatePermissions(permissions?: unknown): unknown {
     if (!permissions) {
       return {
         contents: 'read',
@@ -68,8 +68,8 @@ export class GitHubWorkflowGenerator {
     return permissions;
   }
 
-  private generateJob(stage: unknown, config: GitHubActionsConfig): any {
-    const job: any = {
+  private generateJob(stage: unknown, config: GitHubActionsConfig): unknown {
+    const job: unknown; = {
       name: stage.name,
       'runs-on': stage.runsOn || 'ubuntu-latest',
       steps: [],
@@ -90,8 +90,8 @@ export class GitHubWorkflowGenerator {
     return job;
   }
 
-  private generateStep(step: unknown, config: GitHubActionsConfig): any {
-    const stepConfig: any = {};
+  private generateStep(step: unknown, config: GitHubActionsConfig): unknown {
+    const stepConfig: unknown; = {};
 
     if (step.name) {
       stepConfig.name = step.name;

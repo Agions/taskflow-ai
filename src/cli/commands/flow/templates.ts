@@ -5,7 +5,7 @@
 /**
  * 获取模板
  */
-export function getTemplate(type: string): any {
+export function getTemplate(type: string): unknown {
   switch (type) {
     case 'prd-to-code':
       return {

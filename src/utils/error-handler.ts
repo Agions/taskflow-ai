@@ -18,8 +18,8 @@ export async function withErrorHandling<T>(
 ): Promise<T> {
   try {
     return await fn();
-  } catch (error: any) {
-    const message = `${errorMessage}: ${error.message}`;
+  } catch (error: unknown) {
+    const message = `${errorMessage}: ${error instanceof Error ? error.message : String(error)}`;
     if (logger) {
       logger.error(message, error);
     }
@@ -36,8 +36,8 @@ export async function withErrorHandling<T>(
 export function withSyncErrorHandling<T>(fn: () => T, errorMessage: string, logger?: Logger): T {
   try {
     return fn();
-  } catch (error: any) {
-    const message = `${errorMessage}: ${error.message}`;
+  } catch (error: unknown) {
+    const message = `${errorMessage}: ${error instanceof Error ? error.message : String(error)}`;
     if (logger) {
       logger.error(message, error);
     }
@@ -50,8 +50,8 @@ export function withSyncErrorHandling<T>(fn: () => T, errorMessage: string, logg
  * @param error 错误对象
  * @returns 是否为 Error 类型
  */
-export function isError(error: any): error is Error {
-  return (error as Error) instanceof Error;
+export function isError(error: unknown): error is Error {
+  return error instanceof Error;
 }
 
 /**
@@ -59,7 +59,7 @@ export function isError(error: any): error is Error {
  * @param error 错误对象
  * @returns 错误消息字符串
  */
-export function getErrorMessage(error: any): string {
+export function getErrorMessage(error: unknown): string {
   if (isError(error)) {
     return error.message;
   }
@@ -92,197 +92,138 @@ export type ErrorCode =
  */
 export interface CodedError extends Error {
   code: ErrorCode;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 /**
  * 创建带代码的错误
  * @param code 错误代码
- * @param message 错误消息
- * @param context 上下文信息
- * @returns CodedError
  */
 export function createCodedError(
   code: ErrorCode,
   message: string,
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ): CodedError {
   const error = new Error(message) as CodedError;
   error.code = code;
-  error.context = context;
+  if (context) error.context = context;
   return error;
 }
 
 /**
- * 重试配置
+ * 错误重试装饰器
  */
-export interface RetryConfig {
-  maxAttempts: number;
-  delayMs: number;
-  backoffMultiplier: number;
-  shouldRetry?: (error: Error) => boolean;
+export function withRetry<T extends unknown[], R>(
+  fn: (...args: T) => Promise<R>,
+  maxRetries: number = 3,
+  delay: number = 1000
+) {
+  return async (...args: T): Promise<R> => {
+    let lastError: Error;
+
+    for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+      try {
+        return await fn(...args);
+      } catch (error) {
+        if (isError(error)) {
+          lastError = error;
+        } else {
+          lastError = new Error(String(error));
+        }
+
+        if (attempt <= maxRetries) {
+          const backoffDelay = delay * Math.pow(2, attempt - 1);
+          const jitter = Math.random() * backoffDelay * 0.25;
+          await new Promise(resolve => setTimeout(resolve, backoffDelay + jitter));
+        }
+      }
+    }
+
+    throw lastError!;
+  };
 }
 
 /**
- * 默认重试配置
+ * 安全执行函数
  */
-export const DEFAULT_RETRY_CONFIG: RetryConfig = {
-  maxAttempts: 3,
-  delayMs: 1000,
-  backoffMultiplier: 2,
-  shouldRetry: () => true,
-};
+export async function safeExecute<T>(
+  fn: () => Promise<T>,
+  fallback?: T
+): Promise<{ success: boolean; data?: T; error?: Error }> {
+  try {
+    const data = await fn();
+    return { success: true, data };
+  } catch (error) {
+    return {
+      success: false,
+      error: isError(error) ? error : new Error(String(error)),
+      ...(fallback !== undefined && { data: fallback }),
+    };
+  }
+}
 
 /**
- * 带重试的异步操作
- * @param fn 异步函数
- * @param config 重试配置
- * @returns 操作结果
+ * 验证必需参数
  */
-export async function withRetry<T>(
-  fn: () => Promise<T>,
-  config: Partial<RetryConfig> = {},
-  logger?: Logger
-): Promise<T> {
-  const retryConfig = { ...DEFAULT_RETRY_CONFIG, ...config };
-  let lastError: Error | undefined;
+export function validateRequired(
+  params: Record<string, unknown>,
+  required: string[]
+): void {
+  for (const field of required) {
+    if (!params[field]) {
+      throw createTaskFlowError(
+        'VALIDATION_ERROR',
+        'VALIDATION_ERROR',
+        `Missing required field: ${field}`,
+        { field, provided: Object.keys(params) }
+      );
+    }
+  }
+}
 
-  for (let attempt = 1; attempt <= retryConfig.maxAttempts; attempt++) {
+/**
+ * 异步错误边界
+ */
+export class AsyncErrorBoundary {
+  private handlers: Map<string, (error: CodedError) => void> = new Map();
+
+  onError(type: string, handler: (error: CodedError) => void): void {
+    this.handlers.set(type, handler);
+  }
+
+  async execute<T>(fn: () => Promise<T>): Promise<T> {
     try {
       return await fn();
-    } catch (error: any) {
-      lastError = error;
-
-      if (attempt === retryConfig.maxAttempts) {
-        break;
+    } catch (error) {
+      if (isError(error) && 'code' in error) {
+        const codedError = error as CodedError;
+        const handler = this.handlers.get(codedError.code);
+        if (handler) {
+          handler(codedError);
+          return Promise.reject(error);
+        }
       }
 
-      if (retryConfig.shouldRetry && !retryConfig.shouldRetry(error)) {
-        throw error;
-      }
-
-      const delay = retryConfig.delayMs * Math.pow(retryConfig.backoffMultiplier, attempt - 1);
-      if (logger) {
-        logger.warn(`Attempt ${attempt} failed, retrying in ${delay}ms...`, error);
-      }
-
-      await sleep(delay);
-    }
-  }
-
-  throw lastError;
-}
-
-/**
- * 睡眠函数
- * @param ms 毫秒
- * @returns Promise
- */
-export function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/**
- * 超时包装器
- * @param fn 异步函数
- * @param timeoutMs 超时时间
- * @param errorMessage 错误消息
- * @returns 操作结果
- */
-export async function withTimeout<T>(
-  fn: () => Promise<T>,
-  timeoutMs: number,
-  errorMessage: string = 'Operation timed out'
-): Promise<T> {
-  return Promise.race([
-    fn(),
-    new Promise<T>((_, reject) => {
-      setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
-    }),
-  ]);
-}
-
-/**
- * 批量操作错误处理
- * @param items 操作项
- * @param fn 操作函数
- * @param errorHandler 错误处理函数
- * @returns 成功和失败的结果
- */
-export async function batchWithErrorHandling<T, R>(
-  items: T[],
-  fn: (item: T) => Promise<R>,
-  errorHandler?: (item: T, error: Error) => void
-): Promise<{ successes: R[]; failures: { item: T; error: Error }[] }> {
-  const results = await Promise.allSettled(items.map(fn));
-
-  const successes: R[] = [];
-  const failures: { item: T; error: Error }[] = [];
-
-  results.forEach((result, index) => {
-    if (result.status === 'fulfilled') {
-      successes.push(result.value);
-    } else {
-      const error = result.reason as Error;
-      const item = items[index];
-      failures.push({ item, error });
-      if (errorHandler) {
-        errorHandler(item, error);
-      }
-    }
-  });
-
-  return { successes, failures };
-}
-
-/**
- * 错误日志装饰器
- * @param target 目标类
- * @param propertyKey 方法名
- * @param descriptor 属性描述符
- */
-export function LogErrors(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-  const originalMethod = descriptor.value;
-  const className = target.constructor.name;
-
-  descriptor.value = async function (...args: any[]) {
-    const logger = Logger.getInstance(className);
-
-    try {
-      return await originalMethod.apply(this, args);
-    } catch (error: any) {
-      logger.error(`${propertyKey} failed:`, error);
       throw error;
     }
-  };
-
-  return descriptor;
-}
-
-/**
- * 安全 JSON 解析
- * @param json JSON 字符串
- * @param defaultValue 默认值
- * @returns 解析结果
- */
-export function safeJsonParse<T>(json: string, defaultValue: T): T {
-  try {
-    return JSON.parse(json) as T;
-  } catch {
-    return defaultValue;
   }
 }
 
 /**
- * 安全 JSON 序列化
- * @param obj 对象
- * @param defaultValue 默认值
- * @returns JSON 字符串
+ * JSON 安全序列化
  */
-export function safeJsonStringify(obj: any, defaultValue: string = '{}'): string {
+export function safeJsonStringify(obj: unknown, space?: number): string {
   try {
-    return JSON.stringify(obj);
-  } catch {
-    return defaultValue;
+    return JSON.stringify(obj, (key, value) => {
+      if (typeof value === 'bigint') {
+        return value.toString();
+      }
+      if (value instanceof Error) {
+        return { message: value.message, stack: value.stack };
+      }
+      return value;
+    }, space);
+  } catch (error) {
+    return JSON.stringify({ error: 'Failed to stringify object' });
   }
 }

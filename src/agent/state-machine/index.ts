@@ -15,7 +15,7 @@ export * from './types';
 export * from './machine';
 
 export class AgentStateMachine {
-  private actor: any;
+  private actor: unknown;
   private stateChangeCallbacks: Array<(state: AgentState) => void> = [];
 
   constructor(

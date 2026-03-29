@@ -33,7 +33,7 @@ export class GitHubApiClient {
   }
 
   async getWorkflowRuns(workflowId: string, branch?: string): Promise<unknown[]> {
-    const params: any = {};
+    const params: unknown; = {};
     if (branch) {
       params.branch = branch;
     }
@@ -80,7 +80,7 @@ export class GitHubApiClient {
     };
   }
 
-  private buildStageReport(job: unknown): any {
+  private buildStageReport(job: unknown): unknown {
     return {
       name: job.name,
       status: this.mapStatus(job.status, job.conclusion),

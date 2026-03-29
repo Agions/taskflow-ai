@@ -36,7 +36,7 @@ export class DataProviders {
     }
   }
 
-  async getProjectsData(): Promise<any> {
+  async getProjectsData(): Promise<unknown> {
     try {
       const configPath = path.join(process.cwd(), '.taskflow', 'config.json');
       if (await fs.pathExists(configPath)) {
@@ -63,7 +63,7 @@ export class DataProviders {
     }
   }
 
-  async getConfigData(): Promise<any> {
+  async getConfigData(): Promise<unknown> {
     try {
       const configPath = path.join(process.cwd(), '.taskflow', 'config.json');
       if (await fs.pathExists(configPath)) {
@@ -85,7 +85,7 @@ export class DataProviders {
     }
   }
 
-  async getModelsData(): Promise<any> {
+  async getModelsData(): Promise<unknown> {
     try {
       const configData = await this.getConfigData();
       return {
@@ -99,7 +99,7 @@ export class DataProviders {
     }
   }
 
-  getStatusData(resourceCount: number): any {
+  getStatusData(resourceCount: number): unknown {
     return {
       status: 'healthy',
       uptime: process.uptime(),
@@ -111,7 +111,7 @@ export class DataProviders {
     };
   }
 
-  async getAnalyticsData(resourceCount: number): Promise<any> {
+  async getAnalyticsData(resourceCount: number): Promise<unknown> {
     try {
       const tasks = await this.getTasksData();
       const projects = await this.getProjectsData();

@@ -2,15 +2,23 @@
  * YAML 工作流解析器
  */
 
-import { WorkflowSpec } from './types';
+import { WorkflowSpec, WorkflowStep } from './types';
+
+interface ParsedStep {
+  id: string;
+  type: string;
+  condition?: string;
+  retry?: { max_attempts: number };
+  [key: string]: unknown;
+}
 
 /**
- * 解析 YAML 格式的工作流
+ * 解析 YAML 格式的工作流（简化版）
  */
 export function parseYAML(content: string): WorkflowSpec {
   const lines = content.split('\n');
-  const result: any = { steps: [] };
-  let currentStep: any = null;
+  const result: WorkflowSpec = { steps: [] };
+  let currentStep: ParsedStep | null = null;
   let stepIndent = 0;
   let inSteps = false;
 
@@ -28,9 +36,9 @@ export function parseYAML(content: string): WorkflowSpec {
     if (inSteps) {
       if (trimmed.match(/^-\s+\w+:/)) {
         if (currentStep) {
-          result.steps.push(currentStep);
+          result.steps.push(currentStep as WorkflowStep);
         }
-        const stepName = trimmed.match(/^-\s+(\w+):/)?.[1];
+        const stepName = trimmed.match(/^-\s+(\w+):/)?.[1] || 'unknown';
         currentStep = { id: stepName, type: 'task' };
         stepIndent = indent;
         continue;
@@ -43,11 +51,14 @@ export function parseYAML(content: string): WorkflowSpec {
         if (key === 'if') {
           currentStep.condition = value;
         } else if (key === 'on_true' || key === 'on_false') {
-          // 处理分支
+          // 处理分支 - 存储在额外字段
+          currentStep[key] = value;
         } else if (key === 'retry') {
           currentStep.retry = { max_attempts: 1 };
+        } else if (value === '' || value === 'true') {
+          currentStep[key] = true;
         } else {
-          (currentStep as any)[key] = value || true;
+          currentStep[key] = value;
         }
       }
     } else {
@@ -55,14 +66,14 @@ export function parseYAML(content: string): WorkflowSpec {
       const value = valueParts.join(':').trim();
 
       if (key && value !== '') {
-        (result as any)[key] = value || true;
+        (result as WorkflowSpec)[key as keyof WorkflowSpec] = value as any;
       }
     }
   }
 
   if (currentStep) {
-    result.steps.push(currentStep);
+    result.steps.push(currentStep as WorkflowStep);
   }
 
-  return result as WorkflowSpec;
+  return result;
 }

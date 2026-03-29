@@ -24,11 +24,11 @@ export type ActionType = 'plan' | 'execute' | 'verify' | 'fix' | 'approve' | 're
  */
 export type AgentEvent =
   | { type: 'START' }
-  | { type: 'PLAN_COMPLETE'; data: any }
+  | { type: 'PLAN_COMPLETE'; data: unknown }
   | { type: 'PLAN_FAILED'; error: Error }
-  | { type: 'EXECUTION_COMPLETE'; data: any }
+  | { type: 'EXECUTION_COMPLETE'; data: unknown }
   | { type: 'EXECUTION_FAILED'; error: Error }
-  | { type: 'VERIFICATION_PASS'; data: any }
-  | { type: 'VERIFICATION_FAIL'; data: any }
+  | { type: 'VERIFICATION_PASS'; data: unknown }
+  | { type: 'VERIFICATION_FAIL'; data: unknown }
   | { type: 'APPROVED' }
   | { type: 'REJECTED' };

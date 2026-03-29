@@ -84,7 +84,7 @@ export interface RetrievalOptions {
 export interface FilterCondition {
   field: string;
   operator: 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'contains';
-  value: any;
+  value: unknown;
 }
 
 export interface EmbeddingModel {

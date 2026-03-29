@@ -106,7 +106,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
   }
 }
 
-function createDefaultConfig(): any {
+function createDefaultConfig(): { projectName: string; version: string; aiModels: unknown[]; mcpSettings: Record<string, unknown> } {
   return {
     projectName: 'Untitled Project',
     version: '1.0.0',

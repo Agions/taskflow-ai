@@ -45,8 +45,8 @@ export interface PluginHooks {
   onInit?: (context: PluginContext) => void | Promise<void>;
   onLoad?: (plugin: Plugin) => void | Promise<void>;
   onUnload?: (plugin: Plugin) => void | Promise<void>;
-  onTaskCreate?: (task: unknown) => any | Promise<any>;
-  onTaskUpdate?: (task: unknown) => any | Promise<any>;
+  onTaskCreate?: (task: unknown) => any | Promise<unknown>;
+  onTaskUpdate?: (task: unknown) => any | Promise<unknown>;
   onTaskComplete?: (task: unknown) => void | Promise<void>;
   onWorkflowExecute?: (workflow: unknown, context: unknown) => void | Promise<void>;
   onCommand?: (command: string, args: string[]) => string | void | Promise<string | void>;
@@ -72,7 +72,7 @@ export interface PluginContext {
   /** 配置 */
   config: Record<string, unknown>;
   /** 日志 */
-  logger: any;
+  logger: unknown;
   /** 注册表 */
   registry: PluginRegistry;
 }

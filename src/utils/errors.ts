@@ -26,7 +26,7 @@ export function createTaskFlowError(
 /**
  * 检查是否为TaskFlow错误
  */
-export function isTaskFlowError(error: any): error is TaskFlowError {
+export function isTaskFlowError(error: unknown): error is TaskFlowError {
   return error && error.name === 'TaskFlowError';
 }
 

@@ -8,7 +8,7 @@ import { Logger } from '../../utils/logger';
 
 export class SQLiteStorage implements StorageBackend {
   private logger = Logger.getInstance('SQLiteStorage');
-  private db: any = null;
+  private db: unknown = null;
   private initialized = false;
 
   constructor(private dbPath: string = './taskflow.db') {}

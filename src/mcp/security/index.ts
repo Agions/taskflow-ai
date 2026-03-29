@@ -54,7 +54,7 @@ export class SecurityManager {
   /**
    * 验证请求
    */
-  async validateRequest(request: any): Promise<SecurityContext> {
+  async validateRequest(request: unknown,: Promise<SecurityContext> {
     const context: SecurityContext = {
       permissions: [],
       timestamp: Date.now(),
@@ -91,7 +91,7 @@ export class SecurityManager {
   /**
    * 身份验证
    */
-  private async authenticateRequest(request: any, context: SecurityContext): Promise<void> {
+  private async authenticateRequest(request: unknown, context: SecurityContext): Promise<void> {
     const authHeader = request.headers?.authorization;
 
     if (!authHeader) {
@@ -170,14 +170,14 @@ export class SecurityManager {
   /**
    * 创建安全沙箱
    */
-  createSandbox(): any {
+  createSandbox(): unknown {
     return this.sandboxManager.createSandbox();
   }
 
   /**
    * 记录安全事件
    */
-  logSecurityEvent(event: string, details: any): void {
+  logSecurityEvent(event: string, details: unknown,: void {
     this.logger.warn(`安全事件: ${event}`, details);
   }
 

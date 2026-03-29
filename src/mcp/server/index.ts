@@ -20,8 +20,8 @@ export class MCPServer {
   private toolExecutor: MCPToolExecutor;
 
   constructor(
-    private settings: any,
-    private config: any
+    private settings: { serverName?: string; version?: string },
+    private config: Record<string, unknown>
   ) {
     this.logger = Logger.getInstance('MCPServer');
     this.toolExecutor = new MCPToolExecutor();
@@ -48,7 +48,7 @@ export class MCPServer {
       const handlers = new MCPRequestHandlers(
         this.server,
         this.logger,
-        (name, args) => this.toolExecutor.execute(name, args),
+        (name: string, args: Record<string, unknown>) => this.toolExecutor.execute(name, args),
         () => this.config
       );
       handlers.setup();
@@ -105,12 +105,12 @@ export class MCPServer {
 
   async callTool(
     name: string,
-    args: any
-  ): Promise<{ success: boolean; data?: any; error?: string }> {
+    args: unknown
+  ): Promise<{ success: boolean; data?: unknown; error?: string }> {
     try {
       const result = await this.toolExecutor.execute(name, args);
       return { success: true, data: result };
-    } catch (error: any) {
+    } catch (error: unknown, {
       return { success: false, error: error.message };
     }
   }

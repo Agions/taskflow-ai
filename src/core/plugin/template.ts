@@ -20,7 +20,7 @@ export interface Template {
 export interface TemplateVariable {
   name: string;
   type: 'string' | 'number' | 'boolean' | 'select';
-  default?: any;
+  default?: unknown;
   options?: string[];
   description?: string;
 }

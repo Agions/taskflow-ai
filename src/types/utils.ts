@@ -54,7 +54,7 @@ export interface CLIContext {
  */
 export interface CommandResult {
   success: boolean;
-  data?: any;
+  data?: unknown;
   message?: string;
   error?: string;
 }

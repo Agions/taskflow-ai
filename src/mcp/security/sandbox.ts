@@ -21,7 +21,7 @@ export class SandboxManager {
   /**
    * 创建沙箱
    */
-  createSandbox(): any {
+  createSandbox(): unknown {
     if (!this.settings.enabled) {
       return null;
     }
@@ -31,27 +31,27 @@ export class SandboxManager {
       memoryLimit: this.settings.memoryLimit,
       allowedModules: ['fs', 'path', 'util'],
       blockedModules: ['child_process', 'cluster', 'net', 'dgram'],
-      executeInContext: (code: string, context: any) => this.executeInContext(code, context),
+      executeInContext: (code: string, context: unknown, => this.executeInContext(code, context),
     };
   }
 
   /**
    * 在沙箱上下文中执行代码
    */
-  private executeInContext(code: string, context: any): any {
+  private executeInContext(code: string, context: unknown,: any {
     try {
       const vm = require('vm');
       const sandbox = {
         ...context,
         console: {
-          log: (...args: any[]) => this.logger.debug('Sandbox:', ...args),
+          log: (...args: unknown[]) => this.logger.debug('Sandbox:', ...args),
         },
       };
 
       return vm.runInNewContext(code, sandbox, {
         timeout: this.settings.timeout,
       });
-    } catch (error: any) {
+    } catch (error: unknown, {
       throw new Error(`沙箱执行失败: ${(error instanceof Error ? error.message : String(error))}`);
     }
   }

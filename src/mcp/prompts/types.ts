@@ -21,7 +21,7 @@ export interface PromptArgument {
   description: string;
   type: 'string' | 'number' | 'boolean' | 'array' | 'object';
   required: boolean;
-  default?: any;
+  default?: unknown;
 }
 
 export interface PromptExample {

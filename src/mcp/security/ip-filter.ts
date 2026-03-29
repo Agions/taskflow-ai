@@ -44,7 +44,7 @@ export class IPFilter {
   /**
    * 验证来源
    */
-  validateOrigin(request: any): boolean {
+  validateOrigin(request: unknown,: boolean {
     if (this.allowedOrigins.includes('*')) {
       return true;
     }
@@ -60,7 +60,7 @@ export class IPFilter {
   /**
    * 获取客户端 IP
    */
-  getClientIP(request: any): string {
+  getClientIP(request: unknown,: string {
     return (
       request.headers?.['x-forwarded-for']?.split(',')[0] ||
       request.headers?.['x-real-ip'] ||
