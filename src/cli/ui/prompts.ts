@@ -163,7 +163,7 @@ export interface WizardStep {
   name: string;
   type: 'input' | 'password' | 'confirm' | 'list' | 'checkbox' | 'number';
   message: string;
-  default?: any;
+  default?: unknown;
   choices?: { name: string; value: unknown }[];
   validate?: (value: unknown) => boolean | string;
   when?: (answers: unknown) => boolean;

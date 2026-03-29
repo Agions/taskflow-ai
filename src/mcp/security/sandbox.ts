@@ -1,44 +1,9 @@
-/**
- * 沙箱管理
- */
-
-import { SecuritySettings } from './types';
-import { Logger } from '../../utils/logger';
-
-/**
- * 沙箱管理器
- */
-export class SandboxManager {
-  private logger: Logger;
-
-  constructor(
-    private settings: SecuritySettings['sandbox'],
-    logger?: Logger
-  ) {
-    this.logger = logger || Logger.getInstance('SandboxManager');
-  }
-
-  /**
-   * 创建沙箱
-   */
-  createSandbox(): unknown {
-    if (!this.settings.enabled) {
-      return null;
-    }
-
-    return {
-      timeout: this.settings.timeout,
-      memoryLimit: this.settings.memoryLimit,
-      allowedModules: ['fs', 'path', 'util'],
-      blockedModules: ['child_process', 'cluster', 'net', 'dgram'],
-      executeInContext: (code: string, context: unknown, => this.executeInContext(code, context),
-    };
   }
 
   /**
    * 在沙箱上下文中执行代码
    */
-  private executeInContext(code: string, context: unknown,: any {
+  private executeInContext(code: string, context: unknown): unknown {
     try {
       const vm = require('vm');
       const sandbox = {
@@ -51,8 +16,8 @@ export class SandboxManager {
       return vm.runInNewContext(code, sandbox, {
         timeout: this.settings.timeout,
       });
-    } catch (error: unknown, {
-      throw new Error(`沙箱执行失败: ${(error instanceof Error ? error.message : String(error))}`);
+    } catch (error: unknown) {
+      throw new Error(`沙箱执行失败: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
