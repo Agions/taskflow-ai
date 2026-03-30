@@ -10,7 +10,6 @@ import { TaskGenerator } from './task-generator';
 import { DependencyAnalyzer } from './dependency-analyzer';
 const logger = getLogger('agent/planning/index');
 
-
 interface AIService {
   complete(prompt: string, options?: unknown): Promise<string>;
 }

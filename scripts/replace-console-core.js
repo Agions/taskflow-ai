@@ -18,6 +18,9 @@ const TARGET_DIRS = ['agent', 'knowledge', 'codegen', 'mcp'];
 function shouldProcess(filePath) {
   if (!filePath.endsWith('.ts')) return false;
   if (filePath.includes('/__tests__/')) return false;
+  if (filePath.includes('/node_modules/')) return false;
+  // 排除 logger 实现文件（避免自引用）
+  if (filePath.endsWith('/utils/logger.ts')) return false;
   // 只处理指定目录
   const rel = relative(SRC, filePath);
   return TARGET_DIRS.some(dir => rel.startsWith(dir + sep));

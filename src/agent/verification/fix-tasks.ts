@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { VerificationCheck } from '../types';
 const logger = getLogger('agent/verification/fix-tasks');
 
-
 /**
  * 根据失败的检查生成修复任务
  */

@@ -12,7 +12,6 @@ import { MCPServer } from '../../mcp/server';
 import { validateCommand } from '../../mcp/security/validator';
 const logger = getLogger('agent/execution/task-executor');
 
-
 const execAsync = promisify(exec);
 
 export class TaskExecutor {

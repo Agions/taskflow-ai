@@ -11,7 +11,6 @@ import { VerificationEngine } from '../verification/engine';
 import { AgentConfig } from '../types';
 const logger = getLogger('agent/state-machine/machine');
 
-
 export const createAgentMachine = (
   context: MachineContext,
   agentConfig: AgentConfig,

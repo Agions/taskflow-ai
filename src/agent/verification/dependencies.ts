@@ -8,7 +8,6 @@ import * as path from 'path';
 import { ExecutionResult, VerificationCheck } from '../types';
 const logger = getLogger('agent/verification/dependencies');
 
-
 export class DependencyChecker {
   constructor(private projectPath: string) {}
 

@@ -13,7 +13,6 @@ import {
 } from '../types';
 const logger = getLogger('agent/state-machine/types');
 
-
 export interface MachineContext extends AgentContext {
   error?: Error;
   config: AgentConfig;

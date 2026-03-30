@@ -12,7 +12,6 @@ import { VerificationResult, VerificationCheck } from './verification';
 import { ActionHistory } from './history';
 const logger = getLogger('agent/types/agent');
 
-
 /**
  * Agent 配置
  */

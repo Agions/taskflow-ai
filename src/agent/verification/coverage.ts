@@ -8,7 +8,6 @@ import * as path from 'path';
 import { CoverageReport, FileCoverage, ExecutionResult, VerificationCheck } from '../types';
 const logger = getLogger('agent/verification/coverage');
 
-
 export class CoverageChecker {
   constructor(private projectPath: string) {}
 

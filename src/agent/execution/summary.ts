@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { TaskResult, ExecutionSummary } from '../types';
 const logger = getLogger('agent/execution/summary');
 
-
 export class SummaryCalculator {
   calculate(results: TaskResult[]): ExecutionSummary {
     const total = results.length;

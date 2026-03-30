@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { Task, Dependency } from '../types';
 const logger = getLogger('agent/planning/dependency-analyzer');
 
-
 export class DependencyAnalyzer {
   analyze(tasks: Task[]): Dependency[] {
     const dependencies: Dependency[] = [];

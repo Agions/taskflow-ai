@@ -6,7 +6,6 @@ import { getLogger } from '../../../utils/logger';
 import { ExecutionResult, VerificationCheck } from '../../types';
 const logger = getLogger('agent/verification/checks/task-completion');
 
-
 export async function verifyTaskCompletion(result: ExecutionResult): Promise<VerificationCheck> {
   const failedTasks = result.results.filter(r => !r.success);
 

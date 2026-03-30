@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { Task, Dependency } from '../types';
 const logger = getLogger('agent/execution/sorter');
 
-
 export class TaskSorter {
   topologicalSort(tasks: Task[], dependencies: Dependency[]): Task[] {
     const sorted: Task[] = [];

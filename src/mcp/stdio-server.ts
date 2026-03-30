@@ -9,7 +9,6 @@ import { MCPServer } from './server';
 import { ConfigManager } from '../core/config';
 const logger = getLogger('mcp/stdio-server');
 
-
 async function main() {
   try {
     const configManager = new ConfigManager();

@@ -1,4 +1,3 @@
-import { getLogger } from '../utils/logger';
 /**
  * 日志工具
  */
@@ -7,8 +6,6 @@ import winston from 'winston';
 import path from 'path';
 import fs from 'fs-extra';
 import { CONFIG_DIR, LOGS_DIR } from '../constants';
-const logger = getLogger('utils/logger');
-
 
 export class Logger {
   private logger: winston.Logger;

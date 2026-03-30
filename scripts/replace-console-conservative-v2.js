@@ -15,6 +15,7 @@ const SRC = join(ROOT, 'src');
 function shouldProcess(filePath) {
   if (!filePath.endsWith('.ts')) return false;
   if (filePath.includes('/__tests__/') || filePath.endsWith('.test.ts')) return false;
+  if (filePath.endsWith('/utils/logger.ts')) return false; // 排除 logger 自身
   return true; // 处理所有目录（包括 CLI）
 }
 

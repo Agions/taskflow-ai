@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { ExecutionResult, VerificationCheck } from '../types';
 const logger = getLogger('agent/verification/checks');
 
-
 /**
  * 验证任务完成
  */

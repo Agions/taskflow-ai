@@ -8,7 +8,6 @@ import * as path from 'path';
 import { CodeQualityReport, CodeIssue, ExecutionResult, VerificationCheck } from '../types';
 const logger = getLogger('agent/verification/code-quality');
 
-
 export class CodeQualityChecker {
   constructor(private projectPath: string) {}
 

@@ -13,7 +13,6 @@ import { TypeSafetyChecker } from './type-safety';
 import { generateFixTasks } from './fix-tasks';
 const logger = getLogger('agent/verification/engine');
 
-
 export class VerificationEngine {
   private projectPath: string;
   private codeQualityChecker: CodeQualityChecker;

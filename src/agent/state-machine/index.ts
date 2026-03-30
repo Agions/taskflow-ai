@@ -13,7 +13,6 @@ import { createAgentMachine } from './machine';
 import { MachineContext } from './types';
 const logger = getLogger('agent/state-machine/index');
 
-
 export * from './types';
 export * from './machine';
 
