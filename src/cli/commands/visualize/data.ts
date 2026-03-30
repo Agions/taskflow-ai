@@ -1,3 +1,6 @@
+import { getLogger } from '../../../utils/logger';
+const logger = getLogger('cli/commands/visualize/data');
+
 /**
  * 数据加载器
  */
@@ -30,7 +33,7 @@ export async function loadProjectData(files: string[]): Promise<{ tasks: unknown
       }
       Object.assign(allData.metadata, data.metadata);
     } catch (error) {
-      console.warn(`Failed to load data file: ${file}`);
+      logger.warn(`Failed to load data file: ${file}`);
     }
   }
 

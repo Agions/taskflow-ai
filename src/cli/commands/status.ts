@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * Status命令 - 查看项目状态
  */
@@ -7,6 +8,8 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { ConfigManager } from '../../core/config';
 import { CLI_SYMBOLS } from '../../constants';
+const logger = getLogger('cli/commands/status');
+
 
 export function statusCommand(program: Command) {
   program
@@ -18,7 +21,7 @@ export function statusCommand(program: Command) {
       try {
         await runStatus(options);
       } catch (error) {
-        console.error(chalk.red('获取状态失败:'), error);
+        logger.error(chalk.red('获取状态失败:'), error);
         process.exit(1);
       }
     });

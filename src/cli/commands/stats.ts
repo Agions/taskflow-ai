@@ -1,9 +1,12 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 统计命令 - 显示项目统计信息
  */
 
 import chalk from 'chalk';
 import { execSync } from 'child_process';
+const logger = getLogger('cli/commands/stats');
+
 import fs from 'fs';
 import path from 'path';
 
@@ -25,7 +28,7 @@ export const statsCommand = {
         printStats(stats);
       }
     } catch (error) {
-      console.error(chalk.red('获取统计信息失败:'), error);
+      logger.error(chalk.red('获取统计信息失败:'), error);
     }
   },
 };

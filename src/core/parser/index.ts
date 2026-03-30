@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * PRD解析器
  */
@@ -13,6 +14,8 @@ import { PRDDocument, PRDSection, TaskFlowConfig } from '../../types';
 import { SUPPORTED_PRD_FORMATS } from '../../constants';
 import { createTaskFlowError } from '../../utils/errors';
 import { Logger } from '../../utils/logger';
+const logger = getLogger('core/parser/index');
+
 
 export class PRDParser {
   private logger: Logger;

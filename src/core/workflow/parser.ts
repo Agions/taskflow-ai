@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 工作流解析器
  * 支持 YAML 和 JSON 格式
@@ -87,3 +88,5 @@ export { parseYAML } from './yaml-parser';
 export { convertStep, resolveDependencies, hasCycle } from './step-converter';
 export { validateWorkflow, validateStepId, validateDependencies } from './validator';
 export { toJSON, toYAML, toObject } from './exporter';
+const logger = getLogger('core/workflow/parser');
+

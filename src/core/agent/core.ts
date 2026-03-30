@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * Agent 核心实现
  * 自主任务执行、反思、多 Agent 协作
@@ -15,6 +16,8 @@ import {
 } from './types';
 import { Logger } from '../../utils/logger';
 import { toolRegistry } from '../../mcp/tools/registry';
+const logger = getLogger('core/agent/core');
+
 
 /**
  * Agent 核心类

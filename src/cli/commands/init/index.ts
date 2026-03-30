@@ -1,3 +1,4 @@
+import { getLogger } from '../../../utils/logger';
 /**
  * Init命令 - 初始化TaskFlow项目
  */
@@ -5,6 +6,8 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { runInit } from './runner';
+const logger = getLogger('cli/commands/init/index');
+
 
 export function initCommand(program: Command) {
   program
@@ -17,7 +20,7 @@ export function initCommand(program: Command) {
       try {
         await runInit(options);
       } catch (error) {
-        console.error(chalk.red('初始化失败:'), error);
+        logger.error(chalk.red('初始化失败:'), error);
         process.exit(1);
       }
     });

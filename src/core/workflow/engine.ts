@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 工作流引擎控制器
  * 负责管理工作流的执行流程
@@ -6,6 +7,8 @@
 import { Workflow, WorkflowExecution, WorkflowStep, StepStatus, ExecutionResult } from './types';
 import { createExecutor, ExecutionContext } from './executor';
 import { Logger } from '../../utils/logger';
+const logger = getLogger('core/workflow/engine');
+
 
 export type ExecutionMode = 'sequential' | 'parallel';
 

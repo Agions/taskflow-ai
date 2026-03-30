@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * SQLite 存储后端
  */
@@ -5,6 +6,8 @@
 import { WorkflowExecution } from './types';
 import { StorageBackend } from './storage-types';
 import { Logger } from '../../utils/logger';
+const logger = getLogger('core/workflow/sqlite-storage');
+
 
 export class SQLiteStorage implements StorageBackend {
   private logger = Logger.getInstance('SQLiteStorage');

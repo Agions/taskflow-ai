@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * MCP命令 - Model Context Protocol 服务器管理
  */
@@ -7,6 +8,8 @@ import chalk from 'chalk';
 import { MCPServer } from '../../mcp/server';
 import { ConfigManager } from '../../core/config';
 import { generateAllConfigs, exportConfig } from '../../mcp/config/generator';
+const logger = getLogger('cli/commands/mcp');
+
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
@@ -22,7 +25,7 @@ export function mcpCommand(program: Command) {
       try {
         await startMCPServer(options);
       } catch (error) {
-        console.error(chalk.red('启动MCP服务器失败:'), error);
+        logger.error(chalk.red('启动MCP服务器失败:'), error);
         process.exit(1);
       }
     });
@@ -63,7 +66,7 @@ export function mcpCommand(program: Command) {
       try {
         await generateEditorConfig(options);
       } catch (error) {
-        console.error(chalk.red('生成配置失败:'), error);
+        logger.error(chalk.red('生成配置失败:'), error);
         process.exit(1);
       }
     });
@@ -77,7 +80,7 @@ export function mcpCommand(program: Command) {
       try {
         await listTools(options);
       } catch (error) {
-        console.error(chalk.red('获取工具列表失败:'), error);
+        logger.error(chalk.red('获取工具列表失败:'), error);
         process.exit(1);
       }
     });
@@ -89,7 +92,7 @@ async function startMCPServer(_options: unknown) {
     const config = await configManager.loadConfig();
 
     if (!config) {
-      console.error(chalk.red('未找到配置文件，请先运行 "taskflow init"'));
+      logger.error(chalk.red('未找到配置文件，请先运行 "taskflow init"'));
       process.exit(1);
     }
 
@@ -101,7 +104,7 @@ async function startMCPServer(_options: unknown) {
     const mcpServer = new MCPServer(mcpSettings, config);
     await mcpServer.start();
   } catch (error) {
-    console.error(chalk.red('启动失败:'), error);
+    logger.error(chalk.red('启动失败:'), error);
     throw error;
   }
 }

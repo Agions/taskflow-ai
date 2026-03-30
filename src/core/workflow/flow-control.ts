@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 高级流程控制执行器
  * 包含条件分支、并行执行、循环执行
@@ -6,6 +7,8 @@
 import { WorkflowStep, StepStatus } from './types';
 import { ExecutionContext, createExecutor } from './executor';
 import { Logger } from '../../utils/logger';
+const logger = getLogger('core/workflow/flow-control');
+
 
 export interface ParallelResult {
   success: boolean;

@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 步骤执行器
  * 负责执行工作流中的单个步骤
@@ -6,6 +7,8 @@
 import { WorkflowStep, StepConfig, StepStatus } from './types';
 import { Logger } from '../../utils/logger';
 import { toolRegistry } from '../../mcp/tools/registry';
+const logger = getLogger('core/workflow/executor');
+
 
 export interface ExecutionContext {
   /** 工作流变量 */

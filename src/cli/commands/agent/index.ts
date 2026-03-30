@@ -1,3 +1,4 @@
+import { getLogger } from '../../../utils/logger';
 /**
  * Agent CLI 命令
  * AI Agent 自主执行模式
@@ -8,6 +9,8 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { parsePRD } from './prd-parser';
 import { runAgent } from './runner';
+const logger = getLogger('cli/commands/agent/index');
+
 
 export * from './mock-ai';
 export * from './prd-parser';
@@ -54,7 +57,7 @@ export const agentCommand = new Command('agent')
       });
     } catch (error) {
       spinner.fail('Agent execution failed');
-      console.error(error);
+      logger.error(error);
       process.exit(1);
     }
   });

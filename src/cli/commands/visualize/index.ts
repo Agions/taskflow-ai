@@ -1,3 +1,4 @@
+import { getLogger } from '../../../utils/logger';
 /**
  * Visualize命令 - 生成项目可视化报告
  */
@@ -10,6 +11,8 @@ import { generateCharts } from './charts';
 import { generateReport } from './report';
 import { findDataFiles, loadProjectData, showVisualizationStats } from './data';
 import { getVisualizationOptions } from './prompts';
+const logger = getLogger('cli/commands/visualize/index');
+
 
 export function visualizeCommand(program: Command) {
   program
@@ -23,7 +26,7 @@ export function visualizeCommand(program: Command) {
       try {
         await runVisualize(options);
       } catch (error) {
-        console.error(chalk.red('可视化生成失败:'), error);
+        logger.error(chalk.red('可视化生成失败:'), error);
         process.exit(1);
       }
     });

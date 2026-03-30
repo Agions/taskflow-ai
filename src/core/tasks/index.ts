@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 任务生成器
  */
@@ -5,6 +6,8 @@
 import { PRDDocument, Task, TaskFlowConfig } from '../../types';
 import { TASK_TYPES, TASK_STATUSES, PRIORITY_LEVELS } from '../../constants';
 import { Logger } from '../../utils/logger';
+const logger = getLogger('core/tasks/index');
+
 
 export class TaskGenerator {
   private logger: Logger;

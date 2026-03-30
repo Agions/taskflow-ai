@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * 插件加载器
  * 负责插件的发现、加载、卸载
@@ -7,6 +8,8 @@ import path from 'path';
 import fs from 'fs-extra';
 import { Logger } from '../../utils/logger';
 import { Plugin, PluginContext, PluginHooks } from './types';
+const logger = getLogger('core/plugin/manager');
+
 
 export interface PluginLoadResult {
   success: boolean;

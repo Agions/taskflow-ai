@@ -1,9 +1,12 @@
+import { getLogger } from '../utils/logger';
 /**
  * 通用错误处理工具
  * 提供统一的错误处理模式和辅助函数
  */
 
 import { Logger } from './logger';
+const logger = getLogger('utils/error-handler');
+
 
 /**
  * 异步操作错误处理包装器

@@ -1,3 +1,4 @@
+import { getLogger } from '../../utils/logger';
 /**
  * Parse命令 - 解析PRD文档 (简化版本)
  */
@@ -10,6 +11,8 @@ import fs from 'fs-extra';
 import { PRDParser } from '../../core/parser';
 import { TaskGenerator } from '../../core/tasks';
 import { ConfigManager } from '../../core/config';
+const logger = getLogger('cli/commands/parse');
+
 
 export function parseCommand(program: Command) {
   program
@@ -22,7 +25,7 @@ export function parseCommand(program: Command) {
       try {
         await runParse(file, options);
       } catch (error) {
-        console.error(chalk.red('解析失败:'), error);
+        logger.error(chalk.red('解析失败:'), error);
         process.exit(1);
       }
     });

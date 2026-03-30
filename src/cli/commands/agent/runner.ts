@@ -1,3 +1,4 @@
+import { getLogger } from '../../../utils/logger';
 /**
  * Agent 运行器
  */
@@ -12,6 +13,8 @@ import { VerificationEngine } from '../../../agent/verification/engine';
 import { MCPServer } from '../../../mcp/server';
 import { ConfigManager } from '../../../core/config';
 import { MockAIService } from './mock-ai';
+const logger = getLogger('cli/commands/agent/runner');
+
 import * as path from 'path';
 
 export interface RunOptions {
@@ -101,7 +104,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
     }
   } catch (error) {
     spinner.fail('Agent execution failed');
-    console.error(chalk.red(error));
+    logger.error(chalk.red(error));
     process.exit(1);
   }
 }
