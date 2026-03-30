@@ -1,26 +1,58 @@
-import { getLogger } from '../../utils/logger';
-const logger = getLogger('mcp/security/sandbox');
+/**
+ * 沙箱管理
+ */
 
+import { SecuritySettings } from './types';
+import { Logger } from '../../utils/logger';
+
+/**
+ * 沙箱管理器
+ */
+export class SandboxManager {
+  private logger: Logger;
+
+  constructor(
+    private settings: SecuritySettings['sandbox'],
+    logger?: Logger
+  ) {
+    this.logger = logger || Logger.getInstance('SandboxManager');
+  }
+
+  /**
+   * 创建沙箱
+   */
+  createSandbox(): any {
+    if (!this.settings.enabled) {
+      return null;
+    }
+
+    return {
+      timeout: this.settings.timeout,
+      memoryLimit: this.settings.memoryLimit,
+      allowedModules: ['fs', 'path', 'util'],
+      blockedModules: ['child_process', 'cluster', 'net', 'dgram'],
+      executeInContext: (code: string, context: any) => this.executeInContext(code, context),
+    };
   }
 
   /**
    * 在沙箱上下文中执行代码
    */
-  private executeInContext(code: string, context: unknown): unknown {
+  private executeInContext(code: string, context: any): any {
     try {
       const vm = require('vm');
       const sandbox = {
         ...context,
         console: {
-          log: (...args: unknown[]) => this.logger.debug('Sandbox:', ...args),
+          log: (...args: any[]) => this.logger.debug('Sandbox:', ...args),
         },
       };
 
       return vm.runInNewContext(code, sandbox, {
         timeout: this.settings.timeout,
       });
-    } catch (error: unknown) {
-      throw new Error(`沙箱执行失败: ${error instanceof Error ? error.message : String(error)}`);
+    } catch (error: any) {
+      throw new Error(`沙箱执行失败: ${error.message}`);
     }
   }
 

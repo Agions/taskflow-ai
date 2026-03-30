@@ -113,7 +113,7 @@ export class MCPServer {
     try {
       const result = await this.toolExecutor.execute(name, args);
       return { success: true, data: result };
-    } catch (error: unknown, {
+    } catch (error: unknown) {
       return { success: false, error: error.message };
     }
   }

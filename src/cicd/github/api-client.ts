@@ -33,7 +33,7 @@ export class GitHubApiClient {
   }
 
   async getWorkflowRuns(workflowId: string, branch?: string): Promise<unknown[]> {
-    const params: unknown; = {};
+    const params: unknown = {};
     if (branch) {
       params.branch = branch;
     }

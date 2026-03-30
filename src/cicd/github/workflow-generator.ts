@@ -6,7 +6,7 @@ import { GitHubActionsConfig, WorkflowTemplate } from '../types';
 
 export class GitHubWorkflowGenerator {
   generate(config: GitHubActionsConfig): string {
-    const workflow: unknown; = {
+    const workflow: unknown = {
       name: config.name,
       on: this.generateTriggers(config.triggers),
       permissions: this.generatePermissions(config.permissions),
@@ -32,7 +32,7 @@ export class GitHubWorkflowGenerator {
   }
 
   private generateTriggers(triggers: unknown): unknown {
-    const result: unknown; = {};
+    const result: unknown = {};
 
     for (const trigger of triggers) {
       if (trigger.type === 'push') {
@@ -69,7 +69,7 @@ export class GitHubWorkflowGenerator {
   }
 
   private generateJob(stage: unknown, config: GitHubActionsConfig): unknown {
-    const job: unknown; = {
+    const job: unknown = {
       name: stage.name,
       'runs-on': stage.runsOn || 'ubuntu-latest',
       steps: [],
@@ -91,7 +91,7 @@ export class GitHubWorkflowGenerator {
   }
 
   private generateStep(step: unknown, config: GitHubActionsConfig): unknown {
-    const stepConfig: unknown; = {};
+    const stepConfig: unknown = {};
 
     if (step.name) {
       stepConfig.name = step.name;

@@ -20,10 +20,7 @@ export default defineConfig({
   assetsDir: 'assets',
   cacheDir: '.vitepress/cache',
 
-  // 主题配置
-  themeConfig,
-
-  // 导航和侧边栏
+  // 主题配置（合并 nav、sidebar）
   themeConfig: {
     ...themeConfig,
     nav,

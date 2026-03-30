@@ -55,7 +55,7 @@ export class SecurityManager {
   /**
    * 验证请求
    */
-  async validateRequest(request: unknown,: Promise<SecurityContext> {
+  async validateRequest(request: unknown): Promise<SecurityContext> {
     const context: SecurityContext = {
       permissions: [],
       timestamp: Date.now(),
@@ -178,7 +178,7 @@ export class SecurityManager {
   /**
    * 记录安全事件
    */
-  logSecurityEvent(event: string, details: unknown,: void {
+  logSecurityEvent(event: string, details: unknown): void {
     this.logger.warn(`安全事件: ${event}`, details);
   }
 
