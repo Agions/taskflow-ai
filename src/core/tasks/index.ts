@@ -49,7 +49,7 @@ export class TaskGenerator {
   /**
    * 为章节生成任务
    */
-  private async generateTasksForSection(section: unknown, startOrder: number): Promise<Task[]> {
+  private async generateTasksForSection(section: any, startOrder: number): Promise<Task[]> {
     const tasks: Task[] = [];
     const baseId = `task-${Date.now()}-${startOrder}`;
 
@@ -74,7 +74,7 @@ export class TaskGenerator {
   /**
    * 生成功能性任务
    */
-  private generateFunctionalTasks(section: unknown, baseId: string): Task[] {
+  private generateFunctionalTasks(section: any, baseId: string): Task[] {
     const tasks: Task[] = [];
 
     tasks.push({
@@ -117,7 +117,7 @@ export class TaskGenerator {
   /**
    * 生成技术性任务
    */
-  private generateTechnicalTasks(section: unknown, baseId: string): Task[] {
+  private generateTechnicalTasks(section: any, baseId: string): Task[] {
     return [
       {
         id: `${baseId}-architecture`,
@@ -141,7 +141,7 @@ export class TaskGenerator {
   /**
    * 生成UI任务
    */
-  private generateUITasks(section: unknown, baseId: string): Task[] {
+  private generateUITasks(section: any, baseId: string): Task[] {
     return [
       {
         id: `${baseId}-design`,
@@ -165,7 +165,7 @@ export class TaskGenerator {
   /**
    * 生成通用任务
    */
-  private generateGenericTask(section: unknown, baseId: string): Task {
+  private generateGenericTask(section: any, baseId: string): Task {
     return {
       id: baseId,
       title: `实现${section.title}`,

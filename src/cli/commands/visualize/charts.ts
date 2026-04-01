@@ -9,11 +9,11 @@ export interface ChartData {
   config: Record<string, any>;
 }
 
-export function generateGanttChart(data: unknown, options: unknown): ChartData {
+export function generateGanttChart(data: any, options: any): ChartData {
   return {
     type: 'gantt',
     title: '项目甘特图',
-    data: data.tasks.map((task: unknown) => ({
+    data: data.tasks.map((task: any) => ({
       id: task.id,
       name: task.title,
       start: new Date().toISOString().split('T')[0],
@@ -32,8 +32,8 @@ export function generateGanttChart(data: unknown, options: unknown): ChartData {
   };
 }
 
-export function generatePieChart(data: unknown, options: unknown): ChartData {
-  const taskTypes = data.tasks.reduce((acc: unknown, task: unknown) => {
+export function generatePieChart(data: any, options: any): ChartData {
+  const taskTypes = data.tasks.reduce((acc: any, task: any) => {
     acc[task.type] = (acc[task.type] || 0) + 1;
     return acc;
   }, {});
@@ -54,8 +54,8 @@ export function generatePieChart(data: unknown, options: unknown): ChartData {
   };
 }
 
-export function generateBarChart(data: unknown, options: unknown): ChartData {
-  const workloadByType = data.tasks.reduce((acc: unknown, task: unknown) => {
+export function generateBarChart(data: any, options: any): ChartData {
+  const workloadByType = data.tasks.reduce((acc: any, task: any) => {
     acc[task.type] = (acc[task.type] || 0) + (task.estimatedHours || 0);
     return acc;
   }, {});
@@ -76,11 +76,11 @@ export function generateBarChart(data: unknown, options: unknown): ChartData {
   };
 }
 
-export function generateTimelineChart(data: unknown, options: unknown): ChartData {
+export function generateTimelineChart(data: any, options: any): ChartData {
   return {
     type: 'timeline',
     title: '项目时间线',
-    data: data.tasks.map((task: unknown) => ({
+    data: data.tasks.map((task: any) => ({
       name: task.title,
       start: new Date().toISOString(),
       end: new Date(Date.now() + (task.estimatedHours || 8) * 60 * 60 * 1000).toISOString(),
@@ -95,11 +95,11 @@ export function generateTimelineChart(data: unknown, options: unknown): ChartDat
   };
 }
 
-export function generateKanbanChart(data: unknown, options: unknown): ChartData {
+export function generateKanbanChart(data: any, options: any): ChartData {
   const columns = ['todo', 'in-progress', 'review', 'done'];
   const kanbanData = columns.map(status => ({
     name: status,
-    tasks: data.tasks.filter((task: unknown) => task.status === status),
+    tasks: data.tasks.filter((task: any) => task.status === status),
   }));
 
   return {
@@ -114,7 +114,7 @@ export function generateKanbanChart(data: unknown, options: unknown): ChartData 
   };
 }
 
-export function generateCharts(data: unknown, options: unknown): ChartData[] {
+export function generateCharts(data: any, options: any): ChartData[] {
   const charts: ChartData[] = [];
 
   switch (options.type) {

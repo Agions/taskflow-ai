@@ -51,7 +51,7 @@ async function main() {
       version: '2.0.0',
     };
 
-    const mcpServer = new MCPServer(mcpSettings, effectiveConfig);
+    const mcpServer = new MCPServer(mcpSettings, effectiveConfig as any);
     await mcpServer.start();
   } catch (error) {
     logger.error('MCP Server Error:', error);

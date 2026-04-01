@@ -86,7 +86,7 @@ program
       capabilities: ['chat'],
     };
 
-    const existingIndex = config.aiModels?.findIndex((m: unknown) => m.id === newModel.id);
+    const existingIndex = config.aiModels?.findIndex((m: any) => m.id === newModel.id);
     if (existingIndex !== undefined && existingIndex >= 0) {
       config.aiModels![existingIndex] = newModel as any;
       console.log(chalk.yellow(`更新现有模型: ${newModel.id}`));
@@ -116,7 +116,7 @@ program
       return;
     }
 
-    const index = config.aiModels.findIndex((m: unknown) => m.id === options.id);
+    const index = config.aiModels.findIndex((m: any) => m.id === options.id);
     if (index < 0) {
       console.log(chalk.yellow(`未找到模型: ${options.id}`));
       return;
@@ -139,7 +139,7 @@ program
   .requiredOption('-i, --id <id>', '模型 ID')
   .action(async options => {
     const config = await loadConfig();
-    const model = config?.aiModels?.find((m: unknown) => m.id === options.id);
+    const model = config?.aiModels?.find((m: any) => m.id === options.id);
 
     if (!model) {
       console.log(chalk.red(`未找到模型: ${options.id}`));
@@ -159,7 +159,7 @@ program
   .requiredOption('-i, --id <id>', '模型 ID')
   .action(async options => {
     const config = await loadConfig();
-    const model = config?.aiModels?.find((m: unknown) => m.id === options.id);
+    const model = config?.aiModels?.find((m: any) => m.id === options.id);
 
     if (!model) {
       console.log(chalk.red(`未找到模型: ${options.id}`));
@@ -238,7 +238,7 @@ program
 
     console.log(chalk.bold('\n📊 路由策略基准测试:\n'));
 
-    for (const strategy of strategies) {
+    for (const strategy of [...strategies] as any[]) {
       try {
         const result = await gw.complete({
           messages: [{ role: 'user', content: message }],

@@ -32,7 +32,7 @@ export function visualizeCommand(program: Command) {
     });
 }
 
-async function runVisualize(options: unknown) {
+async function runVisualize(options: any) {
   const spinner = ora('正在生成可视化报告...').start();
 
   try {

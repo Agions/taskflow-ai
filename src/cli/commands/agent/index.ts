@@ -25,7 +25,7 @@ export const agentCommand = new Command('agent')
   .option('--timeout <ms>', 'Task timeout in milliseconds', '30000')
   .option('--dry-run', 'Simulate execution without making changes')
   .option('--continue-on-error', 'Continue execution even if tasks fail')
-  .action(async options => {
+  .action(async (options: any) => {
     const ora = (await import('ora')).default;
     const spinner = ora('Initializing AI Agent...').start();
 
@@ -48,16 +48,16 @@ export const agentCommand = new Command('agent')
 
       await runAgent({
         prd,
-        mode: options.mode,
-        maxIterations: parseInt(options.maxIterations),
-        timeout: parseInt(options.timeout),
+        mode: options.mode as 'assisted' | 'autonomous' | 'supervised',
+        maxIterations: parseInt(options.maxIterations as string),
+        timeout: parseInt(options.timeout as string),
         continueOnError: options.continueOnError || false,
         dryRun: options.dryRun || false,
-        constraints: options.constraint || [],
+        constraints: (options.constraint as string[] | undefined) || [],
       });
     } catch (error) {
       spinner.fail('Agent execution failed');
-      logger.error(error);
+      logger.error(error instanceof Error ? error.message : String(error));
       process.exit(1);
     }
   });

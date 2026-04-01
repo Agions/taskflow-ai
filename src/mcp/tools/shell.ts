@@ -65,7 +65,7 @@ export const shellTools: ToolDefinition[] = [
           cwd,
           duration: Date.now() - startTime,
         };
-      } catch (error: unknown) {
+      } catch (error: any) {
         const err = error as { stdout?: string; stderr?: string; status?: number };
         let errorMessage: string;
         if (error instanceof Error) {
@@ -204,7 +204,7 @@ export const shellTools: ToolDefinition[] = [
       try {
         process.kill(pid, signal);
         return { success: true, pid, signal };
-      } catch (error: unknown) {
+      } catch (error: any) {
         // ESRCH 表示进程不存在，EPERM 表示权限不足（这是我们想要的）
         if (error.code === 'EPERM') {
           return { success: false, error: '权限不足，无法终止该进程', pid };

@@ -26,7 +26,7 @@ export class PromptLoader {
       const files = await fs.readdir(this.promptsDir);
       const promptFiles = files.filter(f => f.endsWith('.json'));
 
-      for (const file of promptFiles) {
+      for (const file of promptFiles as any[]) {
         try {
           const content = await fs.readJson(path.join(this.promptsDir, file));
           if (this.validatePrompt(content)) {
@@ -63,7 +63,7 @@ export class PromptLoader {
   /**
    * 验证提示格式
    */
-  private validatePrompt(prompt: unknown): prompt is MCPPrompt {
+  private validatePrompt(prompt: any): prompt is MCPPrompt {
     return (
       prompt &&
       typeof prompt.name === 'string' &&

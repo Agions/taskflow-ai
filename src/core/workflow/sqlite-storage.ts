@@ -11,7 +11,7 @@ const logger = getLogger('core/workflow/sqlite-storage');
 
 export class SQLiteStorage implements StorageBackend {
   private logger = Logger.getInstance('SQLiteStorage');
-  private db: unknown = null;
+  private db: any = null;
   private initialized = false;
 
   constructor(private dbPath: string = './taskflow.db') {}
@@ -64,7 +64,7 @@ export class SQLiteStorage implements StorageBackend {
     }
   }
 
-  async saveWorkflow(workflow: unknown): Promise<void> {
+  async saveWorkflow(workflow: any): Promise<void> {
     await this.initialize();
     const stmt = this.db.prepare(`
       INSERT OR REPLACE INTO workflows (id, name, version, description, definition, created_at, updated_at)
@@ -156,7 +156,7 @@ export class SQLiteStorage implements StorageBackend {
     stmt.run(id);
   }
 
-  private rowToExecution(row: unknown): WorkflowExecution {
+  private rowToExecution(row: any): WorkflowExecution {
     return {
       id: row.id,
       workflowId: row.workflow_id,

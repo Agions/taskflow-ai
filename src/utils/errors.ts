@@ -26,7 +26,7 @@ export function createTaskFlowError(
 /**
  * 检查是否为TaskFlow错误
  */
-export function isTaskFlowError(error: unknown): error is TaskFlowError {
+export function isTaskFlowError(error: any): error is TaskFlowError {
   return error && error.name === 'TaskFlowError';
 }
 
@@ -95,7 +95,7 @@ export async function safeExecute<T>(
  * 验证必需参数
  */
 export function validateRequired(params: Record<string, any>, required: string[]): void {
-  for (const field of required) {
+  for (const field of required as any[]) {
     if (!params[field]) {
       throw createTaskFlowError(
         'validation',

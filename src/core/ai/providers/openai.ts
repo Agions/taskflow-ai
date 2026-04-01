@@ -102,7 +102,7 @@ export class OpenAIAdapter extends BaseAdapter {
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
 
-      for (const line of lines) {
+      for (const line of lines as any[]) {
         const trimmed = line.trim();
         if (!trimmed || !trimmed.startsWith('data: ')) continue;
 
@@ -112,7 +112,7 @@ export class OpenAIAdapter extends BaseAdapter {
           const data = JSON.parse(trimmed.slice(6));
           yield {
             id: data.id,
-            choices: data.choices.map((choice: unknown) => ({
+            choices: data.choices.map((choice: any) => ({
               index: choice.index,
               delta: choice.delta,
               finish_reason: choice.finish_reason,

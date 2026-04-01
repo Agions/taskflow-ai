@@ -9,7 +9,7 @@ import { RoutingRule } from './router-types';
  */
 export const DEFAULT_ROUTING_RULES: RoutingRule[] = [
   {
-    match: (ctx, msgs) => {
+    match: (ctx: any, msgs: any[]) => {
       const lastMsg = msgs[msgs.length - 1]?.content?.toLowerCase() || '';
       return (
         ctx.taskType === 'code' ||
@@ -42,7 +42,7 @@ export const DEFAULT_ROUTING_RULES: RoutingRule[] = [
     weight: 0.7,
   },
   {
-    match: ctx => ctx.urgent,
+    match: (ctx: any) => ctx.urgent,
     prefer: ['gpt-4o-mini', 'glm-4-flash', 'qwen-turbo'],
     weight: 0.8,
   },

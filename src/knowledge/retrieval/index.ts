@@ -108,7 +108,7 @@ export class KnowledgeRetrievalEngine {
 
     const files = await this.scanner.scan(dirPath, includePatterns, excludePatterns);
 
-    for (const file of files) {
+    for (const file of files as any[]) {
       try {
         const doc = await this.loadDocument(file);
         await this.indexDocument(doc);
@@ -130,14 +130,14 @@ export class KnowledgeRetrievalEngine {
     const documentTypes: Record<string, number> = {};
     const tags: string[] = [];
 
-    for (const chunk of chunks) {
+    for (const chunk of chunks as any[]) {
       const type = chunk.metadata.type || 'other';
       documentTypes[type] = (documentTypes[type] || 0) + 1;
       tags.push(...(chunk.metadata.tags || []));
     }
 
     const tagCounts = new Map<string, number>();
-    for (const tag of tags) {
+    for (const tag of tags as any[]) {
       tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
     }
 
@@ -176,13 +176,13 @@ export class KnowledgeRetrievalEngine {
     };
   }
 
-  private generateSummary(chunks: unknown[]): string {
+  private generateSummary(chunks: any[]): string {
     if (chunks.length === 0) return 'No relevant information found.';
-    const contents = chunks.map(c => c.chunk.content);
+    const contents = chunks.map((c: any) => c.chunk.content);
     return contents.slice(0, 3).join(' ').slice(0, 500) + '...';
   }
 
-  private generateSuggestions(chunks: unknown[], query: string): string[] {
+  private generateSuggestions(chunks: any[], query: string): string[] {
     const suggestions: string[] = [];
     const keywords = query.toLowerCase().split(' ');
 

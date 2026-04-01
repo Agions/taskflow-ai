@@ -25,7 +25,7 @@ async function sendSlackWebhook(
     }
 
     return { success: true };
-  } catch (error: unknown) {
+  } catch (error: any) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
@@ -48,7 +48,7 @@ async function sendDiscordWebhook(
     }
 
     return { success: true };
-  } catch (error: unknown) {
+  } catch (error: any) {
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 }
@@ -74,7 +74,7 @@ export const notificationTools: ToolDefinition[] = [
       const message = input.message as string;
       const blocks = input.blocks as unknown[] | undefined;
 
-      const payload = { text: message };
+      const payload: any = { text: message };
       if (blocks) payload.blocks = blocks;
 
       return sendSlackWebhook(webhookUrl, payload);
@@ -107,7 +107,7 @@ export const notificationTools: ToolDefinition[] = [
       const username = input.username as string | undefined;
       const avatarUrl = input.avatarUrl as string | undefined;
 
-      const payload = { content: message };
+      const payload: any = { content: message };
       if (embeds) payload.embeds = embeds;
       if (username) payload.username = username;
       if (avatarUrl) payload.avatar_url = avatarUrl;
@@ -203,7 +203,7 @@ export const notificationTools: ToolDefinition[] = [
           statusText: response.statusText,
           response: responseText,
         };
-      } catch (error: unknown) {
+      } catch (error: any) {
         return {
           success: false,
           error: error instanceof Error ? error.message : String(error),

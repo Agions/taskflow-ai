@@ -24,7 +24,7 @@ export class MCPToolExecutor {
   async execute(name: string, args: Record<string, unknown>): Promise<unknown> {
     switch (name) {
       case 'terminal_execute':
-        return this.executeTerminal(args as TerminalArgs);
+        return this.executeTerminal(args as any);
       case 'project_analyze':
         return this.executeProjectAnalyze(args as ProjectAnalyzeArgs);
       case 'task_create':
@@ -70,7 +70,7 @@ export class MCPToolExecutor {
         maxBuffer: 1024 * 1024,
       });
       return { output: result, command };
-    } catch (error: unknown) {
+    } catch (error: any) {
       const err = error as { message?: string };
       throw new Error(`Command failed: ${err.message || String(error)}`);
     }
@@ -79,11 +79,11 @@ export class MCPToolExecutor {
   private async executeProjectAnalyze(args: ProjectAnalyzeArgs): Promise<unknown> {
     const { path: projectPath = process.cwd(), depth = 3 } = args;
 
-    const analysis: Record<string, unknown> = {
+    const analysis: any = {
       path: projectPath,
       files: 0,
       directories: 0,
-      languages: {} as Record<string, number>,
+      languages: {},
       structure: [],
     };
 
@@ -91,9 +91,9 @@ export class MCPToolExecutor {
       if (currentDepth > depth) return [];
 
       const items = await fs.readdir(dirPath, { withFileTypes: true });
-      const results: unknown[] = [];
+      const results: any[] = [];
 
-      for (const item of items) {
+      for (const item of items as any[]) {
         const fullPath = path.join(dirPath, item.name);
         if (item.isDirectory()) {
           analysis.directories++;
@@ -116,7 +116,7 @@ export class MCPToolExecutor {
     return analysis;
   }
 
-  private executeTaskCreate(args: unknown): { id: string; status: string } {
+  private executeTaskCreate(args: any): { id: string; status: string } {
     return { id: 'task-' + Date.now(), status: 'created' };
   }
 }

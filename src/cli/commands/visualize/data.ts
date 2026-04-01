@@ -25,7 +25,7 @@ export async function loadProjectData(files: string[]): Promise<{ tasks: unknown
     metadata: {},
   };
 
-  for (const file of files) {
+  for (const file of files as any[]) {
     try {
       const data = await fs.readJson(file);
       if (data.tasks) {
@@ -40,7 +40,7 @@ export async function loadProjectData(files: string[]): Promise<{ tasks: unknown
   return allData;
 }
 
-export function showVisualizationStats(data: unknown): void {
+export function showVisualizationStats(data: any): void {
   const stats = {
     totalTasks: data.tasks.length,
     byType: {} as Record<string, number>,

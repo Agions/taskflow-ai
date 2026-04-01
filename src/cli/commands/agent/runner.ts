@@ -32,7 +32,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
 
   try {
     const configManager = new ConfigManager(process.cwd());
-    const projectConfig = (await configManager.loadConfig()) || createDefaultConfig();
+    const projectConfig: any = (await configManager.loadConfig()) || createDefaultConfig();
 
     spinner.succeed(`PRD loaded: ${options.prd.title}`);
 
@@ -87,7 +87,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
 
     // Wait for completion
     await new Promise<void>(resolve => {
-      agent.onStateChange((state: unknown) => {
+      agent.onStateChange((state: any) => {
         if (state === 'completed' || state === 'failed') {
           resolve();
         }
@@ -109,7 +109,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
   }
 }
 
-function createDefaultConfig(): { projectName: string; version: string; aiModels: unknown[]; mcpSettings: Record<string, unknown> } {
+function createDefaultConfig(): any {
   return {
     projectName: 'Untitled Project',
     version: '1.0.0',

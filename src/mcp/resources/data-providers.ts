@@ -19,7 +19,7 @@ export class DataProviders {
         path.join(process.cwd(), '.taskflow'),
       ];
 
-      for (const dir of possiblePaths) {
+      for (const dir of possiblePaths as any[]) {
         if (await fs.pathExists(dir)) {
           const files = await fs.readdir(dir);
           const taskFiles = files.filter(f => f.includes('task') && f.endsWith('.json'));
@@ -73,7 +73,7 @@ export class DataProviders {
         const config = await fs.readJson(configPath);
         const safeConfig = { ...config };
         if (safeConfig.aiModels) {
-          safeConfig.aiModels = safeConfig.aiModels.map((model: unknown) => ({
+          safeConfig.aiModels = safeConfig.aiModels.map((model: any) => ({
             ...model,
             apiKey: model.apiKey ? '***' : undefined,
           }));
@@ -90,11 +90,11 @@ export class DataProviders {
 
   async getModelsData(): Promise<unknown> {
     try {
-      const configData = await this.getConfigData();
+      const configData: any = await this.getConfigData();
       return {
         models: configData.aiModels || [],
         totalModels: configData.aiModels?.length || 0,
-        enabledModels: configData.aiModels?.filter((m: unknown) => m.enabled).length || 0,
+        enabledModels: configData.aiModels?.filter((m: any) => m.enabled).length || 0,
       };
     } catch (error) {
       this.logger.warn('获取模型数据失败:', error);
@@ -125,12 +125,12 @@ export class DataProviders {
           byStatus: this.groupBy(tasks, 'status'),
           byType: this.groupBy(tasks, 'type'),
           byPriority: this.groupBy(tasks, 'priority'),
-          totalHours: tasks.reduce((sum: number, task: unknown) => sum + (task.estimatedHours || 0), 0),
+          totalHours: tasks.reduce((sum: number, task: any) => sum + (task.estimatedHours || 0), 0),
         },
         projects: {
           total: 1,
-          aiModelsConfigured: projects.aiModels || 0,
-          mcpEnabled: projects.mcpEnabled,
+          aiModelsConfigured: (projects as any).aiModels || 0,
+          mcpEnabled: (projects as any).mcpEnabled,
         },
         generatedAt: new Date().toISOString(),
       };
@@ -140,8 +140,8 @@ export class DataProviders {
     }
   }
 
-  private groupBy(array: unknown[], field: string): Record<string, number> {
-    return array.reduce((acc, item) => {
+  private groupBy(array: any[], field: string): Record<string, number> {
+    return array.reduce((acc: any, item: any) => {
       const key = item[field] || 'unknown';
       acc[key] = (acc[key] || 0) + 1;
       return acc;

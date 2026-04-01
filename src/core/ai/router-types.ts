@@ -49,7 +49,7 @@ export abstract class BaseRouter {
     preferredModel?: string
   ): Promise<RoutingResult>;
 
-  protected extractContext(messages: unknown[]): RoutingContext {
+  protected extractContext(messages: any[]): RoutingContext {
     const lastMessage = messages[messages.length - 1]?.content?.toLowerCase() || '';
 
     let taskType: RoutingContext['taskType'];
@@ -66,7 +66,7 @@ export abstract class BaseRouter {
       taskType = 'chat';
     }
 
-    const totalLength = messages.reduce((sum, m) => sum + (m.content?.length || 0), 0);
+    const totalLength: number = messages.reduce((sum: number, m: any) => sum + (m.content?.length || 0), 0);
     if (totalLength < 200) {
       complexity = 'low';
     } else if (totalLength > 2000) {

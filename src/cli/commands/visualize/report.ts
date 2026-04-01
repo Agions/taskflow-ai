@@ -5,7 +5,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 
-export async function generateReport(charts: unknown[], options: unknown): Promise<string> {
+export async function generateReport(charts: unknown[], options: any): Promise<string> {
   const outputDir = path.resolve(options.output);
   await fs.ensureDir(outputDir);
 
@@ -33,7 +33,7 @@ export async function generateReport(charts: unknown[], options: unknown): Promi
   return reportPath;
 }
 
-function generateHTMLReport(charts: unknown[], options: unknown): string {
+function generateHTMLReport(charts: unknown[], options: any): string {
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -48,7 +48,7 @@ function generateHTMLReport(charts: unknown[], options: unknown): string {
   <h1>TaskFlow 可视化报告</h1>
   ${charts
     .map(
-      chart => `
+      (chart: any) => `
     <div class="chart">
       <h2>${chart.title}</h2>
       <p>类型: ${chart.type}</p>
@@ -60,7 +60,7 @@ function generateHTMLReport(charts: unknown[], options: unknown): string {
 </html>`;
 }
 
-function generateSVGReport(charts: unknown[], options: unknown): string {
+function generateSVGReport(charts: any[], options: any): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">
   <text x="400" y="30" text-anchor="middle" font-size="20">TaskFlow Report</text>

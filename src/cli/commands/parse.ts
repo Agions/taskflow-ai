@@ -31,7 +31,7 @@ export function parseCommand(program: Command) {
     });
 }
 
-async function runParse(filePath: string, options: unknown) {
+async function runParse(filePath: string, options: any) {
   const spinner = ora('正在解析PRD文档...').start();
 
   try {
@@ -72,7 +72,7 @@ async function runParse(filePath: string, options: unknown) {
     console.log(
       chalk.gray('  预估工时: ') +
         chalk.white(
-          tasks.reduce((sum: number, task: unknown) => sum + task.estimatedHours, 0) + ' 小时'
+          tasks.reduce((sum: number, task: any) => sum + task.estimatedHours, 0) + ' 小时'
         )
     );
     console.log(chalk.gray('  输出文件: ') + chalk.blue(outputPath));
@@ -86,7 +86,7 @@ async function runParse(filePath: string, options: unknown) {
   }
 }
 
-async function saveResults(document: unknown, tasks: unknown[], options: unknown): Promise<string> {
+async function saveResults(document: any, tasks: unknown[], options: any): Promise<string> {
   const outputDir = path.resolve(options.output);
   await fs.ensureDir(outputDir);
 
@@ -98,7 +98,7 @@ async function saveResults(document: unknown, tasks: unknown[], options: unknown
     tasks,
     summary: {
       totalTasks: tasks.length,
-      totalHours: tasks.reduce((sum: number, task: unknown) => sum + task.estimatedHours, 0),
+      totalHours: tasks.reduce((sum: number, task: any) => sum + task.estimatedHours, 0),
       generatedAt: new Date().toISOString(),
     },
   };
@@ -118,7 +118,7 @@ async function saveResults(document: unknown, tasks: unknown[], options: unknown
   return outputPath;
 }
 
-function generateMarkdownReport(results: unknown): string {
+function generateMarkdownReport(results: any): string {
   const { document, tasks, summary } = results;
 
   return `# PRD解析报告
@@ -137,7 +137,7 @@ function generateMarkdownReport(results: unknown): string {
 
 ${tasks
   .map(
-    (task: unknown, index: number) => `
+    (task: any, index: number) => `
 ### ${index + 1}. ${task.title}
 
 - **类型**: ${task.type}

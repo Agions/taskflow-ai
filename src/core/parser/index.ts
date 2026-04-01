@@ -99,7 +99,7 @@ export class PRDParser {
   /**
    * 提取文档标题
    */
-  private extractTitle(tokens: unknown[]): string | null {
+  private extractTitle(tokens: any[]): string | null {
     for (const token of tokens) {
       if (token.type === 'heading_open' && token.tag === 'h1') {
         const nextToken = tokens[tokens.indexOf(token) + 1];
@@ -114,7 +114,7 @@ export class PRDParser {
   /**
    * 提取文档章节
    */
-  private extractSections(tokens: unknown[]): PRDSection[] {
+  private extractSections(tokens: any[]): PRDSection[] {
     const sections: PRDSection[] = [];
     let currentSection: Partial<PRDSection> | null = null;
     let sectionOrder = 0;
@@ -184,7 +184,7 @@ export class PRDParser {
   private estimateWorkHours(sections: PRDSection[]): number {
     let totalHours = 0;
 
-    for (const section of sections) {
+    for (const section of sections as any[]) {
       const wordCount = section.content.length;
       const complexity = wordCount > 1000 ? 'complex' : wordCount > 500 ? 'medium' : 'simple';
 

@@ -17,7 +17,7 @@ export * from './types';
 export * from './machine';
 
 export class AgentStateMachine {
-  private actor: unknown;
+  private actor: any;
   private stateChangeCallbacks: Array<(state: AgentState) => void> = [];
 
   constructor(
@@ -42,7 +42,7 @@ export class AgentStateMachine {
 
     this.actor = createActor(machine);
 
-    this.actor.subscribe((state: unknown) => {
+    this.actor.subscribe((state: any) => {
       this.stateChangeCallbacks.forEach(cb => cb(state.value as AgentState));
     });
   }
@@ -51,7 +51,7 @@ export class AgentStateMachine {
     this.actor.start();
   }
 
-  send(event: unknown): void {
+  send(event: any): void {
     this.actor.send(event);
   }
 

@@ -6,8 +6,8 @@ import { PipelineConfig, ValidationResult } from '../types';
 
 export class GitHubConfigValidator {
   async validate(config: PipelineConfig): Promise<ValidationResult> {
-    const errors: unknown[] = [];
-    const warnings: unknown[] = [];
+    const errors: any[] = [];
+    const warnings: any[] = [];
 
     this.validateTriggers(config, errors);
     this.validateStages(config, errors);

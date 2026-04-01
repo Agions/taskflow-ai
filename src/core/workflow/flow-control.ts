@@ -73,14 +73,14 @@ export class ConditionExecutor {
       }
 
       const comparisons = [
-        { op: '===', fn: (a: unknown, b: unknown) => a === b },
-        { op: '==', fn: (a: unknown, b: unknown) => a == b },
-        { op: '!==', fn: (a: unknown, b: unknown) => a !== b },
-        { op: '!=', fn: (a: unknown, b: unknown) => a != b },
-        { op: '>=', fn: (a: unknown, b: unknown) => a >= b },
-        { op: '<=', fn: (a: unknown, b: unknown) => a <= b },
-        { op: '>', fn: (a: unknown, b: unknown) => a > b },
-        { op: '<', fn: (a: unknown, b: unknown) => a < b },
+        { op: '===', fn: (a: any, b: any) => a === b },
+        { op: '==', fn: (a: any, b: any) => a == b },
+        { op: '!==', fn: (a: any, b: any) => a !== b },
+        { op: '!=', fn: (a: any, b: any) => a != b },
+        { op: '>=', fn: (a: any, b: any) => a >= b },
+        { op: '<=', fn: (a: any, b: any) => a <= b },
+        { op: '>', fn: (a: any, b: any) => a > b },
+        { op: '<', fn: (a: any, b: any) => a < b },
       ] as const;
 
       for (const { op, fn } of comparisons) {

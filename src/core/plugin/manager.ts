@@ -58,7 +58,7 @@ export class PluginManager {
     const entries = await fs.readdir(this.pluginDir);
     const pluginDirs = entries.filter(e => !e.startsWith('.'));
 
-    for (const dir of pluginDirs) {
+    for (const dir of pluginDirs as any[]) {
       await this.load(dir);
     }
 
@@ -151,7 +151,7 @@ export class PluginManager {
    */
   private async importPlugin(
     pluginId: string,
-    packageJson: unknown,
+    packageJson: any,
     mainPath: string
   ): Promise<Plugin> {
     const plugin: Plugin = {
@@ -182,7 +182,7 @@ export class PluginManager {
       'onCommand',
     ];
 
-    for (const name of hookNames) {
+    for (const name of hookNames as any[]) {
       if (plugin.hooks && typeof (plugin.hooks as any)[name] === 'function') {
         if (!this.hooks.has(name)) {
           this.hooks.set(name, new Set());
@@ -207,7 +207,7 @@ export class PluginManager {
       'onCommand',
     ];
 
-    for (const name of hookNames) {
+    for (const name of hookNames as any[]) {
       if (plugin.hooks && typeof (plugin.hooks as any)[name] === 'function') {
         this.hooks.get(name)?.delete((plugin.hooks as any)[name]);
       }
@@ -224,7 +224,7 @@ export class PluginManager {
     }
 
     const results: T[] = [];
-    for (const handler of handlers) {
+    for (const handler of Array.from(handlers) as any[]) {
       try {
         const result = await handler(...args);
         if (result !== undefined) {

@@ -12,7 +12,7 @@ export class MemoryStorage implements StorageBackend {
   private workflows: Map<string, any> = new Map();
   private executions: Map<string, WorkflowExecution> = new Map();
 
-  async saveWorkflow(workflow: unknown): Promise<void> {
+  async saveWorkflow(workflow: any): Promise<void> {
     this.workflows.set(workflow.id, workflow);
   }
 

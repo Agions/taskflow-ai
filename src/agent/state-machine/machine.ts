@@ -60,11 +60,11 @@ export const createAgentMachine = (
           onDone: [
             {
               target: 'completed',
-              guard: ({ context }: unknown) => context.verificationResult?.allPassed,
+              guard: ({ context }: any) => context.verificationResult?.allPassed,
             },
             {
               target: 'planning',
-              guard: ({ context }: unknown) => context.retryCount < (agentConfig.maxRetries || 3),
+              guard: ({ context }: any) => context.retryCount < (agentConfig.maxRetries || 3),
             },
           ],
           onError: { target: 'failed', actions: { type: 'setError' } },

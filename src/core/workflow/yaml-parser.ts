@@ -17,7 +17,7 @@ interface ParsedStep {
  */
 export function parseYAML(content: string): WorkflowSpec {
   const lines = content.split('\n');
-  const result: WorkflowSpec = { steps: [] };
+  const result: WorkflowSpec = { name: 'parsed-workflow', steps: [] };
   let currentStep: ParsedStep | null = null;
   let stepIndent = 0;
   let inSteps = false;
@@ -36,7 +36,7 @@ export function parseYAML(content: string): WorkflowSpec {
     if (inSteps) {
       if (trimmed.match(/^-\s+\w+:/)) {
         if (currentStep) {
-          result.steps.push(currentStep as WorkflowStep);
+          result.steps.push(currentStep as any);
         }
         const stepName = trimmed.match(/^-\s+(\w+):/)?.[1] || 'unknown';
         currentStep = { id: stepName, type: 'task' };
@@ -72,7 +72,7 @@ export function parseYAML(content: string): WorkflowSpec {
   }
 
   if (currentStep) {
-    result.steps.push(currentStep as WorkflowStep);
+    result.steps.push(currentStep as any);
   }
 
   return result;

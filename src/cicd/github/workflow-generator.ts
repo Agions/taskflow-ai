@@ -6,7 +6,7 @@ import { GitHubActionsConfig, WorkflowTemplate } from '../types';
 
 export class GitHubWorkflowGenerator {
   generate(config: GitHubActionsConfig): string {
-    const workflow: unknown = {
+    const workflow: any = {
       name: config.name,
       on: this.generateTriggers(config.triggers),
       permissions: this.generatePermissions(config.permissions),
@@ -31,10 +31,10 @@ export class GitHubWorkflowGenerator {
     return this.toYaml(workflow);
   }
 
-  private generateTriggers(triggers: unknown): unknown {
-    const result: unknown = {};
+  private generateTriggers(triggers: any): unknown {
+    const result: any = {};
 
-    for (const trigger of triggers) {
+    for (const trigger of triggers as any[]) {
       if (trigger.type === 'push') {
         result.push = {
           branches: trigger.branches || ['main'],
@@ -68,8 +68,8 @@ export class GitHubWorkflowGenerator {
     return permissions;
   }
 
-  private generateJob(stage: unknown, config: GitHubActionsConfig): unknown {
-    const job: unknown = {
+  private generateJob(stage: any, config: GitHubActionsConfig): unknown {
+    const job: any = {
       name: stage.name,
       'runs-on': stage.runsOn || 'ubuntu-latest',
       steps: [],
@@ -90,8 +90,8 @@ export class GitHubWorkflowGenerator {
     return job;
   }
 
-  private generateStep(step: unknown, config: GitHubActionsConfig): unknown {
-    const stepConfig: unknown = {};
+  private generateStep(step: any, config: GitHubActionsConfig): unknown {
+    const stepConfig: any = {};
 
     if (step.name) {
       stepConfig.name = step.name;
@@ -123,7 +123,7 @@ export class GitHubWorkflowGenerator {
     return stepConfig;
   }
 
-  private toYaml(obj: unknown, indent: number = 0): string {
+  private toYaml(obj: any, indent: number = 0): string {
     const spaces = '  '.repeat(indent);
     let yaml = '';
 
@@ -137,7 +137,7 @@ export class GitHubWorkflowGenerator {
         yaml += this.toYaml(value, indent + 1);
       } else if (Array.isArray(value)) {
         yaml += `${spaces}${key}:\n`;
-        for (const item of value) {
+        for (const item of value as any[]) {
           if (typeof item === 'object') {
             yaml += `${spaces}- `;
             const lines = this.toYaml(item, 0).trim().split('\n');

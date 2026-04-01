@@ -86,7 +86,7 @@ export function mcpCommand(program: Command) {
     });
 }
 
-async function startMCPServer(_options: unknown) {
+async function startMCPServer(_options: any) {
   try {
     const configManager = new ConfigManager();
     const config = await configManager.loadConfig();
@@ -101,7 +101,7 @@ async function startMCPServer(_options: unknown) {
       version: '2.0.0',
     };
 
-    const mcpServer = new MCPServer(mcpSettings, config);
+    const mcpServer = new MCPServer(mcpSettings, config as any);
     await mcpServer.start();
   } catch (error) {
     logger.error(chalk.red('启动失败:'), error);
@@ -109,7 +109,7 @@ async function startMCPServer(_options: unknown) {
   }
 }
 
-async function generateEditorConfig(options: unknown) {
+async function generateEditorConfig(options: any) {
   const editor = options.editor || 'all';
   const outputDir = options.output || process.cwd();
   const packageName = options.package || 'taskflow-ai';
@@ -135,7 +135,7 @@ async function generateEditorConfig(options: unknown) {
     return;
   }
 
-  for (const config of configs) {
+  for (const config of configs as any[]) {
     if (!config) continue;
 
     const fileName = getConfigFileName(config.name);
@@ -177,7 +177,7 @@ function getConfigFileName(editorName: string): string {
   return map[editorName] || 'mcp.json';
 }
 
-function mergeConfig(existing: unknown, newConfig: unknown): unknown {
+function mergeConfig(existing: any, newConfig: any): unknown {
   // 深度合并配置
   const result = { ...existing };
 
@@ -195,7 +195,7 @@ function mergeConfig(existing: unknown, newConfig: unknown): unknown {
   return result;
 }
 
-async function listTools(options: unknown) {
+async function listTools(options: any) {
   const { toolRegistry } = await import('../../mcp/tools/registry');
 
   // 注册所有工具
@@ -210,7 +210,7 @@ async function listTools(options: unknown) {
 
   // 按分类分组
   const byCategory: Record<string, typeof tools> = {};
-  for (const tool of tools) {
+  for (const tool of tools as any[]) {
     const cat = tool.category || 'custom';
     if (!byCategory[cat]) byCategory[cat] = [];
     byCategory[cat].push(tool);
@@ -220,7 +220,7 @@ async function listTools(options: unknown) {
 
   for (const [category, categoryTools] of Object.entries(byCategory)) {
     console.log(chalk.yellow(`\n${category} (${categoryTools.length})`));
-    for (const tool of categoryTools) {
+    for (const tool of categoryTools as any[]) {
       console.log(chalk.gray(`  • ${tool.name}`) + chalk.white(` - ${tool.description}`));
     }
   }

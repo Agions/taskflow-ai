@@ -21,7 +21,7 @@ export async function withErrorHandling<T>(
 ): Promise<T> {
   try {
     return await fn();
-  } catch (error: unknown) {
+  } catch (error: any) {
     const message = `${errorMessage}: ${error instanceof Error ? error.message : String(error)}`;
     if (logger) {
       logger.error(message, error);
@@ -39,7 +39,7 @@ export async function withErrorHandling<T>(
 export function withSyncErrorHandling<T>(fn: () => T, errorMessage: string, logger?: Logger): T {
   try {
     return fn();
-  } catch (error: unknown) {
+  } catch (error: any) {
     const message = `${errorMessage}: ${error instanceof Error ? error.message : String(error)}`;
     if (logger) {
       logger.error(message, error);
@@ -53,7 +53,7 @@ export function withSyncErrorHandling<T>(fn: () => T, errorMessage: string, logg
  * @param error 错误对象
  * @returns 是否为 Error 类型
  */
-export function isError(error: unknown): error is Error {
+export function isError(error: any): error is Error {
   return error instanceof Error;
 }
 
@@ -62,7 +62,7 @@ export function isError(error: unknown): error is Error {
  * @param error 错误对象
  * @returns 错误消息字符串
  */
-export function getErrorMessage(error: unknown): string {
+export function getErrorMessage(error: any): string {
   if (isError(error)) {
     return error.message;
   }
@@ -172,10 +172,9 @@ export function validateRequired(
   params: Record<string, unknown>,
   required: string[]
 ): void {
-  for (const field of required) {
+  for (const field of required as any[]) {
     if (!params[field]) {
-      throw createTaskFlowError(
-        'VALIDATION_ERROR',
+      throw createCodedError(
         'VALIDATION_ERROR',
         `Missing required field: ${field}`,
         { field, provided: Object.keys(params) }
@@ -215,7 +214,7 @@ export class AsyncErrorBoundary {
 /**
  * JSON 安全序列化
  */
-export function safeJsonStringify(obj: unknown, space?: number): string {
+export function safeJsonStringify(obj: any, space?: number): string {
   try {
     return JSON.stringify(obj, (key, value) => {
       if (typeof value === 'bigint') {

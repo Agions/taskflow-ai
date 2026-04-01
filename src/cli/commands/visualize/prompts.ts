@@ -4,7 +4,7 @@
 
 import inquirer from 'inquirer';
 
-export async function getVisualizationOptions(baseOptions: unknown): Promise<any> {
+export async function getVisualizationOptions(baseOptions: any): Promise<any> {
   const answers = await inquirer.prompt([
     {
       type: 'list',

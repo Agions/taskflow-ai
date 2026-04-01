@@ -16,7 +16,7 @@ Handlebars.registerHelper('kebabCase', (str: string) => {
   return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 });
 
-Handlebars.registerHelper('unless', function (this: unknown, conditional: unknown, options: unknown) {
+Handlebars.registerHelper('unless', function (this: any, conditional: any, options: any) {
   if (!conditional) {
     return options.fn(this);
   }
@@ -44,7 +44,7 @@ export class TemplateManager {
     }
 
     const files = await fs.readdir(this.templatesDir);
-    for (const file of files) {
+    for (const file of files as any[]) {
       if (file.endsWith('.json')) {
         try {
           const templatePath = path.join(this.templatesDir, file);

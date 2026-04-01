@@ -81,7 +81,7 @@ export class SecurityManager {
         context.permissions = ['read'];
       }
 
-      context.origin = request.headers?.origin;
+      context.origin = (request as any).headers?.origin;
       return context;
     } catch (error) {
       this.logger.warn('请求验证失败:', error);
@@ -92,7 +92,7 @@ export class SecurityManager {
   /**
    * 身份验证
    */
-  private async authenticateRequest(request: unknown, context: SecurityContext): Promise<void> {
+  private async authenticateRequest(request: any, context: SecurityContext): Promise<void> {
     const authHeader = request.headers?.authorization;
 
     if (!authHeader) {

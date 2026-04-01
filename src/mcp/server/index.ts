@@ -111,9 +111,9 @@ export class MCPServer {
     args: unknown
   ): Promise<{ success: boolean; data?: unknown; error?: string }> {
     try {
-      const result = await this.toolExecutor.execute(name, args);
+      const result = await this.toolExecutor.execute(name, args as Record<string, unknown>);
       return { success: true, data: result };
-    } catch (error: unknown) {
+    } catch (error: any) {
       return { success: false, error: error.message };
     }
   }
