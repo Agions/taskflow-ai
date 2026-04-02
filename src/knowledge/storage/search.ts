@@ -56,7 +56,7 @@ export class SearchManager {
   /**
    * 关键词搜索
    */
-  keywordSearch(query: string, options: RetrievalOptions): RetrievedChunk[] {
+  keywordSearch(query: string, options: RetrievalOptions = {}): RetrievedChunk[] {
     const keywords = query.toLowerCase().split(/\s+/);
     const results: RetrievedChunk[] = [];
 
@@ -64,7 +64,7 @@ export class SearchManager {
       const content = chunk.content.toLowerCase();
       let matches = 0;
 
-      for (const keyword of keywords as any[]) {
+      for (const keyword of keywords) {
         if (content.includes(keyword)) {
           matches++;
         }
@@ -101,11 +101,11 @@ export class SearchManager {
   ): RetrievedChunk[] {
     const merged = new Map<string, RetrievedChunk>();
 
-    for (const result of vectorResults as any[]) {
+    for (const result of vectorResults) {
       merged.set(result.chunk.id, { ...result, score: result.score * 0.7 });
     }
 
-    for (const result of keywordResults as any[]) {
+    for (const result of keywordResults) {
       const existing = merged.get(result.chunk.id);
       if (existing) {
         existing.score += result.score * 0.3;
@@ -128,7 +128,7 @@ export class SearchManager {
         const content = result.chunk.content.toLowerCase();
         let keywordScore = 0;
 
-        for (const keyword of keywords as any[]) {
+        for (const keyword of keywords) {
           const count = (content.match(new RegExp(keyword, 'g')) || []).length;
           keywordScore += count;
         }
@@ -146,25 +146,25 @@ export class SearchManager {
     if (filters.length === 0) return true;
 
     return filters.every(filter => {
-      const value: any = this.getFieldValue(chunk, filter.field);
+      const value = this.getFieldValue(chunk, filter.field);
 
       switch (filter.operator) {
         case 'eq':
-          return value === (filter.value as any);
+          return value === filter.value;
         case 'ne':
-          return value !== (filter.value as any);
+          return value !== filter.value;
         case 'gt':
-          return value > (filter.value as any);
+          return (value as number) > (filter.value as number);
         case 'gte':
-          return value >= (filter.value as any);
+          return (value as number) >= (filter.value as number);
         case 'lt':
-          return value < (filter.value as any);
+          return (value as number) < (filter.value as number);
         case 'lte':
-          return value <= (filter.value as any);
+          return (value as number) <= (filter.value as number);
         case 'in':
-          return Array.isArray(filter.value) && (filter.value as any[]).includes(value);
+          return Array.isArray(filter.value) && (filter.value as unknown[]).includes(value);
         case 'contains':
-          return String(value).includes(String(filter.value as any));
+          return String(value).includes(String(filter.value));
         default:
           return true;
       }
@@ -176,11 +176,11 @@ export class SearchManager {
    */
   private getFieldValue(chunk: DocumentChunk, field: string): unknown {
     const parts = field.split('.');
-    let value: any = chunk;
+    let value: unknown = chunk;
 
-    for (const part of parts as any[]) {
+    for (const part of parts) {
       if (value && typeof value === 'object') {
-        value = value[part];
+        value = (value as Record<string, unknown>)[part];
       } else {
         return undefined;
       }

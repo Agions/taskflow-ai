@@ -51,6 +51,9 @@ export interface StepConfig {
   retries?: number;
   /** 延迟 (ms) */
   delay?: number;
+  /** 循环配置 (loop 类型) */
+  loopCondition?: string;
+  maxIterations?: number;
 }
 
 /** 错误处理配置 */

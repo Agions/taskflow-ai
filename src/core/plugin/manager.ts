@@ -1,12 +1,38 @@
-import { getLogger } from '../../utils/logger';
+/** 插件钩子函数 */
+type PluginHook = (...args: unknown[]) => Promise<unknown> | unknown;
+
+/** 插件钩子名称 */
+const PLUGIN_HOOK_NAMES = [
+  'onInit',
+  'onLoad',
+  'onUnload',
+  'onTaskCreate',
+  'onTaskUpdate',
+  'onTaskComplete',
+  'onWorkflowExecute',
+  'onCommand',
+] as const;
+
+type PluginHookName = (typeof PLUGIN_HOOK_NAMES)[number];
+
+/** 插件 package.json */
+interface PluginPackageJson {
+  name: string;
+  version: string;
+  description?: string;
+  author?: string;
+  main?: string;
+  keywords?: string[];
+  dependencies?: Record<string, string>;
+}
+
 /**
  * 插件加载器
- * 负责插件的发现、加载、卸载
  */
 
 import path from 'path';
 import fs from 'fs-extra';
-import { Logger } from '../../utils/logger';
+import { Logger, getLogger } from '../../utils/logger';
 import { Plugin, PluginContext, PluginHooks } from './types';
 const logger = getLogger('core/plugin/manager');
 
@@ -22,7 +48,7 @@ export interface PluginLoadResult {
 export class PluginManager {
   private logger: Logger;
   private plugins: Map<string, Plugin> = new Map();
-  private hooks: Map<string, Set<Function>> = new Map();
+  private hooks: Map<string, Set<PluginHook>> = new Map();
   private context: PluginContext;
 
   constructor(private pluginDir: string = './plugins') {
@@ -39,7 +65,14 @@ export class PluginManager {
       workspace: process.cwd(),
       config: {},
       logger: this.logger,
-      registry: this as any,
+      registry: {
+        register: (plugin: Plugin) => this.plugins.set(plugin.id, plugin),
+        unregister: (pluginId: string) => {
+          this.plugins.delete(pluginId);
+        },
+        get: (pluginId: string) => this.plugins.get(pluginId),
+        getAll: () => Array.from(this.plugins.values()),
+      },
     };
   }
 
@@ -57,7 +90,7 @@ export class PluginManager {
     const entries = await fs.readdir(this.pluginDir);
     const pluginDirs = entries.filter(e => !e.startsWith('.'));
 
-    for (const dir of pluginDirs as any[]) {
+    for (const dir of pluginDirs) {
       await this.load(dir);
     }
 
@@ -134,7 +167,7 @@ export class PluginManager {
   /**
    * 加载 package.json
    */
-  private async loadPackageJson(pluginPath: string): Promise<any | null> {
+  private async loadPackageJson(pluginPath: string): Promise<PluginPackageJson | null> {
     const packageJsonPath = path.join(pluginPath, 'package.json');
 
     if (!(await fs.pathExists(packageJsonPath))) {
@@ -150,8 +183,8 @@ export class PluginManager {
    */
   private async importPlugin(
     pluginId: string,
-    packageJson: any,
-    mainPath: string
+    packageJson: PluginPackageJson,
+    _mainPath: string
   ): Promise<Plugin> {
     const plugin: Plugin = {
       id: pluginId,
@@ -159,7 +192,7 @@ export class PluginManager {
       version: packageJson.version,
       description: packageJson.description,
       author: packageJson.author,
-      main: packageJson.main,
+      main: packageJson.main || 'index.js',
       dependencies: packageJson.dependencies,
     };
 
@@ -170,23 +203,14 @@ export class PluginManager {
    * 注册钩子
    */
   private registerHooks(plugin: Plugin): void {
-    const hookNames = [
-      'onInit',
-      'onLoad',
-      'onUnload',
-      'onTaskCreate',
-      'onTaskUpdate',
-      'onTaskComplete',
-      'onWorkflowExecute',
-      'onCommand',
-    ];
-
-    for (const name of hookNames as any[]) {
-      if (plugin.hooks && typeof (plugin.hooks as any)[name] === 'function') {
+    for (const name of PLUGIN_HOOK_NAMES) {
+      const hooks = plugin.hooks as Record<string, PluginHook> | undefined;
+      const hook = hooks?.[name];
+      if (typeof hook === 'function') {
         if (!this.hooks.has(name)) {
           this.hooks.set(name, new Set());
         }
-        this.hooks.get(name)!.add((plugin.hooks as any)[name]);
+        this.hooks.get(name)!.add(hook);
       }
     }
   }
@@ -195,20 +219,11 @@ export class PluginManager {
    * 注销钩子
    */
   private unregisterHooks(plugin: Plugin): void {
-    const hookNames = [
-      'onInit',
-      'onLoad',
-      'onUnload',
-      'onTaskCreate',
-      'onTaskUpdate',
-      'onTaskComplete',
-      'onWorkflowExecute',
-      'onCommand',
-    ];
-
-    for (const name of hookNames as any[]) {
-      if (plugin.hooks && typeof (plugin.hooks as any)[name] === 'function') {
-        this.hooks.get(name)?.delete((plugin.hooks as any)[name]);
+    for (const name of PLUGIN_HOOK_NAMES) {
+      const hooks = plugin.hooks as Record<string, PluginHook> | undefined;
+      const hook = hooks?.[name];
+      if (typeof hook === 'function') {
+        this.hooks.get(name)?.delete(hook);
       }
     }
   }
@@ -223,11 +238,11 @@ export class PluginManager {
     }
 
     const results: T[] = [];
-    for (const handler of Array.from(handlers) as any[]) {
+    for (const handler of Array.from(handlers)) {
       try {
         const result = await handler(...args);
         if (result !== undefined) {
-          results.push(result);
+          results.push(result as T);
         }
       } catch (error) {
         this.logger.error(`钩子执行失败: ${hookName}`, error);

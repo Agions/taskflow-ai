@@ -72,14 +72,14 @@ export class ConditionExecutor {
       }
 
       const comparisons = [
-        { op: '===', fn: (a: any, b: any) => a === b },
-        { op: '==', fn: (a: any, b: any) => a == b },
-        { op: '!==', fn: (a: any, b: any) => a !== b },
-        { op: '!=', fn: (a: any, b: any) => a != b },
-        { op: '>=', fn: (a: any, b: any) => a >= b },
-        { op: '<=', fn: (a: any, b: any) => a <= b },
-        { op: '>', fn: (a: any, b: any) => a > b },
-        { op: '<', fn: (a: any, b: any) => a < b },
+        { op: '===', fn: (a: unknown, b: unknown) => a === b },
+        { op: '==', fn: (a: unknown, b: unknown) => a == (b as unknown) },
+        { op: '!==', fn: (a: unknown, b: unknown) => a !== b },
+        { op: '!=', fn: (a: unknown, b: unknown) => a != (b as unknown) },
+        { op: '>=', fn: (a: unknown, b: unknown) => (a as number) >= (b as number) },
+        { op: '<=', fn: (a: unknown, b: unknown) => (a as number) <= (b as number) },
+        { op: '>', fn: (a: unknown, b: unknown) => (a as number) > (b as number) },
+        { op: '<', fn: (a: unknown, b: unknown) => (a as number) < (b as number) },
       ] as const;
 
       for (const { op, fn } of comparisons) {
@@ -155,9 +155,9 @@ export class LoopExecutor {
   async execute(step: WorkflowStep, context: ExecutionContext): Promise<StepResult> {
     const startTime = Date.now();
 
-    const maxIterations = (step.config as any).maxIterations || 10;
-    const condition = (step.config as any).loopCondition;
-    const delay = (step.config as any).delay || 0;
+    const maxIterations = step.config.maxIterations || 10;
+    const condition = step.config.loopCondition;
+    const delay = step.config.delay || 0;
 
     this.logger.info(`开始循环执行 (最大 ${maxIterations} 次)`);
 
