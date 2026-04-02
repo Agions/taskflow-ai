@@ -122,7 +122,10 @@ export class DataProviders {
 
   async getModelsData(): Promise<ModelsData> {
     try {
-      const configData: Record<string, unknown> = (await this.getConfigData()) as Record<string, unknown>;
+      const configData: Record<string, unknown> = (await this.getConfigData()) as Record<
+        string,
+        unknown
+      >;
       const models = (configData.aiModels || []) as AIModelConfig[];
       return {
         models,
@@ -174,10 +177,13 @@ export class DataProviders {
   }
 
   private groupBy<T extends object>(array: T[], field: keyof T): Record<string, number> {
-    return array.reduce((acc, item) => {
-      const key = String(item[field] ?? 'unknown');
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    return array.reduce(
+      (acc, item) => {
+        const key = String(item[field] ?? 'unknown');
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }
 }
