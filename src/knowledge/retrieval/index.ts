@@ -108,7 +108,7 @@ export class KnowledgeRetrievalEngine {
 
     const files = await this.scanner.scan(dirPath, includePatterns, excludePatterns);
 
-    for (const file of files as any[]) {
+    for (const file of files) {
       try {
         const doc = await this.loadDocument(file);
         await this.indexDocument(doc);
@@ -125,19 +125,21 @@ export class KnowledgeRetrievalEngine {
 
   async getStats(): Promise<KnowledgeStats> {
     const status = await this.vectorStore.getStatus();
-    const chunks = await (this.vectorStore as any).getAllChunks();
+    const vectorStoreAny = this.vectorStore as unknown as Record<string, unknown>;
+    const getAllChunks = vectorStoreAny.getAllChunks as (() => Promise<unknown[]>) | undefined;
+    const chunks = getAllChunks ? await getAllChunks() : [];
 
     const documentTypes: Record<string, number> = {};
     const tags: string[] = [];
 
-    for (const chunk of chunks as any[]) {
-      const type = chunk.metadata.type || 'other';
+    for (const chunk of chunks as Array<{ metadata: Record<string, unknown> }>) {
+      const type = String(chunk.metadata?.type ?? 'other');
       documentTypes[type] = (documentTypes[type] || 0) + 1;
-      tags.push(...(chunk.metadata.tags || []));
+      tags.push(...((chunk.metadata?.tags as string[]) || []));
     }
 
     const tagCounts = new Map<string, number>();
-    for (const tag of tags as any[]) {
+    for (const tag of tags) {
       tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
     }
 
@@ -153,7 +155,7 @@ export class KnowledgeRetrievalEngine {
       queries: 0,
       avgLatency: 0,
       topTags,
-      documentTypes: documentTypes as any,
+      documentTypes,
     };
   }
 
@@ -176,13 +178,16 @@ export class KnowledgeRetrievalEngine {
     };
   }
 
-  private generateSummary(chunks: any[]): string {
+  private generateSummary(chunks: Array<{ chunk: { content: string } }>): string {
     if (chunks.length === 0) return 'No relevant information found.';
-    const contents = chunks.map((c: any) => c.chunk.content);
+    const contents = chunks.map(c => c.chunk.content);
     return contents.slice(0, 3).join(' ').slice(0, 500) + '...';
   }
 
-  private generateSuggestions(chunks: any[], query: string): string[] {
+  private generateSuggestions(
+    chunks: Array<{ chunk: { content: string } }>,
+    query: string
+  ): string[] {
     const suggestions: string[] = [];
     const keywords = query.toLowerCase().split(' ');
 

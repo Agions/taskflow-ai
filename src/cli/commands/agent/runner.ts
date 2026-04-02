@@ -7,6 +7,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { AgentStateMachine } from '../../../agent/state-machine';
 import { AgentConfig, AgentContext, PRDDocument } from '../../../agent/types';
+import type { AgentState } from '../../../agent/state-machine/types';
 import { PlanningEngine } from '../../../agent/planning';
 import { ExecutionEngine } from '../../../agent/execution';
 import { VerificationEngine } from '../../../agent/verification/engine';
@@ -32,7 +33,7 @@ export async function runAgent(options: RunOptions): Promise<void> {
 
   try {
     const configManager = new ConfigManager(process.cwd());
-    const projectConfig: any = (await configManager.loadConfig()) || createDefaultConfig();
+    const projectConfig = (await configManager.loadConfig()) || createDefaultConfig();
 
     spinner.succeed(`PRD loaded: ${options.prd.title}`);
 
@@ -87,14 +88,14 @@ export async function runAgent(options: RunOptions): Promise<void> {
 
     // Wait for completion
     await new Promise<void>(resolve => {
-      agent.onStateChange((state: any) => {
+      agent.onStateChange((state: AgentState) => {
         if (state === 'completed' || state === 'failed') {
           resolve();
         }
       });
     });
 
-    const success = (agent.getState() as any) === 'completed';
+    const success = agent.getState() === 'completed';
 
     if (success) {
       console.log(chalk.green('\n✅ Agent execution completed successfully!'));

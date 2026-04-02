@@ -3,7 +3,17 @@
  * 支持文本、Markdown、Mermaid 格式
  */
 
-import { ThoughtChain, ReasoningStep } from './types';
+import { ThoughtChain, ThoughtNode, ReasoningStep } from './types';
+
+/** 渲染步骤类型 */
+interface RenderStep {
+  step: number;
+  title: string;
+  description: string;
+  reasoning?: string;
+  confidence: number;
+  depth: number;
+}
 
 /**
  * 文本渲染器
@@ -16,7 +26,7 @@ export class TextRenderer {
     lines.push('═'.repeat(50));
 
     const steps = this.extractSteps(chain);
-    for (const step of steps as any[]) {
+    for (const step of steps) {
       const indent = '  '.repeat(step.depth);
       lines.push(`${indent}Step ${step.step}: ${step.title}`);
       lines.push(`${indent}  ${step.description}`);
@@ -30,25 +40,11 @@ export class TextRenderer {
     return lines.join('\n');
   }
 
-  private extractSteps(chain: ThoughtChain): Array<{
-    step: number;
-    title: string;
-    description: string;
-    reasoning?: string;
-    confidence: number;
-    depth: number;
-  }> {
-    const steps: Array<{
-      step: number;
-      title: string;
-      description: string;
-      reasoning?: string;
-      confidence: number;
-      depth: number;
-    }> = [];
+  private extractSteps(chain: ThoughtChain): RenderStep[] {
+    const steps: RenderStep[] = [];
 
     let stepNum = 0;
-    const traverse = (node: any, depth: number) => {
+    const traverse = (node: ThoughtNode, depth: number) => {
       stepNum++;
       steps.push({
         step: stepNum,
@@ -94,8 +90,8 @@ export class MarkdownRenderer {
     lines.push(`**输入**: ${chain.metadata.input?.substring(0, 100)}...\n`);
     lines.push('---\n');
 
-    const steps = this.extractSteps(chain.root, 0);
-    for (const step of steps as any[]) {
+    const steps = this.extractSteps(chain.root, 0, { value: 0 });
+    for (const step of steps) {
       const heading = '#'.repeat(Math.min(step.depth + 2, 6));
       lines.push(`${heading} ${step.step}. ${step.title}\n`);
       lines.push(`> **置信度**: ${(step.confidence * 100).toFixed(0)}%\n`);
@@ -108,19 +104,8 @@ export class MarkdownRenderer {
     return lines.join('\n');
   }
 
-  private extractSteps(
-    node: any,
-    depth: number,
-    stepNum = { value: 0 }
-  ): Array<{
-    step: number;
-    title: string;
-    description: string;
-    reasoning?: string;
-    confidence: number;
-    depth: number;
-  }> {
-    const steps: any[] = [];
+  private extractSteps(node: ThoughtNode, depth: number, stepNum: { value: number }): RenderStep[] {
+    const steps: RenderStep[] = [];
     stepNum.value++;
 
     steps.push({
@@ -175,7 +160,7 @@ export class MermaidRenderer {
     let nodeId = 0;
     const idMap = new Map<string, string>();
 
-    const processNode = (node: any) => {
+    const processNode = (node: ThoughtNode): string => {
       const id = `node${nodeId++}`;
       const label = this.truncate(node.content, 30);
       const title = this.getTitle(node.type);
@@ -226,14 +211,14 @@ export class MindMapRenderer {
 
     lines.push('# 思维导图\n');
 
-    const renderTree = (node: any, prefix: string, isLast: boolean) => {
+    const renderTree = (node: ThoughtNode, prefix: string, isLast: boolean) => {
       const connector = isLast ? '└── ' : '├── ';
       const title = this.getTitle(node.type);
       lines.push(`${prefix}${connector}${title}: ${this.truncate(node.content, 40)}`);
 
       const childPrefix = prefix + (isLast ? '    ' : '│   ');
       const children = node.children || [];
-      children.forEach((child: any, index: number) => {
+      children.forEach((child, index) => {
         renderTree(child, childPrefix, index === children.length - 1);
       });
     };

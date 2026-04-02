@@ -5,12 +5,12 @@ import { getLogger } from '../../utils/logger';
  */
 
 import { createActor } from 'xstate';
-import { AgentContext, AgentConfig, AgentState } from '../types';
+import { AgentContext, AgentConfig } from '../types';
 import { PlanningEngine } from '../planning';
 import { ExecutionEngine } from '../execution';
 import { VerificationEngine } from '../verification/engine';
 import { createAgentMachine } from './machine';
-import { MachineContext } from './types';
+import { MachineContext, AgentState } from './types';
 const logger = getLogger('agent/state-machine/index');
 
 export * from './types';

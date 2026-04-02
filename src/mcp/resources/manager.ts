@@ -77,7 +77,7 @@ export class MCPResourceManager {
     return Array.from(this.resources.values());
   }
 
-  async getResourceData(uri: string): Promise<any> {
+  async getResourceData(uri: string): Promise<unknown> {
     switch (uri) {
       case '/tasks':
         return this.dataProviders.getTasksData();
@@ -99,7 +99,7 @@ export class MCPResourceManager {
     }
   }
 
-  private async getFileData(uri: string): Promise<any> {
+  private async getFileData(uri: string): Promise<unknown> {
     const fileName = uri.replace('/files/', '');
     const filePath = path.join(this.dataDir, fileName);
 

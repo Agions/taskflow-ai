@@ -1,4 +1,5 @@
 import { getLogger } from '../../utils/logger';
+
 /**
  * 数据提供者
  */
@@ -6,19 +7,51 @@ import { getLogger } from '../../utils/logger';
 import path from 'path';
 import fs from 'fs-extra';
 import { Logger } from '../../utils/logger';
+import { Task, TaskStatus, TaskType } from '../../types/task';
+import { AIModelConfig } from '../../types';
 const logger = getLogger('mcp/resources/data-providers');
+
+/** 任务数据统计 */
+interface TaskAnalytics {
+  total: number;
+  byStatus: Record<string, number>;
+  byType: Record<string, number>;
+  byPriority: Record<string, number>;
+  totalHours: number;
+}
+
+/** 项目分析数据 */
+interface ProjectAnalytics {
+  total: number;
+  aiModelsConfigured: number;
+  mcpEnabled: boolean;
+}
+
+/** 分析数据输出 */
+interface AnalyticsData {
+  tasks: TaskAnalytics;
+  projects: ProjectAnalytics;
+  generatedAt: string;
+}
+
+/** 模型数据统计 */
+interface ModelsData {
+  models: AIModelConfig[];
+  totalModels: number;
+  enabledModels: number;
+}
 
 export class DataProviders {
   constructor(private logger: Logger) {}
 
-  async getTasksData(): Promise<unknown[]> {
+  async getTasksData(): Promise<Task[]> {
     try {
       const possiblePaths = [
         path.join(process.cwd(), '.taskflow', 'data'),
         path.join(process.cwd(), '.taskflow'),
       ];
 
-      for (const dir of possiblePaths as any[]) {
+      for (const dir of possiblePaths) {
         if (await fs.pathExists(dir)) {
           const files = await fs.readdir(dir);
           const taskFiles = files.filter(f => f.includes('task') && f.endsWith('.json'));
@@ -26,7 +59,7 @@ export class DataProviders {
           if (taskFiles.length > 0) {
             const latestFile = path.join(dir, taskFiles[taskFiles.length - 1]);
             const data = await fs.readJson(latestFile);
-            return data.tasks || [];
+            return (data.tasks || []) as Task[];
           }
         }
       }
@@ -38,7 +71,7 @@ export class DataProviders {
     }
   }
 
-  async getProjectsData(): Promise<unknown> {
+  async getProjectsData(): Promise<Record<string, unknown>> {
     try {
       const configPath = path.join(process.cwd(), '.taskflow', 'config.json');
       if (await fs.pathExists(configPath)) {
@@ -65,14 +98,14 @@ export class DataProviders {
     }
   }
 
-  async getConfigData(): Promise<unknown> {
+  async getConfigData(): Promise<Record<string, unknown>> {
     try {
       const configPath = path.join(process.cwd(), '.taskflow', 'config.json');
       if (await fs.pathExists(configPath)) {
-        const config = await fs.readJson(configPath);
+        const config: Record<string, unknown> = await fs.readJson(configPath);
         const safeConfig = { ...config };
-        if (safeConfig.aiModels) {
-          safeConfig.aiModels = safeConfig.aiModels.map((model: any) => ({
+        if (Array.isArray(safeConfig.aiModels)) {
+          safeConfig.aiModels = (safeConfig.aiModels as Record<string, unknown>[]).map(model => ({
             ...model,
             apiKey: model.apiKey ? '***' : undefined,
           }));
@@ -87,13 +120,14 @@ export class DataProviders {
     }
   }
 
-  async getModelsData(): Promise<unknown> {
+  async getModelsData(): Promise<ModelsData> {
     try {
-      const configData: any = await this.getConfigData();
+      const configData: Record<string, unknown> = (await this.getConfigData()) as Record<string, unknown>;
+      const models = (configData.aiModels || []) as AIModelConfig[];
       return {
-        models: configData.aiModels || [],
-        totalModels: configData.aiModels?.length || 0,
-        enabledModels: configData.aiModels?.filter((m: any) => m.enabled).length || 0,
+        models,
+        totalModels: models.length,
+        enabledModels: models.filter(m => m.enabled).length,
       };
     } catch (error) {
       this.logger.warn('获取模型数据失败:', error);
@@ -101,7 +135,7 @@ export class DataProviders {
     }
   }
 
-  getStatusData(resourceCount: number): unknown {
+  getStatusData(resourceCount: number): Record<string, unknown> {
     return {
       status: 'healthy',
       uptime: process.uptime(),
@@ -113,7 +147,7 @@ export class DataProviders {
     };
   }
 
-  async getAnalyticsData(resourceCount: number): Promise<unknown> {
+  async getAnalyticsData(resourceCount: number): Promise<AnalyticsData | { error: string }> {
     try {
       const tasks = await this.getTasksData();
       const projects = await this.getProjectsData();
@@ -124,12 +158,12 @@ export class DataProviders {
           byStatus: this.groupBy(tasks, 'status'),
           byType: this.groupBy(tasks, 'type'),
           byPriority: this.groupBy(tasks, 'priority'),
-          totalHours: tasks.reduce((sum: number, task: any) => sum + (task.estimatedHours || 0), 0),
+          totalHours: tasks.reduce((sum, task) => sum + (task.estimatedHours || 0), 0),
         },
         projects: {
           total: 1,
-          aiModelsConfigured: (projects as any).aiModels || 0,
-          mcpEnabled: (projects as any).mcpEnabled,
+          aiModelsConfigured: (projects as Record<string, number>).aiModels || 0,
+          mcpEnabled: (projects as Record<string, boolean>).mcpEnabled || false,
         },
         generatedAt: new Date().toISOString(),
       };
@@ -139,11 +173,11 @@ export class DataProviders {
     }
   }
 
-  private groupBy(array: any[], field: string): Record<string, number> {
-    return array.reduce((acc: any, item: any) => {
-      const key = item[field] || 'unknown';
+  private groupBy<T extends object>(array: T[], field: keyof T): Record<string, number> {
+    return array.reduce((acc, item) => {
+      const key = String(item[field] ?? 'unknown');
       acc[key] = (acc[key] || 0) + 1;
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
   }
 }
