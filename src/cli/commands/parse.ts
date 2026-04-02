@@ -11,7 +11,27 @@ import fs from 'fs-extra';
 import { PRDParser } from '../../core/parser';
 import { TaskGenerator } from '../../core/tasks';
 import { ConfigManager } from '../../core/config';
+import { PRDDocument } from '../../types/prd';
+import { Task } from '../../types/task';
 const logger = getLogger('cli/commands/parse');
+
+/** Parse 命令选项 */
+interface ParseCommandOptions {
+  output: string;
+  format: 'json' | 'markdown';
+  tasks?: boolean;
+}
+
+/** 解析结果 */
+interface ParseResult {
+  document: PRDDocument;
+  tasks: Task[];
+  summary: {
+    totalTasks: number;
+    totalHours: number;
+    generatedAt: string;
+  };
+}
 
 export function parseCommand(program: Command) {
   program
@@ -20,7 +40,7 @@ export function parseCommand(program: Command) {
     .option('-o, --output <path>', '输出目录', 'output')
     .option('-f, --format <format>', '输出格式 (json|markdown)', 'json')
     .option('--no-tasks', '只解析文档，不生成任务')
-    .action(async (file: string, options) => {
+    .action(async (file: string, options: ParseCommandOptions) => {
       try {
         await runParse(file, options);
       } catch (error) {
@@ -30,7 +50,7 @@ export function parseCommand(program: Command) {
     });
 }
 
-async function runParse(filePath: string, options: any) {
+async function runParse(filePath: string, options: ParseCommandOptions): Promise<void> {
   const spinner = ora('正在解析PRD文档...').start();
 
   try {
@@ -51,9 +71,9 @@ async function runParse(filePath: string, options: any) {
     spinner.text = '正在解析文档内容...';
 
     const parser = new PRDParser(config);
-    const prdDocument = await parser.parse(fullPath);
+    const prdDocument: PRDDocument = await parser.parse(fullPath);
 
-    let tasks: unknown[] = [];
+    let tasks: Task[] = [];
     if (options.tasks !== false) {
       spinner.text = '正在生成任务...';
       const taskGenerator = new TaskGenerator(config);
@@ -64,16 +84,13 @@ async function runParse(filePath: string, options: any) {
 
     spinner.succeed(chalk.green('解析完成！'));
 
+    const totalHours = tasks.reduce((sum: number, task: Task) => sum + task.estimatedHours, 0);
+
     console.log(chalk.cyan('\n📊 解析结果:'));
     console.log(chalk.gray('  文档标题: ') + chalk.white(prdDocument.title));
     console.log(chalk.gray('  章节数量: ') + chalk.white(prdDocument.sections.length));
     console.log(chalk.gray('  生成任务: ') + chalk.white(tasks.length));
-    console.log(
-      chalk.gray('  预估工时: ') +
-        chalk.white(
-          tasks.reduce((sum: number, task: any) => sum + task.estimatedHours, 0) + ' 小时'
-        )
-    );
+    console.log(chalk.gray('  预估工时: ') + chalk.white(totalHours + ' 小时'));
     console.log(chalk.gray('  输出文件: ') + chalk.blue(outputPath));
 
     console.log(chalk.yellow('\n💡 提示:'));
@@ -85,19 +102,23 @@ async function runParse(filePath: string, options: any) {
   }
 }
 
-async function saveResults(document: any, tasks: unknown[], options: any): Promise<string> {
+async function saveResults(
+  document: PRDDocument,
+  tasks: Task[],
+  options: ParseCommandOptions
+): Promise<string> {
   const outputDir = path.resolve(options.output);
   await fs.ensureDir(outputDir);
 
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const baseName = path.parse(document.title || 'prd').name;
 
-  const results = {
+  const results: ParseResult = {
     document,
     tasks,
     summary: {
       totalTasks: tasks.length,
-      totalHours: tasks.reduce((sum: number, task: any) => sum + task.estimatedHours, 0),
+      totalHours: tasks.reduce((sum: number, task: Task) => sum + task.estimatedHours, 0),
       generatedAt: new Date().toISOString(),
     },
   };
@@ -117,7 +138,7 @@ async function saveResults(document: any, tasks: unknown[], options: any): Promi
   return outputPath;
 }
 
-function generateMarkdownReport(results: any): string {
+function generateMarkdownReport(results: ParseResult): string {
   const { document, tasks, summary } = results;
 
   return `# PRD解析报告
@@ -136,7 +157,7 @@ function generateMarkdownReport(results: any): string {
 
 ${tasks
   .map(
-    (task: any, index: number) => `
+    (task: Task, index: number) => `
 ### ${index + 1}. ${task.title}
 
 - **类型**: ${task.type}

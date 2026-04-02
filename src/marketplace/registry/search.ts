@@ -4,8 +4,37 @@ const logger = getLogger('module');
  * 包搜索功能
  */
 
-import { Registry, SearchOptions, SearchResult, ToolPackage } from '../types';
+import { Registry, SearchOptions, SearchResult, ToolPackage, ToolCategory } from '../types';
 import axios from 'axios';
+
+/** npm registry 搜索响应 */
+interface NpmSearchResponse {
+  objects: NpmSearchObject[];
+  total: number;
+  time: string;
+}
+
+/** npm 搜索结果对象 */
+interface NpmSearchObject {
+  package: NpmPackageInfo;
+  score: { final: number; detail: { quality: number; popularity: number; maintenance: number } };
+  searchScore: number;
+}
+
+/** npm 包信息 */
+interface NpmPackageInfo {
+  name: string;
+  version: string;
+  description?: string;
+  author?: { name: string } | string;
+  license?: string;
+  keywords?: string[];
+  links?: { homepage?: string; repository?: string };
+  mcpVersion?: string;
+  tools?: unknown[];
+  categories?: string[];
+  dependencies?: Record<string, string>;
+}
 
 export class PackageSearcher {
   constructor(private registries: Map<string, Registry>) {}
@@ -36,7 +65,7 @@ export class PackageSearcher {
 
   private async searchRegistry(registry: Registry, options: SearchOptions): Promise<ToolPackage[]> {
     try {
-      const response = await axios.get(`${registry.url}/-/v1/search`, {
+      const response = await axios.get<NpmSearchResponse>(`${registry.url}/-/v1/search`, {
         params: {
           text: options.query,
           size: options.limit || 20,
@@ -45,26 +74,31 @@ export class PackageSearcher {
         timeout: 10000,
       });
 
-      return response.data.objects?.map((obj: any) => this.mapToToolPackage(obj.package)) || [];
+      return (
+        response.data.objects?.map((obj: NpmSearchObject) => this.mapToToolPackage(obj.package)) ||
+        []
+      );
     } catch {
       return [];
     }
   }
 
-  private mapToToolPackage(pkg: any): ToolPackage {
+  private mapToToolPackage(pkg: NpmPackageInfo): ToolPackage {
+    const authorName = typeof pkg.author === 'string' ? pkg.author : pkg.author?.name || '';
+
     return {
       id: pkg.name,
       name: pkg.name,
       version: pkg.version,
       description: pkg.description || '',
-      author: pkg.author?.name || pkg.author || '',
+      author: authorName,
       license: pkg.license || 'MIT',
       keywords: pkg.keywords || [],
-      categories: pkg.categories || [],
+      categories: (pkg.categories || []) as ToolCategory[],
       homepage: pkg.links?.homepage || '',
       repository: pkg.links?.repository || '',
       mcpVersion: pkg.mcpVersion || '1.0.0',
-      tools: pkg.tools || [],
+      tools: (pkg.tools || []) as ToolPackage['tools'],
       dependencies: pkg.dependencies || {},
       metadata: {
         createdAt: new Date(),

@@ -7,7 +7,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { ModelGateway, ModelConfig, DEFAULT_MODELS } from '../../core/ai';
 import { loadConfig, saveConfig } from '../../core/config';
-import { TaskFlowConfig } from '../../types';
+import { TaskFlowConfig, AIModelConfig } from '../../types';
 
 const program = new Command('model');
 
@@ -20,6 +20,32 @@ async function getGateway(): Promise<ModelGateway> {
     gateway = new ModelGateway({ models, defaultRouter: 'smart' });
   }
   return gateway;
+}
+
+/** 模型添加选项 */
+interface ModelAddOptions {
+  id: string;
+  provider: string;
+  modelName: string;
+  apiKey: string;
+  baseUrl?: string;
+  priority: string;
+  enabled: string;
+}
+
+/** 模型 ID 选项 */
+interface ModelIdOptions {
+  id: string;
+}
+
+/** 测试选项 */
+interface TestOptions {
+  id?: string;
+}
+
+/** 路由选项 */
+interface RouteOptions {
+  strategy: 'smart' | 'cost' | 'speed' | 'priority';
 }
 
 /**
@@ -72,32 +98,36 @@ program
   .option('-u, --base-url <url>', 'API 基础 URL')
   .option('--priority <n>', '优先级', '10')
   .option('--enabled', '是否启用', 'true')
-  .action(async options => {
+  .action(async (options: ModelAddOptions) => {
     const config = (await loadConfig()) || ({} as TaskFlowConfig);
 
-    const newModel: ModelConfig = {
+    const newModel: AIModelConfig & { id: string; capabilities: string[] } = {
       id: options.id,
-      provider: options.provider,
+      provider: options.provider as AIModelConfig['provider'],
       modelName: options.modelName,
       apiKey: options.apiKey,
-      baseUrl: options.baseUrl,
+      endpoint: options.baseUrl,
       priority: parseInt(options.priority),
       enabled: options.enabled === 'true',
       capabilities: ['chat'],
     };
 
-    const existingIndex = config.aiModels?.findIndex((m: any) => m.id === newModel.id);
-    if (existingIndex !== undefined && existingIndex >= 0) {
-      config.aiModels![existingIndex] = newModel as any;
+    // AIModelConfig doesn't have id, so we need a type-safe search
+    const models = config.aiModels || [];
+    const existingIndex = models.findIndex(
+      m => (m as AIModelConfig & { id?: string }).id === newModel.id
+    );
+    if (existingIndex >= 0) {
+      Object.assign(models[existingIndex], newModel);
       console.log(chalk.yellow(`更新现有模型: ${newModel.id}`));
     } else {
-      config.aiModels = config.aiModels || [];
-      config.aiModels.push(newModel as any);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      models.push(newModel as any);
       console.log(chalk.green(`添加新模型: ${newModel.id}`));
     }
+    config.aiModels = models;
 
     await saveConfig(config);
-
     gateway = null;
   });
 
@@ -108,7 +138,7 @@ program
   .command('remove')
   .description('移除模型')
   .requiredOption('-i, --id <id>', '模型 ID')
-  .action(async options => {
+  .action(async (options: ModelIdOptions) => {
     const config = await loadConfig();
 
     if (!config?.aiModels) {
@@ -116,7 +146,8 @@ program
       return;
     }
 
-    const index = config.aiModels.findIndex((m: any) => m.id === options.id);
+    const models = config.aiModels as (AIModelConfig & { id?: string })[];
+    const index = models.findIndex(m => m.id === options.id);
     if (index < 0) {
       console.log(chalk.yellow(`未找到模型: ${options.id}`));
       return;
@@ -126,20 +157,20 @@ program
     await saveConfig(config);
 
     console.log(chalk.green(`已移除模型: ${options.id}`));
-
     gateway = null;
   });
 
 /**
- * 启用/禁用模型
+ * 启用模型
  */
 program
   .command('enable')
   .description('启用模型')
   .requiredOption('-i, --id <id>', '模型 ID')
-  .action(async options => {
+  .action(async (options: ModelIdOptions) => {
     const config = await loadConfig();
-    const model = config?.aiModels?.find((m: any) => m.id === options.id);
+    const models = config?.aiModels as (AIModelConfig & { id?: string })[] | undefined;
+    const model = models?.find(m => m.id === options.id);
 
     if (!model) {
       console.log(chalk.red(`未找到模型: ${options.id}`));
@@ -153,13 +184,17 @@ program
     gateway = null;
   });
 
+/**
+ * 禁用模型
+ */
 program
   .command('disable')
   .description('禁用模型')
   .requiredOption('-i, --id <id>', '模型 ID')
-  .action(async options => {
+  .action(async (options: ModelIdOptions) => {
     const config = await loadConfig();
-    const model = config?.aiModels?.find((m: any) => m.id === options.id);
+    const models = config?.aiModels as (AIModelConfig & { id?: string })[] | undefined;
+    const model = models?.find(m => m.id === options.id);
 
     if (!model) {
       console.log(chalk.red(`未找到模型: ${options.id}`));
@@ -180,7 +215,7 @@ program
   .command('test')
   .description('测试所有模型的连接')
   .option('-i, --id <id>', '只测试指定模型')
-  .action(async options => {
+  .action(async (options: TestOptions) => {
     const gw = await getGateway();
 
     console.log(chalk.bold('\n🔄 测试模型连接...\n'));
@@ -207,12 +242,12 @@ program
   .description('测试模型路由决策')
   .argument('<message>', '测试消息')
   .option('-s, --strategy <strategy>', '路由策略 (smart|cost|speed|priority)', 'smart')
-  .action(async (message, options) => {
+  .action(async (message: string, options: RouteOptions) => {
     const gw = await getGateway();
 
     const result = await gw.complete({
       messages: [{ role: 'user', content: message }],
-      strategy: options.strategy as any,
+      strategy: options.strategy,
     });
 
     console.log(chalk.bold('\n🧠 路由决策结果:\n'));
@@ -232,13 +267,18 @@ program
   .command('benchmark')
   .description('对比不同路由策略')
   .argument('<message>', '测试消息')
-  .action(async message => {
+  .action(async (message: string) => {
     const gw = await getGateway();
-    const strategies = ['smart', 'cost', 'speed', 'priority'] as const;
+    const strategies: Array<'smart' | 'cost' | 'speed' | 'priority'> = [
+      'smart',
+      'cost',
+      'speed',
+      'priority',
+    ];
 
     console.log(chalk.bold('\n📊 路由策略基准测试:\n'));
 
-    for (const strategy of [...strategies] as any[]) {
+    for (const strategy of strategies) {
       try {
         const result = await gw.complete({
           messages: [{ role: 'user', content: message }],

@@ -3,9 +3,18 @@
  */
 
 import inquirer from 'inquirer';
+import { VisualizationOptions } from './charts';
 
-export async function getVisualizationOptions(baseOptions: any): Promise<any> {
-  const answers = await inquirer.prompt([
+/** 基础选项 */
+export interface BaseVisualizationOptions extends Partial<VisualizationOptions> {
+  format?: 'html' | 'svg';
+  output?: string;
+}
+
+export async function getVisualizationOptions(
+  baseOptions: BaseVisualizationOptions
+): Promise<BaseVisualizationOptions & VisualizationOptions> {
+  const answers = await inquirer.prompt<BaseVisualizationOptions & VisualizationOptions>([
     {
       type: 'list',
       name: 'type',

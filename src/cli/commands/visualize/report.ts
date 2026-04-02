@@ -4,8 +4,17 @@
 
 import path from 'path';
 import fs from 'fs-extra';
+import { ChartData } from './charts';
 
-export async function generateReport(charts: unknown[], options: any): Promise<string> {
+/** 报告生成选项 */
+export interface ReportOptions {
+  output: string;
+  format: 'html' | 'svg' | 'json';
+  theme?: 'light' | 'dark';
+  title?: string;
+}
+
+export async function generateReport(charts: ChartData[], options: ReportOptions): Promise<string> {
   const outputDir = path.resolve(options.output);
   await fs.ensureDir(outputDir);
 
@@ -33,7 +42,7 @@ export async function generateReport(charts: unknown[], options: any): Promise<s
   return reportPath;
 }
 
-function generateHTMLReport(charts: unknown[], options: any): string {
+function generateHTMLReport(charts: ChartData[], options: ReportOptions): string {
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -48,7 +57,7 @@ function generateHTMLReport(charts: unknown[], options: any): string {
   <h1>TaskFlow 可视化报告</h1>
   ${charts
     .map(
-      (chart: any) => `
+      (chart: ChartData) => `
     <div class="chart">
       <h2>${chart.title}</h2>
       <p>类型: ${chart.type}</p>
@@ -60,7 +69,7 @@ function generateHTMLReport(charts: unknown[], options: any): string {
 </html>`;
 }
 
-function generateSVGReport(charts: any[], options: any): string {
+function generateSVGReport(charts: ChartData[], options: ReportOptions): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">
   <text x="400" y="30" text-anchor="middle" font-size="20">TaskFlow Report</text>

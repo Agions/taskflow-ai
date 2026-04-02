@@ -6,12 +6,16 @@ import { getLogger } from '../../../utils/logger';
 import { Command } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
-import path from 'path';
-import { generateCharts } from './charts';
-import { generateReport } from './report';
+import { generateCharts, VisualizationData, VisualizationOptions } from './charts';
+import { generateReport, ReportOptions } from './report';
 import { findDataFiles, loadProjectData, showVisualizationStats } from './data';
-import { getVisualizationOptions } from './prompts';
+import { getVisualizationOptions, BaseVisualizationOptions } from './prompts';
 const logger = getLogger('cli/commands/visualize/index');
+
+/** Visualize 命令选项 */
+interface VisualizeCommandOptions extends BaseVisualizationOptions {
+  interactive?: boolean;
+}
 
 export function visualizeCommand(program: Command) {
   program
@@ -21,7 +25,7 @@ export function visualizeCommand(program: Command) {
     .option('-o, --output <path>', '输出路径', './reports')
     .option('-f, --format <format>', '输出格式 (html|svg|png)', 'html')
     .option('--interactive', '交互式模式')
-    .action(async options => {
+    .action(async (options: VisualizeCommandOptions) => {
       try {
         await runVisualize(options);
       } catch (error) {
@@ -31,13 +35,14 @@ export function visualizeCommand(program: Command) {
     });
 }
 
-async function runVisualize(options: any) {
+async function runVisualize(options: VisualizeCommandOptions): Promise<void> {
   const spinner = ora('正在生成可视化报告...').start();
 
   try {
+    let finalOptions = options;
     if (options.interactive) {
       spinner.stop();
-      options = await getVisualizationOptions(options);
+      finalOptions = await getVisualizationOptions(options);
       spinner.start('正在生成可视化报告...');
     }
 
@@ -47,21 +52,21 @@ async function runVisualize(options: any) {
       return;
     }
 
-    const data = await loadProjectData(dataFiles);
-    const charts = generateCharts(data, options);
-    const reportPath = await generateReport(charts, options);
+    const data: VisualizationData = await loadProjectData(dataFiles);
+    const charts = generateCharts(data, finalOptions as VisualizationOptions);
+    const reportPath = await generateReport(charts, finalOptions as ReportOptions);
 
     spinner.succeed(chalk.green('可视化报告生成完成！'));
 
     console.log(chalk.cyan('\n📊 可视化报告:'));
-    console.log(chalk.gray('  类型: ') + chalk.white(options.type));
-    console.log(chalk.gray('  格式: ') + chalk.white(options.format));
+    console.log(chalk.gray('  类型: ') + chalk.white(finalOptions.type));
+    console.log(chalk.gray('  格式: ') + chalk.white(finalOptions.format));
     console.log(chalk.gray('  输出: ') + chalk.blue(reportPath));
     console.log(chalk.gray('  数据源: ') + chalk.white(`${dataFiles.length} 个文件`));
 
     showVisualizationStats(data);
 
-    if (options.format === 'html') {
+    if (finalOptions.format === 'html') {
       console.log(chalk.yellow('\n💡 提示: 使用浏览器打开 HTML 文件查看交互式图表'));
     }
   } catch (error) {
