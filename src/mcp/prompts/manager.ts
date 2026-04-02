@@ -13,7 +13,6 @@ import { PromptLoader } from './loader';
 import { PromptRenderer } from './renderer';
 const logger = getLogger('mcp/prompts/manager');
 
-
 export * from './types';
 
 export class MCPPromptManager {

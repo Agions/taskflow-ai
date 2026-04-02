@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { MCPResource } from './types';
 const logger = getLogger('mcp/resources/defaults');
 
-
 export const defaultResources: MCPResource[] = [
   {
     uri: '/tasks',

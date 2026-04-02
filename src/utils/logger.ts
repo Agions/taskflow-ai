@@ -177,7 +177,11 @@ class LoggerWithContext {
  * 性能监控装饰器
  */
 export function logPerformance(logger: Logger, operation?: string) {
-  return function (target: { constructor?: { name?: string } }, propertyName: string, descriptor: PropertyDescriptor) {
+  return function (
+    target: { constructor?: { name?: string } },
+    propertyName: string,
+    descriptor: PropertyDescriptor
+  ) {
     const method = descriptor.value;
     const targetName = target?.constructor?.name || 'unknown';
     const opName = operation || `${targetName}.${propertyName}`;

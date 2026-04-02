@@ -219,4 +219,3 @@ export { IPFilter } from './ip-filter';
 export { SandboxManager } from './sandbox';
 export { validateCommand, validateUrl, validateFilePath, validateDownloadPath } from './validator';
 const logger = getLogger('mcp/security/index');
-

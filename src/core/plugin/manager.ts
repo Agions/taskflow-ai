@@ -10,7 +10,6 @@ import { Logger } from '../../utils/logger';
 import { Plugin, PluginContext, PluginHooks } from './types';
 const logger = getLogger('core/plugin/manager');
 
-
 export interface PluginLoadResult {
   success: boolean;
   plugin?: Plugin;

@@ -8,7 +8,6 @@ import { MCPPrompt, PromptRenderOptions } from './types';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('mcp/prompts/renderer');
 
-
 export class PromptRenderer {
   private compiledCache: Map<string, HandlebarsTemplateDelegate> = new Map();
 

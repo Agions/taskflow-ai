@@ -13,7 +13,6 @@ import { TaskGenerator } from '../../core/tasks';
 import { ConfigManager } from '../../core/config';
 const logger = getLogger('cli/commands/parse');
 
-
 export function parseCommand(program: Command) {
   program
     .command('parse <file>')

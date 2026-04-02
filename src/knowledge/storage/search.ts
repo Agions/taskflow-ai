@@ -8,7 +8,6 @@ import { EmbeddingManager } from '../embedding';
 import { StoredChunk } from './types';
 const logger = getLogger('knowledge/storage/search');
 
-
 /**
  * 搜索管理器
  */

@@ -7,7 +7,6 @@ import { getLogger } from '../../utils/logger';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('mcp/tools/search-replace');
 
-
 export interface SearchReplaceOptions {
   paths?: string[];
   extensions?: string[];

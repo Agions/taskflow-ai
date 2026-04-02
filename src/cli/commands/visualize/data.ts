@@ -19,7 +19,9 @@ export async function findDataFiles(cwd: string = process.cwd()): Promise<string
   return files.filter(f => f.endsWith('.json')).map(f => path.join(dataDir, f));
 }
 
-export async function loadProjectData(files: string[]): Promise<{ tasks: unknown[]; metadata: Record<string, unknown> }> {
+export async function loadProjectData(
+  files: string[]
+): Promise<{ tasks: unknown[]; metadata: Record<string, unknown> }> {
   const allData: { tasks: unknown[]; metadata: Record<string, unknown> } = {
     tasks: [],
     metadata: {},

@@ -8,7 +8,6 @@ import fs from 'fs-extra';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('mcp/resources/data-providers');
 
-
 export class DataProviders {
   constructor(private logger: Logger) {}
 

@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { MCPPrompt } from './types';
 const logger = getLogger('mcp/prompts/defaults');
 
-
 export const defaultPrompts: MCPPrompt[] = [
   {
     name: 'project_plan',

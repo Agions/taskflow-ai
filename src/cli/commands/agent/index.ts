@@ -11,7 +11,6 @@ import { parsePRD } from './prd-parser';
 import { runAgent } from './runner';
 const logger = getLogger('cli/commands/agent/index');
 
-
 export * from './mock-ai';
 export * from './prd-parser';
 export * from './runner';

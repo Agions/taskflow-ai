@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { ToolDefinition } from './types';
 const logger = getLogger('mcp/tools/memory');
 
-
 // 内存存储
 interface MemoryItem {
   key: string;

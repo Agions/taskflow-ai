@@ -10,7 +10,6 @@ import { ConfigManager } from '../../core/config';
 import { CLI_SYMBOLS } from '../../constants';
 const logger = getLogger('cli/commands/status');
 
-
 export function statusCommand(program: Command) {
   program
     .command('status')

@@ -8,7 +8,6 @@ import * as path from 'path';
 import { minimatch } from 'minimatch';
 const logger = getLogger('knowledge/retrieval/scanner');
 
-
 export class DocumentScanner {
   async scan(
     dirPath: string,

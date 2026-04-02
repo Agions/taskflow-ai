@@ -8,7 +8,6 @@ import { StorageBackend } from './storage-types';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('core/workflow/sqlite-storage');
 
-
 export class SQLiteStorage implements StorageBackend {
   private logger = Logger.getInstance('SQLiteStorage');
   private db: any = null;

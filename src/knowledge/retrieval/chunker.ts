@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { Document, DocumentChunk, ChunkMetadata } from '../types';
 const logger = getLogger('knowledge/retrieval/chunker');
 
-
 export class DocumentChunker {
   constructor(
     private chunkSize: number = 1000,

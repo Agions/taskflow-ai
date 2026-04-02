@@ -135,4 +135,3 @@ export * from './types';
 export { DataPersistence } from './persistence';
 export { SearchManager } from './search';
 const logger = getLogger('knowledge/storage/index');
-

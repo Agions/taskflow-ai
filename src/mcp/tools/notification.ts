@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { ToolDefinition, PermissionLevel } from './types';
 const logger = getLogger('mcp/tools/notification');
 
-
 // Slack Webhook
 async function sendSlackWebhook(
   webhookUrl: string,

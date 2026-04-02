@@ -9,7 +9,6 @@ import { ExecutionContext, createExecutor } from './executor';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('core/workflow/flow-control');
 
-
 export interface ParallelResult {
   success: boolean;
   results: Record<string, StepResult>;

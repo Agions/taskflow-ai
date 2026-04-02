@@ -18,7 +18,6 @@ import { Logger } from '../../utils/logger';
 import { toolRegistry } from '../../mcp/tools/registry';
 const logger = getLogger('core/agent/core');
 
-
 /**
  * Agent 核心类
  */

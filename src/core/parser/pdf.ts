@@ -8,7 +8,6 @@ import fs from 'fs-extra';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('core/parser/pdf');
 
-
 export class PDFParser {
   private logger = Logger.getInstance('PDFParser');
 

@@ -13,7 +13,6 @@ import { ResourceScanner } from './scanner';
 import { DataProviders } from './data-providers';
 const logger = getLogger('mcp/resources/manager');
 
-
 export * from './types';
 
 export class MCPResourceManager {

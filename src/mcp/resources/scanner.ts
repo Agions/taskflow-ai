@@ -9,7 +9,6 @@ import { MCPResource } from './types';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('mcp/resources/scanner');
 
-
 export class ResourceScanner {
   constructor(
     private dataDir: string,

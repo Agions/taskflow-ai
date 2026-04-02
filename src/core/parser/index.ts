@@ -16,7 +16,6 @@ import { createTaskFlowError } from '../../utils/errors';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('core/parser/index');
 
-
 export class PRDParser {
   private logger: Logger;
   private markdown: MarkdownIt;

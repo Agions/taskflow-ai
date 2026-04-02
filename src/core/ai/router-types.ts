@@ -66,7 +66,10 @@ export abstract class BaseRouter {
       taskType = 'chat';
     }
 
-    const totalLength: number = messages.reduce((sum: number, m: any) => sum + (m.content?.length || 0), 0);
+    const totalLength: number = messages.reduce(
+      (sum: number, m: any) => sum + (m.content?.length || 0),
+      0
+    );
     if (totalLength < 200) {
       complexity = 'low';
     } else if (totalLength > 2000) {

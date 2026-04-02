@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { RateLimitData, SecuritySettings } from './types';
 const logger = getLogger('mcp/security/rate-limiter');
 
-
 /**
  * 速率限制器
  */

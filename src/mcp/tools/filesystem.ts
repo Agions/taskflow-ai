@@ -7,7 +7,6 @@ import { ToolDefinition } from './types';
 import { validateFilePath } from '../security/validator';
 const logger = getLogger('mcp/tools/filesystem');
 
-
 export const filesystemTools: ToolDefinition[] = [
   {
     name: 'fs_readDir',

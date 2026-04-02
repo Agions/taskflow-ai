@@ -8,7 +8,6 @@ import fs from 'fs-extra';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('core/parser/word');
 
-
 export class WordParser {
   private logger = Logger.getInstance('WordParser');
 

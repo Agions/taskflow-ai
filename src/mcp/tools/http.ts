@@ -7,7 +7,6 @@ import { ToolDefinition } from './types';
 import { validateUrl } from '../security/validator';
 const logger = getLogger('mcp/tools/http');
 
-
 export const httpTools: ToolDefinition[] = [
   {
     name: 'http_request',

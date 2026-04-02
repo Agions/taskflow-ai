@@ -8,7 +8,6 @@ import { execSync } from 'child_process';
 import { promisify } from 'util';
 const logger = getLogger('mcp/tools/git');
 
-
 const execAsync = promisify(execSync);
 
 async function gitExec(

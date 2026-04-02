@@ -19,7 +19,6 @@ import { CodeValidator } from './validator';
 import { CodeSyncer } from './sync';
 const logger = getLogger('codegen/engines/index');
 
-
 export * from './file-generator';
 export * from './validator';
 export * from './sync';

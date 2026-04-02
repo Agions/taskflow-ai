@@ -9,7 +9,6 @@ import { createExecutor, ExecutionContext } from './executor';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('core/workflow/engine');
 
-
 export type ExecutionMode = 'sequential' | 'parallel';
 
 /**

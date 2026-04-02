@@ -8,7 +8,6 @@ import * as path from 'path';
 import { GeneratedComponent, SyncConfig } from '../types';
 const logger = getLogger('codegen/engines/sync');
 
-
 export class CodeSyncer {
   constructor(private outputDir: string) {}
 

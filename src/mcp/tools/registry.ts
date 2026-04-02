@@ -9,7 +9,6 @@ import { ToolDefinition, ToolRegistration, ToolCategory } from './types';
 import { TOOL_CATEGORIES, getCategory } from './categories';
 const logger = getLogger('mcp/tools/registry');
 
-
 export * from './types';
 
 export class ToolRegistry {

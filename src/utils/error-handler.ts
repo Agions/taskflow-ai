@@ -7,7 +7,6 @@ import { getLogger } from '../utils/logger';
 import { Logger } from './logger';
 const logger = getLogger('utils/error-handler');
 
-
 /**
  * 异步操作错误处理包装器
  * @param fn 异步函数
@@ -168,17 +167,13 @@ export async function safeExecute<T>(
 /**
  * 验证必需参数
  */
-export function validateRequired(
-  params: Record<string, unknown>,
-  required: string[]
-): void {
+export function validateRequired(params: Record<string, unknown>, required: string[]): void {
   for (const field of required as any[]) {
     if (!params[field]) {
-      throw createCodedError(
-        'VALIDATION_ERROR',
-        `Missing required field: ${field}`,
-        { field, provided: Object.keys(params) }
-      );
+      throw createCodedError('VALIDATION_ERROR', `Missing required field: ${field}`, {
+        field,
+        provided: Object.keys(params),
+      });
     }
   }
 }
@@ -216,15 +211,19 @@ export class AsyncErrorBoundary {
  */
 export function safeJsonStringify(obj: any, space?: number): string {
   try {
-    return JSON.stringify(obj, (key, value) => {
-      if (typeof value === 'bigint') {
-        return value.toString();
-      }
-      if (value instanceof Error) {
-        return { message: value.message, stack: value.stack };
-      }
-      return value;
-    }, space);
+    return JSON.stringify(
+      obj,
+      (key, value) => {
+        if (typeof value === 'bigint') {
+          return value.toString();
+        }
+        if (value instanceof Error) {
+          return { message: value.message, stack: value.stack };
+        }
+        return value;
+      },
+      space
+    );
   } catch (error) {
     return JSON.stringify({ error: 'Failed to stringify object' });
   }

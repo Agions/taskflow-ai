@@ -13,7 +13,6 @@ import { findDataFiles, loadProjectData, showVisualizationStats } from './data';
 import { getVisualizationOptions } from './prompts';
 const logger = getLogger('cli/commands/visualize/index');
 
-
 export function visualizeCommand(program: Command) {
   program
     .command('visualize')

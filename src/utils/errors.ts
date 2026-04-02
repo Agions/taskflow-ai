@@ -35,7 +35,7 @@ export function isTaskFlowError(error: any): error is TaskFlowError {
  */
 export function formatError(error: Error | TaskFlowError): string {
   if (isTaskFlowError(error)) {
-    return `[${error.type.toUpperCase()}:${error.code}] ${(error instanceof Error ? error.message : String(error))}`;
+    return `[${error.type.toUpperCase()}:${error.code}] ${error instanceof Error ? error.message : String(error)}`;
   }
 
   return (error instanceof Error ? error.message : String(error)) || 'Unknown error';

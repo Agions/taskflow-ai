@@ -8,7 +8,6 @@ import chalk from 'chalk';
 import { runInit } from './runner';
 const logger = getLogger('cli/commands/init/index');
 
-
 export function initCommand(program: Command) {
   program
     .command('init')

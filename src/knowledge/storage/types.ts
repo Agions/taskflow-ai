@@ -12,7 +12,6 @@ import {
 } from '../types';
 const logger = getLogger('knowledge/storage/types');
 
-
 /**
  * 存储的文档块（带时间戳）
  */

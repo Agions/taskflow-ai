@@ -7,7 +7,6 @@ import { getLogger } from '../../utils/logger';
 import { MCPTool } from './types';
 const logger = getLogger('mcp/tools/code-executor');
 
-
 export interface CodeExecutorOptions {
   /** 最大执行时间 (ms) */
   timeout?: number;

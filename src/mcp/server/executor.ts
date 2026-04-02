@@ -42,9 +42,30 @@ export class MCPToolExecutor {
     }
 
     const allowedCommands = [
-      'ls', 'cat', 'grep', 'find', 'head', 'tail', 'wc',
-      'git', 'npm', 'node', 'npx', 'tsc', 'eslint', 'prettier',
-      'mkdir', 'touch', 'rm', 'cp', 'mv', 'echo', 'pwd', 'whoami', 'date', 'which',
+      'ls',
+      'cat',
+      'grep',
+      'find',
+      'head',
+      'tail',
+      'wc',
+      'git',
+      'npm',
+      'node',
+      'npx',
+      'tsc',
+      'eslint',
+      'prettier',
+      'mkdir',
+      'touch',
+      'rm',
+      'cp',
+      'mv',
+      'echo',
+      'pwd',
+      'whoami',
+      'date',
+      'which',
     ];
 
     const shellMetacharacters = /[;&|`$(){}[\]<>\\!*?]/;
@@ -104,7 +125,8 @@ export class MCPToolExecutor {
         } else {
           analysis.files++;
           const ext = path.extname(item.name).slice(1);
-          (analysis.languages as Record<string, number>)[ext] = ((analysis.languages as Record<string, number>)[ext] || 0) + 1;
+          (analysis.languages as Record<string, number>)[ext] =
+            ((analysis.languages as Record<string, number>)[ext] || 0) + 1;
           results.push({ type: 'file', name: item.name, size: (await fs.stat(fullPath)).size });
         }
       }

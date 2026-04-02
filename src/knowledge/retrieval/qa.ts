@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { RetrievedChunk, QAResult, Source } from '../types';
 const logger = getLogger('knowledge/retrieval/qa');
 
-
 export class QAProcessor {
   async answer(question: string, chunks: RetrievedChunk[]): Promise<QAResult> {
     const startTime = Date.now();

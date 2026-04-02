@@ -9,7 +9,6 @@ import { Logger } from '../../utils/logger';
 import { toolRegistry } from '../../mcp/tools/registry';
 const logger = getLogger('core/workflow/executor');
 
-
 export interface ExecutionContext {
   /** 工作流变量 */
   variables: Record<string, unknown>;

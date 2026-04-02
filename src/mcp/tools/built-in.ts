@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { ToolDefinition } from './types';
 const logger = getLogger('mcp/tools/built-in');
 
-
 export const fileTools: ToolDefinition[] = [
   {
     name: 'file_read',

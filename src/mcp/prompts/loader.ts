@@ -9,7 +9,6 @@ import { MCPPrompt } from './types';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('mcp/prompts/loader');
 
-
 export class PromptLoader {
   constructor(
     private promptsDir: string,

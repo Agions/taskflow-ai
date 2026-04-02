@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { ToolDefinition } from './types';
 const logger = getLogger('mcp/tools/vector');
 
-
 // 内存向量存储
 interface VectorEntry {
   id: string;

@@ -16,7 +16,6 @@ import { toolRegistry } from '../tools/registry';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('mcp/server/handlers');
 
-
 interface Config {
   aiModels?: Array<{ apiKey?: string; [key: string]: unknown }>;
   [key: string]: unknown;
@@ -72,7 +71,12 @@ export class MCPRequestHandlers {
         };
       } catch (error: unknown) {
         return {
-          content: [{ type: 'text', text: `Error: ${error instanceof Error ? error.message : String(error)}` }],
+          content: [
+            {
+              type: 'text',
+              text: `Error: ${error instanceof Error ? error.message : String(error)}`,
+            },
+          ],
           isError: true,
         };
       }
@@ -141,7 +145,7 @@ export class MCPRequestHandlers {
 
   private sanitizeConfig(config: Config): Config {
     if (!config) return {};
-    
+
     const sanitized = { ...config } as Config;
     if (sanitized.aiModels && Array.isArray(sanitized.aiModels)) {
       sanitized.aiModels = sanitized.aiModels.map(model => {
@@ -152,7 +156,7 @@ export class MCPRequestHandlers {
         };
       });
     }
-    
+
     return sanitized;
   }
 }

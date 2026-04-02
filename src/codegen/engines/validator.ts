@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { ComponentSpec, CodeQualityCheck, GeneratedFile } from '../types';
 const logger = getLogger('codegen/engines/validator');
 
-
 export class CodeValidator {
   validateSpec(spec: ComponentSpec): void {
     if (!spec.name) {

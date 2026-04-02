@@ -6,7 +6,6 @@ import { getLogger } from '../../utils/logger';
 import { ToolDefinition } from './types';
 const logger = getLogger('mcp/tools/database');
 
-
 // SQL.js 数据库缓存
 const dbCache: Map<string, any> = new Map();
 
@@ -92,7 +91,15 @@ export const databaseTools: ToolDefinition[] = [
           };
         }
       } catch (error: unknown) {
-        return { success: false, error: error instanceof Error ? (error instanceof Error ? error.message : String(error)) : String(error) };
+        return {
+          success: false,
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : String(error)
+              : String(error),
+        };
       }
     },
     category: 'database',
@@ -188,7 +195,15 @@ export const databaseTools: ToolDefinition[] = [
           tables,
         };
       } catch (error: unknown) {
-        return { success: false, error: error instanceof Error ? (error instanceof Error ? error.message : String(error)) : String(error) };
+        return {
+          success: false,
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : String(error)
+              : String(error),
+        };
       }
     },
     category: 'database',
@@ -224,7 +239,15 @@ export const databaseTools: ToolDefinition[] = [
           columns,
         };
       } catch (error: unknown) {
-        return { success: false, error: error instanceof Error ? (error instanceof Error ? error.message : String(error)) : String(error) };
+        return {
+          success: false,
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : String(error)
+              : String(error),
+        };
       }
     },
     category: 'database',

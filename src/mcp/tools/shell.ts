@@ -9,7 +9,6 @@ import { promisify } from 'util';
 import { validateCommand } from '../security/validator';
 const logger = getLogger('mcp/tools/shell');
 
-
 const execAsync = promisify(execSync);
 
 export const shellTools: ToolDefinition[] = [
@@ -152,7 +151,12 @@ export const shellTools: ToolDefinition[] = [
         child.on('error', error => {
           resolve({
             success: false,
-            error: (error instanceof Error ? error instanceof Error ? error.message : String(error) : String(error)),
+            error:
+              error instanceof Error
+                ? error instanceof Error
+                  ? error.message
+                  : String(error)
+                : String(error),
             pid: child.pid,
           });
         });
@@ -212,7 +216,16 @@ export const shellTools: ToolDefinition[] = [
         if (error.code === 'ESRCH') {
           return { success: false, error: '进程不存在', pid };
         }
-        return { success: false, error: (error instanceof Error ? error instanceof Error ? error.message : String(error) : String(error)), pid };
+        return {
+          success: false,
+          error:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : String(error)
+              : String(error),
+          pid,
+        };
       }
     },
     category: 'shell',
