@@ -2,11 +2,50 @@
  * GitHub Actions 工作流生成器
  */
 
-import { GitHubActionsConfig, WorkflowTemplate } from '../types';
+import { GitHubActionsConfig, PipelineTrigger, WorkflowTemplate } from '../types';
+
+/** GitHub Actions trigger YAML 输出 */
+interface GitHubTriggerOutput {
+  push?: { branches?: string[]; paths?: string[] };
+  pull_request?: { branches?: string[]; types?: string[] };
+  schedule?: Array<{ cron: string }>;
+  workflow_dispatch?: { inputs?: unknown };
+}
+
+/** GitHub Actions job YAML 节点 */
+interface GitHubJobOutput {
+  name: string;
+  'runs-on': string;
+  steps: GitHubStepOutput[];
+  needs?: string[];
+  if?: string;
+}
+
+/** GitHub Actions step YAML 节点 */
+interface GitHubStepOutput {
+  name?: string;
+  uses?: string;
+  run?: string;
+  with?: Record<string, unknown>;
+  env?: Record<string, string | number | boolean>;
+  if?: string;
+  'working-directory'?: string;
+  shell?: string;
+}
+
+/** 工作流 YAML 节点 */
+interface WorkflowYamlNode {
+  name: string;
+  on?: GitHubTriggerOutput;
+  permissions?: Record<string, string>;
+  jobs: Record<string, GitHubJobOutput>;
+  concurrency?: Record<string, unknown>;
+  env?: Record<string, string>;
+}
 
 export class GitHubWorkflowGenerator {
   generate(config: GitHubActionsConfig): string {
-    const workflow: any = {
+    const workflow: WorkflowYamlNode = {
       name: config.name,
       on: this.generateTriggers(config.triggers),
       permissions: this.generatePermissions(config.permissions),
@@ -25,39 +64,40 @@ export class GitHubWorkflowGenerator {
     }
 
     for (const stage of config.stages) {
-      workflow.jobs[stage.name] = this.generateJob(stage, config);
+      workflow.jobs[stage.name] = this.generateJob(
+        stage as unknown as Record<string, unknown>,
+        config
+      );
     }
 
-    return this.toYaml(workflow);
+    return this.toYaml(workflow as unknown as Record<string, unknown>);
   }
 
-  private generateTriggers(triggers: any): unknown {
-    const result: any = {};
+  private generateTriggers(triggers: PipelineTrigger[]): GitHubTriggerOutput {
+    const result: GitHubTriggerOutput = {};
 
-    for (const trigger of triggers as any[]) {
+    for (const trigger of triggers) {
       if (trigger.type === 'push') {
         result.push = {
           branches: trigger.branches || ['main'],
           paths: trigger.paths,
         };
-      } else if (trigger.type === 'pull_request') {
+      } else if (trigger.type === 'pr') {
         result.pull_request = {
           branches: trigger.branches || ['main'],
-          types: trigger.types || ['opened', 'synchronize', 'reopened'],
+          types: ['opened', 'synchronize', 'reopened'],
         };
       } else if (trigger.type === 'schedule') {
-        result.schedule = [{ cron: trigger.cron }];
-      } else if (trigger.type === 'workflow_dispatch') {
-        result.workflow_dispatch = {
-          inputs: trigger.inputs,
-        };
+        result.schedule = [{ cron: trigger.cron || '' }];
+      } else if (trigger.type === 'manual') {
+        result.workflow_dispatch = {};
       }
     }
 
     return result;
   }
 
-  private generatePermissions(permissions?: unknown): unknown {
+  private generatePermissions(permissions?: unknown): Record<string, string> {
     if (!permissions) {
       return {
         contents: 'read',
@@ -65,65 +105,71 @@ export class GitHubWorkflowGenerator {
         checks: 'write',
       };
     }
-    return permissions;
+    return permissions as Record<string, string>;
   }
 
-  private generateJob(stage: any, config: GitHubActionsConfig): unknown {
-    const job: any = {
-      name: stage.name,
-      'runs-on': stage.runsOn || 'ubuntu-latest',
+  private generateJob(
+    stage: Record<string, unknown>,
+    _config: GitHubActionsConfig
+  ): GitHubJobOutput {
+    const job: GitHubJobOutput = {
+      name: (stage.name as string) || 'unnamed',
+      'runs-on': (stage.runsOn as string) || 'ubuntu-latest',
       steps: [],
     };
 
     if (stage.needs) {
-      job.needs = stage.needs;
+      job.needs = stage.needs as string[];
     }
 
     if (stage.if) {
-      job.if = stage.if;
+      job.if = stage.if as string;
     }
 
-    for (const step of stage.steps) {
-      job.steps.push(this.generateStep(step, config));
+    const steps = stage.steps as Array<Record<string, string>>;
+    if (Array.isArray(steps)) {
+      for (const step of steps) {
+        job.steps.push(this.generateStep(step));
+      }
     }
 
     return job;
   }
 
-  private generateStep(step: any, config: GitHubActionsConfig): unknown {
-    const stepConfig: any = {};
+  private generateStep(step: Record<string, unknown>): GitHubStepOutput {
+    const stepConfig: GitHubStepOutput = {};
 
     if (step.name) {
-      stepConfig.name = step.name;
+      stepConfig.name = step.name as string;
     }
 
     if (step.uses) {
-      stepConfig.uses = step.uses;
+      stepConfig.uses = step.uses as string;
       if (step.with) {
-        stepConfig.with = step.with;
+        stepConfig.with = step.with as unknown as Record<string, unknown>;
       }
     } else if (step.run) {
-      stepConfig.run = step.run;
+      stepConfig.run = step.run as string;
       if (step['working-directory']) {
-        stepConfig['working-directory'] = step['working-directory'];
+        stepConfig['working-directory'] = step['working-directory'] as string;
       }
       if (step.shell) {
-        stepConfig.shell = step.shell;
+        stepConfig.shell = step.shell as string;
       }
     }
 
     if (step.env) {
-      stepConfig.env = step.env;
+      stepConfig.env = step.env as Record<string, string | number | boolean>;
     }
 
     if (step.if) {
-      stepConfig.if = step.if;
+      stepConfig.if = step.if as string;
     }
 
     return stepConfig;
   }
 
-  private toYaml(obj: any, indent: number = 0): string {
+  private toYaml(obj: Record<string, unknown>, indent: number = 0): string {
     const spaces = '  '.repeat(indent);
     let yaml = '';
 
@@ -134,13 +180,15 @@ export class GitHubWorkflowGenerator {
 
       if (typeof value === 'object' && !Array.isArray(value)) {
         yaml += `${spaces}${key}:\n`;
-        yaml += this.toYaml(value, indent + 1);
+        yaml += this.toYaml(value as Record<string, unknown>, indent + 1);
       } else if (Array.isArray(value)) {
         yaml += `${spaces}${key}:\n`;
-        for (const item of value as any[]) {
-          if (typeof item === 'object') {
+        for (const item of value) {
+          if (typeof item === 'object' && item !== null) {
             yaml += `${spaces}- `;
-            const lines = this.toYaml(item, 0).trim().split('\n');
+            const lines = this.toYaml(item as Record<string, unknown>, 0)
+              .trim()
+              .split('\n');
             yaml += lines.join(`\n${spaces}  `) + '\n';
           } else {
             yaml += `${spaces}- ${item}\n`;
