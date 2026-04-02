@@ -7,7 +7,8 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { MCPServer } from '../../mcp/server';
 import { ConfigManager } from '../../core/config';
-import { generateAllConfigs, exportConfig } from '../../mcp/config/generator';
+import { generateAllConfigs, exportConfig, EditorConfig } from '../../mcp/config/generator';
+import type { ToolDefinition } from '../../mcp/tools/types';
 const logger = getLogger('cli/commands/mcp');
 
 import * as fs from 'fs/promises';
@@ -86,7 +87,25 @@ export function mcpCommand(program: Command) {
     });
 }
 
-async function startMCPServer(_options: any) {
+/** MCP 启动选项 */
+interface MCPStartOptions {
+  verbose?: boolean;
+}
+
+/** MCP 初始化选项 */
+interface MCPInitOptions {
+  editor: string;
+  output: string;
+  package: string;
+  version: string;
+}
+
+/** MCP 工具列表选项 */
+interface MCPToolsOptions {
+  category?: string;
+}
+
+async function startMCPServer(_options: MCPStartOptions) {
   try {
     const configManager = new ConfigManager();
     const config = await configManager.loadConfig();
@@ -101,7 +120,7 @@ async function startMCPServer(_options: any) {
       version: '2.0.0',
     };
 
-    const mcpServer = new MCPServer(mcpSettings, config as any);
+    const mcpServer = new MCPServer(mcpSettings, config as unknown as Record<string, unknown>);
     await mcpServer.start();
   } catch (error) {
     logger.error(chalk.red('启动失败:'), error);
@@ -109,7 +128,7 @@ async function startMCPServer(_options: any) {
   }
 }
 
-async function generateEditorConfig(options: any) {
+async function generateEditorConfig(options: MCPInitOptions) {
   const editor = options.editor || 'all';
   const outputDir = options.output || process.cwd();
   const packageName = options.package || 'taskflow-ai';
@@ -120,14 +139,11 @@ async function generateEditorConfig(options: any) {
   console.log(chalk.gray(`  版本: ${packageVersion}`));
   console.log(chalk.gray(`  输出: ${outputDir}\n`));
 
-  const configs =
+  const generated = generateAllConfigs({ packageName, packageVersion });
+  const configs: EditorConfig[] =
     editor === 'all'
-      ? generateAllConfigs({ packageName, packageVersion })
-      : [
-          generateAllConfigs({ packageName, packageVersion }).find(
-            c => c.name.toLowerCase().replace(/\s+/g, '-') === editor.toLowerCase()
-          ),
-        ].filter(Boolean);
+      ? generated
+      : generated.filter(c => c.name.toLowerCase().replace(/\s+/g, '-') === editor.toLowerCase());
 
   if (configs.length === 0) {
     console.log(chalk.red(`未找到编辑器: ${editor}`));
@@ -135,13 +151,11 @@ async function generateEditorConfig(options: any) {
     return;
   }
 
-  for (const config of configs as any[]) {
-    if (!config) continue;
-
+  for (const config of configs) {
     const fileName = getConfigFileName(config.name);
     const filePath = path.join(outputDir, fileName);
 
-    const content = exportConfig(config);
+    exportConfig(config);
 
     // 读取现有配置（如果存在）
     let existingConfig: Record<string, unknown> = {};
@@ -177,15 +191,17 @@ function getConfigFileName(editorName: string): string {
   return map[editorName] || 'mcp.json';
 }
 
-function mergeConfig(existing: any, newConfig: any): unknown {
-  // 深度合并配置
-  const result = { ...existing };
+function mergeConfig(
+  existing: Record<string, unknown>,
+  newConfig: Record<string, unknown>
+): Record<string, unknown> {
+  const result: Record<string, unknown> = { ...existing };
 
   for (const key of Object.keys(newConfig)) {
     if (key === 'mcpServers') {
       result.mcpServers = {
-        ...(result.mcpServers || {}),
-        ...newConfig.mcpServers,
+        ...((result.mcpServers as Record<string, unknown>) || {}),
+        ...(newConfig.mcpServers as Record<string, unknown>),
       };
     } else {
       result[key] = newConfig[key];
@@ -195,7 +211,7 @@ function mergeConfig(existing: any, newConfig: any): unknown {
   return result;
 }
 
-async function listTools(options: any) {
+async function listTools(options: MCPToolsOptions) {
   const { toolRegistry } = await import('../../mcp/tools/registry');
 
   // 注册所有工具
@@ -209,8 +225,8 @@ async function listTools(options: any) {
   }
 
   // 按分类分组
-  const byCategory: Record<string, typeof tools> = {};
-  for (const tool of tools as any[]) {
+  const byCategory: Record<string, ToolDefinition[]> = {};
+  for (const tool of tools) {
     const cat = tool.category || 'custom';
     if (!byCategory[cat]) byCategory[cat] = [];
     byCategory[cat].push(tool);
@@ -220,7 +236,7 @@ async function listTools(options: any) {
 
   for (const [category, categoryTools] of Object.entries(byCategory)) {
     console.log(chalk.yellow(`\n${category} (${categoryTools.length})`));
-    for (const tool of categoryTools as any[]) {
+    for (const tool of categoryTools) {
       console.log(chalk.gray(`  • ${tool.name}`) + chalk.white(` - ${tool.description}`));
     }
   }
