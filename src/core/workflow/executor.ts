@@ -107,15 +107,25 @@ export class ToolExecutor extends BaseExecutor {
 
       this.logger.info(`执行工具: ${toolName}`);
 
-      const result = await toolRegistry.execute(toolName, toolInput);
+      const response = await toolRegistry.execute(toolName, toolInput);
 
       if (this.step.config.outputKey) {
-        this.context.outputs[this.step.config.outputKey] = result;
+        this.context.outputs[this.step.config.outputKey] = response.data;
+      }
+
+      if (!response.success) {
+        return {
+          success: false,
+          error: response.error
+            ? `${response.error.code}: ${response.error.message}`
+            : 'Unknown tool error',
+          duration: Date.now() - startTime,
+        };
       }
 
       return {
         success: true,
-        output: result,
+        output: response.data,
         duration: Date.now() - startTime,
       };
     } catch (error) {
@@ -216,18 +226,76 @@ export class OutputExecutor extends BaseExecutor {
 
 /**
  * 执行器工厂
+ * 支持 StepConfig.retries 重试机制
  */
 export function createExecutor(step: WorkflowStep, context: ExecutionContext): BaseExecutor {
-  switch (step.type) {
-    case 'tool':
-      return new ToolExecutor(step, context);
-    case 'thought':
-      return new ThoughtExecutor(step, context);
-    case 'task':
-      return new TaskExecutor(step, context);
-    case 'output':
-      return new OutputExecutor(step, context);
-    default:
-      return new TaskExecutor(step, context);
+  const baseExecutor: BaseExecutor = (() => {
+    switch (step.type) {
+      case 'tool':
+        return new ToolExecutor(step, context);
+      case 'thought':
+        return new ThoughtExecutor(step, context);
+      case 'task':
+        return new TaskExecutor(step, context);
+      case 'output':
+        return new OutputExecutor(step, context);
+      default:
+        return new TaskExecutor(step, context);
+    }
+  })();
+
+  // 有重试配置时用 RetryableExecutor 包装
+  const retries = step.config.retries ?? 0;
+  if (retries > 0) {
+    return new RetryableExecutor(baseExecutor, retries, step.config.delay ?? 0, step.id);
+  }
+
+  return baseExecutor;
+}
+
+/**
+ * 重试包装执行器
+ * 将 step.config.retries 连接到实际的指数退避重试
+ */
+class RetryableExecutor extends BaseExecutor {
+  constructor(
+    private inner: BaseExecutor,
+    private maxRetries: number,
+    private retryDelay: number,
+    private stepId: string
+  ) {
+    super(
+      { id: stepId, name: stepId, type: 'task', config: {} } as WorkflowStep,
+      {} as ExecutionContext
+    );
+  }
+
+  async execute(): Promise<StepResult> {
+    let lastError: string | undefined;
+
+    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+      try {
+        const result = await this.inner.execute();
+        if (result.success) return result;
+        lastError = result.error;
+      } catch (error) {
+        lastError = error instanceof Error ? error.message : String(error);
+      }
+
+      if (attempt < this.maxRetries) {
+        // 指数退避: delay * 2^attempt, 最大 30s
+        const backoff = Math.min(this.retryDelay * Math.pow(2, attempt), 30_000);
+        this.logger.info(
+          `[${this.stepId}] retry ${attempt + 1}/${this.maxRetries}, waiting ${backoff}ms`
+        );
+        await new Promise(resolve => setTimeout(resolve, backoff));
+      }
+    }
+
+    return {
+      success: false,
+      error: `Retried ${this.maxRetries} times failed: ${lastError}`,
+      duration: 0,
+    };
   }
 }

@@ -5,7 +5,14 @@ import { getLogger } from '../../utils/logger';
  */
 
 import { Logger } from '../../utils/logger';
-import { ToolDefinition, ToolRegistration, ToolCategory } from './types';
+import {
+  ToolDefinition,
+  ToolRegistration,
+  ToolCategory,
+  ToolResponse,
+  toolOk,
+  toolError,
+} from './types';
 import { TOOL_CATEGORIES, getCategory } from './categories';
 const logger = getLogger('mcp/tools/registry');
 
@@ -129,22 +136,31 @@ export class ToolRegistry {
     return Array.from(this.tools.values()).map(r => r.tool);
   }
 
-  async execute(name: string, input: Record<string, unknown>): Promise<unknown> {
+  async execute(name: string, input: Record<string, unknown>): Promise<ToolResponse<unknown>> {
     const reg = this.tools.get(name);
     if (!reg) {
-      throw new Error(`Tool not found: ${name}`);
+      return toolError('TOOL_NOT_FOUND', `Tool not found: ${name}`, {
+        tool: name,
+        duration: 0,
+      });
     }
 
     const startTime = Date.now();
     try {
-      const result = await reg.tool.handler(input);
+      const data = await reg.tool.handler(input);
       reg.callCount++;
       reg.lastCalled = Date.now();
-      this.logger.debug(`Executed tool ${name} in ${Date.now() - startTime}ms`);
-      return result;
+      const duration = Date.now() - startTime;
+      this.logger.debug(`Executed tool ${name} in ${duration}ms`);
+      return toolOk(data, { tool: name, duration });
     } catch (error) {
+      const duration = Date.now() - startTime;
       this.logger.error(`Tool ${name} execution failed:`, error);
-      throw error;
+      return toolError('EXECUTION_ERROR', error instanceof Error ? error.message : String(error), {
+        tool: name,
+        duration,
+        recoverable: false,
+      });
     }
   }
 
