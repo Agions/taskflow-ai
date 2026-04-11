@@ -73,7 +73,7 @@ export const notificationTools: ToolDefinition[] = [
       const message = input.message as string;
       const blocks = input.blocks as unknown[] | undefined;
 
-      const payload: any = { text: message };
+      const payload: Record<string, unknown> = { text: message };
       if (blocks) payload.blocks = blocks;
 
       return sendSlackWebhook(webhookUrl, payload);
@@ -106,7 +106,7 @@ export const notificationTools: ToolDefinition[] = [
       const username = input.username as string | undefined;
       const avatarUrl = input.avatarUrl as string | undefined;
 
-      const payload: any = { content: message };
+      const payload: Record<string, unknown> = { content: message };
       if (embeds) payload.embeds = embeds;
       if (username) payload.username = username;
       if (avatarUrl) payload.avatar_url = avatarUrl;

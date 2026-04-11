@@ -11,7 +11,7 @@ interface VectorEntry {
   id: string;
   vector: number[];
   text: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 class InMemoryVectorStore {
@@ -30,7 +30,7 @@ class InMemoryVectorStore {
     return { success: true, id: entry.id };
   }
 
-  search(query: number[], k: number = 5, filter?: Record<string, any>): VectorEntry[] {
+  search(query: number[], k: number = 5, filter?: Record<string, unknown>): VectorEntry[] {
     // 计算余弦相似度
     const scores: Array<{ id: string; score: number; entry: VectorEntry }> = [];
 
@@ -125,7 +125,7 @@ export const vectorTools: ToolDefinition[] = [
         id: input.id as string,
         vector: input.vector as number[],
         text: input.text as string,
-        metadata: (input.metadata as Record<string, any>) || {},
+        metadata: (input.metadata as Record<string, unknown>) || {},
       });
       return result;
     },
@@ -151,7 +151,7 @@ export const vectorTools: ToolDefinition[] = [
     },
     handler: async input => {
       const k = (input.k as number) || 5;
-      const filter = input.filter as Record<string, any> | undefined;
+      const filter = input.filter as Record<string, unknown> | undefined;
       const includeMetadata = (input.includeMetadata as boolean) ?? true;
 
       const results = vectorStore.search(input.query as number[], k, filter);

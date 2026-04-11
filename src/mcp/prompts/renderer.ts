@@ -1,22 +1,22 @@
-import { getLogger } from '../../utils/logger';
 /**
  * 提示渲染器
  */
 
 import Handlebars from 'handlebars';
-import { MCPPrompt, PromptRenderOptions } from './types';
+import { MCPPrompt, PromptRenderOptions, PromptArguments } from './types';
 import { Logger } from '../../utils/logger';
-const logger = getLogger('mcp/prompts/renderer');
 
 export class PromptRenderer {
   private compiledCache: Map<string, HandlebarsTemplateDelegate> = new Map();
 
-  constructor(private logger: Logger) {}
+  constructor(private logger: Logger) {
+    this.logger = logger || Logger.getInstance('PromptRenderer');
+  }
 
   /**
    * 渲染提示模板
    */
-  render(prompt: MCPPrompt, args: Record<string, any>, options: PromptRenderOptions = {}): string {
+  render(prompt: MCPPrompt, args: PromptArguments, options: PromptRenderOptions = {}): string {
     try {
       const template = this.getCompiledTemplate(prompt);
       const context = this.buildContext(prompt, args);
@@ -33,14 +33,14 @@ export class PromptRenderer {
   /**
    * 批量渲染
    */
-  renderBatch(prompt: MCPPrompt, argsList: Record<string, any>[]): string[] {
+  renderBatch(prompt: MCPPrompt, argsList: PromptArguments[]): string[] {
     return argsList.map(args => this.render(prompt, args));
   }
 
   /**
    * 验证参数
    */
-  validateArgs(prompt: MCPPrompt, args: Record<string, any>): { valid: boolean; errors: string[] } {
+  validateArgs(prompt: MCPPrompt, args: PromptArguments): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
 
     for (const arg of prompt.arguments) {
@@ -68,8 +68,8 @@ export class PromptRenderer {
   /**
    * 构建渲染上下文
    */
-  private buildContext(prompt: MCPPrompt, args: Record<string, any>): Record<string, any> {
-    const context: Record<string, any> = {};
+  private buildContext(prompt: MCPPrompt, args: PromptArguments): Record<string, unknown> {
+    const context: Record<string, unknown> = {};
 
     for (const arg of prompt.arguments) {
       context[arg.name] = args[arg.name] ?? arg.default;

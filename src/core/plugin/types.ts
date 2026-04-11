@@ -2,6 +2,11 @@
  * 插件系统核心类型定义
  */
 
+import type { Task } from '../../types/task';
+import type { Workflow } from '../workflow/types';
+import type { Logger } from '../../utils/logger';
+import type { TaskFlowConfig } from '../../types/config';
+
 /**
  * 插件注册表
  */
@@ -45,10 +50,10 @@ export interface PluginHooks {
   onInit?: (context: PluginContext) => void | Promise<void>;
   onLoad?: (plugin: Plugin) => void | Promise<void>;
   onUnload?: (plugin: Plugin) => void | Promise<void>;
-  onTaskCreate?: (task: unknown) => any | Promise<unknown>;
-  onTaskUpdate?: (task: unknown) => any | Promise<unknown>;
-  onTaskComplete?: (task: unknown) => void | Promise<void>;
-  onWorkflowExecute?: (workflow: unknown, context: unknown) => void | Promise<void>;
+  onTaskCreate?: (task: Task) => Promise<Task> | Task;
+  onTaskUpdate?: (task: Task) => Promise<Task> | Task;
+  onTaskComplete?: (task: Task) => void | Promise<void>;
+  onWorkflowExecute?: (workflow: Workflow, context: PluginContext) => void | Promise<void>;
   onCommand?: (command: string, args: string[]) => string | void | Promise<string | void>;
 }
 
@@ -70,9 +75,9 @@ export interface PluginContext {
   /** 工作目录 */
   workspace: string;
   /** 配置 */
-  config: Record<string, unknown>;
+  config: Partial<TaskFlowConfig>;
   /** 日志 */
-  logger: unknown;
+  logger: Logger;
   /** 注册表 */
   registry: PluginRegistry;
 }

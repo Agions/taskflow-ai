@@ -1,6 +1,3 @@
-import { getLogger } from '../../utils/logger';
-const logger = getLogger('mcp/prompts/types');
-
 /**
  * MCP 提示类型定义
  */
@@ -12,11 +9,13 @@ export interface MCPPrompt {
   arguments: PromptArgument[];
   category: string;
   version: string;
-  metadata?: {
-    author?: string;
-    tags?: string[];
-    examples?: PromptExample[];
-  };
+  metadata?: PromptMetadata;
+}
+
+export interface PromptMetadata {
+  author?: string;
+  tags?: string[];
+  examples?: PromptExample[];
 }
 
 export interface PromptArgument {
@@ -30,11 +29,27 @@ export interface PromptArgument {
 export interface PromptExample {
   title: string;
   description: string;
-  arguments: Record<string, any>;
+  /** 参数值，与 PromptArgument schema 对应 */
+  arguments: PromptArguments;
   expectedOutput?: string;
 }
+
+/** Prompt 参数值 — 键为参数名，值为对应类型 */
+export type PromptArguments = Record<string, PromptArgumentValue>;
+
+export type PromptArgumentValue = string | number | boolean | unknown[] | Record<string, unknown> | null;
 
 export interface PromptRenderOptions {
   strict?: boolean;
   fallback?: string;
+}
+
+/** MCPPromptManager 配置 */
+export interface MCPPromptManagerConfig {
+  /** 自定义提示目录 */
+  promptsDir?: string;
+  /** 是否启用缓存 */
+  enableCache?: boolean;
+  /** 模板缓存大小 */
+  cacheSize?: number;
 }

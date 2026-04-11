@@ -1,4 +1,3 @@
-import { getLogger } from '../../utils/logger';
 /**
  * MCP提示管理器
  * 管理AI提示模板和生成智能提示
@@ -7,11 +6,10 @@ import { getLogger } from '../../utils/logger';
 import path from 'path';
 import fs from 'fs-extra';
 import { Logger } from '../../utils/logger';
-import { MCPPrompt, PromptRenderOptions } from './types';
+import { MCPPrompt, PromptRenderOptions, PromptArguments, MCPPromptManagerConfig } from './types';
 import { defaultPrompts } from './defaults';
 import { PromptLoader } from './loader';
 import { PromptRenderer } from './renderer';
-const logger = getLogger('mcp/prompts/manager');
 
 export * from './types';
 
@@ -23,11 +21,12 @@ export class MCPPromptManager {
   private renderer: PromptRenderer;
 
   constructor(
-    private config: unknown,
+    private config: MCPPromptManagerConfig = {},
     logger?: Logger
   ) {
     this.logger = logger || Logger.getInstance('MCPPromptManager');
-    this.promptsDir = path.join(process.cwd(), '.taskflow', 'prompts');
+    const cfg = this.config;
+    this.promptsDir = cfg.promptsDir ?? path.join(process.cwd(), '.taskflow', 'prompts');
     this.loader = new PromptLoader(this.promptsDir, this.logger);
     this.renderer = new PromptRenderer(this.logger);
   }
@@ -77,7 +76,7 @@ export class MCPPromptManager {
     this.logger.info(`注销提示: ${name}`);
   }
 
-  renderPrompt(name: string, args: Record<string, any>, options?: PromptRenderOptions): string {
+  renderPrompt(name: string, args: PromptArguments, options?: PromptRenderOptions): string {
     const prompt = this.getPrompt(name);
     if (!prompt) {
       throw new Error(`提示不存在: ${name}`);
@@ -87,7 +86,7 @@ export class MCPPromptManager {
 
   validatePromptArgs(
     name: string,
-    args: Record<string, any>
+    args: PromptArguments
   ): { valid: boolean; errors: string[] } {
     const prompt = this.getPrompt(name);
     if (!prompt) {

@@ -20,6 +20,28 @@ interface ProjectAnalyzeArgs {
   depth?: number;
 }
 
+interface ProjectAnalysisResult {
+  path: string;
+  files: number;
+  directories: number;
+  languages: Record<string, number>;
+  structure: ProjectScanItem[];
+}
+
+interface ProjectScanItem {
+  type: 'file' | 'directory';
+  name: string;
+  size?: number;
+  children?: ProjectScanItem[];
+}
+
+interface TaskCreateArgs {
+  title?: string;
+  description?: string;
+  type?: string;
+  priority?: string;
+}
+
 export class MCPToolExecutor {
   async execute(name: string, args: Record<string, unknown>): Promise<unknown> {
     switch (name) {
@@ -100,7 +122,7 @@ export class MCPToolExecutor {
   private async executeProjectAnalyze(args: ProjectAnalyzeArgs): Promise<unknown> {
     const { path: projectPath = process.cwd(), depth = 3 } = args;
 
-    const analysis: any = {
+    const analysis: ProjectAnalysisResult = {
       path: projectPath,
       files: 0,
       directories: 0,
@@ -108,25 +130,26 @@ export class MCPToolExecutor {
       structure: [],
     };
 
-    const scanDirectory = async (dirPath: string, currentDepth: number): Promise<unknown[]> => {
+    const scanDirectory = async (dirPath: string, currentDepth: number): Promise<ProjectScanItem[]> => {
       if (currentDepth > depth) return [];
 
       const items = await fs.readdir(dirPath, { withFileTypes: true });
-      const results: any[] = [];
+      const results: ProjectScanItem[] = [];
 
-      for (const item of items as any[]) {
+      for (const item of items) {
         const fullPath = path.join(dirPath, item.name);
         if (item.isDirectory()) {
           analysis.directories++;
           if (currentDepth < depth) {
             const subResults = await scanDirectory(fullPath, currentDepth + 1);
             results.push({ type: 'directory', name: item.name, children: subResults });
+          } else {
+            results.push({ type: 'directory', name: item.name });
           }
         } else {
           analysis.files++;
           const ext = path.extname(item.name).slice(1);
-          (analysis.languages as Record<string, number>)[ext] =
-            ((analysis.languages as Record<string, number>)[ext] || 0) + 1;
+          analysis.languages[ext] = (analysis.languages[ext] || 0) + 1;
           results.push({ type: 'file', name: item.name, size: (await fs.stat(fullPath)).size });
         }
       }
@@ -138,7 +161,7 @@ export class MCPToolExecutor {
     return analysis;
   }
 
-  private executeTaskCreate(args: any): { id: string; status: string } {
-    return { id: 'task-' + Date.now(), status: 'created' };
+  private executeTaskCreate(args: TaskCreateArgs): { id: string; status: string; title?: string } {
+    return { id: 'task-' + Date.now(), status: 'created', title: args.title };
   }
 }
