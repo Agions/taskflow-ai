@@ -4,7 +4,7 @@ import { getLogger } from '../../utils/logger';
  */
 
 import { createMachine, fromPromise } from 'xstate';
-import { MachineContext, MachineEvent } from './types';
+import { MachineContext } from './types';
 import { PlanningEngine } from '../planning';
 import { ExecutionEngine } from '../execution';
 import { VerificationEngine } from '../verification/engine';
@@ -60,11 +60,13 @@ export const createAgentMachine = (
           onDone: [
             {
               target: 'completed',
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               guard: ({ context }: any) => context.verificationResult?.allPassed,
             },
             {
               target: 'planning',
-              guard: ({ context }: any) => context.retryCount < (agentConfig.maxRetries || 3),
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              guard: ({ context }: any) => (context.retryCount ?? 0) < (agentConfig.maxRetries || 3),
             },
           ],
           onError: { target: 'failed', actions: { type: 'setError' } },

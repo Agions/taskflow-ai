@@ -11,7 +11,7 @@ const logger = getLogger('agent/verification/checks');
  */
 export async function verifyTaskCompletion(result: ExecutionResult): Promise<VerificationCheck> {
   const tasks = result.tasks || result.results || [];
-  const completed = tasks.filter((t: any) => t.success).length;
+  const completed = tasks.filter((t) => t.success).length;
   const total = tasks.length;
 
   if (total === 0) {
@@ -48,7 +48,7 @@ export async function verifyGeneratedFiles(result: ExecutionResult): Promise<Ver
     };
   }
 
-  const validFiles = files.filter((f: any) => typeof f === 'string' || (f.path && f.content));
+  const validFiles = files.filter((f) => typeof f === 'string' || ((f as { path?: unknown }).path && (f as { content?: unknown }).content));
   const passed = validFiles.length === files.length;
 
   return {

@@ -18,6 +18,7 @@ export interface MachineContext extends AgentContext {
   config: AgentConfig;
   requirements?: Requirement[];
   currentPlan?: TaskPlan;
+  retryCount?: number;
 }
 
 export type MachineEvent =

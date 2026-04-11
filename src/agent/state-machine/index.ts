@@ -10,14 +10,15 @@ import { PlanningEngine } from '../planning';
 import { ExecutionEngine } from '../execution';
 import { VerificationEngine } from '../verification/engine';
 import { createAgentMachine } from './machine';
-import { MachineContext, AgentState } from './types';
+import { MachineContext, AgentState, MachineEvent } from './types';
 const logger = getLogger('agent/state-machine/index');
 
 export * from './types';
 export * from './machine';
 
 export class AgentStateMachine {
-  private actor: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private actor: ReturnType<typeof createActor>;
   private stateChangeCallbacks: Array<(state: AgentState) => void> = [];
 
   constructor(
@@ -42,7 +43,7 @@ export class AgentStateMachine {
 
     this.actor = createActor(machine);
 
-    this.actor.subscribe((state: any) => {
+    this.actor.subscribe((state) => {
       this.stateChangeCallbacks.forEach(cb => cb(state.value as AgentState));
     });
   }
@@ -51,7 +52,7 @@ export class AgentStateMachine {
     this.actor.start();
   }
 
-  send(event: any): void {
+  send(event: MachineEvent): void {
     this.actor.send(event);
   }
 

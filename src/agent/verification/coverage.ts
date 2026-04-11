@@ -8,6 +8,14 @@ import * as path from 'path';
 import { CoverageReport, FileCoverage, ExecutionResult, VerificationCheck } from '../types';
 const logger = getLogger('agent/verification/coverage');
 
+/** Istanbul/lcov coverage-summary.json 文件的单个条目格式 */
+interface CoverageData {
+  statements?: { pct?: number };
+  branches?: { pct?: number };
+  functions?: { pct?: number };
+  lines?: { pct?: number };
+}
+
 export class CoverageChecker {
   constructor(private projectPath: string) {}
 
@@ -56,12 +64,13 @@ export class CoverageChecker {
 
           for (const [file, data] of Object.entries(summary)) {
             if (file !== 'total') {
+              const d = data as CoverageData;
               fileCoverages.push({
                 file,
-                statements: (data as any).statements?.pct || 0,
-                branches: (data as any).branches?.pct || 0,
-                functions: (data as any).functions?.pct || 0,
-                lines: (data as any).lines?.pct || 0,
+                statements: d.statements?.pct || 0,
+                branches: d.branches?.pct || 0,
+                functions: d.functions?.pct || 0,
+                lines: d.lines?.pct || 0,
               });
             }
           }
