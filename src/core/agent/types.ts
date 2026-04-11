@@ -13,6 +13,28 @@ export type AgentStatus =
 
 export type AgentCapability = 'reasoning' | 'code' | 'search' | 'tool_use' | 'collaboration';
 
+export interface AgentMemoryConfig {
+  maxShortTerm: number;
+  maxLongTerm: number;
+  importanceThreshold?: number;
+}
+
+/**
+ * Agent 配置接口（用于构造 AgentCore）
+ */
+export interface AgentConfig {
+  id: string;
+  name: string;
+  description?: string;
+  capabilities: AgentCapability[];
+  model?: string;
+  tools: string[];
+  memory: AgentMemoryConfig;
+  goalParser?: GoalParser;
+  reflectionEnabled?: boolean;
+  maxStepsPerGoal?: number;
+}
+
 export interface Agent {
   /** Agent ID */
   id: string;
@@ -79,6 +101,14 @@ export interface AgentExecution {
   status: AgentStatus;
   startedAt: number;
   finishedAt?: number;
+  /** 断点信息，用于恢复执行 */
+  checkpoint?: ExecutionCheckpoint;
+}
+
+export interface ExecutionCheckpoint {
+  stepIndex: number;
+  subgoalIndex: number;
+  state: Record<string, unknown>;
 }
 
 export interface AgentStep {
@@ -93,12 +123,38 @@ export interface AgentStep {
   duration?: number;
 }
 
-export interface GoalParserResult {
+/**
+ * 目标解析器接口
+ */
+export interface GoalParser {
+  parse(goal: string, context?: Record<string, unknown>): Promise<GoalParseResult>;
+  getStrategy(): 'rule' | 'ai' | 'hybrid';
+}
+
+/**
+ * 目标解析结果
+ */
+export interface GoalParseResult {
   goal: string;
   subgoals: string[];
   constraints: string[];
   successCriteria: string[];
   estimatedSteps: number;
+  confidence: number; // 0-1
+  reasoning?: string;
+}
+
+/**
+ * Agent 指标（用于追踪性能）
+ */
+export interface AgentMetrics {
+  agentId: string;
+  callCount: number;
+  successCount: number;
+  failureCount: number;
+  totalDuration: number; // ms
+  averageDuration: number; // ms
+  lastCallAt?: number;
 }
 
 export interface ReflectionResult {
