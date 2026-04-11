@@ -4,6 +4,7 @@ import { getLogger } from '../../utils/logger';
  */
 
 import { execSync } from 'child_process';
+import { ToolResponse, toolOk, toolError } from '../tools/types';
 const logger = getLogger('mcp/server/executor');
 
 import path from 'path';
@@ -43,17 +44,37 @@ interface TaskCreateArgs {
 }
 
 export class MCPToolExecutor {
-  async execute(name: string, args: Record<string, unknown>): Promise<unknown> {
-    switch (name) {
-      case 'terminal_execute':
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return this.executeTerminal(args as any);
-      case 'project_analyze':
-        return this.executeProjectAnalyze(args as ProjectAnalyzeArgs);
-      case 'task_create':
-        return this.executeTaskCreate(args);
-      default:
-        throw new Error(`Unknown tool: ${name}`);
+  async execute(name: string, args: Record<string, unknown>): Promise<ToolResponse<unknown>> {
+    const startTime = Date.now();
+    try {
+      switch (name) {
+        case 'terminal_execute':
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return toolOk(this.executeTerminal(args as any), {
+            tool: name,
+            duration: Date.now() - startTime,
+          });
+        case 'project_analyze':
+          return toolOk(await this.executeProjectAnalyze(args as ProjectAnalyzeArgs), {
+            tool: name,
+            duration: Date.now() - startTime,
+          });
+        case 'task_create':
+          return toolOk(this.executeTaskCreate(args), {
+            tool: name,
+            duration: Date.now() - startTime,
+          });
+        default:
+          return toolError('UNKNOWN_TOOL', `Unknown tool: ${name}`, {
+            tool: name,
+            duration: Date.now() - startTime,
+          });
+      }
+    } catch (error) {
+      return toolError('EXECUTION_ERROR', error instanceof Error ? error.message : String(error), {
+        tool: name,
+        duration: Date.now() - startTime,
+      });
     }
   }
 
@@ -91,7 +112,7 @@ export class MCPToolExecutor {
       'which',
     ];
 
-    const shellMetacharacters = /[;&|`$(){}[\]<>\\!*?]/;
+    const shellMetacharacters = /[;&|`$(){}<>\\*!?]/;
     if (shellMetacharacters.test(command)) {
       throw new Error('Command contains forbidden shell metacharacters');
     }
@@ -114,7 +135,7 @@ export class MCPToolExecutor {
         maxBuffer: 1024 * 1024,
       });
       return { output: result, command };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const err = error as { message?: string };
       throw new Error(`Command failed: ${err.message || String(error)}`);
     }
