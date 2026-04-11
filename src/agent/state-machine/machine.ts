@@ -60,20 +60,26 @@ export const createAgentMachine = (
           onDone: [
             {
               target: 'completed',
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              guard: ({ context }: any) => context.verificationResult?.allPassed,
+              guard: ({ context }: { context: MachineContext }) =>
+                context.verificationResult?.allPassed === true,
+            },
+            {
+              target: 'awaitingApproval',
+              guard: ({ context }: { context: MachineContext }) =>
+                (context.retryCount ?? 0) >= (agentConfig.maxRetries ?? 3) &&
+                context.verificationResult?.allPassed !== true,
             },
             {
               target: 'planning',
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              guard: ({ context }: any) =>
-                (context.retryCount ?? 0) < (agentConfig.maxRetries || 3),
+              guard: ({ context }: { context: MachineContext }) =>
+                (context.retryCount ?? 0) < (agentConfig.maxRetries ?? 3),
             },
           ],
           onError: { target: 'failed', actions: { type: 'setError' } },
         },
       },
 
+      /** 人工审批状态 — 验证重试耗尽后进入，等待人工确认后继续执行 */
       awaitingApproval: {
         on: {
           APPROVED: 'executing',
