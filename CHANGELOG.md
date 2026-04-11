@@ -36,6 +36,23 @@
 - CLI `options.format as any` 全部移除
 - `getTemplate()` 返回 `null` 时 null 安全处理
 - `state-machine/machine.ts` 重复 import 移除
+- **状态机关键 Bug 修复** (2026-04-11)
+  - `retryCount` 从未递增导致重试死循环：现已通过 `incrementRetry` assign action 正确累计
+  - `verificationResult` 从未写入 context：现已通过 `setVerificationResult` action 在 `verificationDecision` 节点前填充
+  - XState v5 `onDone:[guard,guard,guard]` 并行评估竞态：现已通过 `verificationDecision` 中转节点解决
+  - 5 个 named action 全部正式实现：`setTaskPlan` / `setExecutionResult` / `setVerificationResult` / `incrementRetry` / `setError`
+- **Plugin 热重载**：`PluginManager.reload(pluginId)` 原子 unload+load，运行时更新插件无需重启
+- **工具响应 Schema 统一**：`ToolResponse<T>` + `toolOk()` / `toolError()` 封装，所有 MCP 工具返回结构一致
+- **并行执行超时**：`Promise.race` 超时取消机制，支持部分结果保留
+- **Router 诊断增强**：`SmartRouter.explain()` 返回优先级评分明细 + `DEFAULT_ROUTING_RULES` 规则说明注释
+- **TypeSafetyChecker 真实检查**：实际运行 `tsc --noEmit`，解析 `error TS####` 输出
+- **CodeQualityChecker ESLint 集成**：实际运行 `npx eslint --format=json`，启发式扫描（console.log/TODO/implicit any）
+
+### Tests
+
+- 新增 `src/agent/verification/__tests__/engine.test.ts`（5 tests）：VerificationEngine 行为验证
+- 新增 `src/agent/verification/__tests__/code-quality.test.ts`（9 tests）：CodeQualityChecker 黑盒覆盖
+- 总测试数：152 passed（138 → 152）
 
 ---
 
