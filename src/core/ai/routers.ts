@@ -3,7 +3,13 @@
  */
 
 import { ModelConfig } from './types';
-import { BaseRouter, RoutingResult, RouterStrategy } from './router-types';
+import {
+  BaseRouter,
+  RoutingResult,
+  RouterStrategy,
+  RoutingRule,
+  RoutingContext,
+} from './router-types';
 import { DEFAULT_ROUTING_RULES } from './router-rules';
 
 /**
@@ -57,6 +63,73 @@ export class SmartRouter extends BaseRouter {
       strategy: 'smart',
     };
   }
+
+  /**
+   * 诊断路由决策 — 解释每个模型为什么被选中或落选
+   * 用于调试和可视化路由优先级
+   */
+  explain(
+    messages: unknown[],
+    availableModels: ModelConfig[],
+    preferredModel?: string
+  ): RoutingExplanation {
+    const context = this.extractContext(messages);
+    const scoredModels = new Map<string, ScoredModel>();
+
+    // 初始化所有模型分数
+    for (const model of availableModels) {
+      scoredModels.set(model.id, {
+        model,
+        score: 0,
+        matchedRules: [],
+      });
+    }
+
+    // 按规则打分
+    const matchedRuleDetails: Array<{ rule: RoutingRule; matchedModelIds: string[] }> = [];
+    for (const rule of this.rules) {
+      const matches = rule.match(context, messages);
+      if (matches) {
+        for (const preferId of rule.prefer) {
+          const entry = scoredModels.get(preferId);
+          if (entry) {
+            entry.score += rule.weight;
+            entry.matchedRules.push(rule);
+          }
+        }
+        matchedRuleDetails.push({
+          rule,
+          matchedModelIds: rule.prefer.filter(id => scoredModels.has(id)),
+        });
+      }
+    }
+
+    // 排序
+    const ranked = [...scoredModels.values()].sort((a, b) => b.score - a.score);
+    const selectedId = preferredModel ?? ranked[0]?.model.id;
+
+    return {
+      context,
+      ranked,
+      matchedRuleDetails,
+      selectedId,
+      strategy: 'smart',
+    };
+  }
+}
+
+export interface ScoredModel {
+  model: ModelConfig;
+  score: number;
+  matchedRules: RoutingRule[];
+}
+
+export interface RoutingExplanation {
+  context: RoutingContext;
+  ranked: ScoredModel[];
+  matchedRuleDetails: Array<{ rule: RoutingRule; matchedModelIds: string[] }>;
+  selectedId: string;
+  strategy: RouterStrategy;
 }
 
 /**

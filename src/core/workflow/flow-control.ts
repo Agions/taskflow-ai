@@ -104,6 +104,7 @@ export class ConditionExecutor {
 
 /**
  * 并行执行器
+ * 支持全局超时 + 批量并发控制
  */
 export class ParallelFlowExecutor {
   private logger = Logger.getInstance('ParallelFlowExecutor');
@@ -112,13 +113,20 @@ export class ParallelFlowExecutor {
   async execute(
     steps: WorkflowStep[],
     context: ExecutionContext,
-    concurrency?: number
+    options?: {
+      concurrency?: number;
+      /** 全局超时 (ms)，超时后取消所有进行中的步骤 */
+      timeoutMs?: number;
+    }
   ): Promise<ParallelResult> {
     const startTime = Date.now();
     const results: Record<string, StepResult> = {};
-    const max = concurrency || this.maxConcurrency;
+    const max = options?.concurrency || this.maxConcurrency;
+    const timeoutMs = options?.timeoutMs;
 
-    this.logger.info(`并行执行 ${steps.length} 个步骤 (最大并发: ${max})`);
+    this.logger.info(
+      `并行执行 ${steps.length} 个步骤 (并发: ${max}${timeoutMs ? `, 超时: ${timeoutMs}ms` : ''})`
+    );
 
     for (let i = 0; i < steps.length; i += max) {
       const batch = steps.slice(i, i + max);
@@ -129,7 +137,42 @@ export class ParallelFlowExecutor {
         return { stepId: step.id, result };
       });
 
-      const batchResults = await Promise.all(promises);
+      let batchResults: Array<{ stepId: string; result: StepResult }>;
+
+      if (timeoutMs) {
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(
+            () => reject(new Error(`Parallel batch timed out after ${timeoutMs}ms`)),
+            timeoutMs
+          );
+        });
+
+        try {
+          batchResults = await Promise.all(promises);
+        } catch (err) {
+          const elapsed = Date.now() - startTime;
+          this.logger.error(
+            `并行批次超时 (${elapsed}ms): ${err instanceof Error ? err.message : String(err)}`
+          );
+          // 标记未完成的步骤为超时
+          for (const step of batch) {
+            if (!results[step.id]) {
+              results[step.id] = {
+                success: false,
+                error: `Parallel batch timeout after ${timeoutMs}ms`,
+                duration: elapsed,
+              };
+            }
+          }
+          return {
+            success: false,
+            results,
+            duration: elapsed,
+          };
+        }
+      } else {
+        batchResults = await Promise.all(promises);
+      }
 
       for (const { stepId, result } of batchResults) {
         results[stepId] = result;
