@@ -274,6 +274,22 @@ export class PluginManager {
   }
 
   /**
+   * 热重载插件 — 先卸载再加载（原子操作）
+   * 用于运行时更新插件而不重启进程
+   */
+  async reload(pluginId: string): Promise<PluginLoadResult> {
+    this.logger.info(`热重载插件: ${pluginId}`);
+
+    const unloadOk = await this.unload(pluginId);
+    if (!unloadOk) {
+      this.logger.warn(`插件 ${pluginId} 卸载失败，跳过加载`);
+      return { success: false, error: 'Unload failed' };
+    }
+
+    return this.load(pluginId);
+  }
+
+  /**
    * 初始化所有插件
    */
   async initialize(): Promise<void> {
