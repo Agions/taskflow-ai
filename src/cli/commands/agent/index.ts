@@ -9,11 +9,22 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { parsePRD } from './prd-parser';
 import { runAgent } from './runner';
+
 const logger = getLogger('cli/commands/agent/index');
 
 export * from './mock-ai';
 export * from './prd-parser';
 export * from './runner';
+
+interface AgentCLIOptions {
+  prd?: string;
+  mode?: string;
+  constraint?: string[];
+  maxIterations?: string;
+  timeout?: string;
+  dryRun?: boolean;
+  continueOnError?: boolean;
+}
 
 export const agentCommand = new Command('agent')
   .description('AI Agent autonomous execution mode')
@@ -24,7 +35,7 @@ export const agentCommand = new Command('agent')
   .option('--timeout <ms>', 'Task timeout in milliseconds', '30000')
   .option('--dry-run', 'Simulate execution without making changes')
   .option('--continue-on-error', 'Continue execution even if tasks fail')
-  .action(async (options: any) => {
+  .action(async (options: AgentCLIOptions) => {
     const ora = (await import('ora')).default;
     const spinner = ora('Initializing AI Agent...').start();
 

@@ -121,8 +121,7 @@ program
       Object.assign(models[existingIndex], newModel);
       console.log(chalk.yellow(`更新现有模型: ${newModel.id}`));
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      models.push(newModel as any);
+      models.push(newModel as AIModelConfig);
       console.log(chalk.green(`添加新模型: ${newModel.id}`));
     }
     config.aiModels = models;

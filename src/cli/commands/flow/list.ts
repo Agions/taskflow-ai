@@ -36,8 +36,8 @@ export async function executeList(options: ListOptions): Promise<void> {
     const filePath = path.join(workflowDir, file);
     try {
       const content = await fs.readFile(filePath, 'utf-8');
-      const format = file.endsWith('.yaml') ? 'yaml' : 'json';
-      const workflow = getParser().parse(content, format as any);
+      const format: 'yaml' | 'json' = file.endsWith('.yaml') ? 'yaml' : 'json';
+      const workflow = getParser().parse(content, format);
 
       console.log(`  ${chalk.cyan(workflow.name)} (v${workflow.version})`);
       console.log(`    文件: ${file}`);

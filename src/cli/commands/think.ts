@@ -7,6 +7,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { ThoughtChainManager, createRenderer } from '../../core/thought';
 import { loadConfig } from '../../core/config';
+import type { AIModelConfig } from '../../types/config';
 
 const program = new Command('think');
 
@@ -39,7 +40,7 @@ program
     const manager = getManager();
     const config = await loadConfig();
 
-    const models = config?.aiModels?.filter((m: any) => m.enabled) || [];
+    const models = config?.aiModels?.filter((m: AIModelConfig) => m.enabled) || [];
 
     if (models.length > 0) {
       try {
@@ -66,7 +67,7 @@ program
       const renderer = createRenderer('mermaid');
       console.log(renderer.render(latestChain));
     } else {
-      const renderer = createRenderer(options.format as any);
+      const renderer = createRenderer(options.format as 'text' | 'markdown' | 'mermaid' | 'mindmap');
       console.log(renderer.render(latestChain));
     }
   });
@@ -157,9 +158,7 @@ program
       return;
     }
 
-    const renderer = createRenderer(options.format as any);
+    const renderer = createRenderer(options.format as 'text' | 'markdown' | 'mermaid' | 'mindmap');
     console.log(renderer.render(targetChain));
   });
-
-export default program;
 export const thinkCommand = program;

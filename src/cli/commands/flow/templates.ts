@@ -2,14 +2,16 @@
  * 工作流模板
  */
 
+import type { WorkflowSpec } from '../../../core/workflow/types';
+
 /**
  * 获取模板
  */
-export function getTemplate(type: string): any {
+export function getTemplate(type: string): WorkflowSpec | null {
   switch (type) {
     case 'prd-to-code':
       return {
-        name: '',
+        name: 'prd-to-code',
         description: '从 PRD 生成代码',
         triggers: [{ type: 'manual' }],
         variables: { prd_content: '' },
@@ -39,7 +41,7 @@ export function getTemplate(type: string): any {
 
     case 'ci-cd':
       return {
-        name: '',
+        name: 'ci-cd',
         description: 'CI/CD 流水线',
         triggers: [{ type: 'event' }],
         steps: [
@@ -63,7 +65,7 @@ export function getTemplate(type: string): any {
 
     default:
       return {
-        name: '',
+        name: 'basic',
         description: '基础工作流',
         triggers: [{ type: 'manual' }],
         variables: {},

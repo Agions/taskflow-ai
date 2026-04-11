@@ -21,6 +21,10 @@ export async function executeCreate(name: string, options: CreateOptions): Promi
   await fs.ensureDir(workflowDir);
 
   const template = getTemplate(options.template);
+  if (!template) {
+    console.log(chalk.red(`未知模板: ${options.template}`));
+    return;
+  }
   template.name = name;
   template.version = '1.0.0';
 

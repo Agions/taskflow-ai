@@ -10,7 +10,7 @@ import { getEngine, getParser } from './engine';
 interface RunOptions {
   dir: string;
   input?: string;
-  format: string;
+  format: 'yaml' | 'json';
 }
 
 /**
@@ -29,7 +29,7 @@ export async function executeRun(name: string, options: RunOptions): Promise<voi
 
   try {
     const content = await fs.readFile(filePath, 'utf-8');
-    const workflow = getParser().parse(content, options.format as any);
+    const workflow = getParser().parse(content, options.format);
 
     let input: Record<string, unknown> = {};
     if (options.input) {
