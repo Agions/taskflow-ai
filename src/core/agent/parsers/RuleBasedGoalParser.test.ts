@@ -93,33 +93,25 @@ describe('RuleBasedGoalParser', () => {
 
   describe('parse - constraints', () => {
     it('should extract constraints in brackets', async () => {
-      const result = await parser.parse(
-        '优化系统性能[使用缓存]同时保证代码质量'
-      );
+      const result = await parser.parse('优化系统性能[使用缓存]同时保证代码质量');
 
       expect(result.constraints).toContain('使用缓存');
     });
 
     it('should extract multiple constraints in brackets', async () => {
-      const result = await parser.parse(
-        '完成任务[高效][稳定][可维护]'
-      );
+      const result = await parser.parse('完成任务[高效][稳定][可维护]');
 
       expect(result.constraints.length).toBe(3);
     });
 
     it('should handle constraints with Chinese brackets', async () => {
-      const result = await parser.parse(
-        '完成任务「必须通过测试」'
-      );
+      const result = await parser.parse('完成任务「必须通过测试」');
 
       expect(result.constraints).toContain('必须通过测试');
     });
 
     it('should extract constraints with keyword "约束"', async () => {
-      const result = await parser.parse(
-        '完成任务约束：必须在3天内完成'
-      );
+      const result = await parser.parse('完成任务约束：必须在3天内完成');
 
       expect(result.constraints.length).toBeGreaterThan(0);
     });
@@ -133,33 +125,25 @@ describe('RuleBasedGoalParser', () => {
 
   describe('parse - success criteria', () => {
     it('should extract success criteria with keyword "确保"', async () => {
-      const result = await parser.parse(
-        '完成任务确保：所有测试通过'
-      );
+      const result = await parser.parse('完成任务确保：所有测试通过');
 
       expect(result.successCriteria).toContain('所有测试通过');
     });
 
     it('should extract success criteria with keyword "验证"', async () => {
-      const result = await parser.parse(
-        '完成任务验证：功能正常运行'
-      );
+      const result = await parser.parse('完成任务验证：功能正常运行');
 
       expect(result.successCriteria).toContain('功能正常运行');
     });
 
     it('should extract success criteria with keyword "确认"', async () => {
-      const result = await parser.parse(
-        '完成任务确认：用户可以登录'
-      );
+      const result = await parser.parse('完成任务确认：用户可以登录');
 
       expect(result.successCriteria).toContain('用户可以登录');
     });
 
     it('should extract English success criteria', async () => {
-      const result = await parser.parse(
-        '完成任务 ensure: all tests pass'
-      );
+      const result = await parser.parse('完成任务 ensure: all tests pass');
 
       expect(result.successCriteria).toContain('all tests pass');
     });
@@ -195,7 +179,8 @@ describe('RuleBasedGoalParser', () => {
 
     it('should cap confidence at 0.95', async () => {
       // 构造一个有很多提升 confidence 因素的目标
-      const goal = '任务A[约束1][约束2][约束3][约束4]确保：标准1验证：标准2确认：标准3检查：标准4，然后任务B，再任务C，然后任务D，再任务E，同时任务F，任务G，确保：测试通过';
+      const goal =
+        '任务A[约束1][约束2][约束3][约束4]确保：标准1验证：标准2确认：标准3检查：标准4，然后任务B，再任务C，然后任务D，再任务E，同时任务F，任务G，确保：测试通过';
       const result = await parser.parse(goal);
 
       expect(result.confidence).toBeLessThanOrEqual(0.95);

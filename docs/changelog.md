@@ -9,7 +9,7 @@
 ### 📝 日志系统统一
 
 - **核心模块日志标准化**: 将 console.log/warn/error 统一替换为 Logger 类
-- **已处理模块**: 
+- **已处理模块**:
   - src/core/debug/ (cost-tracker, timeline, error-handler)
   - src/marketplace/registry/ (cache, fetcher, search, index)
 - **排除模块**: CLI 用户界面 (src/cli/ui/, src/cli/commands/) 保留彩色输出
@@ -18,7 +18,7 @@
 ### 🎯 类型安全增强
 
 - **减少 any 使用**: 将 234 处 :any 替换为具体类型或 unknown
-- **改进模块**: 
+- **改进模块**:
   - src/marketplace/registry/search.ts - 定义 ToolPackage 详细类型
   - src/marketplace/registry/cache.ts - 缓存键值对类型安全
   - src/marketplace/registry/fetcher.ts - API 响应类型精确化
@@ -432,7 +432,6 @@ service.parsePRD(content, 'markdown');
 - 💡 [功能建议](https://github.com/agions/taskflow-ai/issues/new?template=feature_request.md)
 - 💬 [社区讨论](https://github.com/Agions/taskflow-ai/issues)
 - 📧 [邮件联系](mailto:1051736049@qq.com)
-
 
 ---
 

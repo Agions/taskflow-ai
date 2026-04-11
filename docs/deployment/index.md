@@ -7,18 +7,21 @@
 ## 🔧 系统要求
 
 ### 最低要求
+
 - **Node.js**: >= 18.0.0
 - **npm**: >= 8.0.0
 - **内存**: >= 2GB
 - **磁盘空间**: >= 1GB
 
 ### 推荐配置
+
 - **Node.js**: >= 20.0.0
 - **npm**: >= 10.0.0
 - **内存**: >= 4GB
 - **磁盘空间**: >= 5GB
 
 ### 支持的操作系统
+
 - Windows 10/11
 - macOS 10.15+
 - Linux (Ubuntu 18.04+, CentOS 7+)
@@ -55,7 +58,6 @@ npm link
 # 验证安装
 taskflow --version
 ```
-
 
 ## ⚙️ 配置设置
 
@@ -163,20 +165,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          
+
       - name: Install TaskFlow AI
         run: npm install -g taskflow-ai
-        
+
       - name: Parse PRD
         run: taskflow parse docs/requirements.md
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          
+
       - name: Upload task plan
         uses: actions/upload-artifact@v3
         with:
@@ -184,15 +186,16 @@ jobs:
           path: taskflow/tasks.json
 ```
 
-
-
 # 切换用户
+
 USER taskflow
 
 # 设置入口点
+
 ENTRYPOINT ["taskflow"]
 CMD ["--help"]
-```
+
+````
 
 #### docker-compose.yml
 
@@ -210,7 +213,7 @@ services:
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
       - ZHIPU_API_KEY=${ZHIPU_API_KEY}
     command: ["parse", "docs/requirements.md"]
-```
+````
 
 ## 🔒 安全配置
 
@@ -327,19 +330,21 @@ taskflow config validate
 ### 常见问题
 
 1. **安装失败**
+
    ```bash
    # 清理npm缓存
    npm cache clean --force
-   
+
    # 重新安装
    npm install -g taskflow-ai
    ```
 
 2. **权限问题**
+
    ```bash
    # 修复npm权限
    sudo chown -R $(whoami) ~/.npm
-   
+
    # 或使用nvm
    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
    nvm install 20
@@ -347,10 +352,11 @@ taskflow config validate
    ```
 
 3. **API连接失败**
+
    ```bash
    # 检查网络连接
    taskflow models test --verbose
-   
+
    # 检查API密钥
    taskflow config get models.deepseek.apiKey
    ```

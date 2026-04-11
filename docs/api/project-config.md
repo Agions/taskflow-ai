@@ -9,21 +9,21 @@
 ```typescript
 interface ProjectConfigManager {
   // 项目初始化
-  initializeProject(options: ProjectInitOptions): Promise<ProjectConfig>
-  validateProject(path: string): Promise<ValidationResult>
-  
+  initializeProject(options: ProjectInitOptions): Promise<ProjectConfig>;
+  validateProject(path: string): Promise<ValidationResult>;
+
   // 配置管理
-  getConfig(): Promise<ProjectConfig>
-  updateConfig(updates: Partial<ProjectConfig>): Promise<ProjectConfig>
-  resetConfig(): Promise<void>
-  
+  getConfig(): Promise<ProjectConfig>;
+  updateConfig(updates: Partial<ProjectConfig>): Promise<ProjectConfig>;
+  resetConfig(): Promise<void>;
+
   // 环境管理
-  setEnvironment(env: Environment): Promise<void>
-  getEnvironment(): Promise<Environment>
-  
+  setEnvironment(env: Environment): Promise<void>;
+  getEnvironment(): Promise<Environment>;
+
   // 项目信息
-  getProjectInfo(): Promise<ProjectInfo>
-  detectProjectType(): Promise<ProjectType>
+  getProjectInfo(): Promise<ProjectInfo>;
+  detectProjectType(): Promise<ProjectType>;
 }
 ```
 
@@ -38,17 +38,18 @@ async initializeProject(options: ProjectInitOptions): Promise<ProjectConfig>
 ```
 
 **示例**:
-```typescript
-import { ProjectConfigManager } from 'taskflow-ai'
 
-const configManager = new ProjectConfigManager()
+```typescript
+import { ProjectConfigManager } from 'taskflow-ai';
+
+const configManager = new ProjectConfigManager();
 
 // 基本初始化
 const config = await configManager.initializeProject({
   projectPath: process.cwd(),
   configDir: '.taskflow',
-  force: false
-})
+  force: false,
+});
 
 // 高级初始化
 const advancedConfig = await configManager.initializeProject({
@@ -58,13 +59,13 @@ const advancedConfig = await configManager.initializeProject({
   projectInfo: {
     name: '我的项目',
     type: 'web-app',
-    description: '一个React Web应用'
+    description: '一个React Web应用',
   },
   teamInfo: {
     members: ['张三', '李四'],
-    roles: ['developer', 'designer']
-  }
-})
+    roles: ['developer', 'designer'],
+  },
+});
 ```
 
 ### validateProject
@@ -76,15 +77,16 @@ async validateProject(path: string): Promise<ValidationResult>
 ```
 
 **示例**:
+
 ```typescript
-const validation = await configManager.validateProject('/path/to/project')
+const validation = await configManager.validateProject('/path/to/project');
 
 if (validation.isValid) {
-  console.log('项目验证通过')
-  console.log('检测到的项目类型:', validation.detectedType)
+  console.log('项目验证通过');
+  console.log('检测到的项目类型:', validation.detectedType);
 } else {
-  console.log('验证失败:', validation.errors)
-  console.log('建议:', validation.suggestions)
+  console.log('验证失败:', validation.errors);
+  console.log('建议:', validation.suggestions);
 }
 ```
 
@@ -96,19 +98,19 @@ if (validation.isValid) {
 
 ```typescript
 // 获取当前配置
-const config = await configManager.getConfig()
+const config = await configManager.getConfig();
 
 // 更新配置
 const updatedConfig = await configManager.updateConfig({
   project: {
     name: '新项目名称',
-    type: 'api'
+    type: 'api',
   },
   ai: {
     primaryModel: 'deepseek',
-    fallbackModels: ['zhipu', 'qwen']
-  }
-})
+    fallbackModels: ['zhipu', 'qwen'],
+  },
+});
 ```
 
 ## 🔧 类型定义
@@ -119,33 +121,33 @@ const updatedConfig = await configManager.updateConfig({
 interface ProjectConfig {
   // 项目基本信息
   project: {
-    name: string
-    type: ProjectType
-    description?: string
-    version?: string
-    workDir: string
-  }
-  
+    name: string;
+    type: ProjectType;
+    description?: string;
+    version?: string;
+    workDir: string;
+  };
+
   // AI配置
   ai: {
-    primaryModel: string
-    fallbackModels: string[]
-    multiModelEnabled: boolean
-  }
-  
+    primaryModel: string;
+    fallbackModels: string[];
+    multiModelEnabled: boolean;
+  };
+
   // 团队配置
   team: {
-    members: TeamMember[]
-    roles: string[]
-    defaultAssignee?: string
-  }
-  
+    members: TeamMember[];
+    roles: string[];
+    defaultAssignee?: string;
+  };
+
   // 工作流配置
   workflow: {
-    defaultPriority: TaskPriority
-    autoAssignment: boolean
-    notificationsEnabled: boolean
-  }
+    defaultPriority: TaskPriority;
+    autoAssignment: boolean;
+    notificationsEnabled: boolean;
+  };
 }
 ```
 
@@ -158,7 +160,7 @@ enum ProjectType {
   API = 'api',
   DESKTOP_APP = 'desktop-app',
   LIBRARY = 'library',
-  OTHER = 'other'
+  OTHER = 'other',
 }
 ```
 
@@ -168,33 +170,33 @@ enum ProjectType {
 
 ```typescript
 async function integrateProject() {
-  const configManager = new ProjectConfigManager()
-  
+  const configManager = new ProjectConfigManager();
+
   // 1. 验证项目
-  const validation = await configManager.validateProject(process.cwd())
+  const validation = await configManager.validateProject(process.cwd());
   if (!validation.isValid) {
-    throw new Error('项目验证失败')
+    throw new Error('项目验证失败');
   }
-  
+
   // 2. 初始化配置
   const config = await configManager.initializeProject({
     projectPath: process.cwd(),
     projectInfo: {
       name: 'My Web App',
-      type: 'web-app'
-    }
-  })
-  
+      type: 'web-app',
+    },
+  });
+
   // 3. 配置AI模型
   await configManager.updateConfig({
     ai: {
       primaryModel: 'deepseek',
       fallbackModels: ['zhipu'],
-      multiModelEnabled: true
-    }
-  })
-  
-  console.log('项目集成完成')
+      multiModelEnabled: true,
+    },
+  });
+
+  console.log('项目集成完成');
 }
 ```
 

@@ -41,17 +41,20 @@ function fixFile(filePath) {
 
   // 修复局部变量声明: const xxx: unknown = -> const xxx: any =
   content = content.replace(/const\s+(\w+)\s*:\s*unknown\s*=/g, 'const $1: any =');
-  
+
   // 修复 let 变量声明
   content = content.replace(/let\s+(\w+)\s*:\s*unknown\s*=/g, 'let $1: any =');
-  
+
   // 修复函数参数类型: (xxx: unknown) -> (xxx: any)
   // 但不修改返回类型
   content = content.replace(/(\w+)\s*:\s*unknown([,\)])/g, '$1: any$2');
-  
+
   // 修复 for...of 循环中的 unknown
-  content = content.replace(/for\s*\(\s*const\s+(\w+)\s+of\s+(\w+)\s*\)/g, 'for (const $1 of $2 as any[])');
-  
+  content = content.replace(
+    /for\s*\(\s*const\s+(\w+)\s+of\s+(\w+)\s*\)/g,
+    'for (const $1 of $2 as any[])'
+  );
+
   // 修复 Object.entries(xxx) 其中 xxx 是 unknown
   // 这个比较复杂，需要手动处理
 

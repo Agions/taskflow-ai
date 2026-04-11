@@ -7,6 +7,7 @@
 ## 🎯 学习目标
 
 完成本教程后，你将能够：
+
 - ✅ 安装和配置 TaskFlow AI
 - ✅ 在现有项目中集成 TaskFlow AI
 - ✅ 解析PRD文档并生成任务
@@ -128,6 +129,7 @@ ls -la .taskflow/
 ```
 
 TaskFlow AI 会在你的项目中创建：
+
 - `.taskflow/config.json` - TaskFlow AI 配置文件
 - `.taskflow/tasks.json` - 任务数据存储
 - `.taskflow/cache/` - 缓存目录
@@ -236,6 +238,7 @@ taskflow parse requirements/user-stories.md
 ```
 
 解析过程中你会看到：
+
 1. 📄 正在读取文档...
 2. 🤖 AI模型分析中...
 3. 📋 生成任务列表...
@@ -317,6 +320,7 @@ taskflow interactive
 ```
 
 在交互式模式中，你可以：
+
 - 📋 浏览任务列表
 - ✏️ 更新任务状态
 - 📊 查看项目进度
@@ -364,6 +368,7 @@ taskflow performance stats
 ## 🎉 恭喜！你已经完成了快速开始教程
 
 你现在已经学会了：
+
 - ✅ 安装和配置 TaskFlow AI
 - ✅ 创建项目和解析PRD文档
 - ✅ 管理任务状态和进度

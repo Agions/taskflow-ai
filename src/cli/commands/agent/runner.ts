@@ -111,8 +111,8 @@ export async function runAgent(options: RunOptions): Promise<void> {
   }
 }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function createDefaultConfig(): any {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createDefaultConfig(): any {
   return {
     projectName: 'Untitled Project',
     version: '1.0.0',

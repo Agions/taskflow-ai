@@ -32,7 +32,7 @@ console.log(stats.totalSteps, stats.avgConfidence);
 
 ```typescript
 const costTracker = new CostTracker({
-  budgetThreshold: 10,  // 预算警告阈值
+  budgetThreshold: 10, // 预算警告阈值
   requestThreshold: 1, // 单次请求警告阈值
 });
 
@@ -76,19 +76,19 @@ console.log(handler.generateErrorReport(error));
 
 ### TimelineViewOptions
 
-| 选项 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| showReasoning | boolean | true | 显示详细推理 |
-| showTimestamp | boolean | true | 显示时间戳 |
-| showModel | boolean | true | 显示模型信息 |
-| maxDepth | number | 10 | 最大显示深度 |
-| timeFormat | string | 'relative' | 时间格式 |
+| 选项          | 类型    | 默认值     | 说明         |
+| ------------- | ------- | ---------- | ------------ |
+| showReasoning | boolean | true       | 显示详细推理 |
+| showTimestamp | boolean | true       | 显示时间戳   |
+| showModel     | boolean | true       | 显示模型信息 |
+| maxDepth      | number  | 10         | 最大显示深度 |
+| timeFormat    | string  | 'relative' | 时间格式     |
 
 ### CostTrackerOptions
 
-| 选项 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| budgetThreshold | number | 10 | 预算警告阈值 (美元) |
-| requestThreshold | number | 1 | 单次请求警告阈值 |
-| autoPrint | boolean | false | 自动打印成本面板 |
-| decimalPlaces | number | 4 | 保留小数位数 |
+| 选项             | 类型    | 默认值 | 说明                |
+| ---------------- | ------- | ------ | ------------------- |
+| budgetThreshold  | number  | 10     | 预算警告阈值 (美元) |
+| requestThreshold | number  | 1      | 单次请求警告阈值    |
+| autoPrint        | boolean | false  | 自动打印成本面板    |
+| decimalPlaces    | number  | 4      | 保留小数位数        |

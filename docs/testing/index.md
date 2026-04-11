@@ -7,12 +7,14 @@
 ## 🧪 测试框架
 
 ### 核心测试工具
+
 - **Jest**: 单元测试和集成测试框架
 - **TypeScript**: 类型安全的测试代码
 - **Supertest**: API测试
 - **Mock**: 模拟外部依赖
 
 ### 测试结构
+
 ```
 tests/
 ├── unit/                 # 单元测试
@@ -60,22 +62,15 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src', '<rootDir>/tests'],
-  testMatch: [
-    '**/__tests__/**/*.ts',
-    '**/?(*.)+(spec|test).ts'
-  ],
+  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
-    '^.+\\.ts$': 'ts-jest'
+    '^.+\\.ts$': 'ts-jest',
   },
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/index.ts'
-  ],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/index.ts'],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-  testTimeout: 30000
+  testTimeout: 30000,
 };
 ```
 
@@ -135,7 +130,7 @@ describe('DeepSeekProvider', () => {
   beforeEach(() => {
     provider = new DeepSeekProvider({
       apiKey: 'test-key',
-      baseURL: 'https://api.deepseek.com'
+      baseURL: 'https://api.deepseek.com',
     });
   });
 
@@ -143,21 +138,23 @@ describe('DeepSeekProvider', () => {
     // 设置mock响应
     mockedAxios.post.mockResolvedValue({
       data: {
-        choices: [{
-          message: { content: 'Test response' }
-        }]
-      }
+        choices: [
+          {
+            message: { content: 'Test response' },
+          },
+        ],
+      },
     });
 
     const result = await provider.chat({
-      messages: [{ role: 'user', content: 'Hello' }]
+      messages: [{ role: 'user', content: 'Hello' }],
     });
 
     expect(result.content).toBe('Test response');
     expect(mockedAxios.post).toHaveBeenCalledWith(
       expect.stringContaining('/chat/completions'),
       expect.objectContaining({
-        messages: [{ role: 'user', content: 'Hello' }]
+        messages: [{ role: 'user', content: 'Hello' }],
       })
     );
   });
@@ -187,8 +184,8 @@ export const expectedTasks = [
     title: '实现用户登录功能',
     description: '开发用户认证和授权系统',
     priority: 'high',
-    estimatedHours: 16
-  }
+    estimatedHours: 16,
+  },
 ];
 ```
 
@@ -207,7 +204,7 @@ describe('Command Handler API', () => {
       .post('/api/parse')
       .send({
         content: samplePRD,
-        type: 'markdown'
+        type: 'markdown',
       })
       .expect(200);
 
@@ -232,7 +229,7 @@ describe('ModelCoordinator Integration', () => {
   it('should coordinate multiple models for complex task', async () => {
     const result = await coordinator.processRequest({
       type: 'complex_analysis',
-      content: 'Analyze this complex requirement...'
+      content: 'Analyze this complex requirement...',
     });
 
     expect(result.success).toBe(true);
@@ -256,13 +253,10 @@ const execAsync = promisify(exec);
 
 describe('Parse Command E2E', () => {
   const testDir = './tests/temp';
-  
+
   beforeEach(async () => {
     await fs.ensureDir(testDir);
-    await fs.writeFile(
-      `${testDir}/test-prd.md`,
-      samplePRD
-    );
+    await fs.writeFile(`${testDir}/test-prd.md`, samplePRD);
   });
 
   afterEach(async () => {
@@ -275,7 +269,7 @@ describe('Parse Command E2E', () => {
     );
 
     expect(stdout).toContain('解析完成');
-    
+
     const tasks = await fs.readJson(`${testDir}/tasks.json`);
     expect(tasks).toHaveProperty('tasks');
     expect(tasks.tasks.length).toBeGreaterThan(0);
@@ -291,13 +285,13 @@ describe('Full Workflow E2E', () => {
   it('should complete full PRD to task workflow', async () => {
     // 1. 初始化项目
     await execAsync('taskflow init --force');
-    
+
     // 2. 解析PRD
     await execAsync('taskflow parse docs/sample-prd.md');
-    
+
     // 3. 生成可视化
     await execAsync('taskflow visualize --format svg');
-    
+
     // 4. 验证输出
     expect(await fs.pathExists('taskflow/tasks.json')).toBe(true);
     expect(await fs.pathExists('taskflow/gantt.svg')).toBe(true);
@@ -314,11 +308,11 @@ describe('Full Workflow E2E', () => {
 describe('Parsing Performance', () => {
   it('should parse large PRD within time limit', async () => {
     const largePRD = generateLargePRD(10000); // 10k lines
-    
+
     const startTime = Date.now();
     const result = await prdParser.parse(largePRD);
     const endTime = Date.now();
-    
+
     const duration = endTime - startTime;
     expect(duration).toBeLessThan(5000); // 5秒内完成
     expect(result.tasks.length).toBeGreaterThan(0);
@@ -333,15 +327,15 @@ describe('Parsing Performance', () => {
 describe('Memory Usage', () => {
   it('should not exceed memory limit during processing', async () => {
     const initialMemory = process.memoryUsage().heapUsed;
-    
+
     // 处理大量数据
     for (let i = 0; i < 100; i++) {
       await prdParser.parse(samplePRD);
     }
-    
+
     const finalMemory = process.memoryUsage().heapUsed;
     const memoryIncrease = finalMemory - initialMemory;
-    
+
     // 内存增长不应超过100MB
     expect(memoryIncrease).toBeLessThan(100 * 1024 * 1024);
   });
@@ -401,30 +395,30 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         node-version: [18, 20]
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run unit tests
         run: npm run test:unit
-        
+
       - name: Run integration tests
         run: npm run test:integration
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          
+
       - name: Upload coverage
         uses: codecov/codecov-action@v3
 ```
@@ -445,7 +439,7 @@ jobs:
 describe.each([
   ['markdown', sampleMarkdown],
   ['html', sampleHTML],
-  ['text', sampleText]
+  ['text', sampleText],
 ])('parseDocument with %s format', (format, content) => {
   it('should parse successfully', () => {
     const result = parser.parse(content, format);

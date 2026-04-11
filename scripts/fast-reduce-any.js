@@ -56,7 +56,9 @@ console.log(`   处理文件: ${priorityFiles.length}`);
 // 统计剩余
 const { execSync } = require('child_process');
 try {
-  const remaining = execSync("grep -rn ': any' src --include='*.ts' | wc -l", { encoding: 'utf-8' }).trim();
+  const remaining = execSync("grep -rn ': any' src --include='*.ts' | wc -l", {
+    encoding: 'utf-8',
+  }).trim();
   console.log(`   剩余 any 数量: ${remaining}`);
 } catch (e) {
   console.log('   无法统计剩余数量');

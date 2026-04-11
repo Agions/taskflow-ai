@@ -22,19 +22,19 @@ function shouldProcess(filePath) {
 function replaceConsole(content, filePath) {
   let count = 0;
   const original = content;
-  
+
   // 只替换 warn 和 error，保留 log（用于用户界面）
   content = content.replace(/console\.warn\((.*?)\)/g, (match, expr) => {
     count++;
     return `logger.warn(${expr})`;
   });
-  
+
   content = content.replace(/console\.error\((.*?)\)/g, (match, expr) => {
     count++;
     return `logger.error(${expr})`;
   });
-  
-  if (count > 0 && !content.includes("import { getLogger }")) {
+
+  if (count > 0 && !content.includes('import { getLogger }')) {
     const relativePath = filePath.replace(SRC + '/', '');
     let importPath = '../utils/logger';
     // 根据目录深度调整导入路径
@@ -44,12 +44,12 @@ function replaceConsole(content, filePath) {
     }
     content = `import { getLogger } from '${importPath}';\n` + content;
   }
-  
+
   if (count > 0 && !content.includes('const logger = getLogger')) {
     const loggerInit = "\nconst logger = getLogger('module');\n";
     content = content.replace(/\n/, loggerInit);
   }
-  
+
   return { content, count };
 }
 
@@ -70,10 +70,10 @@ function processFile(filePath) {
 
 function main() {
   console.log('🔧 安全替换 console.warn/error → logger (保守策略)\n');
-  
+
   let totalFiles = 0;
   let totalReplacements = 0;
-  
+
   function walkDir(dir) {
     const entries = readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
@@ -87,9 +87,9 @@ function main() {
       }
     }
   }
-  
+
   walkDir(SRC);
-  
+
   console.log(`\n✅ 完成！`);
   console.log(`   处理文件: ${totalFiles}`);
   console.log(`   替换次数: ${totalReplacements}`);

@@ -70,7 +70,11 @@ function processFile(filePath) {
         // 找到第一个非 import 行
         const lines = body.split('\n');
         let i = 0;
-        while (i < lines.length && (lines[i].startsWith('import ') || lines[i].trim() === '' || lines[i].startsWith('//'))) i++;
+        while (
+          i < lines.length &&
+          (lines[i].startsWith('import ') || lines[i].trim() === '' || lines[i].startsWith('//'))
+        )
+          i++;
         insertPos = lines.slice(0, i).join('\n').length + (i > 0 ? 1 : 0);
       }
       body = body.slice(0, insertPos) + loggerDecl + body.slice(insertPos);
@@ -112,7 +116,9 @@ function main() {
     totalReplacements += processFile(file);
   }
 
-  console.log(`\n✅ 完成！处理 ${totalFiles} 个文件，替换 ${totalReplacements} 处 console.warn/error。`);
+  console.log(
+    `\n✅ 完成！处理 ${totalFiles} 个文件，替换 ${totalReplacements} 处 console.warn/error。`
+  );
 }
 
 main();

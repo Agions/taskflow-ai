@@ -21,13 +21,13 @@ const parser = new PRDParser();
 const result = await parser.parseFromFile('requirements.md', {
   modelType: 'deepseek',
   extractSections: true,
-  extractFeatures: true
+  extractFeatures: true,
 });
 
 // 解析文本内容
 const textResult = await parser.parseFromText(content, {
   format: 'markdown',
-  language: 'zh-CN'
+  language: 'zh-CN',
 });
 ```
 
@@ -65,12 +65,12 @@ interface ParsedPRD {
 
 #### 方法
 
-| 方法 | 描述 | 参数 | 返回值 |
-|------|------|------|--------|
+| 方法                                | 描述          | 参数                    | 返回值                 |
+| ----------------------------------- | ------------- | ----------------------- | ---------------------- |
 | `parseFromFile(filePath, options?)` | 从文件解析PRD | `string, ParseOptions?` | `Promise<ParseResult>` |
-| `parseFromText(content, options?)` | 从文本解析PRD | `string, ParseOptions?` | `Promise<ParseResult>` |
-| `parseFromUrl(url, options?)` | 从URL解析PRD | `string, ParseOptions?` | `Promise<ParseResult>` |
-| `validatePRD(prd)` | 验证PRD结构 | `ParsedPRD` | `ValidationResult` |
+| `parseFromText(content, options?)`  | 从文本解析PRD | `string, ParseOptions?` | `Promise<ParseResult>` |
+| `parseFromUrl(url, options?)`       | 从URL解析PRD  | `string, ParseOptions?` | `Promise<ParseResult>` |
+| `validatePRD(prd)`                  | 验证PRD结构   | `ParsedPRD`             | `ValidationResult`     |
 
 ### 2. 任务管理器 (Task Manager)
 
@@ -89,7 +89,7 @@ const task = await taskManager.createTask({
   description: '开发用户登录页面和认证逻辑',
   priority: 'high',
   estimatedHours: 8,
-  dependencies: ['task-001']
+  dependencies: ['task-001'],
 });
 
 // 更新任务状态
@@ -98,7 +98,7 @@ await taskManager.updateTaskStatus(task.id, TaskStatus.IN_PROGRESS);
 // 获取任务列表
 const tasks = await taskManager.getTasks({
   status: TaskStatus.NOT_STARTED,
-  priority: 'high'
+  priority: 'high',
 });
 ```
 
@@ -133,29 +133,29 @@ enum TaskStatus {
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
   BLOCKED = 'blocked',
-  CANCELLED = 'cancelled'
+  CANCELLED = 'cancelled',
 }
 
 enum TaskPriority {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 ```
 
 #### 方法
 
-| 方法 | 描述 | 参数 | 返回值 |
-|------|------|------|--------|
-| `createTask(taskData)` | 创建新任务 | `Partial<Task>` | `Promise<Task>` |
-| `updateTask(id, updates)` | 更新任务 | `string, Partial<Task>` | `Promise<Task>` |
-| `deleteTask(id)` | 删除任务 | `string` | `Promise<boolean>` |
-| `getTask(id)` | 获取单个任务 | `string` | `Promise<Task \| null>` |
-| `getTasks(filter?)` | 获取任务列表 | `TaskFilter?` | `Promise<Task[]>` |
-| `updateTaskStatus(id, status)` | 更新任务状态 | `string, TaskStatus` | `Promise<Task>` |
-| `getTaskDependencies(id)` | 获取任务依赖 | `string` | `Promise<Task[]>` |
-| `getTaskProgress(id)` | 获取任务进度 | `string` | `Promise<number>` |
+| 方法                           | 描述         | 参数                    | 返回值                  |
+| ------------------------------ | ------------ | ----------------------- | ----------------------- |
+| `createTask(taskData)`         | 创建新任务   | `Partial<Task>`         | `Promise<Task>`         |
+| `updateTask(id, updates)`      | 更新任务     | `string, Partial<Task>` | `Promise<Task>`         |
+| `deleteTask(id)`               | 删除任务     | `string`                | `Promise<boolean>`      |
+| `getTask(id)`                  | 获取单个任务 | `string`                | `Promise<Task \| null>` |
+| `getTasks(filter?)`            | 获取任务列表 | `TaskFilter?`           | `Promise<Task[]>`       |
+| `updateTaskStatus(id, status)` | 更新任务状态 | `string, TaskStatus`    | `Promise<Task>`         |
+| `getTaskDependencies(id)`      | 获取任务依赖 | `string`                | `Promise<Task[]>`       |
+| `getTaskProgress(id)`          | 获取任务进度 | `string`                | `Promise<number>`       |
 
 ### 3. AI 编排器 (AI Orchestrator)
 
@@ -170,25 +170,22 @@ const orchestrator = new AIOrchestrator({
   models: {
     primary: ModelType.DEEPSEEK,
     fallback: [ModelType.ZHIPU, ModelType.QWEN],
-    loadBalancing: true
-  }
+    loadBalancing: true,
+  },
 });
 
 // 智能文本处理
-const result = await orchestrator.processText(
-  '请分析这个需求的技术难点',
-  {
-    task: 'analysis',
-    context: 'technical',
-    preferredModel: ModelType.DEEPSEEK
-  }
-);
+const result = await orchestrator.processText('请分析这个需求的技术难点', {
+  task: 'analysis',
+  context: 'technical',
+  preferredModel: ModelType.DEEPSEEK,
+});
 
 // 多模型协同
-const comparison = await orchestrator.compareModels(
-  '设计用户界面的最佳实践',
-  [ModelType.DEEPSEEK, ModelType.ZHIPU]
-);
+const comparison = await orchestrator.compareModels('设计用户界面的最佳实践', [
+  ModelType.DEEPSEEK,
+  ModelType.ZHIPU,
+]);
 ```
 
 #### 接口定义
@@ -242,7 +239,7 @@ const config = await configManager.initializeProject({
   name: 'my-existing-project',
   type: 'web-app',
   workDir: './src',
-  team: ['张三', '李四']
+  team: ['张三', '李四'],
 });
 
 // 获取项目信息
@@ -251,7 +248,7 @@ const projectInfo = await configManager.getProjectInfo();
 // 更新项目配置
 await configManager.updateConfig({
   team: ['张三', '李四', '王五'],
-  workDir: './app'
+  workDir: './app',
 });
 ```
 
@@ -350,7 +347,7 @@ try {
     console.error(`错误类型: ${error.code}`);
     console.error(`错误消息: ${error.message}`);
     console.error(`错误上下文:`, error.context);
-    
+
     // 获取恢复建议
     const suggestions = error.getRecoveryActions();
     console.log('建议:', suggestions);
@@ -368,7 +365,7 @@ enum ErrorType {
   API_ERROR = 'API_ERROR',
   FILESYSTEM_ERROR = 'FILESYSTEM_ERROR',
   PARSE_ERROR = 'PARSE_ERROR',
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR'
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
 }
 ```
 
@@ -382,17 +379,17 @@ import { EventEmitter } from 'taskflow-ai';
 const events = EventEmitter.getInstance();
 
 // 监听任务状态变化
-events.on('task:status:changed', (data) => {
+events.on('task:status:changed', data => {
   console.log(`任务 ${data.taskId} 状态变更为 ${data.newStatus}`);
 });
 
 // 监听解析完成事件
-events.on('parse:completed', (data) => {
+events.on('parse:completed', data => {
   console.log(`PRD解析完成，生成了 ${data.taskCount} 个任务`);
 });
 
 // 监听错误事件
-events.on('error', (error) => {
+events.on('error', error => {
   console.error('系统错误:', error);
 });
 ```

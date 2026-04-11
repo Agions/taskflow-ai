@@ -33,7 +33,7 @@ let totalFixes = 0;
 
 for (const file of files) {
   if (!file.includes('/')) continue; // skip
-  
+
   const fullPath = path.join(process.cwd(), file);
   if (!require('fs').existsSync(fullPath)) {
     console.log(`⚠️  skipping (not found)`);
@@ -47,17 +47,17 @@ for (const file of files) {
   // 替换为: catch (error: any) 或 添加类型守卫
   content = content.replace(/catch\s*\(\s*error\s*:\s*unknown\s*\)/g, 'catch (error: any)');
   content = content.replace(/catch\s*\(\s*e\s*:\s*unknown\s*\)/g, 'catch (e: any)');
-  
+
   // config: unknown -> any (config 对象通常来自外部，any 可接受)
   content = content.replace(/config\s*:\s*unknown/gi, 'config: any');
-  
+
   // target: unknown -> any
   content = content.replace(/target\s*:\s*unknown/gi, 'target: any');
-  
+
   // error: unknown -> any
   content = content.replace(/error\s*:\s*unknown/gi, 'error: any');
   content = content.replace(/:\s*Error\s*\|\s*unknown/g, ': Error');
-  
+
   // model: unknown -> any
   content = content.replace(/model\s*:\s*unknown/gi, 'model: any');
 

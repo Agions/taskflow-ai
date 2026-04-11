@@ -39,13 +39,13 @@ TaskFlow AI 是一款**企业级 AI 思维流编排引擎**，专为开发团队
 
 ### 问题我们解决了
 
-| 痛点 | 传统方案 | TaskFlow AI |
-|------|----------|-------------|
-| **需求不清晰** | 靠经验推测 | 📝 智能 PRD 解析，自动提取需求 |
-| **模型选型难** | 人工试错 | 🧠 智能路由，自动选择最优模型 |
-| **过程黑盒** | 结果不可控 | 👁️ 思维链可视化，每一步都可追溯 |
-| **编辑器割裂** | 切换工具 | 🔌 MCP 统一协议，编辑器无感集成 |
-| **团队协作** | 手动同步 | 👥 多 Agent 协作，自动任务分发 |
+| 痛点           | 传统方案   | TaskFlow AI                     |
+| -------------- | ---------- | ------------------------------- |
+| **需求不清晰** | 靠经验推测 | 📝 智能 PRD 解析，自动提取需求  |
+| **模型选型难** | 人工试错   | 🧠 智能路由，自动选择最优模型   |
+| **过程黑盒**   | 结果不可控 | 👁️ 思维链可视化，每一步都可追溯 |
+| **编辑器割裂** | 切换工具   | 🔌 MCP 统一协议，编辑器无感集成 |
+| **团队协作**   | 手动同步   | 👥 多 Agent 协作，自动任务分发  |
 
 ---
 
@@ -65,10 +65,10 @@ TaskFlow AI 是一款**企业级 AI 思维流编排引擎**，专为开发团队
 - **历史追溯** - 完整的思考链路记录，支持回放和分析
 
 ```typescript
-const result = await taskflow.think("如何设计一个高并发系统？");
-console.log(result.chain);          // 完整的思维链
-console.log(result.confidence);     // 置信度 92%
-console.log(result.visualization);  // Mermaid 流程图
+const result = await taskflow.think('如何设计一个高并发系统？');
+console.log(result.chain); // 完整的思维链
+console.log(result.confidence); // 置信度 92%
+console.log(result.visualization); // Mermaid 流程图
 ```
 
 </div>
@@ -107,27 +107,28 @@ console.log(result.visualization);  // Mermaid 流程图
 **YAML/JSON 编排，支持复杂业务逻辑**
 
 ```yaml
-workflow: "ci-cd-pipeline"
+workflow: 'ci-cd-pipeline'
 steps:
-  - name: "代码检查"
-    task: "lint"
+  - name: '代码检查'
+    task: 'lint'
     parallel: true
-    
-  - name: "单元测试"
-    task: "test"
-    dependsOn: ["代码检查"]
-    
-  - name: "构建"
-    task: "build"
-    condition: "allPreviousSuccess"
-    
-  - name: "部署"
-    task: "deploy"
+
+  - name: '单元测试'
+    task: 'test'
+    dependsOn: ['代码检查']
+
+  - name: '构建'
+    task: 'build'
+    condition: 'allPreviousSuccess'
+
+  - name: '部署'
+    task: 'deploy'
     retry: 3
     timeout: 300s
 ```
 
 **特性**:
+
 - ✅ **顺序/并行执行** - 灵活的任务依赖
 - ✅ **条件分支** - 根据结果动态跳转
 - ✅ **循环处理** - 批量任务自动化
@@ -155,6 +156,7 @@ taskflow mcp init -e claude-desktop
 ```
 
 **40+ 内置 MCP 工具**：
+
 - 📁 文件系统操作 (fs_readDir, fs_write, fs_copy...)
 - 🌐 HTTP 请求 (http_get, http_post, http_download...)
 - 💾 SQLite 数据库 (db_query, db_init, db_schema...)
@@ -174,17 +176,18 @@ taskflow mcp init -e claude-desktop
 ```typescript
 // 创建自定义 Agent
 const agent = await taskflow.agent.create({
-  name: "code-reviewer",
-  goal: "自动化代码审查",
-  skills: ["typescript", "security", "performance"],
-  maxIterations: 10
+  name: 'code-reviewer',
+  goal: '自动化代码审查',
+  skills: ['typescript', 'security', 'performance'],
+  maxIterations: 10,
 });
 
 // 分配任务
-await agent.execute("审查 PR #123 的安全性");
+await agent.execute('审查 PR #123 的安全性');
 ```
 
 **核心能力**:
+
 - 🎯 **自主目标分解** - 复杂任务自动拆解
 - 🔄 **协作消息传递** - Agent 间智能通信
 - 🧠 **短期/长期记忆** - 上下文持续积累
@@ -198,13 +201,13 @@ await agent.execute("审查 PR #123 的安全性");
 
 TaskFlow AI 内置多层安全防护：
 
-| 防护类型 | 能力 |
-|---------|------|
-| 🔒 **命令注入** | Shell 命令白名单 + 危险字符检测 |
-| 🌐 **SSRF 防护** | 私有 IP 限制 + URL 协议验证 |
-| 📁 **路径遍历** | 文件路径规范化 + 敏感目录保护 |
-| 🔑 **密钥管理** | 环境变量 + 自动脱敏 |
-| 📝 **审计日志** | 完整操作审计 + 可追溯 |
+| 防护类型         | 能力                            |
+| ---------------- | ------------------------------- |
+| 🔒 **命令注入**  | Shell 命令白名单 + 危险字符检测 |
+| 🌐 **SSRF 防护** | 私有 IP 限制 + URL 协议验证     |
+| 📁 **路径遍历**  | 文件路径规范化 + 敏感目录保护   |
+| 🔑 **密钥管理**  | 环境变量 + 自动脱敏             |
+| 📝 **审计日志**  | 完整操作审计 + 可追溯           |
 
 </div>
 
@@ -314,12 +317,14 @@ taskflow mcp start
 ## 功能需求
 
 ### US-001: 用户注册
+
 - 角色: 未注册用户
 - 优先级: P0
 - 预估工时: 8 小时
 - 描述: 支持邮箱注册、密码强度验证、邮箱唯一性检查
 
 ### US-002: 用户登录
+
 - 角色: 已注册用户
 - 优先级: P0
 - 预估工时: 6 小时
@@ -338,6 +343,7 @@ $ taskflow parse requirements.md --visualize
 ```
 
 **自动生成**:
+
 - ✅ 12 个结构化用户故事
 - ✅ 依赖关系图
 - ✅ 工时估算汇总 (78 小时)
@@ -413,13 +419,13 @@ $ taskflow parse requirements.md --visualize
 
 ## 📦 支持平台
 
-| 平台 | 状态 | 说明 |
-|------|------|------|
-| **Node.js** | ✅ | v18+ 完全支持 |
-| **操作系统** | ✅ | macOS · Linux · Windows |
-| **架构** | ✅ | x64 · arm64 |
-| **Docker** | ✅ | 官方镜像 `agions/taskflow-ai` |
-| **编辑器** | ✅ | Cursor · VSCode · Windsurf · Trae · Claude Desktop |
+| 平台         | 状态 | 说明                                               |
+| ------------ | ---- | -------------------------------------------------- |
+| **Node.js**  | ✅   | v18+ 完全支持                                      |
+| **操作系统** | ✅   | macOS · Linux · Windows                            |
+| **架构**     | ✅   | x64 · arm64                                        |
+| **Docker**   | ✅   | 官方镜像 `agions/taskflow-ai`                      |
+| **编辑器**   | ✅   | Cursor · VSCode · Windsurf · Trae · Claude Desktop |
 
 ---
 
@@ -485,15 +491,15 @@ npm test
 
 ### 🔗 相关链接
 
-| 资源 | 链接 |
-|------|------|
-| **GitHub 仓库** | https://github.com/Agions/taskflow-ai |
-| **NPM 包** | https://www.npmjs.com/package/taskflow-ai |
-| **在线文档** | https://agions.github.io/taskflow-ai/ |
-| **更新日志** | [CHANGELOG.md](./CHANGELOG.md) |
-| **安全策略** | [SECURITY.md](./security.md) |
-| **问题反馈** | https://github.com/Agions/taskflow-ai/issues |
-| **讨论社区** | https://github.com/Agions/taskflow-ai/discussions |
+| 资源            | 链接                                              |
+| --------------- | ------------------------------------------------- |
+| **GitHub 仓库** | https://github.com/Agions/taskflow-ai             |
+| **NPM 包**      | https://www.npmjs.com/package/taskflow-ai         |
+| **在线文档**    | https://agions.github.io/taskflow-ai/             |
+| **更新日志**    | [CHANGELOG.md](./CHANGELOG.md)                    |
+| **安全策略**    | [SECURITY.md](./security.md)                      |
+| **问题反馈**    | https://github.com/Agions/taskflow-ai/issues      |
+| **讨论社区**    | https://github.com/Agions/taskflow-ai/discussions |
 
 ---
 

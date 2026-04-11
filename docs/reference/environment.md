@@ -7,6 +7,7 @@ TaskFlow AI 支持通过环境变量进行配置，这对于CI/CD环境和安全
 ## 🔑 AI模型配置
 
 ### API密钥
+
 ```bash
 # DeepSeek API密钥
 export TASKFLOW_DEEPSEEK_API_KEY="your-deepseek-api-key"
@@ -22,6 +23,7 @@ export TASKFLOW_BAIDU_API_KEY="your-baidu-api-key"
 ```
 
 ### API端点
+
 ```bash
 # 自定义API端点
 export TASKFLOW_DEEPSEEK_ENDPOINT="https://api.deepseek.com/v1"
@@ -31,6 +33,7 @@ export TASKFLOW_ZHIPU_ENDPOINT="https://open.bigmodel.cn/api/paas/v4"
 ## ⚙️ 系统配置
 
 ### 基本配置
+
 ```bash
 # 配置目录路径
 export TASKFLOW_CONFIG_DIR=".taskflow"
@@ -46,6 +49,7 @@ export TASKFLOW_CACHE_DIR=".taskflow/cache"
 ```
 
 ### 性能配置
+
 ```bash
 # 缓存大小（条目数）
 export TASKFLOW_CACHE_SIZE="100"
@@ -63,6 +67,7 @@ export TASKFLOW_MAX_RETRIES="3"
 ## 🌐 网络配置
 
 ### 代理设置
+
 ```bash
 # HTTP代理
 export TASKFLOW_HTTP_PROXY="http://proxy.company.com:8080"
@@ -75,6 +80,7 @@ export TASKFLOW_NO_PROXY="localhost,127.0.0.1,.local"
 ```
 
 ### SSL配置
+
 ```bash
 # 禁用SSL验证（不推荐用于生产环境）
 export TASKFLOW_DISABLE_SSL_VERIFY="false"
@@ -86,6 +92,7 @@ export TASKFLOW_CA_CERT_PATH="/path/to/ca-cert.pem"
 ## 🔒 安全配置
 
 ### 加密设置
+
 ```bash
 # 启用API密钥加密存储
 export TASKFLOW_ENCRYPT_API_KEYS="true"
@@ -98,6 +105,7 @@ export TASKFLOW_AUDIT_LOG="true"
 ```
 
 ### 访问控制
+
 ```bash
 # 启用访问控制
 export TASKFLOW_ACCESS_CONTROL="true"
@@ -112,6 +120,7 @@ export TASKFLOW_ADMIN_USERS="admin@company.com,manager@company.com"
 ## 🏢 企业配置
 
 ### 团队设置
+
 ```bash
 # 默认团队名称
 export TASKFLOW_DEFAULT_TEAM="development"
@@ -124,6 +133,7 @@ export TASKFLOW_DEFAULT_ASSIGNEE="张三"
 ```
 
 ### 集成配置
+
 ```bash
 # Slack Webhook URL
 export TASKFLOW_SLACK_WEBHOOK="https://hooks.slack.com/services/..."
@@ -142,6 +152,7 @@ export TASKFLOW_JIRA_TOKEN="your-jira-token"
 ## 📄 配置文件示例
 
 ### 环境变量文件示例
+
 ```bash
 # .env
 # AI模型配置
@@ -162,6 +173,7 @@ TASKFLOW_ENCRYPTION_KEY=your-encryption-key
 ```
 
 ### .env文件示例
+
 ```bash
 # .env
 # AI模型API密钥
@@ -183,6 +195,7 @@ HTTPS_PROXY=https://proxy.company.com:8080
 ## 🔧 CI/CD环境
 
 ### GitHub Actions
+
 ```yaml
 # .github/workflows/taskflow.yml
 name: TaskFlow AI
@@ -193,10 +206,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup TaskFlow AI
         run: npm install -g taskflow-ai
-        
+
       - name: Parse PRD
         env:
           TASKFLOW_DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
@@ -208,6 +221,7 @@ jobs:
 ```
 
 ### GitLab CI
+
 ```yaml
 # .gitlab-ci.yml
 stages:
@@ -217,8 +231,8 @@ taskflow_analysis:
   stage: analyze
   image: node:18
   variables:
-    TASKFLOW_LOG_LEVEL: "info"
-    TASKFLOW_CACHE_SIZE: "100"
+    TASKFLOW_LOG_LEVEL: 'info'
+    TASKFLOW_CACHE_SIZE: '100'
   script:
     - npm install -g taskflow-ai
     - taskflow init
@@ -231,6 +245,7 @@ taskflow_analysis:
 ## 📊 监控和调试
 
 ### 调试配置
+
 ```bash
 # 启用详细日志
 export TASKFLOW_LOG_LEVEL="debug"
@@ -246,6 +261,7 @@ export TASKFLOW_SAVE_RAW_DATA="true"
 ```
 
 ### 监控配置
+
 ```bash
 # 启用指标收集
 export TASKFLOW_METRICS_ENABLED="true"
@@ -287,6 +303,7 @@ export TASKFLOW_FORCE_MODEL="deepseek"
 ## ✅ 验证环境变量
 
 ### 检查配置
+
 ```bash
 # 显示当前环境变量
 taskflow config list --source env
@@ -299,6 +316,7 @@ taskflow models test --use-env-config
 ```
 
 ### 配置模板生成
+
 ```bash
 # 生成环境变量模板
 taskflow config export --format env > .env.template
@@ -310,6 +328,7 @@ taskflow config export --format bash > env-config.sh
 ## 🔐 安全最佳实践
 
 ### API密钥管理
+
 ```bash
 # 使用密钥管理服务
 export TASKFLOW_DEEPSEEK_API_KEY="$(aws secretsmanager get-secret-value --secret-id deepseek-api-key --query SecretString --output text)"
@@ -320,6 +339,7 @@ export TASKFLOW_ENCRYPTION_KEY="$(openssl rand -hex 32)"
 ```
 
 ### 权限控制
+
 ```bash
 # 限制文件权限
 chmod 600 .env

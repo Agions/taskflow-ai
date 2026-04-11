@@ -36,9 +36,12 @@ for (const file of files) {
 
   // config: unknown -> config: any
   content = content.replace(/: unknown(,?\s*\/\*)/g, ': any$1');
-  
+
   // spread from unknown 不允许 -> 用 any 替代
-  content = content.replace(/\.\.\.(\w+)\s* as\s*Record<string,\s*unknown>/g, '...($1 as Record<string, any>)');
+  content = content.replace(
+    /\.\.\.(\w+)\s* as\s*Record<string,\s*unknown>/g,
+    '...($1 as Record<string, any>)'
+  );
   content = content.replace(/Record<string,\s*unknown>/g, 'Record<string, any>');
 
   if (content !== before) {

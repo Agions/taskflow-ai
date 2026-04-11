@@ -102,7 +102,10 @@
       "data": {
         "label": "保存报告",
         "toolName": "fs_writeJson",
-        "inputMapping": { "path": "./reports/{{input.topic}}-{{timestamp}}.md", "data": "{{compile}}" }
+        "inputMapping": {
+          "path": "./reports/{{input.topic}}-{{timestamp}}.md",
+          "data": "{{compile}}"
+        }
       }
     },
     {

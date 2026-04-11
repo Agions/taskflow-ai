@@ -224,7 +224,10 @@ export class AgentCore {
   /**
    * 基于反思结果重新规划子目标
    */
-  async replan(executionId: string, reflection?: ReflectionResult): Promise<GoalParseResult | undefined> {
+  async replan(
+    executionId: string,
+    reflection?: ReflectionResult
+  ): Promise<GoalParseResult | undefined> {
     const execution = this.executions.get(executionId);
     if (!execution) {
       this.logger.warn(`执行 ${executionId} 不存在`);
@@ -386,7 +389,10 @@ export class AgentCore {
 
     // 检查是否有未完成的子目标
     if (execution.checkpoint) {
-      const state = execution.checkpoint.state as { parsedGoal: GoalParseResult; subgoalIndex: number };
+      const state = execution.checkpoint.state as {
+        parsedGoal: GoalParseResult;
+        subgoalIndex: number;
+      };
       const remaining = state.parsedGoal.subgoals.length - state.subgoalIndex;
       if (remaining > 0) {
         issues.push(`有 ${remaining} 个子目标未完成`);

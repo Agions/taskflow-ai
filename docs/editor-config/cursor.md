@@ -19,6 +19,7 @@ taskflow interactive
 ### 配置文件位置
 
 生成的配置文件将保存在：
+
 - `.cursor-rules` - Cursor AI行为规则
 - `.cursor/mcp.json` - MCP服务配置
 
@@ -61,11 +62,13 @@ TaskFlow AI会根据您的项目类型自动生成适合的Cursor配置：
 # 在.cursor-rules文件中添加自定义规则
 
 ## 自定义代码风格
+
 - 使用4个空格缩进
 - 行长度限制为100字符
 - 优先使用const和let，避免var
 
 ## 项目特定规则
+
 - 组件文件使用PascalCase命名
 - 工具函数文件使用camelCase命名
 - 常量文件使用UPPER_SNAKE_CASE命名

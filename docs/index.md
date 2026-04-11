@@ -2,9 +2,9 @@
 layout: home
 
 hero:
-  name: "TaskFlow AI"
-  text: "AI 思维流编排引擎"
-  tagline: "从任务执行升级为思维编排 — 专为开发团队打造的下一代 AI 开发工具"
+  name: 'TaskFlow AI'
+  text: 'AI 思维流编排引擎'
+  tagline: '从任务执行升级为思维编排 — 专为开发团队打造的下一代 AI 开发工具'
   image:
     src: /assets/logo.svg
     alt: TaskFlow AI Logo

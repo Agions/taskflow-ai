@@ -9,6 +9,7 @@
 ### 1. npm安装失败
 
 #### 问题描述
+
 ```bash
 npm install -g taskflow-ai
 # 错误: EACCES: permission denied
@@ -17,11 +18,13 @@ npm install -g taskflow-ai
 #### 解决方案
 
 **方案1: 使用sudo（Linux/macOS）**
+
 ```bash
 sudo npm install -g taskflow-ai
 ```
 
 **方案2: 配置npm全局目录**
+
 ```bash
 # 创建全局目录
 mkdir ~/.npm-global
@@ -38,6 +41,7 @@ npm install -g taskflow-ai
 ```
 
 **方案3: 使用npx（推荐）**
+
 ```bash
 # 无需全局安装，直接使用
 npx taskflow-ai --version
@@ -47,6 +51,7 @@ npx taskflow-ai init
 ### 2. Node.js版本不兼容
 
 #### 问题描述
+
 ```bash
 npm install -g taskflow-ai
 # 错误: engine "node" is incompatible with this module
@@ -55,12 +60,14 @@ npm install -g taskflow-ai
 #### 解决方案
 
 **检查Node.js版本**
+
 ```bash
 node --version
 # 需要 Node.js 18.0.0 或更高版本
 ```
 
 **升级Node.js**
+
 ```bash
 # 使用nvm升级（推荐）
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -74,6 +81,7 @@ nvm use 18
 ### 3. 网络连接问题
 
 #### 问题描述
+
 ```bash
 npm install -g taskflow-ai
 # 错误: network timeout / ENOTFOUND
@@ -82,6 +90,7 @@ npm install -g taskflow-ai
 #### 解决方案
 
 **配置npm镜像源**
+
 ```bash
 # 使用淘宝镜像
 npm config set registry https://registry.npmmirror.com
@@ -92,6 +101,7 @@ cnpm install -g taskflow-ai
 ```
 
 **配置代理**
+
 ```bash
 # 设置HTTP代理
 npm config set proxy http://proxy.company.com:8080
@@ -104,6 +114,7 @@ npm config set proxy http://username:password@proxy.company.com:8080
 ### 4. 依赖冲突
 
 #### 问题描述
+
 ```bash
 npm install -g taskflow-ai
 # 错误: peer dep missing / conflicting dependencies
@@ -112,24 +123,26 @@ npm install -g taskflow-ai
 #### 解决方案
 
 **清理npm缓存**
+
 ```bash
 npm cache clean --force
 ```
 
 **删除node_modules重新安装**
+
 ```bash
 rm -rf node_modules package-lock.json
 npm install
 ```
 
 **使用--force标志**
+
 ```bash
 npm install -g taskflow-ai --force
 ```
 
-
-
 **设置工作目录权限**
+
 ```bash
 # 确保目录可写
 chmod 755 $(pwd)
@@ -140,18 +153,21 @@ chmod 755 $(pwd)
 ### Windows平台
 
 #### PowerShell执行策略问题
+
 ```powershell
 # 错误: execution of scripts is disabled
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 #### 路径问题
+
 ```cmd
 # 添加npm全局路径到PATH
 set PATH=%PATH%;%APPDATA%\npm
 ```
 
 #### 长路径问题
+
 ```cmd
 # 启用长路径支持
 git config --system core.longpaths true
@@ -160,12 +176,14 @@ git config --system core.longpaths true
 ### macOS平台
 
 #### Xcode命令行工具缺失
+
 ```bash
 # 安装Xcode命令行工具
 xcode-select --install
 ```
 
 #### Homebrew权限问题
+
 ```bash
 # 修复Homebrew权限
 sudo chown -R $(whoami) $(brew --prefix)/*
@@ -174,6 +192,7 @@ sudo chown -R $(whoami) $(brew --prefix)/*
 ### Linux平台
 
 #### 缺少构建工具
+
 ```bash
 # Ubuntu/Debian
 sudo apt-get update
@@ -185,6 +204,7 @@ sudo yum install gcc gcc-c++ make
 ```
 
 #### Python依赖问题
+
 ```bash
 # 安装Python开发包
 sudo apt-get install python3-dev python3-pip
@@ -193,6 +213,7 @@ sudo apt-get install python3-dev python3-pip
 ## 🔧 验证安装
 
 ### 基本验证
+
 ```bash
 # 检查版本
 taskflow --version
@@ -206,6 +227,7 @@ taskflow parse --help
 ```
 
 ### 完整验证
+
 ```bash
 # 创建测试目录
 mkdir taskflow-test
@@ -226,6 +248,7 @@ rm -rf taskflow-test
 ## 🩺 诊断工具
 
 ### 系统诊断
+
 ```bash
 # 运行系统诊断
 taskflow doctor
@@ -238,6 +261,7 @@ taskflow doctor config
 ```
 
 ### 手动诊断
+
 ```bash
 # 检查Node.js环境
 node --version
@@ -256,6 +280,7 @@ ping registry.npmjs.org
 ## 🔄 重新安装
 
 ### 完全卸载
+
 ```bash
 # 卸载全局包
 npm uninstall -g taskflow-ai
@@ -268,6 +293,7 @@ rm -rf ~/.taskflow
 ```
 
 ### 重新安装
+
 ```bash
 # 更新npm
 npm install -g npm@latest
@@ -282,6 +308,7 @@ taskflow --version
 ## 🆘 获取帮助
 
 ### 收集诊断信息
+
 ```bash
 # 生成诊断报告
 taskflow doctor --export diagnosis.txt
@@ -295,6 +322,7 @@ taskflow doctor --export diagnosis.txt
 ```
 
 ### 报告问题
+
 当需要报告安装问题时，请提供：
 
 1. **系统信息**
@@ -313,6 +341,7 @@ taskflow doctor --export diagnosis.txt
    - 之前的安装尝试
 
 ### 联系支持
+
 - **GitHub Issues**: [提交问题](https://github.com/agions/taskflow-ai/issues)
 - **文档**: [查看文档](https://agions.github.io/taskflow-ai/)
 - **社区**: [讨论区](https://github.com/Agions/taskflow-ai/issues)

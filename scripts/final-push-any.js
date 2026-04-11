@@ -52,7 +52,9 @@ for (const file of files) {
 console.log(`\n✅ 完成！共替换 ${total} 处`);
 
 try {
-  const remaining = require('child_process').execSync("grep -rn ': any' src --include='*.ts' | wc -l", { encoding: 'utf-8' }).trim();
+  const remaining = require('child_process')
+    .execSync("grep -rn ': any' src --include='*.ts' | wc -l", { encoding: 'utf-8' })
+    .trim();
   console.log(`   剩余 any 数量: ${remaining}`);
 } catch (e) {
   console.log('   无法统计剩余数量');

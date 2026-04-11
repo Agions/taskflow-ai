@@ -9,36 +9,42 @@
 ## 🤖 Agent 团队设计
 
 ### 1. **RefactorAgent** (重构专家)
+
 - **职责**: 统一日志系统 + 减少 any 类型
 - **能力**: reasoning, code
 - **工具**: file_read, file_write, search, replace
 - **任务量**: 约 800 处代码修改
 
 ### 2. **TypeAgent** (类型专家)
+
 - **职责**: 分析并替换 `: any` 为具体类型
 - **能力**: reasoning, code
 - **工具**: type_analysis, code_refactor
 - **专长**: TypeScript 类型推断
 
 ### 3. **LogAgent** (日志专家)
+
 - **职责**: 批量替换 console → logger
 - **能力**: tool_use, code
 - **工具**:批量编辑、AST 操作
 - **优先级**: 高 (569 处)
 
 ### 4. **TestAgent** (测试专家)
+
 - **职责**: 增加 E2E 测试、提升覆盖率
 - **能力**: reasoning, code
 - **工具**: test_generator, coverage_analyzer
 - **目标**: 覆盖率 86% → 95%
 
 ### 5. **DocAgent** (文档专家)
+
 - **职责**: 补充 API 文档、生成示例
 - **能力**: reasoning, collaboration
 - **工具**: doc_generator, example_creator
 - **输出**: 完整的 API 参考
 
 ### 6. **ReviewAgent** (审查专家)
+
 - **职责**: 代码审查、质量检查
 - **能力**: reasoning, code
 - **工具**: linter, security_scanner
@@ -102,14 +108,14 @@
 
 ## 📋 任务分配矩阵
 
-| Agent | 主要任务 | 文件范围 | 优先级 |
-|-------|----------|----------|--------|
-| LogAgent | console → logger | `src/core/`, `src/mcp/`, `src/agent/`, `src/knowledge/` | P0 |
-| TypeAgent | any → 具体类型 | `src/marketplace/`, `src/cli/commands/visualize/` | P0 |
-| RefactorAgent | 复杂重构 | 跨模块协调 | P1 |
-| TestAgent | E2E 测试 | `tests/e2e/` (新建) | P1 |
-| DocAgent | 文档生成 | API 模块 | P2 |
-| ReviewAgent | 质量检查 | 全项目 | P2 |
+| Agent         | 主要任务         | 文件范围                                                | 优先级 |
+| ------------- | ---------------- | ------------------------------------------------------- | ------ |
+| LogAgent      | console → logger | `src/core/`, `src/mcp/`, `src/agent/`, `src/knowledge/` | P0     |
+| TypeAgent     | any → 具体类型   | `src/marketplace/`, `src/cli/commands/visualize/`       | P0     |
+| RefactorAgent | 复杂重构         | 跨模块协调                                              | P1     |
+| TestAgent     | E2E 测试         | `tests/e2e/` (新建)                                     | P1     |
+| DocAgent      | 文档生成         | API 模块                                                | P2     |
+| ReviewAgent   | 质量检查         | 全项目                                                  | P2     |
 
 ---
 
@@ -136,26 +142,26 @@ taskflow agent logs
 
 ## 📊 预期成果
 
-| 指标 | 当前 | 目标 |
-|------|------|------|
-| console 调用 | 569 | 0 (核心模块) |
-| any 类型 | 234 | 50 |
-| 测试覆盖率 | 86% | 95% |
-| E2E 测试 | 0 | 10+ 场景 |
-| API 文档完整度 | 85% | 100% |
-| 代码质量分数 | B | A |
+| 指标           | 当前 | 目标         |
+| -------------- | ---- | ------------ |
+| console 调用   | 569  | 0 (核心模块) |
+| any 类型       | 234  | 50           |
+| 测试覆盖率     | 86%  | 95%          |
+| E2E 测试       | 0    | 10+ 场景     |
+| API 文档完整度 | 85%  | 100%         |
+| 代码质量分数   | B    | A            |
 
 ---
 
 ## ⏱️ 时间估算
 
-| 阶段 | 时长 | Agent 数量 |
-|------|------|-----------|
-| 并行重构 | 2-3h | 3 |
-| 测试增强 | 1-2h | 1 |
-| 文档完善 | 30m | 1 |
-| 最终审查 | 30m | 1 |
-| **总计** | **4-6h** | **6** |
+| 阶段     | 时长     | Agent 数量 |
+| -------- | -------- | ---------- |
+| 并行重构 | 2-3h     | 3          |
+| 测试增强 | 1-2h     | 1          |
+| 文档完善 | 30m      | 1          |
+| 最终审查 | 30m      | 1          |
+| **总计** | **4-6h** | **6**      |
 
 ---
 
@@ -176,22 +182,25 @@ taskflow agent logs
 主人，您希望:
 
 **A. 立即启动多 Agent 协同开发**
-   - 我会实际创建 Agent 并开始执行任务
-   - 需要一定时间 (4-6 小时)
-   - 可能产生大量提交
+
+- 我会实际创建 Agent 并开始执行任务
+- 需要一定时间 (4-6 小时)
+- 可能产生大量提交
 
 **B. 先手动完成核心重构，再用 Agent 辅助**
-   - 我先手动处理最关键的部分
-   - 然后用 Agent 处理边缘情况
-   - 风险更低，可控性更强
+
+- 我先手动处理最关键的部分
+- 然后用 Agent 处理边缘情况
+- 风险更低，可控性更强
 
 **C. 只设计不执行**
-   - 我完善这个计划，但不实际运行
-   - 留给以后手动执行
+
+- 我完善这个计划，但不实际运行
+- 留给以后手动执行
 
 您选择哪个方案？
 
 ---
 
-*计划创建时间: 2026-03-28 20:46*  
-*版本: 1.0*
+_计划创建时间: 2026-03-28 20:46_  
+_版本: 1.0_

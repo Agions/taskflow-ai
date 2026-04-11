@@ -14,13 +14,17 @@
 # 项目/功能名称
 
 ## 1. 项目概述
+
 - 项目背景和目标
 - 核心价值主张
 - 目标用户群体
 
 ## 2. 功能需求
+
 ### 2.1 核心功能
+
 #### 功能A: 用户登录
+
 - **描述**: 详细的功能描述
 - **用户故事**: 作为...，我希望...，以便...
 - **验收标准**:
@@ -30,19 +34,23 @@
 - **预估工时**: X小时
 
 ### 2.2 辅助功能
+
 ...
 
 ## 3. 非功能性需求
+
 - 性能要求
 - 安全要求
 - 兼容性要求
 
 ## 4. 技术约束
+
 - 技术栈限制
 - 第三方依赖
 - 环境要求
 
 ## 5. 验收标准
+
 - 整体验收标准
 - 测试要求
 - 上线标准
@@ -51,25 +59,33 @@
 ### 编写技巧
 
 **1. 使用清晰的标题层级**
+
 ```markdown
 # 一级标题 - 项目名称
+
 ## 二级标题 - 主要章节
+
 ### 三级标题 - 功能模块
+
 #### 四级标题 - 具体功能
 ```
 
 **2. 编写具体的验收标准**
+
 ```markdown
 ❌ 不好的例子:
+
 - 系统应该快速响应
 
 ✅ 好的例子:
+
 - 页面加载时间不超过2秒
 - API响应时间不超过500ms
 - 支持1000个并发用户
 ```
 
 **3. 使用用户故事格式**
+
 ```markdown
 作为 [用户角色]，
 我希望 [功能描述]，
@@ -82,14 +98,17 @@
 ```
 
 **4. 明确优先级和依赖关系**
+
 ```markdown
 ### 功能优先级
+
 - **P0 (必须有)**: 核心功能，项目成功的关键
 - **P1 (应该有)**: 重要功能，显著提升用户体验
 - **P2 (可以有)**: 增值功能，时间允许时实现
 - **P3 (暂不要)**: 未来版本考虑的功能
 
 ### 依赖关系
+
 - 功能B依赖于功能A的完成
 - 功能C需要第三方API集成
 ```
@@ -99,6 +118,7 @@
 ### 环境配置
 
 **1. 分环境配置**
+
 ```bash
 # 开发环境
 taskflow config env development
@@ -117,6 +137,7 @@ taskflow config set performance.cacheSize 200
 ```
 
 **2. 团队配置同步**
+
 ```bash
 # 创建团队配置模板
 taskflow config export --template team-config.json --exclude-secrets
@@ -132,6 +153,7 @@ taskflow config import team-config.json --merge
 ### 安全配置
 
 **1. API密钥管理**
+
 ```bash
 # 使用环境变量
 export TASKFLOW_DEEPSEEK_API_KEY="your-api-key"
@@ -145,6 +167,7 @@ taskflow config rotate-keys --schedule monthly
 ```
 
 **2. 访问控制**
+
 ```bash
 # 设置项目访问权限
 taskflow config set security.accessControl.enabled true
@@ -160,6 +183,7 @@ taskflow users create --name "李四" --role "admin"
 ### 任务命名规范
 
 **1. 使用动词开头的命名**
+
 ```
 ✅ 好的例子:
 - 实现用户登录功能
@@ -175,6 +199,7 @@ taskflow users create --name "李四" --role "admin"
 ```
 
 **2. 包含具体的范围和目标**
+
 ```
 ✅ 好的例子:
 - 实现React用户登录组件（包含表单验证）
@@ -190,6 +215,7 @@ taskflow users create --name "李四" --role "admin"
 ### 任务状态管理
 
 **1. 及时更新状态**
+
 ```bash
 # 每日工作开始时
 taskflow status next --count 3
@@ -203,6 +229,7 @@ taskflow status update task-001 completed --comment "功能实现完成，已通
 ```
 
 **2. 添加有意义的备注**
+
 ```bash
 # 完成任务时的好备注
 taskflow status update task-001 completed --comment "
@@ -223,6 +250,7 @@ taskflow status update task-002 blocked --comment "
 ### 依赖关系管理
 
 **1. 明确任务依赖**
+
 ```bash
 # 设置依赖关系
 taskflow tasks dependency add task-002 --depends-on task-001
@@ -235,6 +263,7 @@ taskflow tasks dependency validate
 ```
 
 **2. 并行任务识别**
+
 ```bash
 # 识别可并行执行的任务
 taskflow tasks analyze --parallel-opportunities
@@ -248,6 +277,7 @@ taskflow tasks optimize --strategy "critical-path"
 ### 模型选择策略
 
 **1. 根据任务类型选择模型**
+
 ```bash
 # 技术文档解析 - 使用DeepSeek
 taskflow parse technical-spec.md --model deepseek
@@ -260,6 +290,7 @@ taskflow parse comprehensive-prd.md --multi-model
 ```
 
 **2. 配置智能模型选择**
+
 ```bash
 # 启用智能模型选择
 taskflow config set multiModel.enabled true
@@ -273,12 +304,16 @@ taskflow config set multiModel.fallback '["zhipu", "qwen", "baidu"]'
 ### 解析质量优化
 
 **1. 优化PRD文档质量**
+
 ```markdown
 # 在PRD中添加明确的标识符
+
 ## 功能需求 {#requirements}
+
 ### 用户登录 {#user-login}
 
 # 使用结构化的描述
+
 **功能**: 用户登录
 **输入**: 邮箱、密码
 **输出**: 登录成功/失败状态
@@ -286,6 +321,7 @@ taskflow config set multiModel.fallback '["zhipu", "qwen", "baidu"]'
 ```
 
 **2. 使用解析提示**
+
 ```bash
 # 指定解析重点
 taskflow parse requirements.md --focus "功能需求,验收标准"
@@ -302,6 +338,7 @@ taskflow parse requirements.md --rules custom-rules.json
 ### 沟通协作
 
 **1. 建立标准化流程**
+
 ```bash
 # 创建团队工作流模板
 taskflow workflow create --name "feature-development" --template team-workflow.yaml
@@ -314,6 +351,7 @@ taskflow reports schedule daily-summary --recipients "team@company.com"
 ```
 
 **2. 定期同步和回顾**
+
 ```bash
 # 每日站会数据准备
 taskflow status progress --daily-summary
@@ -328,6 +366,7 @@ taskflow reports generate sprint-retrospective --sprint "current"
 ### 权限和角色管理
 
 **1. 合理分配角色**
+
 ```bash
 # 项目经理角色
 taskflow users create --name "PM" --role "admin" --permissions "all"
@@ -340,6 +379,7 @@ taskflow users create --name "QA" --role "tester" --permissions "tasks.view,stat
 ```
 
 **2. 项目访问控制**
+
 ```bash
 # 设置项目级权限
 taskflow projects access --project "web-app" --team "frontend" --level "read-write"
@@ -354,6 +394,7 @@ taskflow projects access --project "payment" --users "senior-dev,pm" --level "ad
 ### 性能监控
 
 **1. 启用全面监控**
+
 ```bash
 # 启用性能监控
 taskflow config set performance.enableMonitoring true
@@ -366,6 +407,7 @@ taskflow alerts create --metric "response-time" --threshold "> 5000ms"
 ```
 
 **2. 定期性能分析**
+
 ```bash
 # 每周性能报告
 taskflow performance report --period "last-week"
@@ -380,6 +422,7 @@ taskflow optimize suggest --based-on "performance-data"
 ### 项目分析
 
 **1. 进度跟踪**
+
 ```bash
 # 设置里程碑
 taskflow milestones create --name "MVP完成" --date "2024-03-01"
@@ -392,6 +435,7 @@ taskflow analyze risks --factors "timeline,dependencies,resources"
 ```
 
 **2. 质量度量**
+
 ```bash
 # 任务质量分析
 taskflow quality analyze --metrics "completion-rate,rework-rate"
@@ -408,6 +452,7 @@ taskflow recommendations generate --based-on "quality-metrics"
 ### 流程优化
 
 **1. 定期流程回顾**
+
 ```bash
 # 流程效率分析
 taskflow analyze workflow-efficiency --period "last-quarter"
@@ -420,6 +465,7 @@ taskflow experiments create --name "new-workflow" --duration "2-weeks"
 ```
 
 **2. 自动化增强**
+
 ```bash
 # 识别重复性任务
 taskflow analyze repetitive-tasks --threshold 3
@@ -434,6 +480,7 @@ taskflow workflow automate --steps "parse,assign,notify"
 ### 知识管理
 
 **1. 文档化最佳实践**
+
 ```bash
 # 导出团队配置
 taskflow config export --template team-best-practices.json
@@ -446,6 +493,7 @@ taskflow knowledge share --with "team" --topic "task-management"
 ```
 
 **2. 培训和指导**
+
 ```bash
 # 创建培训材料
 taskflow training create --topic "taskflow-basics" --audience "new-team-members"
@@ -462,6 +510,7 @@ taskflow skills assess --user "team-member" --areas "prd-analysis,task-managemen
 ### 配置陷阱
 
 **1. 避免配置不一致**
+
 ```bash
 # 使用配置模板
 taskflow config template create --name "team-standard"
@@ -474,6 +523,7 @@ taskflow config sync --schedule "daily"
 ```
 
 **2. 避免密钥泄露**
+
 ```bash
 # 使用环境变量
 export TASKFLOW_API_KEYS_FILE="/secure/path/keys.env"
@@ -488,6 +538,7 @@ taskflow security rotate-keys --schedule "monthly"
 ### 使用陷阱
 
 **1. 避免任务粒度过细或过粗**
+
 ```
 ❌ 过细的任务:
 - 创建login.js文件
@@ -505,6 +556,7 @@ taskflow security rotate-keys --schedule "monthly"
 ```
 
 **2. 避免状态更新不及时**
+
 ```bash
 # 设置自动提醒
 taskflow reminders create --type "status-update" --frequency "daily"
@@ -548,4 +600,4 @@ taskflow sync team-status --schedule "hourly"
 
 ---
 
-*最佳实践是一个持续演进的过程，建议定期回顾和更新这些实践，以适应团队和项目的变化。*
+_最佳实践是一个持续演进的过程，建议定期回顾和更新这些实践，以适应团队和项目的变化。_

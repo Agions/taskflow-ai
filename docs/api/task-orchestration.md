@@ -17,9 +17,11 @@ constructor(config?: TaskOrchestrationConfig)
 ```
 
 **参数:**
+
 - `config` - 编排配置选项（可选）
 
 **示例:**
+
 ```typescript
 import { TaskOrchestrationEngine } from 'taskflow-ai';
 
@@ -27,7 +29,7 @@ const engine = new TaskOrchestrationEngine({
   enableCriticalPath: true,
   enableParallelOptimization: true,
   schedulingStrategy: SchedulingStrategy.CRITICAL_PATH,
-  optimizationGoal: OptimizationGoal.MINIMIZE_DURATION
+  optimizationGoal: OptimizationGoal.MINIMIZE_DURATION,
 });
 ```
 
@@ -38,12 +40,15 @@ const engine = new TaskOrchestrationEngine({
 执行任务编排，返回优化后的任务安排。
 
 **参数:**
+
 - `tasks` - 待编排的任务列表
 
 **返回值:**
+
 - `Promise<TaskOrchestrationResult>` - 编排结果
 
 **示例:**
+
 ```typescript
 const tasks = await taskManager.getAllTasks();
 const result = await engine.orchestrate(tasks);
@@ -58,9 +63,11 @@ console.log(`并行任务组: ${result.parallelGroups.length} 个`);
 更新任务的时间信息，包括最早/最晚开始时间、浮动时间等。
 
 **参数:**
+
 - `tasks` - 任务列表
 
 **返回值:**
+
 - `Task[]` - 更新后的任务列表
 
 ##### `getOrchestrationStats(): OrchestrationStats`
@@ -68,6 +75,7 @@ console.log(`并行任务组: ${result.parallelGroups.length} 个`);
 获取编排统计信息。
 
 **返回值:**
+
 - `OrchestrationStats` - 统计信息对象
 
 ## 工厂类
@@ -83,26 +91,23 @@ console.log(`并行任务组: ${result.parallelGroups.length} 个`);
 创建编排引擎实例。
 
 **参数:**
+
 - `preset` - 预设策略（可选）
 - `customConfig` - 自定义配置（可选）
 
 **示例:**
+
 ```typescript
 import { OrchestrationFactory, OrchestrationPreset } from 'taskflow-ai';
 
 // 使用敏捷冲刺预设
-const agileEngine = OrchestrationFactory.createEngine(
-  OrchestrationPreset.AGILE_SPRINT
-);
+const agileEngine = OrchestrationFactory.createEngine(OrchestrationPreset.AGILE_SPRINT);
 
 // 使用自定义配置
-const customEngine = OrchestrationFactory.createEngine(
-  OrchestrationPreset.ENTERPRISE,
-  {
-    maxParallelTasks: 15,
-    bufferPercentage: 0.2
-  }
-);
+const customEngine = OrchestrationFactory.createEngine(OrchestrationPreset.ENTERPRISE, {
+  maxParallelTasks: 15,
+  bufferPercentage: 0.2,
+});
 ```
 
 ##### `getAvailablePresets(): PresetInfo[]`
@@ -110,6 +115,7 @@ const customEngine = OrchestrationFactory.createEngine(
 获取所有可用的预设策略。
 
 **返回值:**
+
 - `PresetInfo[]` - 预设信息列表
 
 ##### `recommendPreset(characteristics: ProjectCharacteristics): OrchestrationPreset`
@@ -117,15 +123,17 @@ const customEngine = OrchestrationFactory.createEngine(
 根据项目特征推荐合适的预设策略。
 
 **参数:**
+
 - `characteristics` - 项目特征
 
 **示例:**
+
 ```typescript
 const recommended = OrchestrationFactory.recommendPreset({
   teamSize: 8,
   projectDuration: 60,
   uncertaintyLevel: 6,
-  isAgile: true
+  isAgile: true,
 });
 
 console.log(`推荐策略: ${recommended}`);
@@ -139,16 +147,16 @@ console.log(`推荐策略: ${recommended}`);
 
 ```typescript
 interface TaskOrchestrationConfig {
-  enableCriticalPath?: boolean;           // 启用关键路径分析
-  enableParallelOptimization?: boolean;   // 启用并行优化
-  enableResourceLeveling?: boolean;       // 启用资源平衡
-  enableRiskAnalysis?: boolean;           // 启用风险分析
+  enableCriticalPath?: boolean; // 启用关键路径分析
+  enableParallelOptimization?: boolean; // 启用并行优化
+  enableResourceLeveling?: boolean; // 启用资源平衡
+  enableRiskAnalysis?: boolean; // 启用风险分析
   schedulingStrategy?: SchedulingStrategy; // 调度策略
-  optimizationGoal?: OptimizationGoal;    // 优化目标
-  maxParallelTasks?: number;              // 最大并行任务数
-  workingHoursPerDay?: number;            // 每日工作小时数
-  workingDaysPerWeek?: number;            // 每周工作天数
-  bufferPercentage?: number;              // 缓冲时间百分比
+  optimizationGoal?: OptimizationGoal; // 优化目标
+  maxParallelTasks?: number; // 最大并行任务数
+  workingHoursPerDay?: number; // 每日工作小时数
+  workingDaysPerWeek?: number; // 每周工作天数
+  bufferPercentage?: number; // 缓冲时间百分比
 }
 ```
 
@@ -158,14 +166,14 @@ interface TaskOrchestrationConfig {
 
 ```typescript
 interface TaskOrchestrationResult {
-  tasks: Task[];                          // 编排后的任务列表
-  criticalPath: string[];                 // 关键路径任务ID列表
-  totalDuration: number;                  // 项目总持续时间
-  parallelGroups: string[][];             // 可并行执行的任务组
+  tasks: Task[]; // 编排后的任务列表
+  criticalPath: string[]; // 关键路径任务ID列表
+  totalDuration: number; // 项目总持续时间
+  parallelGroups: string[][]; // 可并行执行的任务组
   resourceUtilization: ResourceUtilization[]; // 资源利用率
-  riskAssessment: RiskAssessment;         // 风险评估
-  recommendations: string[];              // 优化建议
-  metadata: OrchestrationMetadata;        // 编排元数据
+  riskAssessment: RiskAssessment; // 风险评估
+  recommendations: string[]; // 优化建议
+  metadata: OrchestrationMetadata; // 编排元数据
 }
 ```
 
@@ -175,13 +183,13 @@ interface TaskOrchestrationResult {
 
 ```typescript
 enum SchedulingStrategy {
-  CRITICAL_PATH = 'critical_path',        // 关键路径优先
-  PRIORITY_FIRST = 'priority_first',      // 优先级优先
-  SHORTEST_FIRST = 'shortest_first',      // 最短任务优先
-  LONGEST_FIRST = 'longest_first',        // 最长任务优先
+  CRITICAL_PATH = 'critical_path', // 关键路径优先
+  PRIORITY_FIRST = 'priority_first', // 优先级优先
+  SHORTEST_FIRST = 'shortest_first', // 最短任务优先
+  LONGEST_FIRST = 'longest_first', // 最长任务优先
   RESOURCE_LEVELING = 'resource_leveling', // 资源平衡
-  EARLY_START = 'early_start',            // 最早开始
-  LATE_START = 'late_start'               // 最晚开始
+  EARLY_START = 'early_start', // 最早开始
+  LATE_START = 'late_start', // 最晚开始
 }
 ```
 
@@ -192,10 +200,10 @@ enum SchedulingStrategy {
 ```typescript
 enum OptimizationGoal {
   MINIMIZE_DURATION = 'minimize_duration', // 最小化项目持续时间
-  MINIMIZE_COST = 'minimize_cost',         // 最小化项目成本
-  MAXIMIZE_QUALITY = 'maximize_quality',   // 最大化项目质量
+  MINIMIZE_COST = 'minimize_cost', // 最小化项目成本
+  MAXIMIZE_QUALITY = 'maximize_quality', // 最大化项目质量
   BALANCE_RESOURCES = 'balance_resources', // 平衡资源使用
-  MINIMIZE_RISK = 'minimize_risk'          // 最小化项目风险
+  MINIMIZE_RISK = 'minimize_risk', // 最小化项目风险
 }
 ```
 
@@ -205,14 +213,14 @@ enum OptimizationGoal {
 
 ```typescript
 enum OrchestrationPreset {
-  AGILE_SPRINT = 'agile_sprint',           // 敏捷冲刺
-  WATERFALL = 'waterfall',                 // 瀑布模型
-  CRITICAL_CHAIN = 'critical_chain',       // 关键链
-  LEAN_STARTUP = 'lean_startup',           // 精益创业
-  RAPID_PROTOTYPE = 'rapid_prototype',     // 快速原型
-  ENTERPRISE = 'enterprise',               // 企业级
-  RESEARCH = 'research',                   // 研究项目
-  MAINTENANCE = 'maintenance'              // 维护项目
+  AGILE_SPRINT = 'agile_sprint', // 敏捷冲刺
+  WATERFALL = 'waterfall', // 瀑布模型
+  CRITICAL_CHAIN = 'critical_chain', // 关键链
+  LEAN_STARTUP = 'lean_startup', // 精益创业
+  RAPID_PROTOTYPE = 'rapid_prototype', // 快速原型
+  ENTERPRISE = 'enterprise', // 企业级
+  RESEARCH = 'research', // 研究项目
+  MAINTENANCE = 'maintenance', // 维护项目
 }
 ```
 
@@ -228,21 +236,21 @@ async function basicOrchestration() {
   const taskManager = new TaskManager();
   await taskManager.loadTasks();
   const tasks = taskManager.getAllTasks();
-  
+
   // 创建编排引擎
   const engine = new TaskOrchestrationEngine({
     enableCriticalPath: true,
-    enableParallelOptimization: true
+    enableParallelOptimization: true,
   });
-  
+
   // 执行编排
   const result = await engine.orchestrate(tasks);
-  
+
   // 显示结果
   console.log('编排完成!');
   console.log(`总持续时间: ${result.totalDuration} 小时`);
   console.log(`关键任务: ${result.criticalPath.length} 个`);
-  
+
   // 保存更新后的任务
   const updatedTasks = engine.updateTaskTimeInfo(result.tasks);
   for (const task of updatedTasks) {
@@ -258,13 +266,11 @@ import { OrchestrationFactory, OrchestrationPreset } from 'taskflow-ai';
 
 async function usePresetStrategy() {
   // 创建敏捷冲刺引擎
-  const agileEngine = OrchestrationFactory.createEngine(
-    OrchestrationPreset.AGILE_SPRINT
-  );
-  
+  const agileEngine = OrchestrationFactory.createEngine(OrchestrationPreset.AGILE_SPRINT);
+
   // 执行编排
   const result = await agileEngine.orchestrate(tasks);
-  
+
   // 显示敏捷相关的建议
   console.log('敏捷冲刺编排建议:');
   result.recommendations.forEach((rec, index) => {
@@ -279,21 +285,21 @@ async function usePresetStrategy() {
 async function riskAnalysis() {
   const engine = new TaskOrchestrationEngine({
     enableRiskAnalysis: true,
-    enableCriticalPath: true
+    enableCriticalPath: true,
   });
-  
+
   const result = await engine.orchestrate(tasks);
-  
+
   // 显示风险评估
   console.log(`整体风险等级: ${result.riskAssessment.overallRiskLevel}/10`);
-  
+
   result.riskAssessment.riskFactors.forEach(risk => {
     console.log(`风险: ${risk.name} (${risk.category})`);
     console.log(`  概率: ${risk.probability * 100}%`);
     console.log(`  影响: ${risk.impact}/10`);
     console.log(`  评分: ${risk.riskScore}`);
   });
-  
+
   // 显示缓解建议
   console.log('\n缓解建议:');
   result.riskAssessment.mitigationSuggestions.forEach((suggestion, index) => {
@@ -308,16 +314,16 @@ async function riskAnalysis() {
 async function resourceOptimization() {
   const engine = new TaskOrchestrationEngine({
     enableResourceLeveling: true,
-    optimizationGoal: OptimizationGoal.BALANCE_RESOURCES
+    optimizationGoal: OptimizationGoal.BALANCE_RESOURCES,
   });
-  
+
   const result = await engine.orchestrate(tasks);
-  
+
   // 显示资源利用率
   console.log('资源利用率:');
   result.resourceUtilization.forEach(resource => {
     console.log(`${resource.resourceName}: ${(resource.utilizationRate * 100).toFixed(1)}%`);
-    
+
     if (resource.overallocation > 0) {
       console.log(`  ⚠️ 超分配: ${resource.overallocation} 单位`);
     }
@@ -343,7 +349,7 @@ async function resourceOptimization() {
 ```typescript
 const config = {
   bufferPercentage: 0.15, // 15% 缓冲时间
-  enableRiskAnalysis: true
+  enableRiskAnalysis: true,
 };
 ```
 
@@ -352,9 +358,7 @@ const config = {
 重点关注关键路径上的任务：
 
 ```typescript
-const criticalTasks = result.tasks.filter(task => 
-  result.criticalPath.includes(task.id)
-);
+const criticalTasks = result.tasks.filter(task => result.criticalPath.includes(task.id));
 
 console.log('关键任务需要特别关注:');
 criticalTasks.forEach(task => {

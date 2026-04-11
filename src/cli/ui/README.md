@@ -98,17 +98,13 @@ ui.info('标题', '提示消息');
 import { ui } from './ui';
 
 // 有序列表
-ui.list('任务列表', [
-  '解析 PRD',
-  '生成代码',
-  '编写测试'
-]);
+ui.list('任务列表', ['解析 PRD', '生成代码', '编写测试']);
 
 // 键值对
 ui.keyValue({
-  '名称': 'TaskFlow',
-  '版本': '2.1.0',
-  '作者': 'Agions'
+  名称: 'TaskFlow',
+  版本: '2.1.0',
+  作者: 'Agions',
 });
 ```
 
@@ -120,12 +116,12 @@ import { ui, TableColumn, TableData } from './ui';
 const columns: TableColumn[] = [
   { header: 'ID', key: 'id', width: 8 },
   { header: '任务', key: 'name', width: 20 },
-  { header: '状态', key: 'status', width: 10 }
+  { header: '状态', key: 'status', width: 10 },
 ];
 
 const data: TableData[] = [
   { id: 'T001', name: '解析 PRD', status: '完成' },
-  { id: 'T002', name: '生成代码', status: '进行中' }
+  { id: 'T002', name: '生成代码', status: '进行中' },
 ];
 
 ui.table(columns, data);
@@ -146,8 +142,8 @@ console.log(ui.progress(50, 100, '处理中'));
 ```typescript
 import { ui } from './ui';
 
-ui.divider('─', 60);  // 自定义分隔线
-ui.section('章节标题');  // 带下划线的标题
+ui.divider('─', 60); // 自定义分隔线
+ui.section('章节标题'); // 带下划线的标题
 ```
 
 ## 交互式提示
@@ -202,7 +198,7 @@ dashboard.project({
   status: 'active',
   progress: 75,
   tasks: { total: 20, completed: 12, inProgress: 5, pending: 2, blocked: 1 },
-  lastUpdated: '2024-01-15 10:30:00'
+  lastUpdated: '2024-01-15 10:30:00',
 });
 
 // 系统信息
@@ -210,25 +206,25 @@ dashboard.system({
   nodeVersion: 'v20.11.0',
   platform: 'linux',
   memory: { used: 512, total: 2048 },
-  uptime: '2d 4h 30m'
+  uptime: '2d 4h 30m',
 });
 
 // 任务列表
 dashboard.tasks([
   { id: '1', name: '重构', status: 'in-progress', priority: 'high' },
-  { id: '2', name: '文档', status: 'pending', priority: 'medium' }
+  { id: '2', name: '文档', status: 'pending', priority: 'medium' },
 ]);
 
 // 时间线
 dashboard.timeline([
   { time: '10:30', event: '完成', status: 'success' },
-  { time: '10:25', event: '开始', status: 'info' }
+  { time: '10:25', event: '开始', status: 'info' },
 ]);
 
 // 统计卡片
 dashboard.stats([
   { label: '总数', value: 20, change: 5 },
-  { label: '完成率', value: '75%', change: 10, unit: '%' }
+  { label: '完成率', value: '75%', change: 10, unit: '%' },
 ]);
 ```
 

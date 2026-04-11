@@ -17,38 +17,38 @@ const AGENTS = [
     id: 'log-agent',
     name: 'LogAgent',
     description: '统一日志系统，将 console 替换为 Logger',
-    taskFile: 'docs/agents/log-agent-tasks.yaml'
+    taskFile: 'docs/agents/log-agent-tasks.yaml',
   },
   {
     id: 'type-agent',
     name: 'TypeAgent',
     description: '类型安全优化，:any → 具体类型',
-    taskFile: 'docs/agents/type-agent-tasks.yaml'
+    taskFile: 'docs/agents/type-agent-tasks.yaml',
   },
   {
     id: 'refactor-agent',
     name: 'RefactorAgent',
     description: '重构协调，解决冲突，质量检查',
-    task: '协调整体重构:\n1. 监控 LogAgent 和 TypeAgent 进度\n2. 解决文件冲突\n3. 运行质量检查\n4. 准备合并'
+    task: '协调整体重构:\n1. 监控 LogAgent 和 TypeAgent 进度\n2. 解决文件冲突\n3. 运行质量检查\n4. 准备合并',
   },
   {
     id: 'test-agent',
     name: 'TestAgent',
     description: '测试增强，E2E 测试和覆盖率提升',
-    task: '完善测试:\n1. 创建 E2E 测试场景 (10+)\n2. 补充集成测试\n3. 覆盖率优化 (86% → 95%)'
+    task: '完善测试:\n1. 创建 E2E 测试场景 (10+)\n2. 补充集成测试\n3. 覆盖率优化 (86% → 95%)',
   },
   {
     id: 'doc-agent',
     name: 'DocAgent',
     description: '文档完善，API 示例和 CHANGELOG',
-    task: 'API 文档:\n1. 检查文档完整性\n2. 生成使用示例\n3. 更新 CHANGELOG'
+    task: 'API 文档:\n1. 检查文档完整性\n2. 生成使用示例\n3. 更新 CHANGELOG',
   },
   {
     id: 'review-agent',
     name: 'ReviewAgent',
     description: '最终审查，质量和安全审计',
-    task: '质量检查:\n1. 运行 npm run quality\n2. 安全审计 npm audit\n3. 性能基准测试\n4. 生成报告'
-  }
+    task: '质量检查:\n1. 运行 npm run quality\n2. 安全审计 npm audit\n3. 性能基准测试\n4. 生成报告',
+  },
 ];
 
 async function confirm() {
@@ -58,12 +58,12 @@ async function confirm() {
   }
 
   const readline = require('readline');
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
+      output: process.stdout,
     });
-    rl.question('\n是否确认启动所有 6 个 Agent? (y/N): ', (ans) => {
+    rl.question('\n是否确认启动所有 6 个 Agent? (y/N): ', ans => {
       rl.close();
       resolve(ans.trim().toLowerCase() === 'y');
     });
@@ -88,40 +88,51 @@ function startAgent(agent, index) {
     // 稍作错开启动时间
     setTimeout(() => {
       const cmd = process.platform === 'win32' ? 'openclaw.cmd' : 'openclaw';
-      const child = spawn(cmd, [
-        'sessions', 'spawn',
-        '--task', task,
-        '--mode', 'session',
-        '--timeout', '14400',
-        '--label', `agent:${agent.id}`,
-        '--thinking', 'medium',
-        '--model', 'openrouter/auto'
-      ], {
-        stdio: 'pipe',
-        detached: true
-      });
+      const child = spawn(
+        cmd,
+        [
+          'sessions',
+          'spawn',
+          '--task',
+          task,
+          '--mode',
+          'session',
+          '--timeout',
+          '14400',
+          '--label',
+          `agent:${agent.id}`,
+          '--thinking',
+          'medium',
+          '--model',
+          'openrouter/auto',
+        ],
+        {
+          stdio: 'pipe',
+          detached: true,
+        }
+      );
 
       child.unref();
 
       let output = '';
-      child.stdout.on('data', (data) => {
+      child.stdout.on('data', data => {
         const text = data.toString();
         output += text;
         process.stdout.write(`[${agent.id}] ${text}`);
       });
 
-      child.stderr.on('data', (data) => {
+      child.stderr.on('data', data => {
         const text = data.toString();
         output += text;
         process.stderr.write(`[${agent.id} ERROR] ${text}`);
       });
 
-      child.on('error', (err) => {
+      child.on('error', err => {
         console.error(`[${agent.id}] ❌ 启动失败: ${err.message}`);
         resolve(null);
       });
 
-      child.on('exit', (code) => {
+      child.on('exit', code => {
         if (code === 0) {
           // 尝试从输出提取 sessionId
           const match = output.match(/sessionId\s*[=:]\s*([a-zA-Z0-9_-]+)/i);
@@ -189,21 +200,18 @@ async function main() {
     agents: sessions.map(s => ({
       id: s.agentId,
       name: s.name,
-      sessionId: s.sessionId
+      sessionId: s.sessionId,
     })),
     commands: {
       list: 'openclaw sessions list',
       monitor: `openclaw sessions list --activeMinutes 5`,
       send: 'openclaw sessions send <sessionId> "progress?"',
       history: 'openclaw sessions history <sessionId> --limit 50',
-      kill: 'openclaw sessions kill <sessionId>'
-    }
+      kill: 'openclaw sessions kill <sessionId>',
+    },
   };
 
-  writeFileSync(
-    join(ROOT, '.agent-sessions.json'),
-    JSON.stringify(sessionInfo, null, 2)
-  );
+  writeFileSync(join(ROOT, '.agent-sessions.json'), JSON.stringify(sessionInfo, null, 2));
 
   console.log('\n═══════════════════════════════════════════════════════');
   console.log('✅ 多 Agent 协同开发已启动！');
@@ -225,7 +233,7 @@ async function main() {
   process.exit(0);
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error('\n❌ 启动失败:', err);
   process.exit(1);
 });

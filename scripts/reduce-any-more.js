@@ -52,7 +52,9 @@ for (const file of files) {
 console.log(`\n✅ 完成！共替换 ${total} 处 : any → : unknown`);
 
 try {
-  const remaining = require('child_process').execSync("grep -rn ': any' src --include='*.ts' | wc -l", { encoding: 'utf-8' }).trim();
+  const remaining = require('child_process')
+    .execSync("grep -rn ': any' src --include='*.ts' | wc -l", { encoding: 'utf-8' })
+    .trim();
   console.log(`   剩余 any 数量: ${remaining}`);
   const percent = Math.round((total / (total + parseInt(remaining))) * 100);
   console.log(`   减少百分比: ~${percent}%`);

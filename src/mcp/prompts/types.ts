@@ -37,7 +37,13 @@ export interface PromptExample {
 /** Prompt 参数值 — 键为参数名，值为对应类型 */
 export type PromptArguments = Record<string, PromptArgumentValue>;
 
-export type PromptArgumentValue = string | number | boolean | unknown[] | Record<string, unknown> | null;
+export type PromptArgumentValue =
+  | string
+  | number
+  | boolean
+  | unknown[]
+  | Record<string, unknown>
+  | null;
 
 export interface PromptRenderOptions {
   strict?: boolean;

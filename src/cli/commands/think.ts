@@ -67,7 +67,9 @@ program
       const renderer = createRenderer('mermaid');
       console.log(renderer.render(latestChain));
     } else {
-      const renderer = createRenderer(options.format as 'text' | 'markdown' | 'mermaid' | 'mindmap');
+      const renderer = createRenderer(
+        options.format as 'text' | 'markdown' | 'mermaid' | 'mindmap'
+      );
       console.log(renderer.render(latestChain));
     }
   });

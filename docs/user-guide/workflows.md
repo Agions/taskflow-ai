@@ -28,6 +28,7 @@ graph TD
 #### 详细步骤
 
 **1. 项目集成**
+
 ```bash
 # 进入现有项目目录
 cd my-personal-project
@@ -40,6 +41,7 @@ ls -la .taskflow/
 ```
 
 **2. 环境配置**
+
 ```bash
 # 配置主要AI模型
 taskflow config set models.deepseek.apiKey "your-deepseek-key"
@@ -53,6 +55,7 @@ taskflow config validate
 ```
 
 **3. PRD准备和解析**
+
 ```bash
 # 创建或准备PRD文档
 # 确保文档结构清晰，包含功能需求和验收标准
@@ -65,6 +68,7 @@ taskflow status list
 ```
 
 **4. 任务执行循环**
+
 ```bash
 # 获取下一个任务
 taskflow status next
@@ -104,6 +108,7 @@ graph TD
 #### 详细步骤
 
 **1. 团队项目设置**
+
 ```bash
 # 项目负责人初始化
 cd team-project
@@ -120,6 +125,7 @@ taskflow config set multiModel.fallback '["zhipu", "qwen"]'
 ```
 
 **2. 协作PRD编写**
+
 ```bash
 # 团队协作编写PRD文档
 # 使用Git管理PRD文档版本
@@ -131,6 +137,7 @@ taskflow parse docs/requirements.md --multi-model
 ```
 
 **3. 任务分配和管理**
+
 ```bash
 # 查看所有任务
 taskflow status list
@@ -144,6 +151,7 @@ taskflow status progress --detailed
 ```
 
 **4. 日常同步**
+
 ```bash
 # 每日站会前查看进度
 taskflow status progress
@@ -183,6 +191,7 @@ graph TD
 #### 企业级配置
 
 **1. 高级项目设置**
+
 ```bash
 # 企业级初始化
 taskflow init --verbose
@@ -198,6 +207,7 @@ taskflow config set performance.cacheSize 1000
 ```
 
 **2. 权限和安全配置**
+
 ```bash
 # 启用安全功能
 taskflow config set security.encryptApiKeys true
@@ -208,6 +218,7 @@ taskflow config set team.roles '["admin", "pm", "developer", "tester"]'
 ```
 
 **3. 自动化工作流**
+
 ```bash
 # 设置自动化规则
 taskflow automation create --trigger "prd-updated" --action "re-parse"
@@ -224,6 +235,7 @@ taskflow schedule create --name "daily-report" --cron "0 9 * * *"
 #### Sprint规划流程
 
 **1. Sprint开始**
+
 ```bash
 # 创建新Sprint
 taskflow sprint create --name "Sprint-2024-01" --duration "2-weeks"
@@ -237,6 +249,7 @@ taskflow status progress --sprint "Sprint-2024-01" --forecast
 ```
 
 **2. Sprint执行**
+
 ```bash
 # 每日站会
 taskflow status progress --daily-summary
@@ -249,6 +262,7 @@ taskflow status update task-002 blocked --comment "等待API接口"
 ```
 
 **3. Sprint回顾**
+
 ```bash
 # Sprint结束统计
 taskflow sprint complete "Sprint-2024-01"
@@ -267,6 +281,7 @@ taskflow analyze team-velocity --sprint "Sprint-2024-01"
 将TaskFlow AI集成到持续集成流程中。
 
 **1. Git Hooks集成**
+
 ```bash
 # 安装Git钩子
 taskflow hooks install --type pre-commit
@@ -279,13 +294,14 @@ fi' > .git/hooks/pre-commit
 ```
 
 **2. GitHub Actions集成**
+
 ```yaml
 # .github/workflows/taskflow.yml
 name: TaskFlow AI Integration
 on:
   push:
     paths: ['docs/**/*.md']
-  
+
 jobs:
   update-tasks:
     runs-on: ubuntu-latest
@@ -304,6 +320,7 @@ jobs:
 ### 自动化监控
 
 **1. 进度监控**
+
 ```bash
 # 设置进度告警
 taskflow alerts create --condition "progress < 50%" --action "notify-pm"
@@ -316,6 +333,7 @@ taskflow reports schedule weekly-progress --recipients "pm@company.com"
 ```
 
 **2. 质量监控**
+
 ```bash
 # 任务质量检查
 taskflow quality check --criteria "completion-rate,accuracy"
@@ -358,13 +376,12 @@ taskflow parse api-spec.md --focus "endpoints,data-models,authentication"
 taskflow tasks create --template "database-migration"
 ```
 
-
-
 ## 🔧 工作流优化
 
 ### 效率提升技巧
 
 **1. 快捷命令设置**
+
 ```bash
 # 创建命令别名
 alias tf='taskflow'
@@ -377,6 +394,7 @@ alias tf-update='git pull && taskflow parse docs/requirements.md'
 ```
 
 **2. 自动化脚本**
+
 ```bash
 #!/bin/bash
 # daily-workflow.sh
@@ -403,6 +421,7 @@ taskflow status progress
 ### 团队协作优化
 
 **1. 配置同步**
+
 ```bash
 # 导出团队配置模板
 taskflow config export --template team-config.json
@@ -416,6 +435,7 @@ git commit -m "更新团队配置"
 ```
 
 **2. 沟通集成**
+
 ```bash
 # Slack集成
 taskflow integrations enable slack
@@ -430,6 +450,7 @@ taskflow notifications create --email "team@company.com" --events "milestone-rea
 ### 效率指标
 
 **1. 团队效率分析**
+
 ```bash
 # 团队速度分析
 taskflow analyze velocity --period "last-month"
@@ -442,6 +463,7 @@ taskflow analyze bottlenecks --threshold 0.7
 ```
 
 **2. 项目健康度**
+
 ```bash
 # 项目健康检查
 taskflow health check --comprehensive

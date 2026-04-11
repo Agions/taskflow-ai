@@ -93,8 +93,20 @@
     { "id": "e1", "source": "input", "target": "read_file" },
     { "id": "e2", "source": "read_file", "target": "validate" },
     { "id": "e3", "source": "validate", "target": "check_errors" },
-    { "id": "e4", "source": "check_errors", "target": "log_error", "sourceHandle": "false", "label": "有错误" },
-    { "id": "e5", "source": "check_errors", "target": "dedupe", "sourceHandle": "true", "label": "无错误" },
+    {
+      "id": "e4",
+      "source": "check_errors",
+      "target": "log_error",
+      "sourceHandle": "false",
+      "label": "有错误"
+    },
+    {
+      "id": "e5",
+      "source": "check_errors",
+      "target": "dedupe",
+      "sourceHandle": "true",
+      "label": "无错误"
+    },
     { "id": "e6", "source": "dedupe", "target": "normalize" },
     { "id": "e7", "source": "normalize", "target": "enrich" },
     { "id": "e8", "source": "enrich", "target": "write_output" },

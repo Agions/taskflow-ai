@@ -3,6 +3,7 @@
 ## 系统要求
 
 ### 最低要求
+
 - **Node.js**: >= 18.0.0
 - **npm**: >= 9.0.0 或 **yarn**: >= 1.22.0
 - **操作系统**: Windows 10+, macOS 10.15+, Linux (Ubuntu 18.04+)
@@ -10,6 +11,7 @@
 - **磁盘空间**: 最少 500MB 可用空间
 
 ### 推荐配置
+
 - **Node.js**: >= 20.0.0
 - **npm**: >= 10.0.0
 - **内存**: 4GB+ RAM
@@ -125,6 +127,7 @@ taskflow config path
 ```
 
 配置文件位置：
+
 - **Windows**: `%USERPROFILE%\.taskflow\config.json`
 - **macOS**: `~/.taskflow/config.json`
 - **Linux**: `~/.taskflow/config.json`
@@ -406,6 +409,7 @@ npm cache clean --force
 4. [查看CLI命令参考](../cli/commands.md)
 
 如果遇到问题，请查看：
+
 - [常见问题解答](../faq.md)
 - [故障排除指南](../troubleshooting/common-issues.md)
 - [GitHub Issues](https://github.com/agions/taskflow-ai/issues)

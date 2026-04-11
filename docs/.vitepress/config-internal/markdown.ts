@@ -6,6 +6,6 @@ export const markdown = {
   lineNumbers: true,
   theme: {
     light: 'github-light',
-    dark: 'github-dark'
-  }
+    dark: 'github-dark',
+  },
 };

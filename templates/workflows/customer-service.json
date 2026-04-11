@@ -76,10 +76,34 @@
   "edges": [
     { "id": "e1", "source": "input", "target": "classify" },
     { "id": "e2", "source": "classify", "target": "switch" },
-    { "id": "e3", "source": "switch", "target": "refund_flow", "sourceHandle": "退款", "label": "退款" },
-    { "id": "e4", "source": "switch", "target": "complaint_flow", "sourceHandle": "投诉", "label": "投诉" },
-    { "id": "e5", "source": "switch", "target": "inquiry_flow", "sourceHandle": "咨询", "label": "咨询" },
-    { "id": "e6", "source": "switch", "target": "default_flow", "sourceHandle": "default", "label": "其他" },
+    {
+      "id": "e3",
+      "source": "switch",
+      "target": "refund_flow",
+      "sourceHandle": "退款",
+      "label": "退款"
+    },
+    {
+      "id": "e4",
+      "source": "switch",
+      "target": "complaint_flow",
+      "sourceHandle": "投诉",
+      "label": "投诉"
+    },
+    {
+      "id": "e5",
+      "source": "switch",
+      "target": "inquiry_flow",
+      "sourceHandle": "咨询",
+      "label": "咨询"
+    },
+    {
+      "id": "e6",
+      "source": "switch",
+      "target": "default_flow",
+      "sourceHandle": "default",
+      "label": "其他"
+    },
     { "id": "e7", "source": "refund_flow", "target": "output" },
     { "id": "e8", "source": "complaint_flow", "target": "output" },
     { "id": "e9", "source": "inquiry_flow", "target": "output" },

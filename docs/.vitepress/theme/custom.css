@@ -9,13 +9,13 @@
   --tf-primary: #3b82f6;
   --tf-primary-light: #60a5fa;
   --tf-primary-dark: #2563eb;
-  
+
   /* 辅助色 */
   --tf-success: #10b981;
   --tf-warning: #f59e0b;
   --tf-error: #ef4444;
   --tf-info: #06b6d4;
-  
+
   /* 中性色 */
   --tf-gray-50: #f9fafb;
   --tf-gray-100: #f3f4f6;
@@ -27,10 +27,14 @@
   --tf-gray-700: #374151;
   --tf-gray-800: #1f2937;
   --tf-gray-900: #111827;
-  
+
   /* 渐变 */
   --tf-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  --tf-gradient-hero: linear-gradient(180deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+  --tf-gradient-hero: linear-gradient(
+    180deg,
+    rgba(59, 130, 246, 0.1) 0%,
+    rgba(139, 92, 246, 0.05) 100%
+  );
 }
 
 /* 暗色主题 */
@@ -353,7 +357,7 @@
   .card-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .VPHero .tagline {
     font-size: 1rem !important;
   }
@@ -366,7 +370,7 @@
   .VPFooter {
     display: none !important;
   }
-  
+
   .VPContent {
     padding: 0 !important;
   }

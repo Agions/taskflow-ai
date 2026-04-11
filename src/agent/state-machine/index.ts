@@ -43,7 +43,7 @@ export class AgentStateMachine {
 
     this.actor = createActor(machine);
 
-    this.actor.subscribe((state) => {
+    this.actor.subscribe(state => {
       this.stateChangeCallbacks.forEach(cb => cb(state.value as AgentState));
     });
   }

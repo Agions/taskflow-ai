@@ -9,12 +9,14 @@
 ### 1. API密钥无效
 
 #### 问题症状
+
 ```bash
 taskflow models test deepseek
 # 错误: TF-CF-004: API密钥无效
 ```
 
 #### 诊断步骤
+
 ```bash
 # 检查当前配置的API密钥
 taskflow config get models.deepseek.apiKey
@@ -25,6 +27,7 @@ taskflow config get models.deepseek.apiKey
 ```
 
 #### 解决方案
+
 ```bash
 # 重新设置正确的API密钥
 taskflow config set models.deepseek.apiKey "sk-your-correct-api-key"
@@ -39,12 +42,14 @@ taskflow models test deepseek
 ### 2. API密钥未配置
 
 #### 问题症状
+
 ```bash
 taskflow parse docs/requirements.md
 # 错误: TF-CF-003: API密钥未配置
 ```
 
 #### 解决方案
+
 ```bash
 # 配置主要模型API密钥
 taskflow config set models.deepseek.apiKey "your-deepseek-key"
@@ -59,12 +64,14 @@ taskflow config validate
 ### 3. API密钥权限不足
 
 #### 问题症状
+
 ```bash
 taskflow models test
 # 错误: 403 Forbidden / insufficient permissions
 ```
 
 #### 解决方案
+
 - 检查API密钥是否有正确的权限
 - 确认账户余额充足
 - 联系API提供商确认账户状态
@@ -74,12 +81,14 @@ taskflow models test
 ### 1. 配置文件损坏
 
 #### 问题症状
+
 ```bash
 taskflow config list
 # 错误: TF-CF-002: 配置文件格式错误
 ```
 
 #### 诊断步骤
+
 ```bash
 # 检查配置文件
 cat .taskflow/config.json
@@ -89,6 +98,7 @@ python -m json.tool .taskflow/config.json
 ```
 
 #### 解决方案
+
 ```bash
 # 备份现有配置
 cp .taskflow/config.json .taskflow/config.json.backup
@@ -103,12 +113,14 @@ taskflow config set models.deepseek.apiKey "your-api-key"
 ### 2. 配置文件权限问题
 
 #### 问题症状
+
 ```bash
 taskflow config set models.deepseek.apiKey "key"
 # 错误: TF-CF-005: 配置权限错误
 ```
 
 #### 解决方案
+
 ```bash
 # 检查文件权限
 ls -la .taskflow/
@@ -124,12 +136,14 @@ sudo chown -R $USER:$USER .taskflow/
 ### 3. 配置目录不存在
 
 #### 问题症状
+
 ```bash
 taskflow config list
 # 错误: TF-CF-001: 配置文件不存在
 ```
 
 #### 解决方案
+
 ```bash
 # 检查当前目录
 pwd
@@ -148,12 +162,14 @@ taskflow init
 ### 1. 模型连接失败
 
 #### 问题症状
+
 ```bash
 taskflow models test
 # 错误: TF-NW-001: 网络连接失败
 ```
 
 #### 诊断步骤
+
 ```bash
 # 测试网络连接
 ping api.deepseek.com
@@ -165,6 +181,7 @@ echo $HTTPS_PROXY
 ```
 
 #### 解决方案
+
 ```bash
 # 配置代理（如果需要）
 export TASKFLOW_HTTP_PROXY="http://proxy.company.com:8080"
@@ -178,12 +195,14 @@ taskflow config set network.proxy.https "https://proxy.company.com:8080"
 ### 2. 多模型配置错误
 
 #### 问题症状
+
 ```bash
 taskflow parse docs/requirements.md --multi-model
 # 错误: 没有可用的模型
 ```
 
 #### 解决方案
+
 ```bash
 # 启用多模型支持
 taskflow config set multiModel.enabled true
@@ -201,12 +220,14 @@ taskflow models status
 ### 3. 模型参数配置错误
 
 #### 问题症状
+
 ```bash
 taskflow parse docs/requirements.md
 # 错误: 模型参数无效
 ```
 
 #### 解决方案
+
 ```bash
 # 重置模型参数为默认值
 taskflow config unset models.deepseek.temperature
@@ -222,12 +243,14 @@ taskflow config set models.deepseek.maxTokens 2000
 ### 1. 代理配置问题
 
 #### 问题症状
+
 ```bash
 taskflow models test
 # 错误: 代理连接失败
 ```
 
 #### 解决方案
+
 ```bash
 # 检查代理设置
 taskflow config get network.proxy
@@ -242,12 +265,14 @@ taskflow config set network.proxy.auth "username:password"
 ### 2. SSL证书问题
 
 #### 问题症状
+
 ```bash
 taskflow models test
 # 错误: TF-NW-004: SSL证书验证失败
 ```
 
 #### 解决方案
+
 ```bash
 # 临时禁用SSL验证（仅用于调试）
 export TASKFLOW_DISABLE_SSL_VERIFY=true
@@ -262,12 +287,14 @@ sudo apt-get update && sudo apt-get install ca-certificates
 ### 3. 防火墙问题
 
 #### 问题症状
+
 ```bash
 taskflow models test
 # 错误: 连接被拒绝
 ```
 
 #### 解决方案
+
 - 检查防火墙设置
 - 确保允许HTTPS出站连接
 - 联系网络管理员开放必要端口
@@ -277,6 +304,7 @@ taskflow models test
 ### 1. 企业代理配置
 
 #### 配置企业代理
+
 ```bash
 # 设置企业代理
 taskflow config set network.proxy.http "http://proxy.company.com:8080"
@@ -292,6 +320,7 @@ taskflow config set network.proxy.noProxy "localhost,127.0.0.1,.company.com"
 ### 2. 企业SSL证书
 
 #### 配置企业CA证书
+
 ```bash
 # 设置企业CA证书路径
 taskflow config set network.ssl.caPath "/etc/ssl/certs/company-ca.pem"
@@ -303,6 +332,7 @@ taskflow config set network.ssl.verify false
 ### 3. 企业安全策略
 
 #### 配置安全设置
+
 ```bash
 # 启用API密钥加密
 taskflow config set security.encryptApiKeys true
@@ -319,6 +349,7 @@ taskflow config set security.auditLog true
 ### 1. 配置验证
 
 #### 运行配置验证
+
 ```bash
 # 完整配置验证
 taskflow config validate
@@ -331,6 +362,7 @@ taskflow config validate --section network
 ### 2. 配置导出和导入
 
 #### 导出配置模板
+
 ```bash
 # 导出当前配置（排除敏感信息）
 taskflow config export --template config-template.json
@@ -340,6 +372,7 @@ taskflow config export --full config-full.json
 ```
 
 #### 导入配置
+
 ```bash
 # 导入配置模板
 taskflow config import config-template.json
@@ -351,6 +384,7 @@ taskflow config import config-template.json --merge
 ### 3. 配置重置
 
 #### 重置特定配置
+
 ```bash
 # 重置模型配置
 taskflow config reset --section models
@@ -360,6 +394,7 @@ taskflow config reset --section network
 ```
 
 #### 完全重置
+
 ```bash
 # 备份当前配置
 taskflow config export --full config-backup.json
@@ -376,6 +411,7 @@ taskflow init
 ### 1. 环境特定配置
 
 #### 开发环境配置
+
 ```bash
 taskflow config env development
 taskflow config set logging.level debug
@@ -383,6 +419,7 @@ taskflow config set performance.cacheSize 50
 ```
 
 #### 生产环境配置
+
 ```bash
 taskflow config env production
 taskflow config set logging.level error
@@ -392,6 +429,7 @@ taskflow config set performance.cacheSize 200
 ### 2. 性能优化配置
 
 #### 缓存配置
+
 ```bash
 # 设置缓存大小
 taskflow config set performance.cacheSize 100
@@ -404,6 +442,7 @@ taskflow config set performance.cacheCompression true
 ```
 
 #### 并发配置
+
 ```bash
 # 设置最大并发数
 taskflow config set performance.maxConcurrency 5
@@ -418,18 +457,21 @@ taskflow config set performance.enableQueue true
 ## 📋 配置检查清单
 
 ### 基本配置检查
+
 - [ ] 项目已初始化 (`taskflow init`)
 - [ ] 配置文件存在 (`.taskflow/config.json`)
 - [ ] API密钥已配置
 - [ ] 模型连接正常
 
 ### 网络配置检查
+
 - [ ] 网络连接正常
 - [ ] 代理配置正确（如果需要）
 - [ ] SSL证书验证通过
 - [ ] 防火墙允许连接
 
 ### 安全配置检查
+
 - [ ] API密钥安全存储
 - [ ] 文件权限正确
 - [ ] 审计日志启用（企业环境）

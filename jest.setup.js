@@ -20,4 +20,4 @@ global.console = {
 // 清理所有模拟
 afterEach(() => {
   jest.clearAllMocks();
-}); 
+});

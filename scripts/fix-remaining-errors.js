@@ -27,24 +27,27 @@ let total = 0;
 for (const file of files) {
   let content = readFileSync(file, 'utf-8');
   const before = content;
-  
+
   // catch (error: unknown) -> any
   content = content.replace(/catch\s*\(\s*(\w+)\s*:\s*unknown\s*\)/g, 'catch ($1: any)');
-  
+
   // config: unknown -> any
   content = content.replace(/: unknown(\s*[=,\]]|$)/g, ': any$1');
-  
+
   // 或将特定 unknown 断言为 any
   content = content.replace(/(\w+): unknown/g, '$1: any');
-  
+
   // Spread from unknown: 使用类型断言
-  content = content.replace(/\.\.\.(\w+)\s+as\s+Record<string,\s*unknown>/g, '...($1 as Record<string, any>)');
+  content = content.replace(
+    /\.\.\.(\w+)\s+as\s+Record<string,\s*unknown>/g,
+    '...($1 as Record<string, any>)'
+  );
   content = content.replace(/Record<string,\s*unknown>/g, 'Record<string, any>');
-  
+
   // 特殊修复: 错误处理中的 unknown
   content = content.replace(/if\s*\(\s*error\s*\)\s*{/g, 'if (error as Error) {');
   content = content.replace(/error\s*instanceof\s+Error/g, '(error as Error) instanceof Error');
-  
+
   if (content !== before) {
     writeFileSync(file, content, 'utf-8');
     console.log(`✅ ${file}`);

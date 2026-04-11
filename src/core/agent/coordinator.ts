@@ -328,7 +328,11 @@ export class MultiAgentCoordinator {
 
         // 如果某个子任务失败，通知所有 Agent
         if (exec.status === 'failed') {
-          this.broadcast('coordinator', `协作任务子任务 ${i + 1} 失败: ${exec.task.error}`, 'notification');
+          this.broadcast(
+            'coordinator',
+            `协作任务子任务 ${i + 1} 失败: ${exec.task.error}`,
+            'notification'
+          );
           break;
         }
 

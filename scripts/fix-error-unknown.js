@@ -24,21 +24,27 @@ let total = 0;
 for (const file of files) {
   let content = readFileSync(file, 'utf-8');
   const before = content;
-  
+
   // 替换 catch (error: unknown) 块中的 error.message
   // 匹配: { success: false, error: error.message }
   // 替换为: { success: false, error: error instanceof Error ? error.message : String(error) }
-  content = content.replace(/(\{\s*success:\s*false,\s*error:\s*)error\.message(\s*\})/g, 
-    '$1error instanceof Error ? error.message : String(error)$2');
-  
+  content = content.replace(
+    /(\{\s*success:\s*false,\s*error:\s*)error\.message(\s*\})/g,
+    '$1error instanceof Error ? error.message : String(error)$2'
+  );
+
   // 替换 throw new Error(`...${error.message}...`)
-  content = content.replace(/(throw\s+new\s+Error\(`[^`]*?)\.error\.message([^`]*?`\))/g,
-    '$1${error => error instanceof Error ? error.message : String(error)}$2');
-  
+  content = content.replace(
+    /(throw\s+new\s+Error\(`[^`]*?)\.error\.message([^`]*?`\))/g,
+    '$1${error => error instanceof Error ? error.message : String(error)}$2'
+  );
+
   // 替换直接使用 error.message 的表达式
-  content = content.replace(/(\berror\.message\b)/g, 
-    '(error instanceof Error ? error.message : String(error))');
-  
+  content = content.replace(
+    /(\berror\.message\b)/g,
+    '(error instanceof Error ? error.message : String(error))'
+  );
+
   if (content !== before) {
     writeFileSync(file, content, 'utf-8');
     console.log(`✅ ${file}`);

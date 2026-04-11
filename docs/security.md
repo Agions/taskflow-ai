@@ -37,14 +37,14 @@ Key fingerprint: 3B82 F6AB C123 DEF0 4567
 
 ## 已修复的安全问题
 
-| CVE | 严重性 | 描述 | 修复版本 |
-|-----|--------|------|----------|
+| CVE                 | 严重性   | 描述                       | 修复版本 |
+| ------------------- | -------- | -------------------------- | -------- |
 | GHSA-67mh-4wv8-2f99 | Moderate | esbuild 开发服务器请求漏洞 | v2.1.10+ |
-| GHSA-f269-vfmq-vjvj | High | undici WebSocket 溢出 | v2.1.10+ |
-| GHSA-2mjp-6q6p-2qxm | High | undici HTTP 走私 | v2.1.10+ |
-| GHSA-vrm6-8vpv-qv8q | High | undici 内存消耗 | v2.1.10+ |
-| GHSA-v9p9-hfj2-hcw8 | High | undici 异常处理 | v2.1.10+ |
-| GHSA-4992-7rv2-5pvq | High | undici CRLF 注入 | v2.1.10+ |
+| GHSA-f269-vfmq-vjvj | High     | undici WebSocket 溢出      | v2.1.10+ |
+| GHSA-2mjp-6q6p-2qxm | High     | undici HTTP 走私           | v2.1.10+ |
+| GHSA-vrm6-8vpv-qv8q | High     | undici 内存消耗            | v2.1.10+ |
+| GHSA-v9p9-hfj2-hcw8 | High     | undici 异常处理            | v2.1.10+ |
+| GHSA-4992-7rv2-5pvq | High     | undici CRLF 注入           | v2.1.10+ |
 
 ---
 
@@ -53,10 +53,11 @@ Key fingerprint: 3B82 F6AB C123 DEF0 4567
 ### 使用 TaskFlow AI
 
 1. **保护 API 密钥**
+
    ```bash
    # ❌ 不要硬编码
    const apiKey = "sk-xxx";
-   
+
    # ✅ 使用环境变量
    const apiKey = process.env.OPENAI_API_KEY;
    ```
@@ -74,10 +75,11 @@ Key fingerprint: 3B82 F6AB C123 DEF0 4567
 ### 开发安全
 
 1. **依赖管理**
+
    ```bash
    # 定期检查漏洞
    npm audit
-   
+
    # 自动更新
    npm audit fix
    ```
@@ -120,6 +122,7 @@ Key fingerprint: 3B82 F6AB C123 DEF0 4567
 - **NPM**: 自动同步更新
 
 订阅安全通知：
+
 ```bash
 # GitHub CLI
 gh api repos/Agions/taskflow-ai/vulnerability-alerts
@@ -132,16 +135,19 @@ gh api repos/Agions/taskflow-ai/vulnerability-alerts
 TaskFlow AI 内置多种安全保护：
 
 ### 命令注入防护
+
 - Shell 命令白名单验证
 - 危险模式检测 (`;`, `|`, `&`, `$()`, backticks)
 - 路径遍历防护
 
 ### SSRF 防护
+
 - URL 协议验证（只允许 http/https）
 - 私有 IP 地址阻止（10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16）
 - localhost/127.0.0.1 限制
 
 ### 敏感信息脱敏
+
 - API 密钥在日志中自动隐藏
 - 配置文件输出时脱敏
 - 错误信息不暴露内部路径
@@ -152,13 +158,14 @@ TaskFlow AI 内置多种安全保护：
 
 我们积极监控依赖漏洞并定期更新：
 
-| 依赖 | 策略 |
-|------|------|
-| esbuild | npm overrides 强制安全版本 |
-| undici | npm overrides 强制安全版本 |
-|所有依赖|每月自动扫描+人工审核|
+| 依赖     | 策略                       |
+| -------- | -------------------------- |
+| esbuild  | npm overrides 强制安全版本 |
+| undici   | npm overrides 强制安全版本 |
+| 所有依赖 | 每月自动扫描+人工审核      |
 
 查看完整依赖树：
+
 ```bash
 npm ls --all
 ```
@@ -184,4 +191,4 @@ npm ls --all
 
 ---
 
-*最后更新: 2025-03-28*
+_最后更新: 2025-03-28_

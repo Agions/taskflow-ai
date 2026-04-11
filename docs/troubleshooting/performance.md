@@ -9,12 +9,14 @@
 ### 1. PRD解析速度慢
 
 #### 问题症状
+
 ```bash
 taskflow parse docs/requirements.md
 # 解析时间超过30秒
 ```
 
 #### 诊断步骤
+
 ```bash
 # 启用性能监控
 taskflow config set performance.enableMonitoring true
@@ -29,6 +31,7 @@ taskflow performance analyze --operation parse
 #### 解决方案
 
 **优化缓存配置**
+
 ```bash
 # 增加缓存大小
 taskflow config set performance.cacheSize 200
@@ -41,6 +44,7 @@ taskflow cache status
 ```
 
 **优化模型选择**
+
 ```bash
 # 使用更快的模型
 taskflow config set multiModel.primary "deepseek"
@@ -53,6 +57,7 @@ taskflow config set performance.timeout 60000
 ```
 
 **文档优化**
+
 ```bash
 # 分割大文档
 split -l 100 docs/large-requirements.md docs/requirements-part-
@@ -64,12 +69,14 @@ split -l 100 docs/large-requirements.md docs/requirements-part-
 ### 2. 任务状态更新慢
 
 #### 问题症状
+
 ```bash
 taskflow status update task-001 completed
 # 更新响应时间超过5秒
 ```
 
 #### 解决方案
+
 ```bash
 # 优化数据库性能
 taskflow config set performance.dbOptimization true
@@ -86,12 +93,14 @@ taskflow maintenance cleanup --older-than 30d
 ### 1. 内存占用过高
 
 #### 问题症状
+
 ```bash
 # 系统内存使用率超过80%
 top | grep taskflow
 ```
 
 #### 诊断步骤
+
 ```bash
 # 查看内存使用情况
 taskflow performance memory
@@ -103,6 +112,7 @@ taskflow debug memory --profile 60s
 #### 解决方案
 
 **减少缓存大小**
+
 ```bash
 # 降低缓存大小
 taskflow config set performance.cacheSize 50
@@ -115,6 +125,7 @@ taskflow config set performance.cacheCleanupInterval 3600000
 ```
 
 **优化并发设置**
+
 ```bash
 # 减少并发请求数
 taskflow config set performance.maxConcurrency 3
@@ -127,11 +138,13 @@ taskflow config set performance.queueSize 50
 ### 2. 内存泄漏
 
 #### 问题症状
+
 ```bash
 # 长时间运行后内存持续增长
 ```
 
 #### 解决方案
+
 ```bash
 # 启用内存监控
 taskflow config set performance.memoryMonitoring true
@@ -148,12 +161,14 @@ taskflow service restart --schedule "0 2 * * *"
 ### 1. API请求延迟高
 
 #### 问题症状
+
 ```bash
 taskflow models test
 # 平均响应时间超过5秒
 ```
 
 #### 诊断步骤
+
 ```bash
 # 测试网络延迟
 ping api.deepseek.com
@@ -166,6 +181,7 @@ taskflow performance analyze --metric response-time
 #### 解决方案
 
 **优化网络配置**
+
 ```bash
 # 启用HTTP/2
 taskflow config set network.http2 true
@@ -178,6 +194,7 @@ taskflow config set network.poolSize 10
 ```
 
 **使用CDN或镜像**
+
 ```bash
 # 配置API镜像（如果可用）
 taskflow config set models.deepseek.endpoint "https://api-mirror.deepseek.com"
@@ -189,12 +206,14 @@ taskflow config set network.requestCache true
 ### 2. 网络超时频繁
 
 #### 问题症状
+
 ```bash
 taskflow parse docs/requirements.md
 # 错误: TF-NW-002: API请求超时
 ```
 
 #### 解决方案
+
 ```bash
 # 增加超时时间
 taskflow config set performance.timeout 60000
@@ -212,6 +231,7 @@ taskflow config set performance.retryBackoff "exponential"
 ### 1. 启用性能监控
 
 #### 基本监控
+
 ```bash
 # 启用性能监控
 taskflow config set performance.enableMonitoring true
@@ -224,6 +244,7 @@ taskflow config set performance.detailedMetrics true
 ```
 
 #### 高级监控
+
 ```bash
 # 启用分布式追踪
 taskflow config set performance.tracing true
@@ -236,6 +257,7 @@ taskflow config set performance.metricsExport.endpoint "http://prometheus:9090"
 ### 2. 性能分析工具
 
 #### 内置分析工具
+
 ```bash
 # 生成性能报告
 taskflow performance report --period "last-24h"
@@ -248,6 +270,7 @@ taskflow performance compare --baseline "last-week"
 ```
 
 #### 外部分析工具
+
 ```bash
 # 导出性能数据
 taskflow performance export --format json > performance.json
@@ -261,6 +284,7 @@ taskflow debug flamegraph --duration 60s --output flame.svg
 ### 1. 缓存优化
 
 #### 多层缓存配置
+
 ```bash
 # L1缓存（内存）
 taskflow config set cache.l1.enabled true
@@ -278,6 +302,7 @@ taskflow config set cache.compression true
 ```
 
 #### 智能缓存
+
 ```bash
 # 启用预测性缓存
 taskflow config set cache.predictive true
@@ -290,6 +315,7 @@ taskflow config set cache.warmup.schedule "0 8 * * *"
 ### 2. 并发优化
 
 #### 请求并发控制
+
 ```bash
 # 设置最优并发数
 taskflow config set performance.maxConcurrency 5
@@ -303,6 +329,7 @@ taskflow config set performance.queueTimeout 30000
 ```
 
 #### 模型并发优化
+
 ```bash
 # 启用模型并行
 taskflow config set multiModel.parallel true
@@ -318,6 +345,7 @@ taskflow config set multiModel.weights '{
 ### 3. 资源优化
 
 #### CPU优化
+
 ```bash
 # 启用CPU亲和性
 taskflow config set performance.cpuAffinity true
@@ -330,6 +358,7 @@ taskflow config set performance.taskScheduling "fair"
 ```
 
 #### 磁盘I/O优化
+
 ```bash
 # 启用异步I/O
 taskflow config set performance.asyncIO true
@@ -346,6 +375,7 @@ taskflow config set performance.fsCache true
 ### 1. 基准测试工具
 
 #### 内置基准测试
+
 ```bash
 # 运行完整基准测试
 taskflow benchmark run --comprehensive
@@ -359,6 +389,7 @@ taskflow benchmark compare --baseline v1.0.0
 ```
 
 #### 自定义基准测试
+
 ```bash
 # 创建基准测试配置
 cat > benchmark.json << 'EOF'
@@ -386,6 +417,7 @@ taskflow benchmark run --config benchmark.json
 ### 2. 性能回归测试
 
 #### 自动化性能测试
+
 ```bash
 # 设置性能基线
 taskflow benchmark baseline --save current-baseline
@@ -402,6 +434,7 @@ taskflow benchmark alert --threshold 20% --notify slack
 ### 1. 配置性能告警
 
 #### 基本告警
+
 ```bash
 # 响应时间告警
 taskflow alerts create --metric response-time --threshold "> 5000ms"
@@ -414,6 +447,7 @@ taskflow alerts create --metric error-rate --threshold "> 5%"
 ```
 
 #### 高级告警
+
 ```bash
 # 趋势告警
 taskflow alerts create --metric response-time --trend "increasing" --duration 10m
@@ -425,6 +459,7 @@ taskflow alerts create --condition "response-time > 5000ms AND error-rate > 2%"
 ### 2. 告警通知
 
 #### 配置通知渠道
+
 ```bash
 # Slack通知
 taskflow notifications slack --webhook "https://hooks.slack.com/..."
@@ -439,18 +474,21 @@ taskflow notifications webhook --url "https://monitoring.company.com/alerts"
 ## 🔍 性能故障排除流程
 
 ### 1. 问题识别
+
 1. 收集性能指标
 2. 识别性能瓶颈
 3. 分析根本原因
 4. 制定优化方案
 
 ### 2. 问题解决
+
 1. 实施优化措施
 2. 验证性能改善
 3. 监控长期效果
 4. 文档化解决方案
 
 ### 3. 预防措施
+
 1. 建立性能基线
 2. 实施持续监控
 3. 定期性能评估

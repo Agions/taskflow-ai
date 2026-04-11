@@ -19,22 +19,26 @@
    - 推荐使用 VSCode 或 Cursor 编辑器
 
 2. **克隆项目**
+
    ```bash
    git clone https://github.com/agions/taskflow-ai.git
    cd taskflow-ai
    ```
 
 3. **安装依赖**
+
    ```bash
    npm install
    ```
 
 4. **构建项目**
+
    ```bash
    npm run build
    ```
 
 5. **运行测试**
+
    ```bash
    npm test
    ```
@@ -120,6 +124,7 @@ git commit -m "docs(readme): update installation guide"
 ```
 
 **提交类型**:
+
 - `feat`: 新功能
 - `fix`: Bug修复
 - `docs`: 文档更新
@@ -138,6 +143,7 @@ git push origin feature/your-feature-name
 ```
 
 **PR要求**:
+
 - 清晰的标题和描述
 - 关联相关的Issue
 - 包含测试用例
@@ -184,9 +190,9 @@ describe('PRDParser', () => {
 - 功能1
 - 功能2
     `;
-    
+
     const result = await parser.parse(content, 'markdown');
-    
+
     expect(result.success).toBe(true);
     expect(result.data.title).toBe('项目标题');
     expect(result.data.features).toHaveLength(2);
@@ -212,7 +218,7 @@ interface TaskData {
 enum TaskStatus {
   NOT_STARTED = 'not_started',
   IN_PROGRESS = 'in_progress',
-  COMPLETED = 'completed'
+  COMPLETED = 'completed',
 }
 
 // 使用泛型提高代码复用性
@@ -259,7 +265,7 @@ npm run format
 
 ### 文档规范
 
-```typescript
+````typescript
 /**
  * 解析PRD文档内容
  * @param content - PRD文档内容
@@ -279,7 +285,7 @@ async parsePRD(
   fileType: FileType = FileType.MARKDOWN,
   options?: ParseOptions
 ): Promise<ServiceResponse<PRDParseResult>>
-```
+````
 
 ## 🐛 Bug报告
 
@@ -296,6 +302,7 @@ async parsePRD(
 简洁清晰地描述bug是什么。
 
 **重现步骤**
+
 1. 执行 '...'
 2. 点击 '....'
 3. 滚动到 '....'
@@ -308,6 +315,7 @@ async parsePRD(
 清晰简洁地描述实际发生了什么。
 
 **环境信息**
+
 - OS: [例如 macOS 12.0]
 - Node.js版本: [例如 18.0.0]
 - TaskFlow AI版本: [例如 1.0.0]

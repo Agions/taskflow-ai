@@ -131,7 +131,10 @@ export class MCPToolExecutor {
       structure: [],
     };
 
-    const scanDirectory = async (dirPath: string, currentDepth: number): Promise<ProjectScanItem[]> => {
+    const scanDirectory = async (
+      dirPath: string,
+      currentDepth: number
+    ): Promise<ProjectScanItem[]> => {
       if (currentDepth > depth) return [];
 
       const items = await fs.readdir(dirPath, { withFileTypes: true });

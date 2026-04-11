@@ -66,7 +66,8 @@ export const createAgentMachine = (
             {
               target: 'planning',
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              guard: ({ context }: any) => (context.retryCount ?? 0) < (agentConfig.maxRetries || 3),
+              guard: ({ context }: any) =>
+                (context.retryCount ?? 0) < (agentConfig.maxRetries || 3),
             },
           ],
           onError: { target: 'failed', actions: { type: 'setError' } },

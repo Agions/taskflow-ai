@@ -35,14 +35,14 @@ try {
 
   // 检查增量构建条件
   const needsFullBuild = isClean || !fs.existsSync(distDir);
-  
+
   if (!needsFullBuild && isIncremental) {
     // 增量构建：只编译修改过的文件
     console.log('⚡ 增量编译...');
-    const tscCmd = isWatch 
+    const tscCmd = isWatch
       ? 'npx tsc -p tsconfig.build.json --watch --incremental'
       : 'npx tsc -p tsconfig.build.json --incremental';
-    
+
     if (isWatch) {
       execSync(tscCmd, { cwd: rootDir, stdio: 'inherit' });
       console.log('👀 监听模式开启，按 Ctrl+C 退出');
@@ -52,12 +52,12 @@ try {
   } else {
     // 完全构建
     console.log('📦 完全编译...');
-    
+
     // 清理旧的构建文件
     if (fs.existsSync(distDir)) {
       fs.rmSync(distDir, { recursive: true, force: true });
     }
-    
+
     execSync('npx tsc -p tsconfig.build.json', { cwd: rootDir, stdio: 'inherit' });
   }
 
@@ -84,7 +84,7 @@ require('./cli/index.js');
   }
 
   // 计算构建大小
-  const getDirectorySize = (dirPath) => {
+  const getDirectorySize = dirPath => {
     let size = 0;
     if (fs.existsSync(dirPath)) {
       const files = fs.readdirSync(dirPath, { withFileTypes: true });
@@ -103,13 +103,12 @@ require('./cli/index.js');
   if (!isWatch) {
     const totalSize = getDirectorySize(distDir);
     const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(2);
-    
+
     console.log(`\n✅ 构建完成!`);
     console.log(`   输出目录: dist/`);
     console.log(`   总大小: ${(totalSize / 1024).toFixed(2)} KB`);
     console.log(`   耗时: ${elapsedTime}s`);
   }
-
 } catch (error) {
   console.error('\n❌ 构建失败:', error.message);
   process.exit(1);

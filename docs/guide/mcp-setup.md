@@ -108,13 +108,13 @@ TaskFlow AI 支持 **Model Context Protocol (MCP)**，可以与 Trae、Cursor、
 
 MCP 服务器提供以下工具：
 
-| 工具名 | 描述 | 参数 |
-|--------|------|------|
-| `file_read` | 读取文件内容 | `path`: 文件路径 |
-| `file_write` | 写入文件内容 | `path`: 文件路径, `content`: 内容 |
-| `shell_exec` | 执行 Shell 命令 | `command`: 命令, `cwd`: 工作目录, `timeout`: 超时时间 |
-| `project_analyze` | 分析项目结构 | `path`: 项目路径, `depth`: 扫描深度 |
-| `task_create` | 创建新任务 | `title`: 标题, `description`: 描述, `priority`: 优先级 |
+| 工具名            | 描述            | 参数                                                   |
+| ----------------- | --------------- | ------------------------------------------------------ |
+| `file_read`       | 读取文件内容    | `path`: 文件路径                                       |
+| `file_write`      | 写入文件内容    | `path`: 文件路径, `content`: 内容                      |
+| `shell_exec`      | 执行 Shell 命令 | `command`: 命令, `cwd`: 工作目录, `timeout`: 超时时间  |
+| `project_analyze` | 分析项目结构    | `path`: 项目路径, `depth`: 扫描深度                    |
+| `task_create`     | 创建新任务      | `title`: 标题, `description`: 描述, `priority`: 优先级 |
 
 ## 使用示例
 
@@ -137,11 +137,13 @@ MCP 服务器提供以下工具：
 ### 连接失败
 
 1. **检查 Node.js 版本**: 确保 Node.js >= 18.0.0
+
    ```bash
    node --version
    ```
 
 2. **检查包是否安装**:
+
    ```bash
    npm list -g taskflow-ai
    ```
@@ -213,6 +215,7 @@ npm install -g npm@latest
 ## 更新日志
 
 ### v2.0.0
+
 - ✅ 修复 MCP 连接问题 (Issue #1)
 - ✅ 支持 stdio 传输模式
 - ✅ 兼容 Trae、Cursor、Claude Desktop、Windsurf

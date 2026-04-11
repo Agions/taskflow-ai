@@ -45,11 +45,11 @@ git push origin main --tags
 
 ## 工作流说明
 
-| 工作流 | 触发条件 | 说明 |
-|--------|----------|------|
-| `ci-optimized.yml` | PR / Push | 并行质量检查 |
-| `npm-publish.yml` | Release / 手动 | 发布到 NPM |
-| `deploy-docs.yml` | docs/** 变更 | 部署文档 |
+| 工作流             | 触发条件       | 说明         |
+| ------------------ | -------------- | ------------ |
+| `ci-optimized.yml` | PR / Push      | 并行质量检查 |
+| `npm-publish.yml`  | Release / 手动 | 发布到 NPM   |
+| `deploy-docs.yml`  | docs/\*\* 变更 | 部署文档     |
 
 ## 本地检查
 

@@ -4,7 +4,7 @@ test.describe('Documentation Site', () => {
   test('should load the homepage with correct title', async ({ page }) => {
     await page.goto('/guide/', { waitUntil: 'networkidle' });
     await page.waitForSelector('body', { timeout: 10000 });
-    
+
     // 检查页面加载成功
     const body = page.locator('body');
     await expect(body).toBeVisible();
@@ -13,7 +13,7 @@ test.describe('Documentation Site', () => {
   test('should display main navigation links', async ({ page }) => {
     await page.goto('/guide/', { waitUntil: 'networkidle' });
     await page.waitForSelector('body', { timeout: 10000 });
-    
+
     // 检查页面有内容
     const body = page.locator('body');
     await expect(body).toBeVisible();
@@ -22,7 +22,7 @@ test.describe('Documentation Site', () => {
   test('should have a working "Getting Started" section', async ({ page }) => {
     await page.goto('/guide/', { waitUntil: 'networkidle' });
     await page.waitForSelector('body', { timeout: 10000 });
-    
+
     const content = await page.content();
     expect(content.length).toBeGreaterThan(100);
   });
@@ -30,7 +30,7 @@ test.describe('Documentation Site', () => {
   test('should display the API reference page', async ({ page }) => {
     await page.goto('/api/', { waitUntil: 'networkidle' });
     await page.waitForSelector('body', { timeout: 10000 });
-    
+
     // API 页面应该有内容
     const body = page.locator('body');
     await expect(body).toBeVisible();
@@ -39,7 +39,7 @@ test.describe('Documentation Site', () => {
   test('should have functional search', async ({ page }) => {
     await page.goto('/guide/', { waitUntil: 'networkidle' });
     await page.waitForSelector('body', { timeout: 10000 });
-    
+
     // 页面应该加载成功
     const body = page.locator('body');
     await expect(body).toBeVisible();
@@ -69,7 +69,7 @@ test.describe('Documentation Site', () => {
   test('should display footer', async ({ page }) => {
     await page.goto('/guide/', { waitUntil: 'networkidle' });
     await page.waitForSelector('body', { timeout: 10000 });
-    
+
     const body = page.locator('body');
     await expect(body).toBeVisible();
   });
@@ -77,7 +77,7 @@ test.describe('Documentation Site', () => {
   test('code examples should be visible', async ({ page }) => {
     await page.goto('/cli/', { waitUntil: 'networkidle' });
     await page.waitForSelector('body', { timeout: 10000 });
-    
+
     // 检查页面有内容
     const body = page.locator('body');
     await expect(body).toBeVisible();
@@ -87,7 +87,7 @@ test.describe('Documentation Site', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/guide/', { waitUntil: 'networkidle' });
     await page.waitForSelector('body', { timeout: 10000 });
-    
+
     // 页面应该加载成功
     const body = page.locator('body');
     await expect(body).toBeVisible();

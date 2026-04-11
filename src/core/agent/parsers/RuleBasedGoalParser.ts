@@ -223,7 +223,20 @@ export class RuleBasedGoalParser implements GoalParser {
     const baseSteps = subgoals.length * 2;
 
     // 根据目标复杂度调整
-    const toolKeywords = ['搜索', '查找', '获取', '创建', '修改', '删除', '执行', 'run', 'get', 'create', 'update', 'delete'];
+    const toolKeywords = [
+      '搜索',
+      '查找',
+      '获取',
+      '创建',
+      '修改',
+      '删除',
+      '执行',
+      'run',
+      'get',
+      'create',
+      'update',
+      'delete',
+    ];
     const toolCount = toolKeywords.filter(k => goal.toLowerCase().includes(k.toLowerCase())).length;
 
     const complexityAdjustment = Math.min(toolCount, subgoals.length);

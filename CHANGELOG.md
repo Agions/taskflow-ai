@@ -8,6 +8,7 @@
 ## [2.1.11] - 2026-04-11
 
 ### Added
+
 - Agent 核心模块重构
   - `GoalParser` 接口抽象，支持规则/AI/混合模式
   - `RuleBasedGoalParser` 实现，无 AI 依赖的规则解析器（支持中英文，32 个测试）
@@ -16,6 +17,7 @@
   - `MultiAgentCoordinator` 新增 `broadcast()` / `executeCollaborative()` / `AgentMetrics` 指标
 
 ### Changed
+
 - **类型安全强化** — ~46 处 `any` 类型消除（115→69）
   - `core/plugin/types.ts`: `PluginContext.logger unknown→Logger`，hooks 参数类型化
   - `mcp/prompts/types.ts`: `PromptExample.arguments any→PromptArguments`
@@ -30,6 +32,7 @@
   - `agent/verification/`: `tasks filter` / `CoverageData` 类型化
 
 ### Fixed
+
 - CLI `options.format as any` 全部移除
 - `getTemplate()` 返回 `null` 时 null 安全处理
 - `state-machine/machine.ts` 重复 import 移除
@@ -39,6 +42,7 @@
 ## [Unreleased]
 
 ### Added
+
 - 新增专业级 CLI UI 组件库
   - 统一颜色主题系统
   - ASCII Logo 展示
@@ -60,6 +64,7 @@
   - 增强的 release.yml
 
 ### Changed
+
 - 优化 package.json 发布配置
   - 添加 publishConfig
   - 优化 files 字段
@@ -68,6 +73,7 @@
 ## [2.1.0] - 2026-02-22
 
 ### Added
+
 - ✨ 新增 Agent 系统
   - 自主任务执行能力
   - 工具调用框架
@@ -86,11 +92,13 @@
   - 内存管理改进
 
 ### Changed
+
 - 重构核心配置模块
 - 优化 AI 路由算法
 - 改进错误处理机制
 
 ### Fixed
+
 - 修复 MCP 连接稳定性问题
 - 修复工作流状态持久化 bug
 - 修复多模型切换时的内存泄漏
@@ -98,6 +106,7 @@
 ## [2.0.0] - 2026-01-15
 
 ### Added
+
 - 🎉 全新架构设计
   - 模块化架构
   - 插件系统
@@ -116,39 +125,46 @@
   - 自定义命令
 
 ### Changed
+
 - 完全重构 CLI 架构
 - 新的配置管理系统
 - 改进的日志系统
 
 ### Removed
+
 - 废弃 v1.x 的 API 接口
 - 移除旧版配置格式支持
 
 ## [1.2.0] - 2025-12-10
 
 ### Added
+
 - Docker MCP 注册表
 - 容器化部署支持
 - 环境变量配置
 
 ### Fixed
+
 - 修复 Windows 路径问题
 - 修复并发任务冲突
 
 ## [1.1.0] - 2025-11-20
 
 ### Added
+
 - CI/CD 工作流支持
 - GitHub Actions 集成
 - 自动化测试
 
 ### Changed
+
 - 优化 PRD 解析算法
 - 改进任务分配逻辑
 
 ## [1.0.0] - 2025-10-01
 
 ### Added
+
 - 🎉 初始版本发布
 - 基础 CLI 功能
 - PRD 文档解析

@@ -9,6 +9,7 @@
 ### 1. npm 安装失败
 
 #### 问题描述
+
 ```bash
 npm ERR! code EACCES
 npm ERR! syscall access
@@ -17,6 +18,7 @@ npm ERR! errno -13
 ```
 
 #### 解决方案
+
 ```bash
 # 方案1: 使用 sudo (不推荐)
 sudo npm install -g taskflow-ai
@@ -37,12 +39,14 @@ npm install -g taskflow-ai
 ### 2. Node.js 版本不兼容
 
 #### 问题描述
+
 ```bash
 Error: TaskFlow AI requires Node.js >= 18.0.0
 Current version: v16.14.0
 ```
 
 #### 解决方案
+
 ```bash
 # 使用 nvm 升级 Node.js
 nvm install 18
@@ -57,12 +61,14 @@ npm install -g taskflow-ai
 ### 3. 网络连接问题
 
 #### 问题描述
+
 ```bash
 npm ERR! network request to https://registry.npmjs.org/taskflow-ai failed
 npm ERR! network This is a problem related to network connectivity
 ```
 
 #### 解决方案
+
 ```bash
 # 使用国内镜像
 npm install -g taskflow-ai --registry https://registry.npmmirror.com
@@ -80,12 +86,14 @@ npm cache clean --force
 ### 1. API 密钥无效
 
 #### 问题描述
+
 ```bash
 Error: Invalid API key for DeepSeek model
 API returned: 401 Unauthorized
 ```
 
 #### 解决方案
+
 ```bash
 # 检查 API 密钥格式
 taskflow config get models.deepseek.apiKey
@@ -103,12 +111,14 @@ curl -H "Authorization: Bearer your-api-key" https://api.deepseek.com/v1/models
 ### 2. 配置文件损坏
 
 #### 问题描述
+
 ```bash
 Error: Failed to parse configuration file
 SyntaxError: Unexpected token } in JSON at position 245
 ```
 
 #### 解决方案
+
 ```bash
 # 验证 JSON 格式
 cat ~/.taskflow/config.json | jq .
@@ -126,11 +136,13 @@ taskflow config import ~/.taskflow/config.json.backup --merge
 ### 3. 权限问题
 
 #### 问题描述
+
 ```bash
 Error: EACCES: permission denied, open '/Users/username/.taskflow/config.json'
 ```
 
 #### 解决方案
+
 ```bash
 # 检查文件权限
 ls -la ~/.taskflow/
@@ -148,6 +160,7 @@ sudo chown -R $USER:$USER ~/.taskflow
 ### 1. 模型连接超时
 
 #### 问题描述
+
 ```bash
 Error: Request timeout after 30000ms
 Model: deepseek
@@ -155,6 +168,7 @@ Operation: text processing
 ```
 
 #### 解决方案
+
 ```bash
 # 增加超时时间
 taskflow config set models.deepseek.timeout 60000
@@ -173,6 +187,7 @@ taskflow models test --timeout 60000
 ### 2. API 配额超限
 
 #### 问题描述
+
 ```bash
 Error: API quota exceeded
 Model: zhipu
@@ -181,6 +196,7 @@ Reset time: 2024-01-01T00:00:00Z
 ```
 
 #### 解决方案
+
 ```bash
 # 检查配额状态
 taskflow models status
@@ -200,9 +216,11 @@ taskflow config set security.rateLimitMax 50
 ### 3. 模型响应质量差
 
 #### 问题描述
+
 解析结果不准确或任务生成质量低
 
 #### 解决方案
+
 ```bash
 # 尝试不同的模型
 taskflow parse requirements.md --model zhipu
@@ -223,6 +241,7 @@ taskflow config set models.deepseek.maxTokens 4000
 ### 1. PRD 文档解析失败
 
 #### 问题描述
+
 ```bash
 Error: Failed to parse PRD document
 File: requirements.md
@@ -230,6 +249,7 @@ Reason: Unsupported format or corrupted file
 ```
 
 #### 解决方案
+
 ```bash
 # 检查文件格式
 file requirements.md
@@ -251,9 +271,11 @@ taskflow parse requirements.md --model zhipu
 ### 2. 任务生成不完整
 
 #### 问题描述
+
 解析后生成的任务数量少于预期，或缺少重要任务
 
 #### 解决方案
+
 ```bash
 # 启用详细解析
 taskflow parse requirements.md --extract-sections --extract-features
@@ -275,9 +297,11 @@ taskflow status add "补充任务名称" --description "详细描述"
 ### 3. 依赖关系识别错误
 
 #### 问题描述
+
 生成的任务依赖关系不正确或缺失
 
 #### 解决方案
+
 ```bash
 # 重新分析依赖关系
 taskflow status analyze-dependencies
@@ -297,9 +321,11 @@ taskflow status validate-dependencies
 ### 1. 命令执行缓慢
 
 #### 问题描述
+
 TaskFlow AI 命令执行时间过长
 
 #### 解决方案
+
 ```bash
 # 启用性能监控
 taskflow config set performance.enableMonitoring true
@@ -321,9 +347,11 @@ taskflow cache clear
 ### 2. 内存使用过高
 
 #### 问题描述
+
 TaskFlow AI 占用大量内存
 
 #### 解决方案
+
 ```bash
 # 减少缓存大小
 taskflow config set performance.cacheSize 50
@@ -341,9 +369,11 @@ taskflow performance monitor --memory
 ### 3. 网络请求频繁失败
 
 #### 问题描述
+
 AI 模型 API 请求经常失败
 
 #### 解决方案
+
 ```bash
 # 增加重试次数
 taskflow config set performance.retryAttempts 5
@@ -366,9 +396,11 @@ taskflow config set network.proxy.port 7890
 ### 1. 任务数据丢失
 
 #### 问题描述
+
 之前创建的任务突然消失
 
 #### 解决方案
+
 ```bash
 # 检查数据目录
 ls -la ~/.taskflow/data/
@@ -387,9 +419,11 @@ taskflow data reindex
 ### 2. 配置重置
 
 #### 问题描述
+
 配置设置被意外重置
 
 #### 解决方案
+
 ```bash
 # 检查配置历史
 taskflow config history
@@ -407,9 +441,11 @@ taskflow config set security.protectConfig true
 ### 3. 数据同步问题
 
 #### 问题描述
+
 多设备间数据不同步
 
 #### 解决方案
+
 ```bash
 # 手动同步数据
 taskflow sync pull
@@ -586,4 +622,4 @@ taskflow config set monitoring.notifications.email "admin@example.com"
 
 ---
 
-*如果本指南没有解决你的问题，请通过 GitHub Issues 联系我们。*
+_如果本指南没有解决你的问题，请通过 GitHub Issues 联系我们。_

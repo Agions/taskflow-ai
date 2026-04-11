@@ -24,26 +24,26 @@ taskflow status next
 
 ### 核心命令
 
-| 命令 | 描述 | 示例 |
-|------|------|------|
-| [`init`](#init) | 在现有项目中初始化TaskFlow AI | `taskflow init` |
-| [`parse`](#parse) | 解析PRD文档并生成任务计划 | `taskflow parse prd.md` |
-| [`status`](#status) | 任务状态管理 | `taskflow status list` |
+| 命令                | 描述                          | 示例                    |
+| ------------------- | ----------------------------- | ----------------------- |
+| [`init`](#init)     | 在现有项目中初始化TaskFlow AI | `taskflow init`         |
+| [`parse`](#parse)   | 解析PRD文档并生成任务计划     | `taskflow parse prd.md` |
+| [`status`](#status) | 任务状态管理                  | `taskflow status list`  |
 
 ### 配置命令
 
-| 命令 | 描述 | 示例 |
-|------|------|------|
-| [`config`](#config) | 配置管理 | `taskflow config set key value` |
-| [`models`](#models) | AI模型管理 | `taskflow models test` |
-| [`mcp`](#mcp) | MCP配置管理 | `taskflow mcp info` |
+| 命令                | 描述        | 示例                            |
+| ------------------- | ----------- | ------------------------------- |
+| [`config`](#config) | 配置管理    | `taskflow config set key value` |
+| [`models`](#models) | AI模型管理  | `taskflow models test`          |
+| [`mcp`](#mcp)       | MCP配置管理 | `taskflow mcp info`             |
 
 ### 工具命令
 
-| 命令 | 描述 | 示例 |
-|------|------|------|
-| [`visualize`](#visualize) | 生成可视化图表 | `taskflow visualize gantt` |
-| [`interactive`](#interactive) | 交互式模式 | `taskflow interactive` |
+| 命令                          | 描述           | 示例                       |
+| ----------------------------- | -------------- | -------------------------- |
+| [`visualize`](#visualize)     | 生成可视化图表 | `taskflow visualize gantt` |
+| [`interactive`](#interactive) | 交互式模式     | `taskflow interactive`     |
 
 ## 📖 详细命令说明
 
@@ -52,16 +52,19 @@ taskflow status next
 在现有项目中初始化TaskFlow AI配置和MCP集成。
 
 **语法**:
+
 ```bash
 taskflow init [选项]
 ```
 
 **选项**:
+
 - `--force, -f` - 强制覆盖现有配置
 - `--verbose, -v` - 显示详细输出
 - `--editor <editor>` - 指定编辑器类型 (windsurf, trae, cursor, vscode)
 
 **示例**:
+
 ```bash
 # 基本初始化
 taskflow init
@@ -74,6 +77,7 @@ taskflow init --editor cursor
 ```
 
 **生成的文件**:
+
 - `.taskflow/config.json` - 主配置文件
 - `.cursor/mcp.json` - Cursor MCP配置
 - `.cursor-rules` - Cursor AI规则
@@ -84,22 +88,26 @@ taskflow init --editor cursor
 解析PRD文档并生成结构化的任务计划。
 
 **语法**:
+
 ```bash
 taskflow parse <文件路径> [选项]
 ```
 
 **选项**:
+
 - `--model, -m <model>` - 指定AI模型 (deepseek, zhipu, qwen, baidu, moonshot, spark)
 - `--output, -o <path>` - 输出文件路径
 - `--format <format>` - 输出格式 (json, yaml, markdown)
 - `--verbose, -v` - 显示详细解析过程
 
 **支持的文件格式**:
+
 - Markdown (`.md`, `.markdown`)
 - 纯文本 (`.txt`)
 - Word文档 (`.docx`)
 
 **示例**:
+
 ```bash
 # 基本解析
 taskflow parse docs/requirements.md
@@ -118,6 +126,7 @@ taskflow parse prd.md --verbose
 **子命令**:
 
 #### status list
+
 查看任务列表。
 
 ```bash
@@ -125,11 +134,13 @@ taskflow status list [选项]
 ```
 
 **选项**:
+
 - `--input, -i <path>` - 任务文件路径
 - `--filter <filter>` - 过滤条件
 - `--format <format>` - 输出格式
 
 #### status update
+
 更新任务状态。
 
 ```bash
@@ -137,13 +148,15 @@ taskflow status update <taskId> <status> [选项]
 ```
 
 **状态值**:
+
 - `not_started` - 未开始
-- `in_progress` - 进行中  
+- `in_progress` - 进行中
 - `completed` - 已完成
 - `blocked` - 阻塞
 - `cancelled` - 已取消
 
 #### status progress
+
 显示项目进度统计。
 
 ```bash
@@ -151,6 +164,7 @@ taskflow status progress [选项]
 ```
 
 #### status next
+
 获取推荐的下一个任务。
 
 ```bash
@@ -158,6 +172,7 @@ taskflow status next [选项]
 ```
 
 **示例**:
+
 ```bash
 # 查看所有任务
 taskflow status list
@@ -177,12 +192,14 @@ taskflow status next
 配置管理命令。
 
 **子命令**:
+
 - `list` - 查看所有配置
 - `get <key>` - 获取配置值
 - `set <key> <value>` - 设置配置值
 - `reset` - 重置配置
 
 **示例**:
+
 ```bash
 # 查看配置
 taskflow config list
@@ -199,11 +216,13 @@ taskflow config get models.default
 AI模型管理和测试。
 
 **子命令**:
+
 - `test [model]` - 测试模型连接
 - `status` - 查看模型状态
 - `benchmark` - 性能基准测试
 
 **示例**:
+
 ```bash
 # 测试所有模型
 taskflow models test
@@ -220,12 +239,14 @@ taskflow models status
 MCP (Model Context Protocol) 配置管理。
 
 **子命令**:
+
 - `info` - 显示MCP服务信息
 - `validate` - 验证MCP配置
 - `test` - 测试MCP配置
 - `regenerate` - 重新生成MCP配置
 
 **示例**:
+
 ```bash
 # 查看MCP信息
 taskflow mcp info
@@ -242,16 +263,19 @@ taskflow mcp regenerate
 生成任务计划可视化图表。
 
 **子命令**:
+
 - `gantt` - 甘特图
 - `timeline` - 时间线图
 - `dependency` - 依赖关系图
 
 **选项**:
+
 - `--input, -i <path>` - 任务文件路径
 - `--output, -o <path>` - 输出文件路径
 - `--format <format>` - 输出格式 (svg, png, html)
 
 **示例**:
+
 ```bash
 # 生成甘特图
 taskflow visualize gantt -i tasks.json
@@ -272,17 +296,18 @@ taskflow interactive
 
 所有命令都支持以下全局选项：
 
-| 选项 | 简写 | 描述 |
-|------|------|------|
-| `--help` | `-h` | 显示帮助信息 |
-| `--version` | `-V` | 显示版本信息 |
-| `--verbose` | `-v` | 详细输出模式 |
-| `--quiet` | `-q` | 静默模式 |
-| `--no-color` | | 禁用彩色输出 |
+| 选项         | 简写 | 描述         |
+| ------------ | ---- | ------------ |
+| `--help`     | `-h` | 显示帮助信息 |
+| `--version`  | `-V` | 显示版本信息 |
+| `--verbose`  | `-v` | 详细输出模式 |
+| `--quiet`    | `-q` | 静默模式     |
+| `--no-color` |      | 禁用彩色输出 |
 
 ## 📊 输出格式
 
 ### 表格格式 (默认)
+
 ```
 ┌─────────────┬──────────────────────────┬──────────┐
 │ ID          │ 任务名称                 │ 状态     │
@@ -292,6 +317,7 @@ taskflow interactive
 ```
 
 ### JSON格式
+
 ```json
 {
   "tasks": [

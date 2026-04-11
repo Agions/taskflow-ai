@@ -84,10 +84,7 @@ export class MCPPromptManager {
     return this.renderer.render(prompt, args, options);
   }
 
-  validatePromptArgs(
-    name: string,
-    args: PromptArguments
-  ): { valid: boolean; errors: string[] } {
+  validatePromptArgs(name: string, args: PromptArguments): { valid: boolean; errors: string[] } {
     const prompt = this.getPrompt(name);
     if (!prompt) {
       return { valid: false, errors: [`提示不存在: ${name}`] };
