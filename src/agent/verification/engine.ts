@@ -57,14 +57,6 @@ export class VerificationEngine {
       fixTasks: allPassed ? undefined : generateFixTasks(failedChecks),
     };
   }
-
-  async checkCodeQuality(files: string[]) {
-    return this.codeQualityChecker.check(files);
-  }
-
-  async checkTestCoverage(files: string[]) {
-    return this.coverageChecker.check(files);
-  }
 }
 
 export default VerificationEngine;
