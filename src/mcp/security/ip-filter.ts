@@ -2,8 +2,19 @@ import { getLogger } from '../../utils/logger';
 const logger = getLogger('mcp/security/ip-filter');
 
 /**
- * IP 过滤器
+ * HTTP 请求对象的最小接口（兼容 Express / http / 自定义）
  */
+export interface RequestLike {
+  headers?: {
+    origin?: string;
+    authorization?: string;
+    'x-forwarded-for'?: string;
+    'x-real-ip'?: string;
+    [key: string]: unknown;
+  };
+  connection?: { remoteAddress?: string };
+  socket?: { remoteAddress?: string };
+}
 
 /**
  * IP 过滤器
@@ -47,7 +58,7 @@ export class IPFilter {
   /**
    * 验证来源
    */
-  validateOrigin(request: any): boolean {
+  validateOrigin(request: RequestLike): boolean {
     if (this.allowedOrigins.includes('*')) {
       return true;
     }
@@ -63,7 +74,7 @@ export class IPFilter {
   /**
    * 获取客户端 IP
    */
-  getClientIP(request: any): string {
+  getClientIP(request: RequestLike): string {
     return (
       request.headers?.['x-forwarded-for']?.split(',')[0] ||
       request.headers?.['x-real-ip'] ||

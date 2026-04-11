@@ -54,6 +54,8 @@ export interface StepConfig {
   /** 循环配置 (loop 类型) */
   loopCondition?: string;
   maxIterations?: number;
+  /** 依赖步骤 ID (内部填充) */
+  dependsOn?: string[];
 }
 
 /** 错误处理配置 */

@@ -52,7 +52,7 @@ export function withSyncErrorHandling<T>(fn: () => T, errorMessage: string, logg
  * @param error 错误对象
  * @returns 是否为 Error 类型
  */
-export function isError(error: any): error is Error {
+export function isError(error: unknown): error is Error {
   return error instanceof Error;
 }
 
@@ -61,7 +61,7 @@ export function isError(error: any): error is Error {
  * @param error 错误对象
  * @returns 错误消息字符串
  */
-export function getErrorMessage(error: any): string {
+export function getErrorMessage(error: unknown): string {
   if (isError(error)) {
     return error.message;
   }

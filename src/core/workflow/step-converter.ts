@@ -45,7 +45,7 @@ export function convertStep(spec: StepSpec, allSpecs: StepSpec[]): WorkflowStep 
 
   if (spec.depends_on) {
     step.config = step.config || {};
-    (step.config as any).dependsOn = spec.depends_on;
+    step.config.dependsOn = Array.isArray(spec.depends_on) ? spec.depends_on : [spec.depends_on];
   }
 
   if (spec.retry) {
@@ -69,7 +69,7 @@ export function resolveDependencies(workflow: Workflow): void {
       continue;
     }
 
-    const config = step.config as any;
+    const config = step.config;
     if (config?.dependsOn) {
       const deps = Array.isArray(config.dependsOn) ? config.dependsOn : [config.dependsOn];
 

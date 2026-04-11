@@ -8,7 +8,7 @@ import { Logger } from '../../utils/logger';
 import { SecuritySettings, SecurityContext, SecurityStats } from './types';
 import { AuthManager } from './auth';
 import { RateLimiter } from './rate-limiter';
-import { IPFilter } from './ip-filter';
+import { IPFilter, RequestLike } from './ip-filter';
 import { SandboxManager } from './sandbox';
 
 export class SecurityManager {
@@ -62,12 +62,13 @@ export class SecurityManager {
     };
 
     try {
-      const clientIP = this.ipFilter.getClientIP(request);
+      const req = request as RequestLike;
+      const clientIP = this.ipFilter.getClientIP(req);
       if (this.ipFilter.isBlacklisted(clientIP)) {
         throw new Error('IP已被禁止访问');
       }
 
-      if (!this.ipFilter.validateOrigin(request)) {
+      if (!this.ipFilter.validateOrigin(req)) {
         throw new Error('来源不被允许');
       }
 
@@ -76,12 +77,12 @@ export class SecurityManager {
       }
 
       if (this.settings.authRequired) {
-        await this.authenticateRequest(request, context);
+        await this.authenticateRequest(req, context);
       } else {
         context.permissions = ['read'];
       }
 
-      context.origin = (request as any).headers?.origin;
+      context.origin = req.headers?.origin;
       return context;
     } catch (error) {
       this.logger.warn('请求验证失败:', error);
@@ -92,7 +93,7 @@ export class SecurityManager {
   /**
    * 身份验证
    */
-  private async authenticateRequest(request: any, context: SecurityContext): Promise<void> {
+  private async authenticateRequest(request: RequestLike, context: SecurityContext): Promise<void> {
     const authHeader = request.headers?.authorization;
 
     if (!authHeader) {
