@@ -14,6 +14,7 @@ import { VerificationEngine } from '../../../agent/verification/engine';
 import { MCPServer } from '../../../mcp/server';
 import { ConfigManager } from '../../../core/config';
 import { MockAIService } from './mock-ai';
+import type { TaskFlowConfig } from '../../../types/config';
 const logger = getLogger('cli/commands/agent/runner');
 
 import * as path from 'path';
@@ -110,7 +111,8 @@ export async function runAgent(options: RunOptions): Promise<void> {
   }
 }
 
-function createDefaultConfig(): any {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function createDefaultConfig(): any {
   return {
     projectName: 'Untitled Project',
     version: '1.0.0',

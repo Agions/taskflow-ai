@@ -3,7 +3,38 @@
  */
 
 import axios from 'axios';
-import { PipelineStatus, BuildReport } from '../types';
+import { PipelineStatus, BuildReport, StageReport, JobReport, StepReport } from '../types';
+
+/** GitHub Actions Workflow Run 响应 */
+interface GitHubWorkflowRun {
+  id: number;
+  name: string;
+  status: string;
+  conclusion: string | null;
+  duration?: number;
+}
+
+/** GitHub Actions Job 响应 */
+interface GitHubJob {
+  id: number;
+  name: string;
+  status: string;
+  conclusion: string | null;
+  duration?: number;
+  steps?: GitHubStep[];
+}
+
+/** GitHub Action Step 响应 */
+interface GitHubStep {
+  name: string;
+  status: string;
+  conclusion: string | null;
+}
+
+/** GitHub Secret 响应 */
+interface GitHubSecret {
+  name: string;
+}
 
 export class GitHubApiClient {
   private baseUrl: string = 'https://api.github.com';
@@ -33,7 +64,7 @@ export class GitHubApiClient {
   }
 
   async getWorkflowRuns(workflowId: string, branch?: string): Promise<unknown[]> {
-    const params: any = {};
+    const params: Record<string, string> = {};
     if (branch) {
       params.branch = branch;
     }
@@ -56,17 +87,17 @@ export class GitHubApiClient {
       }),
     ]);
 
-    const run = runResponse.data;
-    const jobs = jobsResponse.data.jobs;
+    const run = runResponse.data as GitHubWorkflowRun;
+    const jobs = (jobsResponse.data.jobs as GitHubJob[]) ?? [];
 
     return this.buildReport(run, jobs);
   }
 
-  private buildReport(run: any, jobs: any[]): BuildReport {
+  private buildReport(run: GitHubWorkflowRun, jobs: GitHubJob[]): BuildReport {
     return {
       id: run.id.toString(),
       status: this.mapStatus(run.status, run.conclusion),
-      stages: jobs.map(job => this.buildStageReport(job)) as any[],
+      stages: jobs.map(job => this.buildStageReport(job)),
       summary: {
         totalStages: jobs.length,
         successfulStages: jobs.filter(j => j.conclusion === 'success').length,
@@ -80,24 +111,29 @@ export class GitHubApiClient {
     };
   }
 
-  private buildStageReport(job: any): unknown {
+  private buildStageReport(job: GitHubJob): StageReport {
+    const stageJobs: JobReport[] = [
+      {
+        name: job.name,
+        status: this.mapStatus(job.status, job.conclusion),
+        duration: job.duration || 0,
+        steps: (job.steps ?? []).map(step => this.buildStepReport(step)),
+      },
+    ];
+
     return {
       name: job.name,
       status: this.mapStatus(job.status, job.conclusion),
       duration: job.duration || 0,
-      jobs: [
-        {
-          name: job.name,
-          status: this.mapStatus(job.status, job.conclusion),
-          duration: job.duration || 0,
-          steps:
-            job.steps?.map((step: any) => ({
-              name: step.name,
-              status: this.mapStatus(step.status, step.conclusion),
-              duration: 0,
-            })) || [],
-        },
-      ],
+      jobs: stageJobs,
+    };
+  }
+
+  private buildStepReport(step: GitHubStep): StepReport {
+    return {
+      name: step.name,
+      status: this.mapStatus(step.status, step.conclusion),
+      duration: 0,
     };
   }
 
@@ -127,7 +163,7 @@ export class GitHubApiClient {
     const response = await axios.get(`${this.baseUrl}/repos/${this.repository}/actions/secrets`, {
       headers: this.getHeaders(),
     });
-    return response.data.secrets.map((s: any) => s.name);
+    return (response.data.secrets as GitHubSecret[]).map(s => s.name);
   }
 
   async createOrUpdateSecret(name: string, value: string): Promise<void> {
@@ -148,10 +184,12 @@ export class GitHubApiClient {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async encryptSecret(value: string, key: string): Promise<string> {
-    // sodium-plus 是可选依赖，使用简单的 base64 编码作为回退
     try {
       const sodiumPlus = await import('sodium-plus');
+      // sodium-plus 动态导入，类型未知
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { SodiumPlus } = sodiumPlus as any;
       const sodium = await SodiumPlus.auto();
       const publicKey = Buffer.from(key, 'base64');
@@ -159,7 +197,7 @@ export class GitHubApiClient {
       const encrypted = await sodium.crypto_box_seal(message, publicKey);
       return Buffer.from(encrypted).toString('base64');
     } catch {
-      // 如果 sodium-plus 不可用，使用 base64 编码（注意：这不是加密，只是编码）
+      // 回退：base64 编码（非加密）
       return Buffer.from(value).toString('base64');
     }
   }

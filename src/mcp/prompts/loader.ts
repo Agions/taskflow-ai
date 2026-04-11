@@ -25,7 +25,7 @@ export class PromptLoader {
       const files = await fs.readdir(this.promptsDir);
       const promptFiles = files.filter(f => f.endsWith('.json'));
 
-      for (const file of promptFiles as any[]) {
+      for (const file of promptFiles) {
         try {
           const content = await fs.readJson(path.join(this.promptsDir, file));
           if (this.validatePrompt(content)) {
@@ -62,6 +62,8 @@ export class PromptLoader {
   /**
    * 验证提示格式
    */
+  /** 验证原始提示对象（来自 JSON 文件） */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private validatePrompt(prompt: any): prompt is MCPPrompt {
     return (
       prompt &&

@@ -46,6 +46,7 @@ export class MCPToolExecutor {
   async execute(name: string, args: Record<string, unknown>): Promise<unknown> {
     switch (name) {
       case 'terminal_execute':
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return this.executeTerminal(args as any);
       case 'project_analyze':
         return this.executeProjectAnalyze(args as ProjectAnalyzeArgs);

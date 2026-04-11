@@ -2,12 +2,12 @@
  * GitHub Actions 配置验证器
  */
 
-import { PipelineConfig, ValidationResult } from '../types';
+import { PipelineConfig, ValidationResult, ValidationError, ValidationWarning } from '../types';
 
 export class GitHubConfigValidator {
   async validate(config: PipelineConfig): Promise<ValidationResult> {
-    const errors: any[] = [];
-    const warnings: any[] = [];
+    const errors: ValidationError[] = [];
+    const warnings: ValidationWarning[] = [];
 
     this.validateTriggers(config, errors);
     this.validateStages(config, errors);
@@ -21,7 +21,7 @@ export class GitHubConfigValidator {
     };
   }
 
-  private validateTriggers(config: PipelineConfig, errors: unknown[]): void {
+  private validateTriggers(config: PipelineConfig, errors: ValidationError[]): void {
     if (!config.triggers || config.triggers.length === 0) {
       errors.push({
         field: 'triggers',
@@ -31,7 +31,7 @@ export class GitHubConfigValidator {
     }
   }
 
-  private validateStages(config: PipelineConfig, errors: unknown[]): void {
+  private validateStages(config: PipelineConfig, errors: ValidationError[]): void {
     if (!config.stages || config.stages.length === 0) {
       errors.push({
         field: 'stages',
@@ -41,7 +41,7 @@ export class GitHubConfigValidator {
     }
   }
 
-  private validateSecrets(config: PipelineConfig, errors: unknown[]): void {
+  private validateSecrets(config: PipelineConfig, errors: ValidationError[]): void {
     for (const secret of config.secrets || []) {
       if (!/^[A-Z_][A-Z0-9_]*$/.test(secret)) {
         errors.push({
@@ -53,12 +53,12 @@ export class GitHubConfigValidator {
     }
   }
 
-  private validateEnvironment(_config: PipelineConfig, warnings: unknown[]): void {
+  private validateEnvironment(_config: PipelineConfig, warnings: ValidationWarning[]): void {
     if (!process.env.GITHUB_TOKEN) {
       warnings.push({
         field: 'env.GITHUB_TOKEN',
         message: 'GITHUB_TOKEN not set, some features may not work',
-        code: 'MISSING_TOKEN',
+        suggestion: 'Set GITHUB_TOKEN environment variable to enable full functionality',
       });
     }
   }

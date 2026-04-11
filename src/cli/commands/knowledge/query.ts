@@ -5,6 +5,7 @@
 import chalk from 'chalk';
 import ora from 'ora';
 import { createEngine, isInitialized } from './engine';
+import type { DocumentMetadata } from '../../../knowledge/types';
 
 interface QueryOptions {
   topK: string;
@@ -53,7 +54,7 @@ export async function executeQuery(query: string, options: QueryOptions): Promis
     for (let i = 0; i < searchResult.chunks.length; i++) {
       const chunk = searchResult.chunks[i];
       console.log(
-        `${chalk.bold(`${i + 1}. ${(chunk.chunk.metadata as any).title}`)} ${chalk.yellow(`(${chunk.score.toFixed(3)})`)}`
+        `${chalk.bold(`${i + 1}. ${(chunk.chunk.metadata as DocumentMetadata).title}`)} ${chalk.yellow(`(${chunk.score.toFixed(3)})`)}`
       );
       console.log(chalk.gray(chunk.chunk.content.slice(0, 200) + '...'));
       console.log();
