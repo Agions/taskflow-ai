@@ -5,6 +5,37 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [2.1.11] - 2026-04-11
+
+### Added
+- Agent 核心模块重构
+  - `GoalParser` 接口抽象，支持规则/AI/混合模式
+  - `RuleBasedGoalParser` 实现，无 AI 依赖的规则解析器（支持中英文，32 个测试）
+  - `AgentConfig` 替代直接对象字面量配置
+  - `AgentCore` 新增 `replan()` / `resume()` 断点恢复
+  - `MultiAgentCoordinator` 新增 `broadcast()` / `executeCollaborative()` / `AgentMetrics` 指标
+
+### Changed
+- **类型安全强化** — ~46 处 `any` 类型消除（115→69）
+  - `core/plugin/types.ts`: `PluginContext.logger unknown→Logger`，hooks 参数类型化
+  - `mcp/prompts/types.ts`: `PromptExample.arguments any→PromptArguments`
+  - `cli/commands/flow/`: `format string→'yaml'|'json'`
+  - `cli/commands/`: `options: any→AgentCLIOptions/StatusOptions`
+  - `cicd/github/api-client.ts`: 定义 `GitHubWorkflowRun/Job/Step/Secret` 接口
+  - `cicd/github/validator.ts`: `errors/warnings: any[]→ValidationError[]/ValidationWarning[]`
+  - `workflow/types.ts`: `StepConfig` 新增 `dependsOn?: string[]`
+  - `mcp/security/ip-filter.ts`: 定义 `RequestLike` 接口
+  - `utils/error-handler.ts`: `getErrorMessage/isError any→unknown`
+  - `agent/state-machine/`: `actor: any→ReturnType<typeof createActor>`
+  - `agent/verification/`: `tasks filter` / `CoverageData` 类型化
+
+### Fixed
+- CLI `options.format as any` 全部移除
+- `getTemplate()` 返回 `null` 时 null 安全处理
+- `state-machine/machine.ts` 重复 import 移除
+
+---
+
 ## [Unreleased]
 
 ### Added

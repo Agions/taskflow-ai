@@ -13,6 +13,8 @@
 [![codecov](https://img.shields.io/codecov/c/github/Agions/taskflow-ai?style=for-the-badge)](https://codecov.io/gh/Agions/taskflow-ai)
 [![GitHub Stars](https://img.shields.io/github/stars/Agions/taskflow-ai?style=for-the-badge)](https://github.com/Agions/taskflow-ai/stargazers)
 
+> **📦 最新版本: v2.1.11** — 类型安全强化 + Agent 核心重构 · 2026-04-11
+
 **專為開發團隊打造的下一代 AI 開發工具 · 企业级生产就绪**
 
 <p align="center" style="margin-top: 2rem;">
