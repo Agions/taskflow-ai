@@ -13,7 +13,7 @@ export function doctorCommand(program: Command) {
     .command('doctor')
     .description('诊断并修复常见问题')
     .option('-f, --fix', '自动修复问题')
-    .action(async (options) => {
+    .action(async options => {
       await runDoctor(options);
     });
 }

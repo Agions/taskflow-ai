@@ -13,9 +13,7 @@ import { CLI_SYMBOLS } from '../../constants';
 const logger = getLogger('cli/commands/status');
 
 export function statusCommand(program: Command) {
-  const statusProgram = program
-    .command('status')
-    .description('查看项目状态和任务列表');
+  const statusProgram = program.command('status').description('查看项目状态和任务列表');
 
   // status list - 显示任务列表
   statusProgram
@@ -26,7 +24,7 @@ export function statusCommand(program: Command) {
     .option('--format <format>', '输出格式 (table|json)', 'table')
     .option('--limit <number>', '显示数量限制', '50')
     .option('--output <path>', '任务文件目录', 'output')
-    .action(async (options) => {
+    .action(async options => {
       try {
         await runStatusList(options);
       } catch (error) {
@@ -39,7 +37,7 @@ export function statusCommand(program: Command) {
   statusProgram
     .option('--json', '以JSON格式输出')
     .option('--detailed', '显示详细信息')
-    .action(async (options) => {
+    .action(async options => {
       try {
         await runStatus(options);
       } catch (error) {
@@ -254,7 +252,9 @@ async function runStatusList(options: {
       filteredTasks.sort((a: any, b: any) => {
         if (options.sort === 'priority') {
           const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
-          return (priorityOrder[String(b.priority)] || 0) - (priorityOrder[String(a.priority)] || 0);
+          return (
+            (priorityOrder[String(b.priority)] || 0) - (priorityOrder[String(a.priority)] || 0)
+          );
         }
         return 0;
       });
@@ -279,14 +279,14 @@ async function runStatusList(options: {
     // 表头
     console.log(
       chalk.white('ID') +
-      ' | ' +
-      chalk.white('标题').padEnd(30) +
-      ' | ' +
-      chalk.white('状态').padEnd(12) +
-      ' | ' +
-      chalk.white('优先级').padEnd(8) +
-      ' | ' +
-      chalk.white('工时')
+        ' | ' +
+        chalk.white('标题').padEnd(30) +
+        ' | ' +
+        chalk.white('状态').padEnd(12) +
+        ' | ' +
+        chalk.white('优先级').padEnd(8) +
+        ' | ' +
+        chalk.white('工时')
     );
     console.log(chalk.gray('-'.repeat(90)));
 
@@ -312,14 +312,14 @@ async function runStatusList(options: {
 
       console.log(
         chalk.gray(id) +
-        ' | ' +
-        chalk.white(title).padEnd(30) +
-        ' | ' +
-        (statusColors[status] || chalk.white)(status.padEnd(12)) +
-        ' | ' +
-        (priorityColors[priority] || chalk.white)(priority.padEnd(8)) +
-        ' | ' +
-        chalk.blue(`${hours}h`)
+          ' | ' +
+          chalk.white(title).padEnd(30) +
+          ' | ' +
+          (statusColors[status] || chalk.white)(status.padEnd(12)) +
+          ' | ' +
+          (priorityColors[priority] || chalk.white)(priority.padEnd(8)) +
+          ' | ' +
+          chalk.blue(`${hours}h`)
       );
     });
 
