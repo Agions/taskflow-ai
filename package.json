@@ -116,8 +116,8 @@
     "url": "https://github.com/sponsors/Agions"
   },
   "dependencies": {
-    "@taskflow-ai/core": "2.2.0",
     "@modelcontextprotocol/sdk": "1.27.1",
+    "@taskflow-ai/core": "2.2.0",
     "@xstate/fsm": "^2.1.0",
     "axios": "^1.6.7",
     "boxen": "^5.1.2",
@@ -179,7 +179,7 @@
     "prettier": "^3.2.5",
     "release-it": "19.2.4",
     "ts-jest": "^29.4.6",
-    "typescript": "^5.4.2",
+    "typescript": "5.9.3",
     "vitepress": "1.6.4"
   },
   "engines": {
