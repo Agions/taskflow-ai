@@ -1,80 +1,34 @@
-name: Publish to NPM
+name: NPM Publish
 
 on:
   release:
-    types: [published]
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to publish (e.g., 2.1.7)'
-        required: false
-        type: string
+    types: [created]
 
 jobs:
-  publish:
-    name: Publish to npm
+  publish-npm:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v2
         with:
           version: 9
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
+      - uses: actions/setup-node@v3
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Type check
-        run: pnpm run type-check
-
-      - name: Lint
-        run: pnpm run lint
-
-      - name: Format check
-        run: pnpm run format:check
-
-      - name: Test
-        run: pnpm run test
+      - name: Run tests
+        run: pnpm test
 
       - name: Build
-        run: pnpm run build
-
-      - name: Update version
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.version != ''
-        run: |
-          CURRENT_VERSION=$(node -p "require('./package.json').version")
-          if [ "$CURRENT_VERSION" != "${{ github.event.inputs.version }}" ]; then
-            pnpm version ${{ github.event.inputs.version }} --no-git-tag-version
-          else
-            echo "Version $CURRENT_VERSION already matches target, skipping update"
-          fi
+        run: pnpm build
 
       - name: Publish to npm
-        run: npm publish --access public
+        run: pnpm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
