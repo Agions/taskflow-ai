@@ -499,7 +499,7 @@ npm test
 | **更新日志**    | [CHANGELOG.md](./CHANGELOG.md)                    |
 | **安全策略**    | [SECURITY.md](./security.md)                      |
 | **问题反馈**    | https://github.com/Agions/taskflow-ai/issues      |
-| **讨论社区**    | https://github.com/Agions/taskflow-ai/discussions |
+| **讨论社区**    | https://github.com/Agions/taskflow-ai/issues |
 
 ---
 
