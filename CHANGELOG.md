@@ -109,38 +109,21 @@
 
 ---
 
-## [Unreleased]
+## [2.3.0] - 2026-04-17
 
-### Added
+### Fixed
 
-- 新增专业级 CLI UI 组件库
-  - 统一颜色主题系统
-  - ASCII Logo 展示
-  - 加载动画 (Spinner)
-  - 信息框组件 (成功/错误/警告/信息)
-  - 列表和表格展示
-  - 进度条组件
-  - 交互式提示 (确认/输入/选择/向导)
-  - 仪表板组件 (项目状态/系统信息/任务列表/时间线)
-- 新增 NPM 发布脚本
-  - `npm run publish:patch` - 发布补丁版本
-  - `npm run publish:minor` - 发布次要版本
-  - `npm run publish:major` - 发布主要版本
-  - `npm run publish:beta` - 发布 Beta 版本
-  - `npm run publish:alpha` - 发布 Alpha 版本
-- 优化 CI/CD 工作流
-  - 增强的 npm-publish.yml
-  - 改进的 ci.yml (支持 Node 18/20/22)
-  - 增强的 release.yml
+- **修复不存在的Discussions链接** - 将项目中的所有Discussions链接替换为有效的Issues链接
+  - docs/security.md: 一般问题链接
+  - README.md: 讨论社区链接
+  - CONTRIBUTING.md: 社区讨论链接
 
 ### Changed
 
-- 优化 package.json 发布配置
-  - 添加 publishConfig
-  - 优化 files 字段
-  - 添加 prepublishOnly 脚本
+- **项目迁移** - 将项目从/tmp/taskflow-ai迁移到/root/taskflow-ai
+- **文档更新** - 更新相关链接和文档结构
 
-## [2.1.0] - 2026-02-22
+## [Unreleased]
 
 ### Added
 
