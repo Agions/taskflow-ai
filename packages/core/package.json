@@ -1,0 +1,26 @@
+{
+  "name": "@taskflow-ai/core",
+  "version": "2.2.0",
+  "description": "Core utilities and types for TaskFlow AI",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^20.11.25",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.6"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
