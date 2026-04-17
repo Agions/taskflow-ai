@@ -6,17 +6,40 @@ import { getLogger } from '../../utils/logger';
 import { Command } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
+import path from 'path';
+import fs from 'fs-extra';
 import { ConfigManager } from '../../core/config';
 import { CLI_SYMBOLS } from '../../constants';
 const logger = getLogger('cli/commands/status');
 
 export function statusCommand(program: Command) {
-  program
+  const statusProgram = program
     .command('status')
-    .description('查看项目状态和统计信息')
+    .description('查看项目状态和任务列表');
+
+  // status list - 显示任务列表
+  statusProgram
+    .command('list')
+    .description('显示任务列表')
+    .option('--filter <condition>', '过滤条件 (status=xxx|priority=xxx)')
+    .option('--sort <field>', '排序字段', 'created_at')
+    .option('--format <format>', '输出格式 (table|json)', 'table')
+    .option('--limit <number>', '显示数量限制', '50')
+    .option('--output <path>', '任务文件目录', 'output')
+    .action(async (options) => {
+      try {
+        await runStatusList(options);
+      } catch (error) {
+        logger.error(chalk.red('获取任务列表失败:'), error);
+        process.exit(1);
+      }
+    });
+
+  // status - 显示项目配置状态（原有功能）
+  statusProgram
     .option('--json', '以JSON格式输出')
     .option('--detailed', '显示详细信息')
-    .action(async options => {
+    .action(async (options) => {
       try {
         await runStatus(options);
       } catch (error) {
@@ -175,6 +198,136 @@ async function runStatus(options: StatusOptions) {
     console.log(chalk.gray('\n使用 "taskflow --help" 查看所有可用命令'));
   } catch (error) {
     spinner.fail('获取状态失败');
+    throw error;
+  }
+}
+
+/**
+ * 运行 status list 命令 - 显示任务列表
+ */
+async function runStatusList(options: {
+  filter?: string;
+  sort?: string;
+  format?: string;
+  limit?: string;
+  output?: string;
+}) {
+  const spinner = ora('正在加载任务列表...').start();
+  const outputDir = path.resolve(options.output || 'output');
+
+  try {
+    // 查找 output 目录中的任务文件
+    if (!(await fs.pathExists(outputDir))) {
+      spinner.fail(chalk.red('未找到任务文件目录，请先运行 "taskflow parse"'));
+      return;
+    }
+
+    const files = await fs.readdir(outputDir);
+    const taskFiles = files.filter(f => f.endsWith('.json') && !f.startsWith('.'));
+
+    if (taskFiles.length === 0) {
+      spinner.fail(chalk.red('未找到任务文件，请先运行 "taskflow parse"'));
+      return;
+    }
+
+    // 读取最新的任务文件
+    const latestFile = taskFiles.sort().reverse()[0];
+    const taskFilePath = path.join(outputDir, latestFile);
+    const taskData = await fs.readJson(taskFilePath);
+
+    spinner.succeed(chalk.green('任务加载成功'));
+
+    const tasks = taskData.tasks || [];
+    const document = taskData.document || {};
+
+    // 过滤
+    let filteredTasks = [...tasks];
+    if (options.filter) {
+      const [key, value] = options.filter.split('=');
+      if (key && value) {
+        filteredTasks = filteredTasks.filter((t: any) => t[key] === value);
+      }
+    }
+
+    // 排序
+    if (options.sort) {
+      filteredTasks.sort((a: any, b: any) => {
+        if (options.sort === 'priority') {
+          const priorityOrder = { high: 3, medium: 2, low: 1 };
+          return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
+        }
+        return 0;
+      });
+    }
+
+    // 限制数量
+    const limit = parseInt(options.limit || '50');
+    filteredTasks = filteredTasks.slice(0, limit);
+
+    // 输出
+    if (options.format === 'json') {
+      console.log(JSON.stringify(filteredTasks, null, 2));
+      return;
+    }
+
+    // 表格输出
+    console.log(chalk.cyan(`\n📋 任务列表 (${filteredTasks.length}/${tasks.length})\n`));
+    console.log(chalk.gray('文档: ') + chalk.white(document.title || '未知'));
+    console.log(chalk.gray('文件: ') + chalk.blue(latestFile));
+    console.log();
+
+    // 表头
+    console.log(
+      chalk.white('ID') +
+      ' | ' +
+      chalk.white('标题').padEnd(30) +
+      ' | ' +
+      chalk.white('状态').padEnd(12) +
+      ' | ' +
+      chalk.white('优先级').padEnd(8) +
+      ' | ' +
+      chalk.white('工时')
+    );
+    console.log(chalk.gray('-'.repeat(90)));
+
+    // 任务行
+    filteredTasks.forEach((task: any) => {
+      const statusColors: Record<string, any> = {
+        todo: chalk.yellow,
+        in_progress: chalk.cyan,
+        done: chalk.green,
+        blocked: chalk.red,
+      };
+      const priorityColors: Record<string, any> = {
+        high: chalk.red,
+        medium: chalk.yellow,
+        low: chalk.gray,
+      };
+
+      const id = task.id?.substring(0, 8) || 'N/A';
+      const title = (task.title || '无标题').substring(0, 28);
+      const status = task.status || 'todo';
+      const priority = task.priority || 'medium';
+      const hours = task.estimatedHours || 0;
+
+      console.log(
+        chalk.gray(id) +
+        ' | ' +
+        chalk.white(title).padEnd(30) +
+        ' | ' +
+        (statusColors[status] || chalk.white)(status.padEnd(12)) +
+        ' | ' +
+        (priorityColors[priority] || chalk.white)(priority.padEnd(8)) +
+        ' | ' +
+        chalk.blue(`${hours}h`)
+      );
+    });
+
+    console.log(chalk.gray('\n💡 提示:'));
+    console.log(chalk.gray('  - 使用 "taskflow status list --filter status=todo" 过滤任务'));
+    console.log(chalk.gray('  - 使用 "taskflow status list --format json" JSON格式输出'));
+  } catch (error) {
+    spinner.fail('加载任务列表失败');
     throw error;
   }
 }
