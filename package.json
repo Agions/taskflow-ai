@@ -4,9 +4,7 @@
   "private": true,
   "description": "TaskFlow AI - 智能PRD文档解析与任务管理助手，支持多模型AI协同、MCP编辑器集成，专为开发团队设计的CLI工具",
   "logo": "assets/logo.svg",
-  "workspaces": [
-    "packages/*"
-  ],
+
   "main": "dist/cli/index.js",
   "types": "dist/cli/index.d.ts",
   "bin": {
@@ -117,7 +115,6 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.27.1",
-    "@taskflow-ai/core": "2.2.0",
     "@xstate/fsm": "^2.1.0",
     "axios": "^1.6.7",
     "boxen": "^5.1.2",
@@ -176,6 +173,7 @@
     "jest": "^29.7.0",
     "jest-junit": "^16.0.0",
     "playwright": "1.58.2",
+    "pnpm": "9.15.9",
     "prettier": "^3.2.5",
     "release-it": "19.2.4",
     "ts-jest": "^29.4.6",
