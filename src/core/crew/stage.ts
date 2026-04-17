@@ -187,7 +187,7 @@ export class StageExecutor {
   /**
    * 带超时的执行
    */
-  private async executeWithTimeout(
+  private executeWithTimeout(
     agent: AgentCore,
     config: AgentConfig,
     input: string,
@@ -195,36 +195,35 @@ export class StageExecutor {
     timeout: number,
     options?: { signal?: AbortSignal; onThought?: (thought: string) => void }
   ): Promise<unknown> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         reject(new Error(`Stage 执行超时 (${timeout}ms)`));
       }, timeout);
 
-      try {
-        // 构造 Agent 任务
-        const task = {
-          id: `task-${Date.now()}`,
-          description: input,
-          status: 'in_progress' as const,
-          createdAt: Date.now(),
-        };
+      // 执行 Agent
+      const task = {
+        id: `task-${Date.now()}`,
+        description: input,
+        status: 'in_progress' as const,
+        createdAt: Date.now(),
+      };
 
-        // 执行 Agent
-        const execution = await agent.execute(task);
+      agent.execute(task)
+        .then((execution) => {
+          clearTimeout(timer);
 
-        clearTimeout(timer);
-
-        if (execution.status === 'failed') {
-          reject(new Error(execution.task.error || 'Agent 执行失败'));
-        } else {
-          // 提取结果
-          const result = this.extractResult(execution, outputSchema);
-          resolve(result);
-        }
-      } catch (error) {
-        clearTimeout(timer);
-        reject(error);
-      }
+          if (execution.status === 'failed') {
+            reject(new Error(execution.task.error || 'Agent 执行失败'));
+          } else {
+            // 提取结果
+            const result = this.extractResult(execution, outputSchema);
+            resolve(result);
+          }
+        })
+        .catch((error) => {
+          clearTimeout(timer);
+          reject(error);
+        });
     });
   }
 
