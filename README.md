@@ -13,9 +13,9 @@
 [![codecov](https://img.shields.io/codecov/c/github/Agions/taskflow-ai?style=for-the-badge)](https://codecov.io/gh/Agions/taskflow-ai)
 [![GitHub Stars](https://img.shields.io/github/stars/Agions/taskflow-ai?style=for-the-badge)](https://github.com/Agions/taskflow-ai/stargazers)
 
-> **📦 最新版本: v2.1.13** — 修复 CLI 命令注册问题 · 2026-04-17
+> **📦 最新版本: v2.2.0** — 支持 npm 发布 · 2026-04-17
 
-**專為開發團隊打造的下一代 AI 開發工具 · 企业级生产就绪**
+**专为开发团队打造的下一代 AI 开发工具 · 企业级生产就绪**
 
 <p align="center" style="margin-top: 2rem;">
   <a href="#-核心特性" style="margin: 0 0.5rem; text-decoration: none; color: var(--tf-primary, #3b82f6); font-weight: 600;">✨ 核心特性</a>
@@ -51,8 +51,6 @@ TaskFlow AI 是一款**企业级 AI 思维流编排引擎**，专为开发团队
 
 ## ✨ 核心特性
 
-<div align="center">
-
 ### 🧠 思维链可视化
 
 **看见 AI 的思考过程**
@@ -70,10 +68,6 @@ console.log(result.chain); // 完整的思维链
 console.log(result.confidence); // 置信度 92%
 console.log(result.visualization); // Mermaid 流程图
 ```
-
-</div>
-
-<div align="center" style="margin-top: 2rem;">
 
 ### 🤖 多模型智能路由
 
@@ -97,10 +91,6 @@ console.log(result.visualization); // Mermaid 流程图
 ```
 
 **支持的厂商**: DeepSeek · OpenAI · Anthropic · 智谱 AI · 通义千问 · 文心一言 · 月之暗面 · 讯飞星火
-
-</div>
-
-<div align="center" style="margin-top: 2rem;">
 
 ### ⚡ 声明式工作流引擎
 
@@ -135,10 +125,6 @@ steps:
 - ✅ **SQLite 持久化** - 状态可靠存储
 - ✅ **完整错误处理** - 自动重试、熔断、降级
 
-</div>
-
-<div align="center" style="margin-top: 2rem;">
-
 ### 🔌 企业级 MCP 集成
 
 **一行配置，连接所有编辑器**
@@ -165,10 +151,6 @@ taskflow mcp init -e claude-desktop
 - 🧠 记忆管理 (memory_set, memory_get, memory_clear...)
 - 📊 代码执行 (code_execute, code_eval_js, code_eval_python...)
 
-</div>
-
-<div align="center" style="margin-top: 2rem;">
-
 ### 🤝 多 Agent 协作系统
 
 **自主执行，智能协作**
@@ -193,10 +175,6 @@ await agent.execute('审查 PR #123 的安全性');
 - 🧠 **短期/长期记忆** - 上下文持续积累
 - 📈 **性能监控** - 实时追踪执行状态
 
-</div>
-
-<div align="center" style="margin-top: 2rem;">
-
 ### 🛡️ 企业级安全防护
 
 TaskFlow AI 内置多层安全防护：
@@ -208,8 +186,6 @@ TaskFlow AI 内置多层安全防护：
 | 📁 **路径遍历**  | 文件路径规范化 + 敏感目录保护   |
 | 🔑 **密钥管理**  | 环境变量 + 自动脱敏             |
 | 📝 **审计日志**  | 完整操作审计 + 可追溯           |
-
-</div>
 
 ---
 
@@ -499,7 +475,7 @@ npm test
 | **更新日志**    | [CHANGELOG.md](./CHANGELOG.md)                    |
 | **安全策略**    | [SECURITY.md](./security.md)                      |
 | **问题反馈**    | https://github.com/Agions/taskflow-ai/issues      |
-| **讨论社区**    | https://github.com/Agions/taskflow-ai/issues |
+| **讨论社区**    | https://github.com/Agions/taskflow-ai/discussions |
 
 ---
 

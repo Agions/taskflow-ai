@@ -21,6 +21,7 @@ import { knowledgeCommand } from './commands/knowledge';
 import { cicdCommand } from './commands/cicd';
 import { modelCommand } from './commands/model';
 import { doctorCommand } from './commands/doctor';
+import { crewCommand } from './commands/crew';
 
 const program = new Command();
 
@@ -49,6 +50,7 @@ program.addCommand(knowledgeCommand);
 program.addCommand(cicdCommand);
 program.addCommand(modelCommand);
 doctorCommand(program);
+program.addCommand(crewCommand);
 
 // 自定义帮助信息
 program.on('--help', () => {
