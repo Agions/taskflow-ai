@@ -48,7 +48,7 @@ program.addCommand(marketplaceCommand);
 program.addCommand(knowledgeCommand);
 program.addCommand(cicdCommand);
 program.addCommand(modelCommand);
-program.addCommand(doctorCommand);
+doctorCommand(program);
 
 // 自定义帮助信息
 program.on('--help', () => {

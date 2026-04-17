@@ -253,8 +253,8 @@ async function runStatusList(options: {
     if (options.sort) {
       filteredTasks.sort((a: any, b: any) => {
         if (options.sort === 'priority') {
-          const priorityOrder = { high: 3, medium: 2, low: 1 };
-          return (priorityOrder[b.priority] || 0) - (priorityOrder[a.priority] || 0);
+          const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
+          return (priorityOrder[String(b.priority)] || 0) - (priorityOrder[String(a.priority)] || 0);
         }
         return 0;
       });
