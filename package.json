@@ -232,11 +232,15 @@
       }
     }
   },
+  "workspaces": [
+    "packages/core"
+  ],
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/src"
+      "<rootDir>/src",
+      "<rootDir>/packages/*/src"
     ],
     "testMatch": [
       "**/__tests__/**/*.test.ts",
