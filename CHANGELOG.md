@@ -5,6 +5,27 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [2.1.13] - 2026-04-17
+
+### Fixed
+
+- **CLI 命令修复** — 注册缺失的命令
+  - 注册 `taskflow model` 命令（包含 list/add/remove/enable/disable/test 子命令）
+  - 注册 `taskflow doctor` 命令
+  - 添加 `taskflow status list` 子命令，支持查看 parse 生成的任务列表
+
+- **文档更新**
+  - 修正 CLI 文档中的命令名称（models → model）
+  - 移除不存在的命令文档（logs、cache）
+
+### Added
+
+- `taskflow status list` 新增功能
+  - 支持 `--filter` 过滤任务
+  - 支持 `--sort` 排序
+  - 支持 `--format json` JSON 输出
+  - 支持 `--output` 指定任务文件目录
+
 ## [2.1.11] - 2026-04-11
 
 ### Added
