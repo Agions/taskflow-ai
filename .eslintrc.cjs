@@ -1,0 +1,38 @@
+module.exports = {
+  parser: '@typescript-eslint/parser',
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
+  plugins: ['@typescript-eslint'],
+  parserOptions: {
+    ecmaVersion: 2021,
+    sourceType: 'module',
+  },
+  env: {
+    node: true,
+    jest: true,
+    es6: true,
+  },
+  rules: {
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
+    '@typescript-eslint/no-require-imports': 'off',
+    '@typescript-eslint/no-unsafe-function-type': 'off',
+    '@typescript-eslint/no-unsafe-call': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
+    '@typescript-eslint/no-unsafe-return': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off',
+    '@typescript-eslint/no-unused-expressions': 'off',
+    'no-console': 'off',
+    'no-unused-vars': 'off',
+    'prefer-const': 'off',
+    'no-var': 'off',
+    'eqeqeq': 'off',
+    'no-empty': 'off',
+  },
+  ignorePatterns: ['dist', 'node_modules', 'coverage', '*.js', '*.d.ts'],
+};
