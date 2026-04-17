@@ -90,10 +90,14 @@ export async function executeRun(
       console.log(`\n▶ Stage: ${stage.name}`);
     },
     onStageComplete: (stageResult: StageExecutionResult) => {
-      const icon = stageResult.status === 'completed' ? '✅' : stageResult.status === 'skipped' ? '⏭️' : '❌';
+      const icon =
+        stageResult.status === 'completed' ? '✅' : stageResult.status === 'skipped' ? '⏭️' : '❌';
       console.log(`   ${icon} 完成 (${stageResult.duration}ms)`);
       if (options.verbose && stageResult.output) {
-        console.log(`   输出:`, JSON.stringify(stageResult.output, null, 2).split('\n').slice(0, 5).join('\n'));
+        console.log(
+          `   输出:`,
+          JSON.stringify(stageResult.output, null, 2).split('\n').slice(0, 5).join('\n')
+        );
       }
     },
   });
@@ -103,7 +107,9 @@ export async function executeRun(
   console.log(`\n📊 执行结果:`);
   console.log(`   状态: ${result.status}`);
   console.log(`   总耗时: ${result.duration}ms`);
-  console.log(`   完成 Stages: ${result.stageResults.filter((s: StageExecutionResult) => s.status === 'completed').length}/${result.stageResults.length}`);
+  console.log(
+    `   完成 Stages: ${result.stageResults.filter((s: StageExecutionResult) => s.status === 'completed').length}/${result.stageResults.length}`
+  );
 
   if (result.error) {
     console.log(`   错误: ${result.error}`);
@@ -112,10 +118,16 @@ export async function executeRun(
   // 8. 显示上下文内容
   console.log(`\n📦 上下文内容:`);
   const ctx = result.context;
-  if (ctx.prd) console.log(`   - prd: { title: "${ctx.prd.title || 'N/A'}", requirements: ${ctx.prd.requirements?.length || 0} }`);
+  if (ctx.prd)
+    console.log(
+      `   - prd: { title: "${ctx.prd.title || 'N/A'}", requirements: ${ctx.prd.requirements?.length || 0} }`
+    );
   if (ctx.plan) console.log(`   - plan: { tasks: ${ctx.plan.tasks?.length || 0} }`);
   if (ctx.code) console.log(`   - code: { files: ${ctx.code.files?.length || 0} }`);
-  if (ctx.review) console.log(`   - review: { score: ${ctx.review.score}, issues: ${ctx.review.issues?.length || 0} }`);
+  if (ctx.review)
+    console.log(
+      `   - review: { score: ${ctx.review.score}, issues: ${ctx.review.issues?.length || 0} }`
+    );
 
   console.log(`\n✨ 执行完成\n`);
 }

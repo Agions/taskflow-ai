@@ -39,10 +39,7 @@ program
   .option('-o, --output <file>', '输出文件路径')
   .action(executeCreate);
 
-program
-  .command('templates')
-  .description('显示所有内置模板')
-  .action(executeTemplates);
+program.command('templates').description('显示所有内置模板').action(executeTemplates);
 
 export default program;
 export const crewCommand = program;

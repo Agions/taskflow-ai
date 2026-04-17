@@ -15,11 +15,11 @@ import { AgentCapability } from '../agent/types';
  * 每个专业有明确的职责边界和工具偏好
  */
 export type AgentSpecialty =
-  | 'researcher'    // 需求研究员 - PRD 解析、信息提取
-  | 'planner'       // 计划员 - 任务拆解、优先级排序
-  | 'coder'         // 工程师 - 代码编写、调试
-  | 'reviewer'      // 审查员 - 代码审查、质量把控
-  | 'documenter';  // 文档员 - 文档生成、注释编写
+  | 'researcher' // 需求研究员 - PRD 解析、信息提取
+  | 'planner' // 计划员 - 任务拆解、优先级排序
+  | 'coder' // 工程师 - 代码编写、调试
+  | 'reviewer' // 审查员 - 代码审查、质量把控
+  | 'documenter'; // 文档员 - 文档生成、注释编写
 
 /**
  * Agent 配置（差异化：专业 + 工具 + 能力）
@@ -162,7 +162,7 @@ export interface PRDDocument {
   requirements: string[];
   constraints?: string[];
   acceptanceCriteria?: string[];
-  raw: string;  // 原始内容
+  raw: string; // 原始内容
 }
 
 /**
@@ -201,7 +201,7 @@ export interface ReviewResult {
     message: string;
     suggestion?: string;
   }[];
-  score: number;  // 0-100
+  score: number; // 0-100
   summary: string;
 }
 
@@ -345,9 +345,7 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
         },
         input: { fromContext: 'plan' },
         output: {
-          fields: [
-            { name: 'files', type: 'array', required: true },
-          ],
+          fields: [{ name: 'files', type: 'array', required: true }],
         },
       },
       {

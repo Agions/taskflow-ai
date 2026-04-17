@@ -343,7 +343,10 @@ export class WorkflowEngine {
         } else if (currentStage) {
           if (line.match(/^\s+name:/) && !inAgent && !inInput && !inOutput) {
             currentStage.name = line.split(':')[1].trim();
-          } else if (line.match(/^\s+agent:/) || (inAgent && indent === 3 && line.match(/^\s+\w/))) {
+          } else if (
+            line.match(/^\s+agent:/) ||
+            (inAgent && indent === 3 && line.match(/^\s+\w/))
+          ) {
             if (line.match(/^\s+agent:/)) inAgent = true;
             else if (!line.startsWith('      ') && line.match(/^\s+\w/)) inAgent = false;
           } else if (inAgent && line.match(/^\s+id:/)) {
@@ -357,17 +360,26 @@ export class WorkflowEngine {
           } else if (inAgent && line.match(/^\s+tools:/)) {
             const toolsStr = line.split(':')[1].trim();
             if (toolsStr.startsWith('[')) {
-              currentStage.agent.tools = toolsStr.slice(1, -1).split(',').map(t => t.trim());
+              currentStage.agent.tools = toolsStr
+                .slice(1, -1)
+                .split(',')
+                .map(t => t.trim());
             }
           } else if (inAgent && line.match(/^\s+capabilities:/)) {
             const capsStr = line.split(':')[1].trim();
             if (capsStr.startsWith('[')) {
-              currentStage.agent.capabilities = capsStr.slice(1, -1).split(',').map(t => t.trim()) as any[];
+              currentStage.agent.capabilities = capsStr
+                .slice(1, -1)
+                .split(',')
+                .map(t => t.trim()) as any[];
             }
           } else if (line.match(/^\s+input:/)) {
             inInput = true;
             inOutput = false;
-          } else if (line.match(/^\s+output:/) || (inOutput && indent <= 3 && line.match(/^\s+\w/))) {
+          } else if (
+            line.match(/^\s+output:/) ||
+            (inOutput && indent <= 3 && line.match(/^\s+\w/))
+          ) {
             inInput = false;
             if (line.match(/^\s+output:/)) inOutput = true;
             else if (!line.startsWith('      ') && line.match(/^\s+\w/)) inOutput = false;

@@ -3,13 +3,7 @@
  * 差异化设计：与 Workflow 深度绑定，支持条件执行和错误恢复
  */
 
-import {
-  Stage,
-  StageExecutionResult,
-  StageStatus,
-  OutputSchema,
-  CrewAgentConfig,
-} from './types';
+import { Stage, StageExecutionResult, StageStatus, OutputSchema, CrewAgentConfig } from './types';
 import { WorkflowContext } from './context';
 import { Logger } from '../../utils/logger';
 import { AgentCore } from '../agent/core';
@@ -65,7 +59,9 @@ export class StageExecutor {
       const agent = this.buildAgent(stage.agent);
       const agentConfig = this.convertToAgentConfig(stage.agent);
 
-      this.logger.debug(`[${stage.name}] 使用 Agent: ${stage.agent.name} (${stage.agent.specialty})`);
+      this.logger.debug(
+        `[${stage.name}] 使用 Agent: ${stage.agent.name} (${stage.agent.specialty})`
+      );
 
       // 4. 执行（带超时）
       const timeout = stage.timeout || 300000; // 默认 5 分钟
@@ -208,8 +204,9 @@ export class StageExecutor {
         createdAt: Date.now(),
       };
 
-      agent.execute(task)
-        .then((execution) => {
+      agent
+        .execute(task)
+        .then(execution => {
           clearTimeout(timer);
 
           if (execution.status === 'failed') {
@@ -220,7 +217,7 @@ export class StageExecutor {
             resolve(result);
           }
         })
-        .catch((error) => {
+        .catch(error => {
           clearTimeout(timer);
           reject(error);
         });
@@ -231,7 +228,10 @@ export class StageExecutor {
    * 从 Agent 执行结果提取输出
    */
   private extractResult(
-    execution: { steps: { content: string; tool?: string; toolResult?: unknown }[]; task: { result?: unknown } },
+    execution: {
+      steps: { content: string; tool?: string; toolResult?: unknown }[];
+      task: { result?: unknown };
+    },
     schema?: OutputSchema
   ): unknown {
     // 如果有结构化结果，直接使用
@@ -285,7 +285,7 @@ export class StageExecutor {
     const stageToContextMap: Record<string, string> = {
       'parse-prd': 'prd',
       'plan-tasks': 'plan',
-      'implement': 'code',
+      implement: 'code',
       'review-code': 'review',
     };
 
