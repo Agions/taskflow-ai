@@ -5,6 +5,38 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [2.2.0] - 2026-04-17
+
+### 🚀 Architecture Upgrade - 架构升级
+
+#### Added
+
+- **Monorepo 结构** — 采用 workspaces 管理多包
+  - 新增 `@taskflow-ai/core` 核心包
+  - 任务管理、工作流引擎、插件系统独立发布
+  - 支持独立引用核心库
+
+- **插件系统增强**
+  - 新增 10+ 生命周期钩子
+    - `onTaskCreated` / `onTaskUpdated` - 任务创建/更新后
+    - `onWorkflowBeforeExecute` - 工作流执行前
+    - `onCommandBefore` - 命令执行前
+    - `onConfigLoaded` / `onConfigBeforeSave` - 配置加载/保存
+    - `onError` - 错误处理
+  - 新增 `PluginAPI` - 插件可调用任务/工作流/配置/存储 API
+  - 新增 `EventEmitter` - 事件机制
+  - 新增命令选项定义 `PluginCommandOption`
+  - 新增可视化扩展 `PluginVisualization`
+
+- **统一配置管理**
+  - `ConfigManager` 整合所有配置操作
+  - 支持 AI 模型管理、备份恢复、导入导出
+  - 配置统计信息
+
+#### Changed
+
+- **版本号升级** — v2.1.13 → v2.2.0
+
 ## [2.1.13] - 2026-04-17
 
 ### Fixed
