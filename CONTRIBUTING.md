@@ -127,7 +127,7 @@ taskflow-ai/
 ## 💬 社区
 
 - 📖 [文档](https://agions.github.io/taskflow-ai/)
-- 💬 [讨论](https://github.com/Agions/taskflow-ai/discussions)
+- 💬 [讨论](https://github.com/Agions/taskflow-ai/issues)
 - 🐛 [问题反馈](https://github.com/Agions/taskflow-ai/issues)
 
 ## 📜 行为准则
