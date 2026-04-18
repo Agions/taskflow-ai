@@ -60,3 +60,4 @@ reports/
 # Runtime data
 .taskflow/
 taskflow/
+REFORM_PLAN*.md
