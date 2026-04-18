@@ -87,7 +87,7 @@ Existing solutions suffer from:
 
 **Edge Cases:**
 
-- Attempting to login with an unverified email shows: "Please verify your email first. <Resend verification>"
+- Attempting to login with an unverified email shows: "Please verify your email first. [Resend verification]"
 - Attempting to login to a locked account shows: "Account locked. Try again in X minutes."
 
 ---
