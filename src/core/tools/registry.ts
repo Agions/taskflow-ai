@@ -5,7 +5,17 @@
 
 import { getLogger } from '../../utils/logger';
 import { getEventBus, TaskFlowEvent } from '../events';
-import { Tool, ToolCategory, ToolHandler, ToolResult, ToolContext, ToolCall, ToolCallEvent, ToolExecuteOptions, BuiltInToolInfo } from './types';
+import {
+  Tool,
+  ToolCategory,
+  ToolHandler,
+  ToolResult,
+  ToolContext,
+  ToolCall,
+  ToolCallEvent,
+  ToolExecuteOptions,
+  BuiltInToolInfo,
+} from './types';
 
 const logger = getLogger('tools');
 
@@ -18,19 +28,19 @@ export const BUILT_IN_TOOLS: BuiltInToolInfo[] = [
   { name: 'file_write', category: 'filesystem', description: '写入文件内容' },
   { name: 'file_search', category: 'filesystem', description: '搜索文件' },
   { name: 'file_list', category: 'filesystem', description: '列出目录文件' },
-  
+
   // 命令执行
   { name: 'bash', category: 'system', description: '执行 Bash 命令' },
   { name: 'git', category: 'system', description: '执行 Git 命令' },
-  
+
   // 网络
   { name: 'http_request', category: 'network', description: '发送 HTTP 请求' },
   { name: 'web_search', category: 'network', description: '网络搜索' },
-  
+
   // 代码
   { name: 'code_search', category: 'code', description: '代码搜索' },
   { name: 'code_analysis', category: 'code', description: '代码分析' },
-  
+
   // 数据库
   { name: 'db_query', category: 'database', description: '执行数据库查询' },
 ];
@@ -96,10 +106,11 @@ export class ToolRegistry {
    */
   search(query: string): Tool[] {
     const lower = query.toLowerCase();
-    return this.getAll().filter(t => 
-      t.name.toLowerCase().includes(lower) ||
-      t.description.toLowerCase().includes(lower) ||
-      t.tags?.some(tag => tag.toLowerCase().includes(lower))
+    return this.getAll().filter(
+      t =>
+        t.name.toLowerCase().includes(lower) ||
+        t.description.toLowerCase().includes(lower) ||
+        t.tags?.some(tag => tag.toLowerCase().includes(lower))
     );
   }
 
@@ -114,8 +125,8 @@ export class ToolRegistry {
    * 执行工具
    */
   async execute(
-    name: string, 
-    params: Record<string, unknown>, 
+    name: string,
+    params: Record<string, unknown>,
     context: ToolContext,
     options?: ToolExecuteOptions
   ): Promise<ToolResult> {
@@ -152,7 +163,7 @@ export class ToolRegistry {
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
           const result = await this.executeWithTimeout(tool.handler, params, context, timeout);
-          
+
           toolCall.endTime = Date.now();
           toolCall.result = result;
 
@@ -161,12 +172,14 @@ export class ToolRegistry {
 
           logger.debug(`工具执行成功: ${name} (${toolCall.endTime - startTime}ms)`);
           return result;
-
         } catch (error) {
           lastError = error instanceof Error ? error : new Error(String(error));
-          
+
           if (attempt < maxRetries) {
-            logger.warn(`工具 ${name} 执行失败，${attempt + 1}/${maxRetries} 重试:`, lastError.message);
+            logger.warn(
+              `工具 ${name} 执行失败，${attempt + 1}/${maxRetries} 重试:`,
+              lastError.message
+            );
             await this.sleep(Math.pow(2, attempt) * 100); // 指数退避
           }
         }
@@ -184,7 +197,6 @@ export class ToolRegistry {
       this.emitToolEvent('tool_call_error', name, callId, undefined, undefined, lastError?.message);
 
       return errorResult;
-
     } catch (error) {
       const errorResult: ToolResult = {
         success: false,
@@ -211,7 +223,7 @@ export class ToolRegistry {
   ): Promise<ToolResult> {
     return Promise.race([
       handler(params, context),
-      new Promise<ToolResult>((_, reject) => 
+      new Promise<ToolResult>((_, reject) =>
         setTimeout(() => reject(new Error(`工具执行超时 (${timeout}ms)`)), timeout)
       ),
     ]);
@@ -250,8 +262,7 @@ export class ToolRegistry {
    * 获取调用历史
    */
   getCallHistory(limit?: number): ToolCall[] {
-    const calls = Array.from(this.toolCalls.values())
-      .sort((a, b) => b.startTime - a.startTime);
+    const calls = Array.from(this.toolCalls.values()).sort((a, b) => b.startTime - a.startTime);
     return limit ? calls.slice(0, limit) : calls;
   }
 
@@ -294,9 +305,10 @@ export class ToolRegistry {
    */
   private trimCallHistory(): void {
     if (this.toolCalls.size > this.maxCallHistory) {
-      const sorted = Array.from(this.toolCalls.entries())
-        .sort((a, b) => b[1].startTime - a[1].startTime);
-      
+      const sorted = Array.from(this.toolCalls.entries()).sort(
+        (a, b) => b[1].startTime - a[1].startTime
+      );
+
       const toDelete = sorted.slice(this.maxCallHistory);
       for (const [id] of toDelete) {
         this.toolCalls.delete(id);

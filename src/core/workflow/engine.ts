@@ -30,7 +30,7 @@ export class WorkflowEngine {
       enableL2: true,
       l1MaxSize: 100,
       l1MaxMemory: 10,
-      l1Ttl: 600,  // 10 分钟
+      l1Ttl: 600, // 10 分钟
       l2Ttl: 86400, // 24 小时
     });
     logger.info('WorkflowEngine 缓存已启用');
@@ -44,7 +44,7 @@ export class WorkflowEngine {
 
     // 生成缓存键
     const cacheKey = CacheKeys.workflow(workflow.id);
-    
+
     // 尝试从缓存获取已完成的工作流结果
     const cachedResult = this.cacheManager.get<ExecutionResult>(cacheKey);
     if (cachedResult && cachedResult.success) {
@@ -129,7 +129,7 @@ export class WorkflowEngine {
       };
 
       // 缓存成功的执行结果
-      this.cacheManager.set(cacheKey, result, 600);  // 10 分钟 TTL
+      this.cacheManager.set(cacheKey, result, 600); // 10 分钟 TTL
 
       // 发送工作流完成事件
       const completePayload: WorkflowEventPayload = {

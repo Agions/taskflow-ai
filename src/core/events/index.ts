@@ -2,11 +2,7 @@
  * Events Module - 事件驱动系统
  */
 
-export {
-  EventBus,
-  getEventBus,
-  createEventBus,
-} from './event-bus';
+export { EventBus, getEventBus, createEventBus } from './event-bus';
 
 export {
   TaskFlowEvent,

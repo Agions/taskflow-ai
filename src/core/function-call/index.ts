@@ -6,10 +6,10 @@
 export * from './types';
 
 // Executor
-export { 
-  FunctionCallingHandler, 
+export {
+  FunctionCallingHandler,
   StructuredOutputHandler,
   ToolBasedFunctionExecutor,
   RegistryFunctionExecutor,
-  getFunctionCallingHandler 
+  getFunctionCallingHandler,
 } from './executor';

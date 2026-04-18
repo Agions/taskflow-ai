@@ -35,7 +35,7 @@ export function createLazy<T>(
   loading: boolean;
 } {
   let lazyModule = lazyModules.get(name);
-  
+
   if (!lazyModule) {
     lazyModule = {
       loaded: false,
@@ -45,30 +45,29 @@ export function createLazy<T>(
     };
     lazyModules.set(name, lazyModule);
   }
-  
+
   return {
     get(): T {
       if (lazyModule!.loaded && lazyModule!.module) {
         return lazyModule!.module as T;
       }
-      throw new Error(
-        `Module ${name} not loaded. Use await loadModule('${name}') first.`
-      );
+      throw new Error(`Module ${name} not loaded. Use await loadModule('${name}') first.`);
     },
-    get loaded() { return lazyModule!.loaded; },
-    get loading() { return lazyModule!.loading; },
+    get loaded() {
+      return lazyModule!.loaded;
+    },
+    get loading() {
+      return lazyModule!.loading;
+    },
   };
 }
 
 /**
  * 加载懒加载模块
  */
-export async function loadModule<T>(
-  name: string,
-  loader: () => Promise<T>
-): Promise<T> {
+export async function loadModule<T>(name: string, loader: () => Promise<T>): Promise<T> {
   let lazyModule = lazyModules.get(name);
-  
+
   if (!lazyModule) {
     lazyModule = {
       loaded: false,
@@ -78,11 +77,11 @@ export async function loadModule<T>(
     };
     lazyModules.set(name, lazyModule);
   }
-  
+
   if (lazyModule.loaded && lazyModule.module) {
     return lazyModule.module as T;
   }
-  
+
   if (lazyModule.loading) {
     return new Promise((resolve, reject) => {
       const checkInterval = setInterval(() => {
@@ -97,9 +96,9 @@ export async function loadModule<T>(
       }, 10);
     });
   }
-  
+
   lazyModule.loading = true;
-  
+
   try {
     logger.debug(`加载懒加载模块: ${name}`);
     const module = await loader();
@@ -148,7 +147,7 @@ export function getLazyModulesStatus(): Array<{
     loading: boolean;
     error: string | null;
   }> = [];
-  
+
   for (const [name, lazyModule] of Array.from(lazyModules.entries())) {
     result.push({
       name,
@@ -157,6 +156,6 @@ export function getLazyModulesStatus(): Array<{
       error: lazyModule.error?.message ?? null,
     });
   }
-  
+
   return result;
 }

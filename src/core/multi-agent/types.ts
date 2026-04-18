@@ -156,7 +156,12 @@ export interface TaskAssignment {
  * 协调器事件
  */
 export interface CoordinatorEvent {
-  type: 'task_assigned' | 'task_completed' | 'agent_status_changed' | 'context_shared' | 'iteration_complete';
+  type:
+    | 'task_assigned'
+    | 'task_completed'
+    | 'agent_status_changed'
+    | 'context_shared'
+    | 'iteration_complete';
   crewId: string;
   data: Record<string, unknown>;
   timestamp: number;

@@ -50,15 +50,15 @@ export const CacheKeys = {
   // PRD 缓存
   prd: (id: string) => `prd:${id}`,
   prdResult: (id: string) => `prd:${id}:result`,
-  
+
   // AI 响应缓存
   aiResponse: (key: string) => `ai:response:${key}`,
   aiEmbedding: (text: string) => `ai:embedding:${text.slice(0, 100)}`,
-  
+
   // 工作流缓存
   workflow: (id: string) => `workflow:${id}`,
   workflowState: (id: string) => `workflow:${id}:state`,
-  
+
   // 用户配置缓存
   userConfig: (userId: string) => `user:config:${userId}`,
   userSession: (sessionId: string) => `user:session:${sessionId}`,
@@ -69,30 +69,30 @@ export class CacheManager {
   private l2: LocalCache | null = null;
   private enableL1: boolean;
   private enableL2: boolean;
-  
+
   constructor(options: CacheOptions = {}) {
     this.enableL1 = options.enableL1 ?? true;
     this.enableL2 = options.enableL2 ?? true;
-    
+
     if (this.enableL1) {
       this.l1 = new MemoryCache<string, unknown>({
         maxSize: options.l1MaxSize ?? 500,
-        maxMemory: options.l1MaxMemory ?? 30,  // 30MB
-        ttl: options.l1Ttl ?? 300,  // 5 分钟
+        maxMemory: options.l1MaxMemory ?? 30, // 30MB
+        ttl: options.l1Ttl ?? 300, // 5 分钟
         evictionPolicy: 'LRU',
       });
     }
-    
+
     if (this.enableL2) {
       this.l2 = new LocalCache({
-        ttl: options.l2Ttl ?? 86400,  // 24 小时
+        ttl: options.l2Ttl ?? 86400, // 24 小时
         cacheDir: options.cacheDir,
       });
     }
-    
+
     logger.info(`CacheManager 初始化: L1=${this.enableL1}, L2=${this.enableL2}`);
   }
-  
+
   /**
    * 获取缓存值
    */
@@ -104,7 +104,7 @@ export class CacheManager {
         return value as T;
       }
     }
-    
+
     // L2 次之
     if (this.l2) {
       const value = this.l2.get<T>(key);
@@ -116,10 +116,10 @@ export class CacheManager {
         return value;
       }
     }
-    
+
     return null;
   }
-  
+
   /**
    * 设置缓存值
    */
@@ -128,13 +128,13 @@ export class CacheManager {
     if (this.l1) {
       this.l1.set(key, value, ttl);
     }
-    
+
     // L2
     if (this.l2) {
       this.l2.set(key, value, ttl);
     }
   }
-  
+
   /**
    * 检查键是否存在
    */
@@ -143,7 +143,7 @@ export class CacheManager {
     if (this.l2?.has(key)) return true;
     return false;
   }
-  
+
   /**
    * 删除缓存
    */
@@ -153,7 +153,7 @@ export class CacheManager {
     if (this.l2?.delete(key)) deleted = true;
     return deleted;
   }
-  
+
   /**
    * 使缓存失效 (支持模式匹配)
    */
@@ -163,7 +163,7 @@ export class CacheManager {
     if (this.l2) count += this.l2.invalidate(pattern);
     return count;
   }
-  
+
   /**
    * 清空所有缓存
    */
@@ -172,18 +172,18 @@ export class CacheManager {
     this.l2?.clear();
     logger.info('缓存已清空');
   }
-  
+
   /**
    * 获取统计信息
    */
   getStats(): CacheStats {
     const l1Stats = this.l1?.getStats() ?? { size: 0, memory: 0, hits: 0, misses: 0, hitRate: 0 };
     const l2Stats = this.l2?.getStats() ?? { size: 0, memory: 0 };
-    
+
     const totalHits = l1Stats.hits;
     const totalMisses = l1Stats.misses;
     const total = totalHits + totalMisses;
-    
+
     return {
       l1: l1Stats as any,
       l2: l2Stats as any,
@@ -192,7 +192,7 @@ export class CacheManager {
       hitRate: total > 0 ? totalHits / total : 0,
     };
   }
-  
+
   /**
    * 关闭缓存
    */

@@ -120,13 +120,13 @@ export interface PluginContext {
 export interface TaskFlowPlugin {
   /** 元数据 */
   manifest: PluginManifest;
-  
+
   /** 生命周期 */
   onLoad(context: PluginContext): Promise<void>;
   onEnable(): Promise<void>;
   onDisable(): Promise<void>;
   onUnload(): Promise<void>;
-  
+
   /** 钩子实现 */
   hooks?: {
     beforeWorkflowExecute?: HookHandler;
@@ -150,4 +150,4 @@ export const BUILTIN_PLUGINS = {
   NOTIFIER: '@taskflow/notifier',
 } as const;
 
-export type BuiltinPluginName = typeof BUILTIN_PLUGINS[keyof typeof BUILTIN_PLUGINS];
+export type BuiltinPluginName = (typeof BUILTIN_PLUGINS)[keyof typeof BUILTIN_PLUGINS];

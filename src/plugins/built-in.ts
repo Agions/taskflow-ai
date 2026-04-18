@@ -14,7 +14,13 @@ export class LoggerPlugin implements TaskFlowPlugin {
     description: '内置日志插件，记录所有事件到控制台',
     author: 'TaskFlow Team',
     main: './built-in/logger.js',
-    hooks: ['beforeWorkflowExecute', 'afterWorkflowComplete', 'onAIRequest', 'onAIResponse', 'onCacheHit'],
+    hooks: [
+      'beforeWorkflowExecute',
+      'afterWorkflowComplete',
+      'onAIRequest',
+      'onAIResponse',
+      'onCacheHit',
+    ],
     permissions: [],
     tags: ['builtin', 'logging'],
   };
@@ -38,7 +44,7 @@ export class LoggerPlugin implements TaskFlowPlugin {
     this.context.logger.info('LoggerPlugin unloaded');
   }
 
-    hooks = {
+  hooks = {
     beforeWorkflowExecute: async (context: HookContext) => {
       this.context.logger.info('[Workflow] 开始执行', context.data);
       return { continue: true };
@@ -82,15 +88,21 @@ export class StoragePlugin implements TaskFlowPlugin {
 
   async onLoad(context: PluginContext): Promise<void> {
     this.context = context;
-    
+
     // 替换上下文中的存储实现
     this.context.storage = {
       get: async (key: string): Promise<unknown> => this.store.get(key),
-      set: async (key: string, value: unknown): Promise<void> => { this.store.set(key, value); },
-      delete: async (key: string): Promise<void> => { this.store.delete(key); },
-      clear: async (): Promise<void> => { this.store.clear(); },
+      set: async (key: string, value: unknown): Promise<void> => {
+        this.store.set(key, value);
+      },
+      delete: async (key: string): Promise<void> => {
+        this.store.delete(key);
+      },
+      clear: async (): Promise<void> => {
+        this.store.clear();
+      },
     };
-    
+
     this.context.logger.info('StoragePlugin loaded');
   }
 
@@ -112,8 +124,5 @@ export class StoragePlugin implements TaskFlowPlugin {
  * 获取所有内置插件
  */
 export function getBuiltInPlugins(): TaskFlowPlugin[] {
-  return [
-    new LoggerPlugin(),
-    new StoragePlugin(),
-  ];
+  return [new LoggerPlugin(), new StoragePlugin()];
 }

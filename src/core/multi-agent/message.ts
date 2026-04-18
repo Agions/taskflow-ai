@@ -54,7 +54,10 @@ export function createAgentMessageWithReasoning(
 /**
  * 消息转 ChatMessage 格式 (用于 AI 模型)
  */
-export function toChatMessage(msg: AgentMessage): { role: 'user' | 'assistant' | 'system'; content: string } {
+export function toChatMessage(msg: AgentMessage): {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+} {
   const prefix = msg.agentName ? `[${msg.agentName}] ` : '';
   return {
     role: msg.role === 'agent' ? 'assistant' : msg.role,
@@ -65,7 +68,9 @@ export function toChatMessage(msg: AgentMessage): { role: 'user' | 'assistant' |
 /**
  * Agent 消息列表转 ChatMessage 格式
  */
-export function toChatMessages(messages: AgentMessage[]): { role: 'user' | 'assistant' | 'system'; content: string }[] {
+export function toChatMessages(
+  messages: AgentMessage[]
+): { role: 'user' | 'assistant' | 'system'; content: string }[] {
   return messages.map(toChatMessage);
 }
 
@@ -78,10 +83,11 @@ export function buildSystemPrompt(
   instructions: string,
   availableTools: string[]
 ): string {
-  const toolsList = availableTools.length > 0 
-    ? `\n\n可用工具:\n${availableTools.map(t => `- ${t}`).join('\n')}`
-    : '';
-  
+  const toolsList =
+    availableTools.length > 0
+      ? `\n\n可用工具:\n${availableTools.map(t => `- ${t}`).join('\n')}`
+      : '';
+
   return `你是 ${agentName}。
   
 角色描述: ${agentDescription}

@@ -35,8 +35,8 @@ export const fileReadTool: Tool = {
   handler: async (params, context): Promise<ToolResult> => {
     try {
       const filePath = join(context.cwd, params.path as string);
-      const content = await readFile(filePath, params.encoding as BufferEncoding || 'utf-8');
-      
+      const content = await readFile(filePath, (params.encoding as BufferEncoding) || 'utf-8');
+
       let result = content.toString();
       if (params.limit && typeof params.limit === 'number') {
         const lines = result.split('\n');
@@ -86,7 +86,11 @@ export const fileWriteTool: Tool = {
   handler: async (params, context): Promise<ToolResult> => {
     try {
       const filePath = join(context.cwd, params.path as string);
-      await writeFile(filePath, params.content as string, params.encoding as BufferEncoding || 'utf-8');
+      await writeFile(
+        filePath,
+        params.content as string,
+        (params.encoding as BufferEncoding) || 'utf-8'
+      );
 
       return {
         success: true,
@@ -127,7 +131,7 @@ export const fileListTool: Tool = {
     try {
       const dirPath = join(context.cwd, (params.path as string) || '.');
       const entries = await readdir(dirPath, { withFileTypes: true });
-      
+
       const files = entries.map(entry => ({
         name: entry.name,
         type: entry.isDirectory() ? 'dir' : 'file',
@@ -214,25 +218,29 @@ export const bashTool: Tool = {
   timeout: 60000,
   retryable: true,
   handler: async (params, _context): Promise<ToolResult> => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const { exec } = require('child_process');
       const command = params.command as string;
       const timeout = (params.timeout as number) || 30000;
 
-      const child = exec(command, { timeout }, async (error: Error | null, stdout: string, stderr: string) => {
-        if (error) {
-          resolve({
-            success: false,
-            error: stderr || error.message,
-            output: stdout,
-          });
-        } else {
-          resolve({
-            success: true,
-            output: stdout,
-          });
+      const child = exec(
+        command,
+        { timeout },
+        async (error: Error | null, stdout: string, stderr: string) => {
+          if (error) {
+            resolve({
+              success: false,
+              error: stderr || error.message,
+              output: stdout,
+            });
+          } else {
+            resolve({
+              success: true,
+              output: stdout,
+            });
+          }
         }
-      });
+      );
     });
   },
 };
@@ -256,7 +264,7 @@ export const gitTool: Tool = {
   },
   timeout: 30000,
   handler: async (params, context): Promise<ToolResult> => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const { exec } = require('child_process');
       const command = `git ${params.command}`;
 
@@ -313,7 +321,7 @@ export const httpRequestTool: Tool = {
   handler: async (params): Promise<ToolResult> => {
     try {
       const response = await fetch(params.url as string, {
-        method: params.method as string || 'GET',
+        method: (params.method as string) || 'GET',
         headers: params.headers as Record<string, string>,
         body: params.body as string,
       });

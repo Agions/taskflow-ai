@@ -33,9 +33,9 @@ export class AgentCrew {
    */
   async create(config: CrewConfig): Promise<string> {
     const crewId = `crew-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-    
+
     const agents = new Map<string, Agent>();
-    
+
     // 创建 Agent 实例
     for (const role of config.roles) {
       const agent: Agent = {
@@ -61,7 +61,7 @@ export class AgentCrew {
     };
 
     this.crews.set(crewId, crew);
-    
+
     logger.info(`Crew created: ${crewId} with ${agents.size} agents`);
     this.emitEvent(crewId, 'crew_created', { agentCount: agents.size });
 
@@ -119,11 +119,10 @@ export class AgentCrew {
 
       this.emitEvent(crewId, 'crew_completed', result as unknown as Record<string, unknown>);
       return result;
-
     } catch (error) {
       crew.status = 'failed';
       errors.push(error instanceof Error ? error.message : String(error));
-      
+
       const result: CrewResult = {
         crewId,
         success: false,
@@ -180,11 +179,14 @@ export class AgentCrew {
   /**
    * 顺序执行
    */
-  private async executeSequential(crew: Crew, task: string): Promise<{ messages: AgentMessage[]; iterations: number }> {
+  private async executeSequential(
+    crew: Crew,
+    task: string
+  ): Promise<{ messages: AgentMessage[]; iterations: number }> {
     const allMessages: AgentMessage[] = [];
     let iterations = 0;
     const maxIterations = crew.config.maxIterations || 10;
-    
+
     // 添加初始任务
     const initialMessage = createAgentMessage('user', task);
     allMessages.push(initialMessage);
@@ -194,15 +196,19 @@ export class AgentCrew {
 
       agent.status = 'thinking';
       this.emitAgentStatus(agent);
-      
+
       // 模拟 Agent 执行
-      const response = await this.simulateAgentExecution(agent, allMessages, crew.config.sharingStrategy || 'minimal');
-      
+      const response = await this.simulateAgentExecution(
+        agent,
+        allMessages,
+        crew.config.sharingStrategy || 'minimal'
+      );
+
       agent.status = 'completed';
       agent.lastActiveAt = Date.now();
       agent.messages.push(response);
       allMessages.push(response);
-      
+
       iterations++;
       this.emitAgentStatus(agent);
     }
@@ -213,14 +219,18 @@ export class AgentCrew {
   /**
    * 层级执行 (按优先级)
    */
-  private async executeHierarchical(crew: Crew, task: string): Promise<{ messages: AgentMessage[]; iterations: number }> {
+  private async executeHierarchical(
+    crew: Crew,
+    task: string
+  ): Promise<{ messages: AgentMessage[]; iterations: number }> {
     const allMessages: AgentMessage[] = [];
     let iterations = 0;
     const maxIterations = crew.config.maxIterations || 10;
 
     // 按优先级排序 Agent
-    const sortedAgents = Array.from(crew.agents.values())
-      .sort((a, b) => (a.role.priority || 0) - (b.role.priority || 0));
+    const sortedAgents = Array.from(crew.agents.values()).sort(
+      (a, b) => (a.role.priority || 0) - (b.role.priority || 0)
+    );
 
     // 初始任务
     allMessages.push(createAgentMessage('user', task));
@@ -255,23 +265,30 @@ export class AgentCrew {
   /**
    * 并行执行
    */
-  private async executeParallel(crew: Crew, task: string): Promise<{ messages: AgentMessage[]; iterations: number }> {
+  private async executeParallel(
+    crew: Crew,
+    task: string
+  ): Promise<{ messages: AgentMessage[]; iterations: number }> {
     const allMessages: AgentMessage[] = [];
     const maxIterations = crew.config.maxIterations || 10;
 
     allMessages.push(createAgentMessage('user', task));
 
     // 并行执行所有 Agent
-    const agentPromises = Array.from(crew.agents.values()).map(async (agent) => {
+    const agentPromises = Array.from(crew.agents.values()).map(async agent => {
       agent.status = 'executing';
       this.emitAgentStatus(agent);
-      
-      const response = await this.simulateAgentExecution(agent, allMessages, crew.config.sharingStrategy || 'minimal');
-      
+
+      const response = await this.simulateAgentExecution(
+        agent,
+        allMessages,
+        crew.config.sharingStrategy || 'minimal'
+      );
+
       agent.status = 'completed';
       agent.lastActiveAt = Date.now();
       agent.messages.push(response);
-      
+
       return response;
     });
 
@@ -307,7 +324,11 @@ export class AgentCrew {
       };
 
       // 模拟流式输出
-      const response = await this.simulateAgentStream(agent, agent.role.instructions, crew.config.sharingStrategy || 'minimal');
+      const response = await this.simulateAgentStream(
+        agent,
+        agent.role.instructions,
+        crew.config.sharingStrategy || 'minimal'
+      );
 
       for await (const chunk of response) {
         yield chunk;
@@ -323,8 +344,9 @@ export class AgentCrew {
    * 流式层级执行
    */
   private async *executeHierarchicalStream(crew: Crew, task: string): AsyncGenerator<StreamEvent> {
-    const sortedAgents = Array.from(crew.agents.values())
-      .sort((a, b) => (a.role.priority || 0) - (b.role.priority || 0));
+    const sortedAgents = Array.from(crew.agents.values()).sort(
+      (a, b) => (a.role.priority || 0) - (b.role.priority || 0)
+    );
 
     yield {
       type: 'message',
@@ -380,13 +402,13 @@ export class AgentCrew {
     };
 
     // 并行执行所有 Agent
-    const agentPromises = Array.from(crew.agents.values()).map(async (agent) => {
+    const agentPromises = Array.from(crew.agents.values()).map(async agent => {
       agent.status = 'executing';
       this.emitAgentStatus(agent);
 
       const chunks: StreamEvent[] = [];
       const stream = this.simulateAgentStream(agent, agent.role.instructions);
-      
+
       for await (const chunk of stream) {
         chunks.push({ ...chunk, agentId: agent.id, agentName: agent.role.name });
       }
@@ -454,7 +476,7 @@ export class AgentCrew {
     _sharingStrategy: SharingStrategy = 'minimal'
   ): AsyncGenerator<StreamEvent> {
     const words = `[${agent.role.name}] 执行中: ${instructions.slice(0, 30)}...`.split(' ');
-    
+
     for (const word of words) {
       yield {
         type: 'message',

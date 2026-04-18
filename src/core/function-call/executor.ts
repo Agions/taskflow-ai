@@ -4,7 +4,15 @@
 
 import { getLogger } from '../../utils/logger';
 import { getToolRegistry, Tool } from '../tools';
-import { FunctionExecutor, FunctionCallResult, FunctionCallingOptions, FunctionDefinition, FunctionCallRequest, FunctionCallResponse, ParallelFunctionCall } from './types';
+import {
+  FunctionExecutor,
+  FunctionCallResult,
+  FunctionCallingOptions,
+  FunctionDefinition,
+  FunctionCallRequest,
+  FunctionCallResponse,
+  ParallelFunctionCall,
+} from './types';
 
 const logger = getLogger('function-call');
 
@@ -16,7 +24,7 @@ export class ToolBasedFunctionExecutor implements FunctionExecutor {
 
   async execute(name: string, args: Record<string, unknown>): Promise<FunctionCallResult> {
     const tool = this.registry.get(name);
-    
+
     if (!tool) {
       return {
         success: false,
@@ -73,7 +81,7 @@ export class FunctionCallingHandler {
     // 实际应连接 ModelGateway 使用模型
 
     const functions = options?.functions || request.functions || [];
-    
+
     if (!functions.length) {
       return {
         finishReason: 'stop',
@@ -99,10 +107,7 @@ export class FunctionCallingHandler {
   /**
    * 执行函数并返回结果
    */
-  async executeFunction(
-    name: string,
-    args: Record<string, unknown>
-  ): Promise<FunctionCallResult> {
+  async executeFunction(name: string, args: Record<string, unknown>): Promise<FunctionCallResult> {
     return this.executor.execute(name, args);
   }
 
@@ -114,12 +119,12 @@ export class FunctionCallingHandler {
     options?: FunctionCallingOptions
   ): Promise<FunctionCallResult[]> {
     const results: FunctionCallResult[] = [];
-    
+
     for (const call of calls) {
       const result = await this.executor.execute(call.name, call.parsedArguments || {});
       results.push(result);
     }
-    
+
     return results;
   }
 
@@ -132,7 +137,7 @@ export class FunctionCallingHandler {
       description: fn.description || '',
       category: 'custom' as const,
       parameters: fn.parameters || { type: 'object', properties: {} },
-      handler: async (args) => ({ success: true, output: JSON.stringify(args) }),
+      handler: async args => ({ success: true, output: JSON.stringify(args) }),
     }));
   }
 }
@@ -153,10 +158,10 @@ export class StructuredOutputHandler {
 
     return {
       finishReason: 'stop',
-      content: JSON.stringify({ 
+      content: JSON.stringify({
         structured: true,
         schema: options?.outputSchema,
-        message: '结构化输出处理' 
+        message: '结构化输出处理',
       }),
     };
   }
@@ -170,12 +175,12 @@ export class StructuredOutputHandler {
   ): Record<string, unknown> | null {
     try {
       const parsed = JSON.parse(text);
-      
+
       // 简单的 schema 验证
       if (this.validateSchema(parsed, schema)) {
         return parsed;
       }
-      
+
       return null;
     } catch {
       return null;
@@ -185,10 +190,7 @@ export class StructuredOutputHandler {
   /**
    * 验证 schema
    */
-  private validateSchema(
-    data: unknown,
-    schema: Record<string, unknown>
-  ): boolean {
+  private validateSchema(data: unknown, schema: Record<string, unknown>): boolean {
     if (typeof data !== 'object' || data === null) {
       return false;
     }
@@ -216,7 +218,7 @@ export class RegistryFunctionExecutor implements FunctionExecutor {
 
   async execute(name: string, args: Record<string, unknown>): Promise<FunctionCallResult> {
     const startTime = Date.now();
-    
+
     try {
       const result = await this.registry.execute(name, args, {
         cwd: process.cwd(),

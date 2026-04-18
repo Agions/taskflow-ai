@@ -47,7 +47,10 @@ export interface Tool {
 /**
  * 工具处理器类型
  */
-export type ToolHandler = (params: Record<string, unknown>, context: ToolContext) => Promise<ToolResult>;
+export type ToolHandler = (
+  params: Record<string, unknown>,
+  context: ToolContext
+) => Promise<ToolResult>;
 
 /**
  * 工具执行上下文

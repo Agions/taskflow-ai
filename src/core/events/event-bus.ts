@@ -4,12 +4,7 @@
  */
 
 import { getLogger } from '../../utils/logger';
-import {
-  Event,
-  EventHandler,
-  Subscription,
-  TaskFlowEvent,
-} from './event-types';
+import { Event, EventHandler, Subscription, TaskFlowEvent } from './event-types';
 
 const logger = getLogger('core/events/bus');
 
@@ -30,10 +25,12 @@ export class EventBus {
   private maxHistorySize: number;
   private enableLogging: boolean;
 
-  constructor(options: {
-    maxHistorySize?: number;
-    enableLogging?: boolean;
-  } = {}) {
+  constructor(
+    options: {
+      maxHistorySize?: number;
+      enableLogging?: boolean;
+    } = {}
+  ) {
     this.maxHistorySize = options.maxHistorySize ?? 1000;
     this.enableLogging = options.enableLogging ?? false;
   }
@@ -41,9 +38,7 @@ export class EventBus {
   /**
    * 添加中间件
    */
-  use(
-    middleware: (event: Event) => Event | Promise<Event>
-  ): void {
+  use(middleware: (event: Event) => Event | Promise<Event>): void {
     this.middleware.push(middleware);
   }
 

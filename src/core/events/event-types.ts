@@ -83,7 +83,7 @@ export interface StepEventPayload {
   executionId: string;
   stepId: string;
   stepName: string;
-  progress?: number;  // 0-100
+  progress?: number; // 0-100
   duration?: number;
   error?: string;
 }

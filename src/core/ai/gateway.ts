@@ -93,7 +93,7 @@ export class ModelGateway {
     this.enableRateLimit = options.enableRateLimit ?? true;
     if (this.enableRateLimit) {
       const limits: Record<string, { rpm: number; rps: number }> = {};
-      
+
       // 合并默认配置和自定义配置
       for (const [provider, config] of Object.entries(DEFAULT_LIMITS)) {
         limits[provider] = { rpm: config.rpm, rps: config.rps };
@@ -103,7 +103,7 @@ export class ModelGateway {
           limits[provider] = config;
         }
       }
-      
+
       this.rateLimiter = new RateLimiter({
         enableQueue: true,
         queueTimeout: 30000,
@@ -120,7 +120,7 @@ export class ModelGateway {
         enableL2: true,
         l1MaxSize: 200,
         l1MaxMemory: 20,
-        l1Ttl: 300,  // 5 分钟
+        l1Ttl: 300, // 5 分钟
         l2Ttl: 86400, // 24 小时
       });
       logger.info('ModelGateway 缓存已启用');
@@ -136,7 +136,10 @@ export class ModelGateway {
    */
   private generateCacheKey(messages: ChatMessage[], model: string): string {
     const content = messages.map(m => `${m.role}:${m.content}`).join('|');
-    const hash = createHash('sha256').update(content + model).digest('hex').slice(0, 32);
+    const hash = createHash('sha256')
+      .update(content + model)
+      .digest('hex')
+      .slice(0, 32);
     return CacheKeys.aiResponse(hash);
   }
 
@@ -257,11 +260,13 @@ export class ModelGateway {
         modelName: model.modelName,
         responseLength: cached.choices?.[0]?.message?.content?.length ?? 0,
         duration: 0,
-        tokens: cached.usage ? {
-          prompt: cached.usage.prompt_tokens,
-          completion: cached.usage.completion_tokens,
-          total: cached.usage.total_tokens,
-        } : undefined,
+        tokens: cached.usage
+          ? {
+              prompt: cached.usage.prompt_tokens,
+              completion: cached.usage.completion_tokens,
+              total: cached.usage.total_tokens,
+            }
+          : undefined,
         cacheHit: true,
         cost: 0,
       };
@@ -313,7 +318,7 @@ export class ModelGateway {
 
         // 缓存结果
         if (this.cacheManager && response.choices && response.choices.length > 0) {
-          this.cacheManager.set(cacheKey, response, 300);  // 5分钟 TTL
+          this.cacheManager.set(cacheKey, response, 300); // 5分钟 TTL
         }
 
         // 发送 AI 响应事件
@@ -322,11 +327,13 @@ export class ModelGateway {
           modelName: model.modelName,
           responseLength: response.choices?.[0]?.message?.content?.length ?? 0,
           duration: Date.now() - startTime,
-          tokens: response.usage ? {
-            prompt: response.usage.prompt_tokens,
-            completion: response.usage.completion_tokens,
-            total: response.usage.total_tokens,
-          } : undefined,
+          tokens: response.usage
+            ? {
+                prompt: response.usage.prompt_tokens,
+                completion: response.usage.completion_tokens,
+                total: response.usage.total_tokens,
+              }
+            : undefined,
           cacheHit: false,
           cost,
         };

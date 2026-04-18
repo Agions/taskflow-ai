@@ -5,7 +5,16 @@
 
 import { getLogger } from '../utils/logger';
 import { getEventBus, TaskFlowEvent } from '../core/events';
-import { TaskFlowPlugin, PluginManifest, PluginInfo, PluginContext, PluginStatus, HookHandler, HookContext, HookResult } from './types';
+import {
+  TaskFlowPlugin,
+  PluginManifest,
+  PluginInfo,
+  PluginContext,
+  PluginStatus,
+  HookHandler,
+  HookContext,
+  HookResult,
+} from './types';
 
 const logger = getLogger('plugins');
 
@@ -33,13 +42,13 @@ export class PluginManager {
   constructor(options: PluginManagerOptions = {}) {
     this.pluginDir = options.pluginDir || './plugins';
     this.autoEnable = options.autoEnable ?? true;
-    
+
     // 创建插件上下文
     this.context = this.createContext();
-    
+
     // 订阅事件系统
     this.setupEventBusHooks();
-    
+
     logger.info(`PluginManager 初始化: pluginDir=${this.pluginDir}, autoEnable=${this.autoEnable}`);
   }
 
@@ -48,7 +57,7 @@ export class PluginManager {
    */
   private createContext(): PluginContext {
     const eventBus = getEventBus();
-    
+
     return {
       config: {
         get: <T>(key: string, defaultValue?: T): T => {
@@ -84,8 +93,10 @@ export class PluginManager {
       logger: {
         info: (message: string, ...meta: unknown[]) => logger.info(`[Plugin] ${message}`, ...meta),
         warn: (message: string, ...meta: unknown[]) => logger.warn(`[Plugin] ${message}`, ...meta),
-        error: (message: string, ...meta: unknown[]) => logger.error(`[Plugin] ${message}`, ...meta),
-        debug: (message: string, ...meta: unknown[]) => logger.debug(`[Plugin] ${message}`, ...meta),
+        error: (message: string, ...meta: unknown[]) =>
+          logger.error(`[Plugin] ${message}`, ...meta),
+        debug: (message: string, ...meta: unknown[]) =>
+          logger.debug(`[Plugin] ${message}`, ...meta),
       },
       storage: {
         get: async (_key: string): Promise<unknown> => undefined,
@@ -101,7 +112,7 @@ export class PluginManager {
    */
   private setupEventBusHooks(): void {
     const eventBus = getEventBus();
-    
+
     // 监听各种事件并触发插件钩子
     const hookMap: Record<string, TaskFlowEvent[]> = {
       beforeWorkflowExecute: [TaskFlowEvent.WORKFLOW_START],
