@@ -76,7 +76,7 @@ chmod +x install.sh
 ./install.sh --yarn
 ```
 
-### 2. 项目本地安装
+### 4. 项目本地安装
 
 如果你只想在特定项目中使用 TaskFlow AI：
 
@@ -145,6 +145,65 @@ choco install taskflow-ai
 # 安装
 sudo snap install taskflow-ai
 ```
+
+### 6. 安装脚本选项
+
+安装脚本 `install.sh` 支持多种选项：
+
+```bash
+# 查看帮助
+./install.sh --help
+
+# 仅检查环境
+./install.sh --check
+
+# 指定包管理器
+./install.sh --npm
+./install.sh --pnpm
+./install.sh --yarn
+
+# 卸载
+./install.sh --uninstall
+
+# 跳过配置初始化
+./install.sh --skip-config
+```
+
+脚本会自动检测系统环境和可用包管理器。如不指定，将按以下优先级选择：
+1. pnpm (如果已安装)
+2. yarn (如果已安装)
+3. npm (默认)
+
+### 7. 安装脚本工作流程
+
+安装脚本执行以下步骤：
+
+1. **环境检测**
+   - 检测操作系统 (Linux/macOS/WSL/Windows)
+   - 检测 CPU 架构 (x64/arm64)
+   - 检测 Node.js 版本
+
+2. **Node.js 验证**
+   - 检查 Node.js 是否已安装
+   - 验证版本 >= 18.0.0
+
+3. **包管理器检测**
+   - 自动选择可用的包管理器
+   - 或使用用户指定的包管理器
+
+4. **卸载旧版本** (如果存在)
+   - 清理 npm/yarn/pnpm 全局安装
+
+5. **安装 TaskFlow AI**
+   - 使用选定的包管理器全局安装
+
+6. **验证安装**
+   - 检查 `taskflow` 命令是否可用
+   - 显示安装版本
+
+7. **初始化配置** (可选)
+   - 创建配置文件
+   - 设置默认配置项
 
 ## 初始配置
 

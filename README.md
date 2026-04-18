@@ -196,7 +196,13 @@ TaskFlow AI 内置多层安全防护：
 <a name="安装"></a>
 
 ```bash
-# npm (推荐)
+# 一键安装 (Linux/macOS/WSL) - 推荐
+curl -fsSL https://raw.githubusercontent.com/Agions/taskflow-ai/main/scripts/install.sh | bash
+
+# Windows (PowerShell)
+iwr -useb https://raw.githubusercontent.com/Agions/taskflow-ai/main/scripts/install.ps1 | iex
+
+# npm
 npm install -g taskflow-ai
 
 # pnpm
@@ -205,6 +211,8 @@ pnpm add -g taskflow-ai
 # yarn
 yarn global add taskflow-ai
 ```
+
+> 💡 使用一键安装脚本，自动检测环境并配置，无忧安装。
 
 ### 初始化
 
