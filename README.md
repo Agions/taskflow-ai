@@ -13,7 +13,7 @@
 [![codecov](https://img.shields.io/codecov/c/github/Agions/taskflow-ai?style=for-the-badge)](https://codecov.io/gh/Agions/taskflow-ai)
 [![GitHub Stars](https://img.shields.io/github/stars/Agions/taskflow-ai?style=for-the-badge)](https://github.com/Agions/taskflow-ai/stargazers)
 
-> **📦 最新版本: v2.2.0** — 支持 npm 发布 · 2026-04-17
+> **📦 最新版本: v3.0.0** — 事件驱动架构 · 多Agent协作 · 2026-04-18
 
 **专为开发团队打造的下一代 AI 开发工具 · 企业级生产就绪**
 
@@ -156,24 +156,111 @@ taskflow mcp init -e claude-desktop
 **自主执行，智能协作**
 
 ```typescript
-// 创建自定义 Agent
-const agent = await taskflow.agent.create({
-  name: 'code-reviewer',
-  goal: '自动化代码审查',
-  skills: ['typescript', 'security', 'performance'],
-  maxIterations: 10,
+// 创建多 Agent 团队
+const crew = await taskflow.crew.create({
+  roles: [
+    { id: 'planner', name: '任务规划师', model: 'deepseek-chat',
+      instructions: '负责分析需求，制定执行计划' },
+    { id: 'coder', name: '代码工程师', model: 'deepseek-chat',
+      instructions: '负责代码实现和测试' },
+  ],
+  coordination: 'hierarchical', // sequential | hierarchical | parallel
 });
 
-// 分配任务
-await agent.execute('审查 PR #123 的安全性');
+// 执行任务
+const result = await crew.execute('实现一个用户注册功能');
 ```
 
-**核心能力**:
+**支持三种协调模式**:
 
-- 🎯 **自主目标分解** - 复杂任务自动拆解
-- 🔄 **协作消息传递** - Agent 间智能通信
-- 🧠 **短期/长期记忆** - 上下文持续积累
-- 📈 **性能监控** - 实时追踪执行状态
+- 🔄 **Sequential** - 顺序执行，每个 Agent 依次处理
+- 🏛️ **Hierarchical** - 层级协作，规划者分配任务给执行者
+- ⚡ **Parallel** - 并行执行，多个 Agent 同时工作
+
+### 🔌 事件驱动架构
+
+**松耦合，实时响应**
+
+TaskFlow AI 内置 EventBus 事件系统，模块间通过事件通信：
+
+```typescript
+// 订阅事件
+eventBus.on('workflow:complete', (data) => {
+  console.log('工作流完成:', data);
+});
+
+// 发送事件
+eventBus.emit({
+  type: TaskFlowEvent.WORKFLOW_COMPLETE,
+  payload: { workflowId, duration },
+});
+```
+
+**事件类型**: WORKFLOW_START/COMPLETE/ERROR, STEP_START/COMPLETE, AI_REQUEST/RESPONSE, CACHE_HIT
+
+### 🛠️ 插件系统
+
+**可扩展，零配置**
+
+```typescript
+// 注册插件
+const plugin = {
+  manifest: { name: 'my-plugin', version: '1.0.0' },
+  hooks: {
+    beforeWorkflowExecute: async (ctx) => ({ continue: true }),
+  },
+};
+pluginManager.register(plugin);
+```
+
+**内置插件**: LoggerPlugin, StoragePlugin
+
+### ⚡ 工具系统 (Tool Use)
+
+**20+ 内置工具，开箱即用**
+
+| 类别 | 工具 |
+|------|------|
+| 📁 文件系统 | file_read, file_write, file_list, file_search |
+| 💻 系统 | bash, git |
+| 🌐 网络 | http_request, web_search |
+| 📊 代码 | code_search, code_analysis |
+
+### 🎯 Function Calling
+
+**结构化输出，类型安全**
+
+```typescript
+// 定义函数
+const functions = [{
+  name: 'get_weather',
+  description: '获取天气信息',
+  parameters: { type: 'object', properties: { city: { type: 'string' } } }
+}];
+
+// 执行函数调用
+const result = await functionCaller.handle({ functions }, { city: '杭州' });
+```
+
+### 📊 智能限流
+
+**保护 API 配额，避免限速**
+
+```typescript
+// ModelGateway 自动限流
+const gateway = new ModelGateway({
+  models,
+  enableRateLimit: true,
+  rateLimits: {
+    deepseek: { rpm: 60, rps: 10 },
+    openai: { rpm: 500, rps: 100 },
+  }
+});
+```
+
+---
+
+## 🚀 快速开始
 
 ### 🛡️ 企业级安全防护
 

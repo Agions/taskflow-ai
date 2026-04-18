@@ -5,6 +5,78 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 并且本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [3.0.0] - 2026-04-18
+
+### 🚀 v3.0.0 Major Upgrade - 事件驱动架构
+
+这是 TaskFlow AI 的重大版本升级，带来全新的事件驱动架构和多项核心功能增强。
+
+#### Added
+
+##### 核心架构
+
+- **EventBus 事件驱动系统** (`src/core/events/`)
+  - `TaskFlowEvent` 枚举定义所有事件类型
+  - 支持同步/异步发布、订阅、通配符、中间件
+  - 事件历史记录 (`getHistory()`)
+  - 内置事件: WORKFLOW_*, STEP_*, AI_*, CACHE_* 事件
+
+- **多级缓存系统** (`src/core/cache/`)
+  - `MemoryCache` - L1 内存 LRU 缓存 (20MB, 5分钟 TTL)
+  - `LocalCache` - L2 文件持久化缓存 (24小时 TTL)
+  - `CacheManager` - 分层缓存调度
+
+- **网络层优化** (`src/core/network/`)
+  - `RateLimiter` - 令牌桶限流 (RPM/RPS 控制)
+  - `RetryHandler` - 指数退避重试机制
+
+##### 插件系统
+
+- **PluginManager** (`src/plugins/`)
+  - 插件生命周期: onLoad → onEnable → onDisable → onUnload
+  - 钩子系统: beforeWorkflowExecute, afterWorkflowComplete, onAIRequest, onAIResponse, onCacheHit
+  - 内置插件: LoggerPlugin, StoragePlugin
+  - 自动集成 EventBus
+
+##### 多 Agent 协作
+
+- **AgentCrew** (`src/core/multi-agent/`)
+  - 三种协调模式: sequential, hierarchical, parallel
+  - 流式执行支持
+  - 团队状态管理 (pause/resume/stop)
+  - 消息历史管理 (MessageHistory)
+  - 上下文共享策略: full, minimal, contextual
+
+##### 工具系统
+
+- **ToolRegistry** (`src/core/tools/`)
+  - 工具注册/查找/执行/统计
+  - 内置工具: file_read, file_write, file_list, file_search, bash, git, http_request
+  - 工具类别: filesystem, system, network, code, database
+  - 调用历史和统计
+  - 超时控制和重试机制
+
+##### Function Calling
+
+- **FunctionCallingHandler** (`src/core/function-call/`)
+  - 函数调用处理器
+  - StructuredOutputHandler - 结构化输出
+  - 并行函数调用支持
+  - RegistryFunctionExecutor - 工具注册表适配器
+
+##### ModelGateway 增强
+
+- 集成 RateLimiter 限流
+- 集成多级缓存
+- 集成 EventBus 事件发射
+- 新增 `getRateLimitStats()` 方法
+
+#### Changed
+
+- **版本号升级** — v2.2.1 → v3.0.0
+- **.gitignore 更新** — 添加 REFORM_PLAN*.md 忽略规则
+- **构建优化** — 增量编译 (2157KB → 2220KB)
+
 ## [2.2.0] - 2026-04-17
 
 ### 🚀 Architecture Upgrade - 架构升级
