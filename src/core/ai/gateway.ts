@@ -1,6 +1,7 @@
 import { getLogger } from '../../utils/logger';
 import { CacheManager, CacheKeys } from '../cache';
 import { getEventBus, TaskFlowEvent, AIRequestPayload, AIResponsePayload } from '../events';
+import { RateLimiter, DEFAULT_LIMITS } from '../network/rate-limiter';
 
 const logger = getLogger('module');
 /**
@@ -29,6 +30,10 @@ export interface ModelGatewayOptions {
   retryDelay?: number;
   /** 启用缓存 */
   enableCache?: boolean;
+  /** 启用限流 */
+  enableRateLimit?: boolean;
+  /** 限流配置 */
+  rateLimits?: Record<string, { rpm: number; rps: number }>;
 }
 
 export interface CompletionRequest {
@@ -74,6 +79,8 @@ export class ModelGateway {
   private cacheManager: CacheManager | null = null;
   private enableCache: boolean;
   private eventBus = getEventBus();
+  private rateLimiter: RateLimiter | null = null;
+  private enableRateLimit: boolean;
 
   constructor(options: ModelGatewayOptions) {
     this.defaultRouter = options.defaultRouter || 'smart';
@@ -81,6 +88,30 @@ export class ModelGateway {
     this.maxRetries = options.maxRetries ?? 2;
     this.retryDelay = options.retryDelay ?? 1000;
     this.enableCache = options.enableCache ?? true;
+
+    // 初始化限流器
+    this.enableRateLimit = options.enableRateLimit ?? true;
+    if (this.enableRateLimit) {
+      const limits: Record<string, { rpm: number; rps: number }> = {};
+      
+      // 合并默认配置和自定义配置
+      for (const [provider, config] of Object.entries(DEFAULT_LIMITS)) {
+        limits[provider] = { rpm: config.rpm, rps: config.rps };
+      }
+      if (options.rateLimits) {
+        for (const [provider, config] of Object.entries(options.rateLimits)) {
+          limits[provider] = config;
+        }
+      }
+      
+      this.rateLimiter = new RateLimiter({
+        enableQueue: true,
+        queueTimeout: 30000,
+        maxQueueSize: 100,
+        limits,
+      });
+      logger.info('ModelGateway 限流已启用');
+    }
 
     // 初始化缓存管理器
     if (this.enableCache) {
@@ -268,6 +299,11 @@ export class ModelGateway {
 
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       try {
+        // 等待限流令牌
+        if (this.rateLimiter) {
+          await this.rateLimiter.acquire(model.provider);
+        }
+
         const response = await adapter.complete(options);
 
         const cost = adapter.estimateCost(
@@ -394,6 +430,11 @@ export class ModelGateway {
   /** 获取缓存统计 */
   getCacheStats() {
     return this.cacheManager?.getStats() ?? null;
+  }
+
+  /** 获取限流统计 */
+  getRateLimitStats() {
+    return this.rateLimiter?.getStats() ?? null;
   }
 
   /** 清空缓存 */
