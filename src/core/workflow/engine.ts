@@ -1,4 +1,6 @@
 import { getLogger } from '../../utils/logger';
+import { CacheManager, CacheKeys } from '../cache';
+
 /**
  * 工作流引擎控制器
  * 负责管理工作流的执行流程
@@ -17,9 +19,19 @@ export type ExecutionMode = 'sequential' | 'parallel';
 export class WorkflowEngine {
   private logger: Logger;
   private executions: Map<string, WorkflowExecution> = new Map();
+  private cacheManager: CacheManager;
 
   constructor() {
     this.logger = Logger.getInstance('WorkflowEngine');
+    this.cacheManager = new CacheManager({
+      enableL1: true,
+      enableL2: true,
+      l1MaxSize: 100,
+      l1MaxMemory: 10,
+      l1Ttl: 600,  // 10 分钟
+      l2Ttl: 86400, // 24 小时
+    });
+    logger.info('WorkflowEngine 缓存已启用');
   }
 
   /**
@@ -27,6 +39,20 @@ export class WorkflowEngine {
    */
   async execute(workflow: Workflow, input?: Record<string, unknown>): Promise<ExecutionResult> {
     const startTime = Date.now();
+
+    // 生成缓存键
+    const cacheKey = CacheKeys.workflow(workflow.id);
+    
+    // 尝试从缓存获取已完成的工作流结果
+    const cachedResult = this.cacheManager.get<ExecutionResult>(cacheKey);
+    if (cachedResult && cachedResult.success) {
+      this.logger.info(`工作流缓存命中: ${workflow.name}`);
+      // 返回缓存结果的副本
+      return {
+        ...cachedResult,
+        duration: Date.now() - startTime,
+      };
+    }
 
     const context: ExecutionContext = {
       variables: { ...workflow.variables, ...input },
@@ -65,12 +91,17 @@ export class WorkflowEngine {
 
       this.logger.info(`工作流执行完成: ${execution.id}`);
 
-      return {
+      const result: ExecutionResult = {
         success: true,
         execution,
         output: context.outputs,
         duration: Date.now() - startTime,
       };
+
+      // 缓存成功的执行结果
+      this.cacheManager.set(cacheKey, result, 600);  // 10 分钟 TTL
+
+      return result;
     } catch (error) {
       execution.status = 'failed';
       execution.error = error instanceof Error ? error.message : String(error);

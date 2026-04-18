@@ -1,4 +1,6 @@
 import { getLogger } from '../../utils/logger';
+import { CacheManager, CacheKeys } from '../cache';
+
 const logger = getLogger('module');
 /**
  * 模型网关 - 统一入口
@@ -11,6 +13,7 @@ import { DeepSeekAdapter } from './providers/deepseek';
 import { OpenAIAdapter } from './providers/openai';
 import { AnthropicAdapter } from './providers/anthropic';
 import { createRouter, RouterStrategy, RoutingResult } from './router';
+import { createHash } from 'crypto';
 
 export interface ModelGatewayOptions {
   /** 模型配置列表 */
@@ -23,6 +26,8 @@ export interface ModelGatewayOptions {
   maxRetries?: number;
   /** 重试延迟 (ms) */
   retryDelay?: number;
+  /** 启用缓存 */
+  enableCache?: boolean;
 }
 
 export interface CompletionRequest {
@@ -65,16 +70,41 @@ export class ModelGateway {
   private maxRetries: number;
   private retryDelay: number;
   private enabledModels: ModelConfig[] = [];
+  private cacheManager: CacheManager | null = null;
+  private enableCache: boolean;
 
   constructor(options: ModelGatewayOptions) {
     this.defaultRouter = options.defaultRouter || 'smart';
     this.enableFallback = options.enableFallback ?? true;
     this.maxRetries = options.maxRetries ?? 2;
     this.retryDelay = options.retryDelay ?? 1000;
+    this.enableCache = options.enableCache ?? true;
+
+    // 初始化缓存管理器
+    if (this.enableCache) {
+      this.cacheManager = new CacheManager({
+        enableL1: true,
+        enableL2: true,
+        l1MaxSize: 200,
+        l1MaxMemory: 20,
+        l1Ttl: 300,  // 5 分钟
+        l2Ttl: 86400, // 24 小时
+      });
+      logger.info('ModelGateway 缓存已启用');
+    }
 
     for (const config of options.models) {
       this.addModel(config);
     }
+  }
+
+  /**
+   * 生成缓存键
+   */
+  private generateCacheKey(messages: ChatMessage[], model: string): string {
+    const content = messages.map(m => `${m.role}:${m.content}`).join('|');
+    const hash = createHash('sha256').update(content + model).digest('hex').slice(0, 32);
+    return CacheKeys.aiResponse(hash);
   }
 
   /** 添加模型 */
@@ -174,6 +204,20 @@ export class ModelGateway {
       options.messages = [{ role: 'system', content: request.systemPrompt }, ...options.messages];
     }
 
+    // 生成缓存键
+    const cacheKey = this.generateCacheKey(options.messages, model.modelName);
+    const cached = this.cacheManager?.get<ChatCompletionResponse>(cacheKey);
+    if (cached) {
+      logger.debug(`缓存命中: ${cacheKey}`);
+      return {
+        response: cached,
+        model,
+        routing,
+        cost: 0,
+        latency: 0,
+      };
+    }
+
     let lastError: Error | null = null;
     const startTime = Date.now();
 
@@ -185,6 +229,11 @@ export class ModelGateway {
           response.usage?.prompt_tokens || 0,
           response.usage?.completion_tokens || 0
         );
+
+        // 缓存结果
+        if (this.cacheManager && response.choices && response.choices.length > 0) {
+          this.cacheManager.set(cacheKey, response, 300);  // 5分钟 TTL
+        }
 
         return {
           response,
@@ -274,6 +323,16 @@ export class ModelGateway {
   /** 查找支持特定能力的模型 */
   findByCapability(capability: ModelCapability): ModelConfig[] {
     return this.enabledModels.filter(m => m.capabilities.includes(capability));
+  }
+
+  /** 获取缓存统计 */
+  getCacheStats() {
+    return this.cacheManager?.getStats() ?? null;
+  }
+
+  /** 清空缓存 */
+  clearCache(): void {
+    this.cacheManager?.clear();
   }
 
   /** 睡眠辅助函数 */
