@@ -1,5 +1,6 @@
 import { getLogger } from '../../utils/logger';
 import { CacheManager, CacheKeys } from '../cache';
+import { getEventBus, TaskFlowEvent, WorkflowEventPayload } from '../events';
 
 /**
  * 工作流引擎控制器
@@ -20,6 +21,7 @@ export class WorkflowEngine {
   private logger: Logger;
   private executions: Map<string, WorkflowExecution> = new Map();
   private cacheManager: CacheManager;
+  private eventBus = getEventBus();
 
   constructor() {
     this.logger = Logger.getInstance('WorkflowEngine');
@@ -47,6 +49,21 @@ export class WorkflowEngine {
     const cachedResult = this.cacheManager.get<ExecutionResult>(cacheKey);
     if (cachedResult && cachedResult.success) {
       this.logger.info(`工作流缓存命中: ${workflow.name}`);
+
+      // 发送工作流完成事件 (缓存)
+      const payload: WorkflowEventPayload = {
+        workflowId: workflow.id,
+        workflowName: workflow.name,
+        executionId: cachedResult.execution.id,
+        duration: Date.now() - startTime,
+      };
+      this.eventBus.emit({
+        type: TaskFlowEvent.WORKFLOW_COMPLETE,
+        payload,
+        timestamp: Date.now(),
+        source: 'WorkflowEngine',
+      });
+
       // 返回缓存结果的副本
       return {
         ...cachedResult,
@@ -73,6 +90,19 @@ export class WorkflowEngine {
 
     this.executions.set(execution.id, execution);
     this.logger.info(`开始执行工作流: ${workflow.name} (${execution.id})`);
+
+    // 发送工作流开始事件
+    const startPayload: WorkflowEventPayload = {
+      workflowId: workflow.id,
+      workflowName: workflow.name,
+      executionId: execution.id,
+    };
+    this.eventBus.emit({
+      type: TaskFlowEvent.WORKFLOW_START,
+      payload: startPayload,
+      timestamp: Date.now(),
+      source: 'WorkflowEngine',
+    });
 
     try {
       const validation = this.validateWorkflow(workflow);
@@ -101,6 +131,20 @@ export class WorkflowEngine {
       // 缓存成功的执行结果
       this.cacheManager.set(cacheKey, result, 600);  // 10 分钟 TTL
 
+      // 发送工作流完成事件
+      const completePayload: WorkflowEventPayload = {
+        workflowId: workflow.id,
+        workflowName: workflow.name,
+        executionId: execution.id,
+        duration: result.duration,
+      };
+      this.eventBus.emit({
+        type: TaskFlowEvent.WORKFLOW_COMPLETE,
+        payload: completePayload,
+        timestamp: Date.now(),
+        source: 'WorkflowEngine',
+      });
+
       return result;
     } catch (error) {
       execution.status = 'failed';
@@ -108,6 +152,20 @@ export class WorkflowEngine {
       execution.finishedAt = Date.now();
 
       this.logger.error(`工作流执行失败: ${execution.id}`, error);
+
+      // 发送工作流错误事件
+      const errorPayload: WorkflowEventPayload = {
+        workflowId: workflow.id,
+        workflowName: workflow.name,
+        executionId: execution.id,
+        error: execution.error,
+      };
+      this.eventBus.emit({
+        type: TaskFlowEvent.WORKFLOW_ERROR,
+        payload: errorPayload,
+        timestamp: Date.now(),
+        source: 'WorkflowEngine',
+      });
 
       return {
         success: false,

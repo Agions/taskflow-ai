@@ -1,5 +1,6 @@
 import { getLogger } from '../../utils/logger';
 import { CacheManager, CacheKeys } from '../cache';
+import { getEventBus, TaskFlowEvent, AIRequestPayload, AIResponsePayload } from '../events';
 
 const logger = getLogger('module');
 /**
@@ -72,6 +73,7 @@ export class ModelGateway {
   private enabledModels: ModelConfig[] = [];
   private cacheManager: CacheManager | null = null;
   private enableCache: boolean;
+  private eventBus = getEventBus();
 
   constructor(options: ModelGatewayOptions) {
     this.defaultRouter = options.defaultRouter || 'smart';
@@ -209,6 +211,36 @@ export class ModelGateway {
     const cached = this.cacheManager?.get<ChatCompletionResponse>(cacheKey);
     if (cached) {
       logger.debug(`缓存命中: ${cacheKey}`);
+
+      // 发送缓存命中事件
+      this.eventBus.emit({
+        type: TaskFlowEvent.CACHE_HIT,
+        payload: { cacheType: 'l1', key: cacheKey },
+        timestamp: Date.now(),
+        source: 'ModelGateway',
+      });
+
+      // 发送 AI 响应事件 (缓存)
+      const responsePayload: AIResponsePayload = {
+        modelId: model.id,
+        modelName: model.modelName,
+        responseLength: cached.choices?.[0]?.message?.content?.length ?? 0,
+        duration: 0,
+        tokens: cached.usage ? {
+          prompt: cached.usage.prompt_tokens,
+          completion: cached.usage.completion_tokens,
+          total: cached.usage.total_tokens,
+        } : undefined,
+        cacheHit: true,
+        cost: 0,
+      };
+      this.eventBus.emit({
+        type: TaskFlowEvent.AI_RESPONSE,
+        payload: responsePayload,
+        timestamp: Date.now(),
+        source: 'ModelGateway',
+      });
+
       return {
         response: cached,
         model,
@@ -220,6 +252,19 @@ export class ModelGateway {
 
     let lastError: Error | null = null;
     const startTime = Date.now();
+
+    // 发送 AI 请求事件
+    this.eventBus.emit({
+      type: TaskFlowEvent.AI_REQUEST,
+      payload: {
+        modelId: model.id,
+        modelName: model.modelName,
+        promptLength: options.messages.reduce((sum, m) => sum + (m.content?.length ?? 0), 0),
+        cacheKey,
+      },
+      timestamp: Date.now(),
+      source: 'ModelGateway',
+    });
 
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       try {
@@ -234,6 +279,27 @@ export class ModelGateway {
         if (this.cacheManager && response.choices && response.choices.length > 0) {
           this.cacheManager.set(cacheKey, response, 300);  // 5分钟 TTL
         }
+
+        // 发送 AI 响应事件
+        const responsePayload: AIResponsePayload = {
+          modelId: model.id,
+          modelName: model.modelName,
+          responseLength: response.choices?.[0]?.message?.content?.length ?? 0,
+          duration: Date.now() - startTime,
+          tokens: response.usage ? {
+            prompt: response.usage.prompt_tokens,
+            completion: response.usage.completion_tokens,
+            total: response.usage.total_tokens,
+          } : undefined,
+          cacheHit: false,
+          cost,
+        };
+        this.eventBus.emit({
+          type: TaskFlowEvent.AI_RESPONSE,
+          payload: responsePayload,
+          timestamp: Date.now(),
+          source: 'ModelGateway',
+        });
 
         return {
           response,
