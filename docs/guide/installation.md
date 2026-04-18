@@ -20,7 +20,21 @@
 
 ## 安装方式
 
-### 1. 全局安装（推荐）
+### 1. 一键安装（推荐）
+
+**Linux / macOS / WSL:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Agions/taskflow-ai/main/scripts/install.sh | bash
+```
+
+**Windows (PowerShell):**
+
+```powershell
+iwr -useb https://raw.githubusercontent.com/Agions/taskflow-ai/main/scripts/install.ps1 | iex
+```
+
+### 2. 全局安装
 
 全局安装可以在任何目录下使用 `taskflow` 命令：
 
@@ -40,6 +54,26 @@ pnpm add -g taskflow-ai
 ```bash
 taskflow --version
 taskflow --help
+```
+
+### 3. 离线/定制安装
+
+下载安装脚本到本地后安装：
+
+```bash
+# 下载脚本
+curl -fsSL https://raw.githubusercontent.com/Agions/taskflow-ai/main/scripts/install.sh -o install.sh
+
+# 添加执行权限
+chmod +x install.sh
+
+# 运行安装脚本
+./install.sh
+
+# 或指定包管理器
+./install.sh --npm
+./install.sh --pnpm
+./install.sh --yarn
 ```
 
 ### 2. 项目本地安装
@@ -64,7 +98,7 @@ npx taskflow --version
 npx taskflow init
 ```
 
-### 3. 从源码安装
+### 4. 从源码安装
 
 适合开发者或需要最新功能的用户：
 
@@ -86,7 +120,7 @@ npm link
 taskflow --version
 ```
 
-### 4. 使用包管理器
+### 5. 使用包管理器
 
 #### Homebrew (macOS)
 
