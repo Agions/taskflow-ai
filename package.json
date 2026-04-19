@@ -1,0 +1,260 @@
+{
+  "name": "taskflow-ai",
+  "version": "3.0.1",
+  "private": false,
+  "description": "TaskFlow AI - 智能PRD文档解析与任务管理助手，支持多模型AI协同、MCP编辑器集成，专为开发团队设计的CLI工具",
+  "logo": "assets/logo.svg",
+  "main": "dist/cli/index.js",
+  "types": "dist/cli/index.d.ts",
+  "bin": {
+    "taskflow": "bin/index.js",
+    "taskflow-ai": "bin/index.js"
+  },
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "node build.js",
+    "build:fast": "tsc --skipLibCheck",
+    "build:clean": "node build.js --clean",
+    "build:watch": "node build.js --watch",
+    "build:inc": "node build.js --incremental",
+    "prepublishOnly": "npm run quality && npm run build",
+    "prepack": "npm run build",
+    "postpack": "echo 'Package ready for publishing'",
+    "prepublish": "npm run check",
+    "release": "release-it",
+    "release:dry": "release-it --dry-run",
+    "release:patch": "release-it patch",
+    "release:minor": "release-it minor",
+    "release:major": "release-it major",
+    "release:beta": "release-it --preRelease=beta",
+    "release:alpha": "release-it --preRelease=alpha",
+    "publish:patch": "npm run check && npm version patch && npm publish",
+    "publish:minor": "npm run check && npm version minor && npm publish",
+    "publish:major": "npm run check && npm version major && npm publish",
+    "publish:beta": "npm run check && npm version prerelease --preid=beta && npm publish --tag beta",
+    "publish:alpha": "npm run check && npm version prerelease --preid=alpha && npm publish --tag alpha",
+    "publish:dry": "npm run check && npm publish --dry-run",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --ci --coverage --reporters=default --reporters=jest-junit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "type-check": "tsc --noEmit",
+    "type-check:fast": "tsc --noEmit --skipLibCheck",
+    "quality": "npm run type-check && npm run lint && npm run format:check && npm run test",
+    "quality:fast": "npm run type-check:fast && npm run lint && npm run test",
+    "check": "npm run type-check && npm run lint && npm run format:check",
+    "check:fix": "npm run lint:fix && npm run format",
+    "ci": "npm run quality && npm run build",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "docs:deploy": "bash scripts/deploy-docs.sh",
+    "clean": "rm -rf dist coverage .nyc_output",
+    "clean:all": "rm -rf dist coverage .nyc_output node_modules docs/node_modules docs/.vitepress/dist",
+    "mcp": "node dist/mcp/stdio-server.js",
+    "mcp:dev": "npm run build && node dist/mcp/stdio-server.js",
+    "mcp:start": "npm run mcp",
+    "verify": "npm run check && npm run build && npm run test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "postinstall": "node -e \"console.log('\\n🎉 TaskFlow AI 安装成功！\\n运行 taskflow --help 开始使用\\n')\""
+  },
+  "keywords": [
+    "ai",
+    "task-management",
+    "prd-parser",
+    "project-planning",
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "docker-mcp-registry",
+    "ai-orchestration",
+    "project-orchestration",
+    "cursor",
+    "windsurf",
+    "trae",
+    "vscode",
+    "claude-desktop",
+    "deepseek",
+    "zhipu",
+    "qwen",
+    "cli-tool",
+    "typescript"
+  ],
+  "author": {
+    "name": "Agions",
+    "email": "contact@agions.com",
+    "url": "https://github.com/Agions"
+  },
+  "contributors": [
+    {
+      "name": "Agions Team",
+      "url": "https://github.com/Agions"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Agions/taskflow-ai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Agions/taskflow-ai/issues",
+    "email": "support@agions.com"
+  },
+  "homepage": "https://agions.github.io/taskflow-ai/",
+  "documentation": "https://agions.github.io/taskflow-ai/",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/Agions"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.27.1",
+    "@xstate/fsm": "^2.1.0",
+    "axios": "^1.6.7",
+    "boxen": "^5.1.2",
+    "chalk": "^4.1.2",
+    "cli-spinners": "^2.9.2",
+    "commander": "^12.0.0",
+    "conf": "^10.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.4.1",
+    "figlet": "^1.7.0",
+    "fs-extra": "^11.2.0",
+    "gradient-string": "^2.0.2",
+    "handlebars": "^4.7.8",
+    "inquirer": "^8.2.6",
+    "js-yaml": "^4.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "log-update": "^5.0.1",
+    "markdown-it": "^14.1.0",
+    "minimatch": "10.2.4",
+    "ora": "^5.4.1",
+    "socket.io": "4.8.3",
+    "sql.js": "^1.14.1",
+    "tar": "^7.5.9",
+    "term-size": "^3.0.2",
+    "undici": "7.24.4",
+    "winston": "^3.17.0",
+    "xstate": "^5.28.0",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@playwright/test": "1.58.2",
+    "@release-it/conventional-changelog": "10.0.6",
+    "@types/chalk": "^0.4.31",
+    "@types/cli-spinners": "^1.3.3",
+    "@types/conf": "^2.1.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.3",
+    "@types/figlet": "^1.5.8",
+    "@types/fs-extra": "^11.0.4",
+    "@types/gradient-string": "^1.1.6",
+    "@types/inquirer": "^9.0.8",
+    "@types/jest": "^29.5.14",
+    "@types/js-yaml": "^4.0.9",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/markdown-it": "^13.0.9",
+    "@types/node": "^20.11.25",
+    "@types/winston": "^2.4.4",
+    "@types/ws": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^10.1.8",
+    "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "playwright": "1.58.2",
+    "pnpm": "9.15.9",
+    "prettier": "^3.2.5",
+    "release-it": "19.2.4",
+    "ts-jest": "^29.4.6",
+    "typescript": "5.9.3",
+    "vitepress": "1.6.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "files": [
+    "bin",
+    "dist",
+    "assets",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "overrides": {
+    "esbuild": "^0.25.0",
+    "vite": "^6.1.7",
+    "release-it": {
+      "undici": "^6.24.0"
+    }
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release v${version}",
+      "tagName": "v${version}",
+      "requireBranch": "main"
+    },
+    "npm": {
+      "publish": true,
+      "access": "public"
+    },
+    "github": {
+      "release": true,
+      "draft": false
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": "conventionalcommits",
+        "infile": "CHANGELOG.md"
+      }
+    }
+  },
+  "workspaces": [
+    "packages/core"
+  ],
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.ts",
+      "**/*.test.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts",
+      "!src/**/*.test.ts"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html",
+      "json-summary"
+    ]
+  }
+}

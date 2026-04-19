@@ -1,0 +1,38 @@
+# Binary files
+*.7z binary
+*.bmp binary
+*.deb binary
+*.dmg binary
+*.ear binary
+*.gif binary
+*.gz binary
+*.jar binary
+*.jpeg binary
+*.jpg binary
+*.png binary
+*.rar binary
+*.rpm binary
+*.svg text
+*.tar binary
+*.tgz binary
+*.war binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.zip binary
+
+# Images
+assets/** binary
+
+# Docs
+docs/.vitepress/cache/** binary
+docs/.vitepress/dist/** binary
+
+# Build outputs
+dist/** binary
+
+# Dependencies
+node_modules/** binary
+
+# Test coverage
+coverage/** binary

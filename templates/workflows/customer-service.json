@@ -1,0 +1,112 @@
+{
+  "version": "1.0.0",
+  "meta": {
+    "name": "客服对话工作流",
+    "description": "智能客服系统，自动识别意图并回复",
+    "author": "TaskFlow AI",
+    "tags": ["客服", "对话", "LLM"],
+    "category": "chat",
+    "icon": "💬"
+  },
+  "config": {
+    "timeout": 60000,
+    "retry": { "enabled": true, "maxAttempts": 3, "delay": 1000 }
+  },
+  "nodes": [
+    {
+      "id": "input",
+      "type": "input",
+      "data": { "label": "用户消息" }
+    },
+    {
+      "id": "classify",
+      "type": "llm",
+      "data": {
+        "label": "意图分类",
+        "model": "gpt-4",
+        "systemPrompt": "分析用户消息意图，返回JSON: {\"intent\": \"咨询|投诉|退款|其他\", \"category\": \"具体分类\"}"
+      }
+    },
+    {
+      "id": "switch",
+      "type": "switch",
+      "data": {
+        "label": "分支路由",
+        "variable": "{{classify.intent}}"
+      }
+    },
+    {
+      "id": "refund_flow",
+      "type": "llm",
+      "data": {
+        "label": "退款处理",
+        "systemPrompt": "你是退款客服专员，帮助用户完成退款流程。询问订单号和退款原因。"
+      }
+    },
+    {
+      "id": "complaint_flow",
+      "type": "llm",
+      "data": {
+        "label": "投诉处理",
+        "systemPrompt": "你是投诉处理专员，认真倾听用户抱怨，表达歉意并提供解决方案。"
+      }
+    },
+    {
+      "id": "inquiry_flow",
+      "type": "llm",
+      "data": {
+        "label": "咨询回复",
+        "systemPrompt": "你是专业客服，根据产品知识库准确回答用户咨询。"
+      }
+    },
+    {
+      "id": "default_flow",
+      "type": "llm",
+      "data": {
+        "label": "默认回复",
+        "systemPrompt": "你是友好客服，保持积极态度，提供帮助。"
+      }
+    },
+    {
+      "id": "output",
+      "type": "output",
+      "data": { "label": "回复用户" }
+    }
+  ],
+  "edges": [
+    { "id": "e1", "source": "input", "target": "classify" },
+    { "id": "e2", "source": "classify", "target": "switch" },
+    {
+      "id": "e3",
+      "source": "switch",
+      "target": "refund_flow",
+      "sourceHandle": "退款",
+      "label": "退款"
+    },
+    {
+      "id": "e4",
+      "source": "switch",
+      "target": "complaint_flow",
+      "sourceHandle": "投诉",
+      "label": "投诉"
+    },
+    {
+      "id": "e5",
+      "source": "switch",
+      "target": "inquiry_flow",
+      "sourceHandle": "咨询",
+      "label": "咨询"
+    },
+    {
+      "id": "e6",
+      "source": "switch",
+      "target": "default_flow",
+      "sourceHandle": "default",
+      "label": "其他"
+    },
+    { "id": "e7", "source": "refund_flow", "target": "output" },
+    { "id": "e8", "source": "complaint_flow", "target": "output" },
+    { "id": "e9", "source": "inquiry_flow", "target": "output" },
+    { "id": "e10", "source": "default_flow", "target": "output" }
+  ]
+}
