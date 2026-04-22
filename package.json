@@ -62,7 +62,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
-    "postinstall": "node -e \"console.log('\\n🎉 TaskFlow AI 安装成功！\\n运行 taskflow --help 开始使用\\n')\""
+    "postinstall": "echo '🎉 TaskFlow AI 安装成功！运行 taskflow --help 开始使用'"
   },
   "keywords": [
     "ai",

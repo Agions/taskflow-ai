@@ -108,12 +108,25 @@ export const shellTools: ToolDefinition[] = [
     },
     handler: async input => {
       const { execSync } = await import('child_process');
-      const result = execSync(input.command as string, {
+      const { validateCommand } = await import('../security/validator');
+      const command = input.command as string;
+
+      // 验证命令安全性
+      const validation = validateCommand(command);
+      if (!validation.valid) {
+        return {
+          success: false,
+          error: `命令验证失败: ${validation.reason}`,
+          command,
+        };
+      }
+
+      const result = execSync(command, {
         cwd: (input.cwd as string) || process.cwd(),
         timeout: ((input.timeout as number) || 30) * 1000,
         encoding: 'utf-8',
       });
-      return { output: result, command: input.command };
+      return { output: result, command };
     },
     category: 'shell',
     tags: ['shell', 'exec'],
