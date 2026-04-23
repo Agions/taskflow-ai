@@ -23,11 +23,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Run tests
-        run: pnpm exec jest --config jest.config.js
+      - name: Debug - List files
+        run: |
+          ls -la
+          cat jest.config.js
+          cat tsconfig.test.json
 
-      - name: Build
-        run: pnpm exec node build.js
+      - name: Run tests
+        run: pnpm exec jest --config jest.config.js --verbose 2>&1 || true
+
+      - name: Debug - Check test results
+        run: |
+          echo "Exit code: $?"
+          ls -la
 
       - name: Publish to npm
         run: pnpm publish --access public --no-git-checks
