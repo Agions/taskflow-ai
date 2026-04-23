@@ -1,12 +1,6 @@
 /**
- * 工作流模块导出
+ * Workflow Module
+ * TaskFlow AI v4.0
  */
 
-export * from './types';
-export * from './parser';
-export * from './executor';
-export * from './engine';
-
-import { WorkflowEngine } from './engine';
-
-export const workflowEngine = new WorkflowEngine();
+export * from './workflow-engine';
