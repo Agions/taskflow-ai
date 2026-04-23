@@ -38,7 +38,7 @@ jobs:
           ls -la
 
       - name: Build
-        run: pnpm exec node build.js
+        run: pnpm exec tsc -p tsconfig.build.json
 
       - name: Publish to npm
         run: pnpm publish --access public --no-git-checks
