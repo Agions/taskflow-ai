@@ -163,3 +163,17 @@ export interface WorkflowLogger {
   error(message: string, context?: Record<string, unknown>): void;
   debug(message: string, context?: Record<string, unknown>): void;
 }
+
+/**
+ * Workflow 节点定义
+ * 用于注册自定义工作流节点
+ */
+export interface WorkflowNodeDefinition {
+  type: string;
+  name: string;
+  description: string;
+  parallelizable?: boolean;
+  inputSchema: Record<string, unknown>;
+  outputSchema: Record<string, unknown>;
+  executor: NodeExecutor;
+}

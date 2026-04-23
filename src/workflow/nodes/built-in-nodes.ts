@@ -100,7 +100,7 @@ export class BuiltInNodes {
           result: {}
         }
       },
-      executor: async (input, context) => {
+      executor: async (input: Record<string, unknown>, context: NodeContext) => {
         // Implementation would apply transformations
         return {
           success: true,
@@ -129,7 +129,7 @@ export class BuiltInNodes {
           merged: {}
         }
       },
-      executor: async (input, context) => {
+      executor: async (input: Record<string, unknown>, context: NodeContext) => {
         const sources = input.sources as unknown[];
         const merged = sources.reduce((acc, src) => ({ ...acc, ...(src as Record<string, unknown>) }), {});
         return {
@@ -160,7 +160,7 @@ export class BuiltInNodes {
         type: 'object',
         properties: {}
       },
-      executor: async (input, context) => {
+      executor: async (input: Record<string, unknown>, context: NodeContext) => {
         const condition = input.condition as boolean;
         const nextStep = condition ? input.trueBranch : input.falseBranch;
         return {
@@ -191,7 +191,7 @@ export class BuiltInNodes {
           results: { type: 'array' }
         }
       },
-      executor: async (input, context) => {
+      executor: async (input: Record<string, unknown>, context: NodeContext) => {
         const items = input.items as unknown[];
         const results = items.map((item, index) => ({ index, result: item }));
         return {
@@ -226,7 +226,7 @@ export class BuiltInNodes {
           data: {}
         }
       },
-      executor: async (input, context) => {
+      executor: async (input: Record<string, unknown>, context: NodeContext) => {
         try {
           const response = await fetch(input.url as string, {
             method: input.method as string,
@@ -268,7 +268,7 @@ export class BuiltInNodes {
           result: {}
         }
       },
-      executor: async (input, context) => {
+      executor: async (input: Record<string, unknown>, context: NodeContext) => {
         // Implementation would integrate with Agent system
         return {
           success: true,
