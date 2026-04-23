@@ -37,6 +37,9 @@ jobs:
           echo "Exit code: $?"
           ls -la
 
+      - name: Build
+        run: pnpm exec node build.js
+
       - name: Publish to npm
         run: pnpm publish --access public --no-git-checks
         env:
