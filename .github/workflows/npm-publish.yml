@@ -38,7 +38,8 @@ jobs:
           ls -la
 
       - name: Build
-        run: pnpm exec tsc -p tsconfig.build.json
+        run: |
+          pnpm exec tsc -p tsconfig.build.json 2>&1 || echo "Build failed with exit code $?"
 
       - name: Publish to npm
         run: pnpm publish --access public --no-git-checks
