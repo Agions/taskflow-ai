@@ -34,10 +34,10 @@
     "publish:beta": "npm run check && npm version prerelease --preid=beta && npm publish --tag beta",
     "publish:alpha": "npm run check && npm version prerelease --preid=alpha && npm publish --tag alpha",
     "publish:dry": "npm run check && npm publish --dry-run",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci --coverage --reporters=default --reporters=jest-junit",
+    "test": "jest --config jest.config.js",
+    "test:watch": "jest --watch --config jest.config.js",
+    "test:coverage": "jest --coverage --config jest.config.js",
+    "test:ci": "jest --ci --coverage --reporters=default --reporters=jest-junit --config jest.config.js",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
@@ -234,28 +234,5 @@
   },
   "workspaces": [
     "packages/core"
-  ],
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "roots": [
-      "<rootDir>/src"
-    ],
-    "testMatch": [
-      "**/__tests__/**/*.test.ts",
-      "**/*.test.ts"
-    ],
-    "collectCoverageFrom": [
-      "src/**/*.ts",
-      "!src/**/*.d.ts",
-      "!src/**/*.test.ts"
-    ],
-    "coverageDirectory": "coverage",
-    "coverageReporters": [
-      "text",
-      "lcov",
-      "html",
-      "json-summary"
-    ]
-  }
+  ]
 }
