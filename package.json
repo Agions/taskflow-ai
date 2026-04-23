@@ -176,6 +176,7 @@
     "prettier": "^3.2.5",
     "release-it": "19.2.4",
     "ts-jest": "^29.4.6",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "5.9.3",
     "vitepress": "1.6.4"
   },

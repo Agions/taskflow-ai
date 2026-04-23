@@ -43,7 +43,7 @@
 
   "include": ["src/**/*", "src/**/*.json"],
 
-  "exclude": ["node_modules", "dist", "build", "**/*.spec.ts", "**/*.test.ts", "packages"],
+  "exclude": ["node_modules", "dist", "build", "packages"],
 
   "ts-node": {
     "require": ["tsconfig-paths/register"],
