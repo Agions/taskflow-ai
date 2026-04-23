@@ -1,68 +1,96 @@
 /**
- * 任务相关类型
+ * Task 类型定义
+ * TaskFlow AI v4.0 - Unified Task Types
  */
 
-import { Priority, Complexity, Requirement } from './prd';
+/**
+ * Task 状态
+ */
+export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'failed' | 'skipped';
 
 /**
- * 任务
+ * Task 优先级
+ */
+export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
+
+/**
+ * Task 类型
+ */
+export type TaskType = 'code' | 'test' | 'analysis' | 'documentation' | 'deployment';
+
+/**
+ * Task
  */
 export interface Task {
   id: string;
-  title: string;
+  name: string;
   description: string;
-  type: TaskType;
   status: TaskStatus;
-  priority: Priority;
-  complexity: Complexity;
-  estimatedHours: number;
-  actualHours?: number;
-  assignee?: string;
-  dependencies: string[];
+  priority: TaskPriority;
+  type: TaskType;
+  dependsOn: string[];
   tags: string[];
-  requirement?: Requirement;
-  subtasks: SubTask[];
-  progress: number;
-  createdAt: Date;
-  updatedAt: Date;
-  dueDate?: Date;
-  completedAt?: Date;
+  createdAt: number;
+  updatedAt: number;
+  completedAt?: number;
+  estimatedDuration?: number;
+  actualDuration?: number;
+  metadata?: Record<string, unknown>;
 }
 
 /**
- * 任务类型
+ * Task 执行上下文
  */
-export type TaskType =
-  | 'frontend'
-  | 'backend'
-  | 'database'
-  | 'testing'
-  | 'deployment'
-  | 'documentation'
-  | 'research'
-  | 'design';
+export interface TaskExecutionContext {
+  taskId: string;
+  projectPath: string;
+  workspacePath?: string;
+  environment: 'development' | 'staging' | 'production';
+  config: Record<string, unknown>;
+  variables: Record<string, unknown>;
+}
 
 /**
- * 任务状态
+ * Task 执行结果
  */
-export type TaskStatus =
-  | 'todo'
-  | 'in-progress'
-  | 'review'
-  | 'testing'
-  | 'done'
-  | 'blocked'
-  | 'cancelled';
+export interface TaskResult {
+  taskId: string;
+  success: boolean;
+  output?: string;
+  error?: string;
+  duration: number;
+  artifacts: Artifact[];
+  logs: TaskLog[];
+  metrics: TaskMetrics;
+}
 
 /**
- * 子任务
+ * 任务产物
  */
-export interface SubTask {
-  id: string;
-  title: string;
-  description: string;
-  status: TaskStatus;
-  estimatedHours: number;
-  actualHours?: number;
-  completedAt?: Date;
+export interface Artifact {
+  path: string;
+  type: 'file' | 'directory' | 'url';
+  size?: number;
+  checksum?: string;
+}
+
+/**
+ * 任务日志
+ */
+export interface TaskLog {
+  level: 'info' | 'warn' | 'error' | 'debug';
+  timestamp: number;
+  message: string;
+  context?: Record<string, unknown>;
+}
+
+/**
+ * 任务指标
+ */
+export interface TaskMetrics {
+  cpuTime: number;
+  memoryPeak: number;
+  networkCalls: number;
+  cacheHits: number;
+  cacheMisses: number;
 }

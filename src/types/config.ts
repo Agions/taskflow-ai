@@ -1,119 +1,130 @@
 /**
- * 配置相关类型
+ * Config 类型定义
+ * TaskFlow AI v4.0 - Unified Config Types
  */
 
 /**
- * TaskFlow 配置
+ * TaskFlow AI 配置
  */
 export interface TaskFlowConfig {
-  projectName: string;
   version: string;
-  aiModels: AIModelConfig[];
-  mcpSettings: MCPSettings;
-  outputFormats: string[];
-  plugins: PluginConfig[];
+  workspace: string;
+  environment: 'development' | 'staging' | 'production';
+  models: ModelConfig[];
+  cache: CacheConfig;
+  logging: LoggingConfig;
+  plugins: PluginsConfig;
+  extensions: ExtensionsConfig;
+  security: SecurityConfig;
 }
 
 /**
- * AI 模型配置
+ * 模型配置
  */
-export interface AIModelConfig {
-  provider: AIProvider;
+export interface ModelConfig {
+  id: string;
+  provider: ModelProvider;
   modelName: string;
-  apiKey: string;
-  endpoint?: string;
-  maxTokens?: number;
-  temperature?: number;
-  priority: number;
+  apiKey?: string;
+  apiEndpoint?: string;
   enabled: boolean;
+  priority: number;
+  capabilities: ModelCapability[];
+  rateLimits?: RateLimit;
 }
 
 /**
- * AI 提供商
+ * 模型提供商
  */
-export type AIProvider =
+export type ModelProvider =
   | 'deepseek'
+  | 'openai'
+  | 'anthropic'
   | 'zhipu'
   | 'qwen'
-  | 'baidu'
   | 'moonshot'
-  | 'spark'
-  | 'openai'
-  | 'claude';
+  | 'custom';
 
 /**
- * MCP 设置
+ * 模型能力
  */
-export interface MCPSettings {
-  enabled: boolean;
-  port: number;
-  host: string;
-  serverName: string;
-  version: string;
-  capabilities: MCPCapability[];
-  security: MCPSecurity;
-  tools: MCPTool[];
-  resources: MCPResource[];
+export type ModelCapability =
+  | 'chat'
+  | 'completion'
+  | 'embedding'
+  | 'vision'
+  | 'function_calling'
+  | 'json_mode'
+  | 'streaming';
+
+/**
+ * 速率限制配置
+ */
+export interface RateLimit {
+  rpm: number;
+  tpm: number;
+  concurrent: number;
 }
 
 /**
- * MCP 能力
+ * 缓存配置
  */
-export interface MCPCapability {
-  name: string;
-  version: string;
-  description: string;
+export interface CacheConfig {
   enabled: boolean;
-}
-
-/**
- * MCP 安全设置
- */
-export interface MCPSecurity {
-  authRequired: boolean;
-  allowedOrigins: string[];
-  rateLimit: {
+  l1: {
     enabled: boolean;
-    maxRequests: number;
-    windowMs: number;
+    maxSize: number;
+    ttl: number;
   };
-  sandbox: {
+  l2: {
     enabled: boolean;
-    timeout: number;
-    memoryLimit: number;
+    ttl: number;
   };
 }
 
 /**
- * MCP 工具
+ * 日志配置
  */
-export interface MCPTool {
-  name: string;
-  description: string;
-  inputSchema: object;
-  outputSchema?: object;
-  handler: string;
-  enabled: boolean;
-  category: string;
-}
-
-/**
- * MCP 资源
- */
-export interface MCPResource {
-  uri: string;
-  name: string;
-  description: string;
-  mimeType: string;
-  handler: string;
+export interface LoggingConfig {
+  level: 'debug' | 'info' | 'warn' | 'error';
+  file?: string;
+  console: boolean;
+  format: 'json' | 'text';
 }
 
 /**
  * 插件配置
  */
-export interface PluginConfig {
-  name: string;
-  version: string;
-  enabled: boolean;
-  settings: Record<string, any>;
+export interface PluginsConfig {
+  enabled: string[];
+  directory: string;
+  autoLoad: boolean;
+}
+
+/**
+ * 扩展配置
+ */
+export interface ExtensionsConfig {
+  agents: ExtensionsDirectoryConfig;
+  tools: ExtensionsDirectoryConfig;
+  workflows: ExtensionsDirectoryConfig;
+}
+
+/**
+ * 扩展目录配置
+ */
+export interface ExtensionsDirectoryConfig {
+  directory: string;
+  autoDiscover: boolean;
+}
+
+/**
+ * 安全配置
+ */
+export interface SecurityConfig {
+  enableCommandWhitelist: boolean;
+  allowedCommands?: string[];
+  enablePrivateIPRestriction: boolean;
+  enablePathTraversalProtection: boolean;
+  enableCredentialMasking: boolean;
 }

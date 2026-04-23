@@ -1,16 +1,13 @@
 /**
- * Agent 模块导出
+ * Core Agent Module Index
+ * TaskFlow AI v4.0
  */
 
-export * from './types';
-export * from './core';
-export * from './coordinator';
+// Re-export runtime and related types
+export * from './runtime';
 
-// Parsers
-export { RuleBasedGoalParser } from './parsers/RuleBasedGoalParser';
+// Re-export registry
+export * from './registry';
 
-import { agentCoordinator } from './coordinator';
-import { AgentCore } from './core';
-import { AgentFactory } from './coordinator';
-
-export { agentCoordinator, AgentCore, AgentFactory };
+// Re-export from types
+export * from '../../types/agent';
