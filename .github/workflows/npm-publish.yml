@@ -24,10 +24,10 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Run tests
-        run: pnpm test
+        run: pnpm exec jest --config jest.config.js
 
       - name: Build
-        run: pnpm build
+        run: pnpm exec node build.js
 
       - name: Publish to npm
         run: pnpm publish --access public --no-git-checks
