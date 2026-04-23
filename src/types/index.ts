@@ -30,5 +30,5 @@ export * from './config';
 // Extension types
 export * from './extensions';
 
-// Cache types (new)
+// Cache types
 export * from './cache';
