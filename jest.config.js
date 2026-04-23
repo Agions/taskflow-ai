@@ -25,10 +25,7 @@ module.exports = {
   },
   transform: {
     '^.+\\.ts$': ['ts-jest', {
-      tsconfig: '<rootDir>/tsconfig.json',
-      diagnostics: {
-        ignoreCodes: [151001]
-      }
+      tsconfig: '<rootDir>/tsconfig.test.json'
     }]
   },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
