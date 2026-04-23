@@ -1,233 +1,166 @@
 /**
- * 日志工具
+ * Logger - 统一日志系统
+ * TaskFlow AI v4.0
  */
 
-import winston from 'winston';
-import path from 'path';
-import fs from 'fs-extra';
-import { CONFIG_DIR, LOGS_DIR } from '../constants';
+export enum LogLevel {
+  DEBUG = 0,
+  INFO = 1,
+  WARN = 2,
+  ERROR = 3,
+  SILENT = 4
+}
+
+export interface LoggerContext {
+  [key: string]: unknown;
+}
+
+export interface LogEntry {
+  level: LogLevel;
+  message: string;
+  context?: LoggerContext;
+  timestamp: number;
+  source: string;
+}
 
 export class Logger {
-  private logger: winston.Logger;
   private static instances: Map<string, Logger> = new Map();
+  private source: string;
+  private level: LogLevel;
+  private context: LoggerContext;
+  private history: LogEntry[] = [];
+  private maxHistorySize = 1000;
 
-  private constructor(private name: string) {
-    this.logger = this.createWinstonLogger();
+  private constructor(source: string, context: LoggerContext = {}) {
+    this.source = source;
+    this.level = this.getLevelFromEnv();
+    this.context = context;
   }
 
-  /**
-   * 获取Logger实例
-   */
-  static getInstance(name: string): Logger {
-    if (!Logger.instances.has(name)) {
-      Logger.instances.set(name, new Logger(name));
+  static getInstance(source: string, context?: LoggerContext): Logger {
+    if (!Logger.instances.has(source)) {
+      Logger.instances.set(source, new Logger(source, context));
     }
-    return Logger.instances.get(name)!;
+    return Logger.instances.get(source)!;
   }
 
-  /**
-   * 创建Winston Logger
-   */
-  private createWinstonLogger(): winston.Logger {
-    const logsDir = path.join(process.cwd(), CONFIG_DIR, LOGS_DIR);
-    fs.ensureDirSync(logsDir);
-
-    const logFormat = winston.format.combine(
-      winston.format.timestamp({
-        format: 'YYYY-MM-DD HH:mm:ss',
-      }),
-      winston.format.errors({ stack: true }),
-      winston.format.printf(({ timestamp, level, message, stack, ...meta }) => {
-        const metaStr = Object.keys(meta).length > 0 ? ` ${JSON.stringify(meta)}` : '';
-        const stackStr = stack ? `\n${stack}` : '';
-        return `[${timestamp}] [${this.name}] ${level.toUpperCase()}: ${message}${metaStr}${stackStr}`;
-      })
-    );
-
-    const transports: winston.transport[] = [
-      new winston.transports.Console({
-        level: process.env.LOG_LEVEL || 'info',
-        format: winston.format.combine(winston.format.colorize(), logFormat),
-      }),
-
-      new winston.transports.File({
-        filename: path.join(logsDir, 'taskflow.log'),
-        level: 'debug',
-        format: logFormat,
-        maxsize: 10 * 1024 * 1024, // 10MB
-        maxFiles: 5,
-      }),
-
-      new winston.transports.File({
-        filename: path.join(logsDir, 'error.log'),
-        level: 'error',
-        format: logFormat,
-        maxsize: 10 * 1024 * 1024, // 10MB
-        maxFiles: 3,
-      }),
-    ];
-
-    return winston.createLogger({
-      level: 'debug',
-      format: logFormat,
-      transports,
-      exitOnError: false,
-    });
+  static reset(): void {
+    Logger.instances.clear();
   }
 
-  /**
-   * Debug级别日志
-   */
-  debug(message: string, ...args: unknown[]): void {
-    this.logger.debug(message, ...args);
+  setLevel(level: LogLevel): void {
+    this.level = level;
   }
 
-  /**
-   * Info级别日志
-   */
-  info(message: string, ...args: unknown[]): void {
-    this.logger.info(message, ...args);
+  setContext(context: LoggerContext): void {
+    this.context = { ...this.context, ...context };
   }
 
-  /**
-   * Warning级别日志
-   */
-  warn(message: string, ...args: unknown[]): void {
-    this.logger.warn(message, ...args);
+  debug(message: string, context?: LoggerContext): void {
+    if (this.level > LogLevel.DEBUG) return;
+
+    const entry = this.log(LogLevel.DEBUG, message, context);
+    this.output(entry);
   }
 
-  /**
-   * Error级别日志
-   */
-  error(message: string, error?: Error | any, ...args: unknown[]): void {
-    if ((error as Error) instanceof Error) {
-      this.logger.error(message, { error: error.message, stack: error.stack, ...args });
-    } else if (error as Error) {
-      this.logger.error(message, { error, ...args });
-    } else {
-      this.logger.error(message, ...args);
-    }
+  info(message: string, context?: LoggerContext): void {
+    if (this.level > LogLevel.INFO) return;
+
+    const entry = this.log(LogLevel.INFO, message, context);
+    this.output(entry);
   }
 
-  /**
-   * 性能日志
-   */
-  perf(operation: string, duration: number, details?: Record<string, unknown>): void {
-    this.logger.info(`Performance: ${operation} completed in ${duration}ms`, {
-      operation,
-      duration,
-      ...(details || {}),
-    });
+  warn(message: string, context?: LoggerContext): void {
+    if (this.level > LogLevel.WARN) return;
+
+    const entry = this.log(LogLevel.WARN, message, context);
+    this.output(entry);
   }
 
-  /**
-   * 审计日志
-   */
-  audit(action: string, user: string, details?: Record<string, unknown>): void {
-    this.logger.info(`Audit: ${action} by ${user}`, {
-      action,
-      user,
-      timestamp: new Date().toISOString(),
-      ...(details || {}),
-    });
+  error(message: string, context?: LoggerContext): void {
+    if (this.level > LogLevel.ERROR) return;
+
+    const entry = this.log(LogLevel.ERROR, message, context);
+    this.output(entry);
   }
 
-  /**
-   * 创建子Logger
-   */
-  child(childName: string): Logger {
-    return Logger.getInstance(`${this.name}:${childName}`);
-  }
-
-  /**
-   * 添加上下文信息
-   */
-  withContext(context: Record<string, any>): LoggerWithContext {
-    return new LoggerWithContext(this, context);
-  }
-}
-
-/**
- * 带上下文的Logger
- */
-class LoggerWithContext {
-  constructor(
-    private logger: Logger,
-    private context: Record<string, any>
-  ) {}
-
-  debug(message: string, ...args: unknown[]): void {
-    this.logger.debug(message, this.context, ...args);
-  }
-
-  info(message: string, ...args: unknown[]): void {
-    this.logger.info(message, this.context, ...args);
-  }
-
-  warn(message: string, ...args: unknown[]): void {
-    this.logger.warn(message, this.context, ...args);
-  }
-
-  error(message: string, error?: Error | any, ...args: unknown[]): void {
-    this.logger.error(message, error, this.context, ...args);
-  }
-}
-
-/**
- * 性能监控装饰器
- */
-export function logPerformance(logger: Logger, operation?: string) {
-  return function (
-    target: { constructor?: { name?: string } },
-    propertyName: string,
-    descriptor: PropertyDescriptor
-  ) {
-    const method = descriptor.value;
-    const targetName = target?.constructor?.name || 'unknown';
-    const opName = operation || `${targetName}.${propertyName}`;
-
-    descriptor.value = async function (...args: unknown[]) {
-      const start = Date.now();
-      try {
-        const result = await method.apply(this, args);
-        const duration = Date.now() - start;
-        logger.perf(opName, duration, { success: true });
-        return result;
-      } catch (error) {
-        const duration = Date.now() - start;
-        logger.perf(opName, duration, { success: false, error: (error as Error).message });
-        throw error;
-      }
+  private log(level: LogLevel, message: string, context?: LoggerContext): LogEntry {
+    const entry: LogEntry = {
+      level,
+      message,
+      context: { ...this.context, ...context },
+      timestamp: Date.now(),
+      source: this.source
     };
 
-    return descriptor;
-  };
-}
+    // 添加到历史
+    this.history.push(entry);
+    if (this.history.length > this.maxHistorySize) {
+      this.history.shift();
+    }
 
-/**
- * 获取默认Logger实例
- */
-export function getLogger(name: string = 'default'): Logger {
-  return Logger.getInstance(name);
-}
+    return entry;
+  }
 
-/**
- * 创建带计时的执行器
- */
-export async function withTiming<T>(
-  logger: Logger,
-  operation: string,
-  fn: () => Promise<T>
-): Promise<T> {
-  const start = Date.now();
-  try {
-    const result = await fn();
-    const duration = Date.now() - start;
-    logger.perf(operation, duration);
-    return result;
-  } catch (error) {
-    const duration = Date.now() - start;
-    logger.perf(operation, duration, { error: (error as Error).message });
-    throw error;
+  private output(entry: LogEntry): void {
+    const levelName = this.getLevelName(entry.level);
+    const timestamp = new Date(entry.timestamp).toISOString();
+    const prefix = `[${timestamp}] [${levelName}] [${entry.source}]`;
+
+    // 格式化上下文
+    let contextStr = '';
+    if (entry.context && Object.keys(entry.context).length > 0) {
+      contextStr = ` ${JSON.stringify(entry.context)}`;
+    }
+
+    const message = `${prefix} ${entry.message}${contextStr}`;
+
+    // 根据级别输出到不同的 stream
+    switch (entry.level) {
+      case LogLevel.DEBUG:
+        console.log(message);
+        break;
+      case LogLevel.INFO:
+        console.log(message);
+        break;
+      case LogLevel.WARN:
+        console.warn(message);
+        break;
+      case LogLevel.ERROR:
+        console.error(message);
+        break;
+    }
+  }
+
+  private getLevelName(level: LogLevel): string {
+    return LogLevel[level];
+  }
+
+  private getLevelFromEnv(): LogLevel {
+    const envLevel = process.env.LOG_LEVEL?.toUpperCase();
+    if (envLevel && envLevel in LogLevel) {
+      return LogLevel[envLevel as keyof typeof LogLevel];
+    }
+    return LogLevel.INFO;
+  }
+
+  getHistory(): LogEntry[] {
+    return [...this.history];
+  }
+
+  clearHistory(): void {
+    this.history = [];
   }
 }
+
+/**
+ * 全局日志方法
+ */
+export const logger = Logger.getInstance('global');
+
+export const log = {
+  debug: (message: string, context?: LoggerContext) => logger.debug(message, context),
+  info: (message: string, context?: LoggerContext) => logger.info(message, context),
+  warn: (message: string, context?: LoggerContext) => logger.warn(message, context),
+  error: (message: string, context?: LoggerContext) => logger.error(message, context)
+};

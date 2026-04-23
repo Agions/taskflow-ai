@@ -1,216 +1,220 @@
 /**
- * Cache Manager - 多级缓存管理器
- * 统一管理 L1 (内存) 和 L2 (本地文件) 缓存
+ * Cache Manager - 缓存管理器
+ * TaskFlow AI v4.0
  */
 
-import { getLogger } from '../../utils/logger';
-import { MemoryCache } from './memory-cache';
-import { LocalCache } from './local-cache';
-
-const logger = getLogger('core/cache/manager');
-
-export interface CacheOptions {
-  /** 是否启用 L1 缓存 (内存) */
-  enableL1?: boolean;
-  /** 是否启用 L2 缓存 (本地文件) */
-  enableL2?: boolean;
-  /** L1 最大条目数 */
-  l1MaxSize?: number;
-  /** L1 最大内存 (MB) */
-  l1MaxMemory?: number;
-  /** L1 TTL (秒) */
-  l1Ttl?: number;
-  /** L2 TTL (秒) */
-  l2Ttl?: number;
-  /** 缓存目录 */
-  cacheDir?: string;
-}
-
-export interface CacheStats {
+export interface CacheConfig {
+  enabled: boolean;
   l1: {
-    size: number;
-    memory: number;
-    hits: number;
-    misses: number;
-    hitRate: number;
+    enabled: boolean;
+    maxSize: number;
+    ttl: number; // seconds
   };
   l2: {
-    size: number;
-    memory: number;
+    enabled: boolean;
+    ttl: number; // seconds
   };
-  totalHits: number;
-  totalMisses: number;
-  hitRate: number;
+}
+
+export interface CacheEntry<T = unknown> {
+  value: T;
+  timestamp: number;
+  ttl: number;
+  hits: number;
 }
 
 /**
- * 缓存键名空间
+ * L1 Cache - 内存缓存
  */
-export const CacheKeys = {
-  // PRD 缓存
-  prd: (id: string) => `prd:${id}`,
-  prdResult: (id: string) => `prd:${id}:result`,
+class L1Cache {
+  private cache: Map<string, CacheEntry>;
+  private maxSize: number;
+  private defaultTtl: number;
 
-  // AI 响应缓存
-  aiResponse: (key: string) => `ai:response:${key}`,
-  aiEmbedding: (text: string) => `ai:embedding:${text.slice(0, 100)}`,
-
-  // 工作流缓存
-  workflow: (id: string) => `workflow:${id}`,
-  workflowState: (id: string) => `workflow:${id}:state`,
-
-  // 用户配置缓存
-  userConfig: (userId: string) => `user:config:${userId}`,
-  userSession: (sessionId: string) => `user:session:${sessionId}`,
-} as const;
-
-export class CacheManager {
-  private l1: MemoryCache<string, unknown> | null = null;
-  private l2: LocalCache | null = null;
-  private enableL1: boolean;
-  private enableL2: boolean;
-
-  constructor(options: CacheOptions = {}) {
-    this.enableL1 = options.enableL1 ?? true;
-    this.enableL2 = options.enableL2 ?? true;
-
-    if (this.enableL1) {
-      this.l1 = new MemoryCache<string, unknown>({
-        maxSize: options.l1MaxSize ?? 500,
-        maxMemory: options.l1MaxMemory ?? 30, // 30MB
-        ttl: options.l1Ttl ?? 300, // 5 分钟
-        evictionPolicy: 'LRU',
-      });
-    }
-
-    if (this.enableL2) {
-      this.l2 = new LocalCache({
-        ttl: options.l2Ttl ?? 86400, // 24 小时
-        cacheDir: options.cacheDir,
-      });
-    }
-
-    logger.info(`CacheManager 初始化: L1=${this.enableL1}, L2=${this.enableL2}`);
+  constructor(maxSize: number, defaultTtl: number) {
+    this.cache = new Map();
+    this.maxSize = maxSize;
+    this.defaultTtl = defaultTtl;
   }
 
-  /**
-   * 获取缓存值
-   */
-  get<T>(key: string): T | null {
-    // L1 优先
-    if (this.l1) {
-      const value = this.l1.get(key);
-      if (value !== undefined) {
-        return value as T;
-      }
-    }
+  set<T = unknown>(key: string, value: T, ttl?: number): void {
+    this.evictIfNeeded();
 
-    // L2 次之
-    if (this.l2) {
-      const value = this.l2.get<T>(key);
-      if (value !== null) {
-        // 回填 L1
-        if (this.l1) {
-          this.l1.set(key, value);
-        }
-        return value;
-      }
-    }
-
-    return null;
+    this.cache.set(key, {
+      value,
+      timestamp: Date.now(),
+      ttl: ttl || this.defaultTtl,
+      hits: 0
+    });
   }
 
-  /**
-   * 设置缓存值
-   */
-  set<T>(key: string, value: T, ttl?: number): void {
-    // L1
-    if (this.l1) {
-      this.l1.set(key, value, ttl);
+  get<T = unknown>(key: string): T | undefined {
+    const entry = this.cache.get(key);
+    if (!entry) return undefined;
+
+    if (this.isExpired(entry)) {
+      this.cache.delete(key);
+      return undefined;
     }
 
-    // L2
-    if (this.l2) {
-      this.l2.set(key, value, ttl);
-    }
+    entry.hits++;
+    return entry.value as T;
   }
 
-  /**
-   * 检查键是否存在
-   */
-  has(key: string): boolean {
-    if (this.l1?.has(key)) return true;
-    if (this.l2?.has(key)) return true;
-    return false;
-  }
-
-  /**
-   * 删除缓存
-   */
   delete(key: string): boolean {
-    let deleted = false;
-    if (this.l1?.delete(key)) deleted = true;
-    if (this.l2?.delete(key)) deleted = true;
-    return deleted;
+    return this.cache.delete(key);
   }
 
-  /**
-   * 使缓存失效 (支持模式匹配)
-   */
-  invalidate(pattern: string | RegExp): number {
-    let count = 0;
-    if (this.l1) count += this.l1.invalidate(pattern);
-    if (this.l2) count += this.l2.invalidate(pattern);
-    return count;
+  has(key: string): boolean {
+    const entry = this.cache.get(key);
+    if (!entry) return false;
+
+    if (this.isExpired(entry)) {
+      this.cache.delete(key);
+      return false;
+    }
+
+    return true;
   }
 
-  /**
-   * 清空所有缓存
-   */
   clear(): void {
-    this.l1?.clear();
-    this.l2?.clear();
-    logger.info('缓存已清空');
+    this.cache.clear();
   }
 
-  /**
-   * 获取统计信息
-   */
-  getStats(): CacheStats {
-    const l1Stats = this.l1?.getStats() ?? { size: 0, memory: 0, hits: 0, misses: 0, hitRate: 0 };
-    const l2Stats = this.l2?.getStats() ?? { size: 0, memory: 0 };
-
-    const totalHits = l1Stats.hits;
-    const totalMisses = l1Stats.misses;
-    const total = totalHits + totalMisses;
-
-    return {
-      l1: l1Stats as any,
-      l2: l2Stats as any,
-      totalHits,
-      totalMisses,
-      hitRate: total > 0 ? totalHits / total : 0,
-    };
+  size(): number {
+    this.cleanupExpired();
+    return this.cache.size;
   }
 
-  /**
-   * 关闭缓存
-   */
-  close(): void {
-    this.l1?.clear();
-    this.l2?.close();
+  private isExpired(entry: CacheEntry): boolean {
+    const age = Date.now() - entry.timestamp;
+    return age > entry.ttl * 1000;
+  }
+
+  private cleanupExpired(): void {
+    for (const [key, entry] of this.cache) {
+      if (this.isExpired(entry)) {
+        this.cache.delete(key);
+      }
+    }
+  }
+
+  private evictIfNeeded(): void {
+    this.cleanupExpired();
+
+    if (this.cache.size >= this.maxSize) {
+      // LRU eviction
+      const sorted = Array.from(this.cache.entries())
+        .sort((a, b) => a[1].hits - b[1].hits);
+
+      const evictCount = Math.floor(this.maxSize * 0.2);
+      for (let i = 0; i < evictCount && i < sorted.length; i++) {
+        this.cache.delete(sorted[i][0]);
+      }
+    }
   }
 }
 
-// 全局缓存管理器实例
-let globalCacheManager: CacheManager | null = null;
+/**
+ * Cache Manager
+ */
+export class CacheManager {
+  private config: CacheConfig;
+  private l1Cache?: L1Cache;
+  // L2 cache can be Redis, etc.
+
+  constructor(config: Partial<CacheConfig> = {}) {
+    this.config = {
+      enabled: config.enabled ?? true,
+      l1: {
+        enabled: config.l1?.enabled ?? true,
+        maxSize: config.l1?.maxSize ?? 100,
+        ttl: config.l1?.ttl ?? 600
+      },
+      l2: {
+        enabled: config.l2?.enabled ?? false,
+        ttl: config.l2?.ttl ?? 3600
+      }
+    };
+
+    if (this.config.enabled && this.config.l1.enabled) {
+      this.l1Cache = new L1Cache(
+        this.config.l1.maxSize,
+        this.config.l1.ttl
+      );
+    }
+  }
+
+  set<T = unknown>(key: string, value: T, ttl?: number): void {
+    if (!this.config.enabled) return;
+
+    this.l1Cache?.set(key, value, ttl);
+    // L2 cache would go here
+  }
+
+  get<T = unknown>(key: string): T | undefined {
+    if (!this.config.enabled) return undefined;
+
+    return this.l1Cache?.get<T>(key);
+  }
+
+  delete(key: string): void {
+    this.l1Cache?.delete(key);
+    // L2 cache would go here
+  }
+
+  has(key: string): boolean {
+    if (!this.config.enabled) return false;
+
+    return this.l1Cache?.has(key) ?? false;
+  }
+
+  clear(): void {
+    this.l1Cache?.clear();
+    // L2 cache would go here
+  }
+
+  increment(key: string, amount: number = 1): number {
+    const current = this.get<number>(key) || 0;
+    const newValue = current + amount;
+    this.set(key, newValue);
+    return newValue;
+  }
+
+  size(): number {
+    return this.l1Cache?.size() || 0;
+  }
+}
 
 /**
- * 获取全局缓存管理器
+ * Cache Keys - 统一的缓存键生成器
  */
-export function getCacheManager(options?: CacheOptions): CacheManager {
-  if (!globalCacheManager) {
-    globalCacheManager = new CacheManager(options);
+export class CacheKeys {
+  static agent(agentId: string): string {
+    return `agent:${agentId}`;
   }
-  return globalCacheManager;
+
+  static workflow(workflowId: string): string {
+    return `workflow:${workflowId}`;
+  }
+
+  static task(taskId: string): string {
+    return `task:${taskId}`;
+  }
+
+  static tool(toolId: string): string {
+    return `tool:${toolId}`;
+  }
+
+  static plugin(pluginId: string): string {
+    return `plugin:${pluginId}`;
+  }
+
+  static aiRequest(provider: string, model: string): string {
+    return `ai:${provider}:${model}`;
+  }
+
+  static custom(prefix: string, suffix: string): string {
+    return `${prefix}:${suffix}`;
+  }
 }
