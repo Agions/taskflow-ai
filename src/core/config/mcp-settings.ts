@@ -63,10 +63,11 @@ export class MCPSettingsManager {
       throw createTaskFlowError('config', ERROR_CODES.CONFIG_NOT_FOUND, '配置文件不存在');
     }
 
-    (((config.mcpSettings as any)?.security ?? {}) ?? {}) = {
-      ...(((config.mcpSettings as any)?.security ?? {}) ?? {}),
-      ...securitySettings,
-    };
+    const security = config.mcpSettings?.security ?? {};
+    Object.assign(security, securitySettings);
+    if (config.mcpSettings) {
+      config.mcpSettings.security = security;
+    }
 
     await this.operations.saveConfig(config as any);
   }

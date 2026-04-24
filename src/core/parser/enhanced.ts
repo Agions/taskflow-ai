@@ -185,7 +185,7 @@ export class TaskDecomposer {
     for (const task of tasks) {
       const base = baseHours[task.type] ?? 8;
       const lengthFactor = Math.max(0.5, Math.min(2, task.description.length / 100));
-      (task.estimatedHours ?? 0) = Math.round(base * lengthFactor);
+      task.estimatedHours = Math.round(base * lengthFactor);
     }
   }
 
