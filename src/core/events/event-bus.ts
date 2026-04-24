@@ -10,7 +10,7 @@ import {
   TaskFlowEvent,
   EventListenerConfig
 } from '../../types/event';
-import { Logger } from '../utils/logger';
+import { Logger } from '../../utils/logger';
 
 /**
  * 事件总线实现
@@ -29,7 +29,7 @@ export class EventBus implements IEventBus {
   /**
    * 订阅事件
    */
-  on<T = unknown>(event: string | TaskFlowEvent, handler: EventHandler<T>): () => void {
+  on<T = unknown>(event: string | TaskFlowEvent, handler: EventHandler<any>): () => void {
     const config: EventListenerConfig = {
       handler,
       once: false,
@@ -45,7 +45,7 @@ export class EventBus implements IEventBus {
   /**
    * 订阅事件（只触发一次）
    */
-  once<T = unknown>(event: string | TaskFlowEvent, handler: EventHandler<T>): () => void {
+  once<T = unknown>(event: string | TaskFlowEvent, handler: EventHandler<any>): () => void {
     const config: EventListenerConfig = {
       handler,
       once: true,

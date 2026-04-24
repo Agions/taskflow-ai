@@ -22,14 +22,14 @@ export class AIModelManager {
       throw createTaskFlowError('config', ERROR_CODES.CONFIG_NOT_FOUND, '配置文件不存在');
     }
 
-    const existingIndex = config.aiModels.findIndex(
+    const existingIndex = config.aiModels!.findIndex(
       model => model.provider === modelConfig.provider && model.modelName === modelConfig.modelName
     );
 
     if (existingIndex >= 0) {
-      config.aiModels[existingIndex] = modelConfig;
+      config.aiModels![existingIndex] = modelConfig;
     } else {
-      config.aiModels.push(modelConfig);
+      config.aiModels!.push(modelConfig);
     }
 
     await this.operations.saveConfig(config);
@@ -44,7 +44,7 @@ export class AIModelManager {
       throw createTaskFlowError('config', ERROR_CODES.CONFIG_NOT_FOUND, '配置文件不存在');
     }
 
-    config.aiModels = config.aiModels.filter(
+    config.aiModels! = config.aiModels!.filter(
       model => !(model.provider === provider && model.modelName === modelName)
     );
 

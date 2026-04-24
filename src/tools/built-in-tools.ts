@@ -11,6 +11,18 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
+// ToolCategory 值映射
+const ToolCategories = {
+  FILESYSTEM: 'filesystem' as ToolCategory,
+  SHELL: 'shell' as ToolCategory,
+  HTTP: 'http' as ToolCategory,
+  GIT: 'git' as ToolCategory,
+  CODE: 'code' as ToolCategory,
+  AI: 'ai' as ToolCategory,
+  DATABASE: 'database' as ToolCategory,
+  CUSTOM: 'custom' as ToolCategory
+};
+
 export class BuiltInTools {
   private tools: Map<string, ToolDefinition> = new Map();
 
@@ -28,7 +40,7 @@ export class BuiltInTools {
       id: 'fs_read',
       name: 'Read File',
       description: 'Read the contents of a file',
-      category: ToolCategory.FILESYSTEM,
+      category: ToolCategories.FILESYSTEM,
       parameters: {
         type: 'object',
         properties: {
@@ -58,7 +70,7 @@ export class BuiltInTools {
       id: 'fs_write',
       name: 'Write File',
       description: 'Write content to a file',
-      category: ToolCategory.FILESYSTEM,
+      category: ToolCategories.FILESYSTEM,
       parameters: {
         type: 'object',
         properties: {
@@ -74,7 +86,7 @@ export class BuiltInTools {
         const encoding = params.encoding as string || 'utf-8';
 
         try {
-          await fs.writeFile(filepath, content, encoding);
+await fs.writeFile(filepath, content)
           return { success: true, output: 'File written successfully' };
         } catch (error) {
           return {
@@ -90,7 +102,7 @@ export class BuiltInTools {
       id: 'fs_list',
       name: 'List Directory',
       description: 'List contents of a directory',
-      category: ToolCategory.FILESYSTEM,
+      category: ToolCategories.FILESYSTEM,
       parameters: {
         type: 'object',
         properties: {
@@ -128,7 +140,7 @@ export class BuiltInTools {
       id: 'fs_exists',
       name: 'Check File Exists',
       description: 'Check if a file or directory exists',
-      category: ToolCategory.FILESYSTEM,
+      category: ToolCategories.FILESYSTEM,
       parameters: {
         type: 'object',
         properties: {
@@ -154,7 +166,7 @@ export class BuiltInTools {
       id: 'fs_delete',
       name: 'Delete File/Directory',
       description: 'Delete a file or directory',
-      category: ToolCategory.FILESYSTEM,
+      category: ToolCategories.FILESYSTEM,
       parameters: {
         type: 'object',
         properties: {
@@ -187,7 +199,7 @@ export class BuiltInTools {
       id: 'shell_exec',
       name: 'Execute Shell Command',
       description: 'Execute a shell command',
-      category: ToolCategory.SHELL,
+      category: ToolCategories.SHELL,
       parameters: {
         type: 'object',
         properties: {
@@ -224,7 +236,7 @@ export class BuiltInTools {
       id: 'http_get',
       name: 'HTTP GET',
       description: 'Send HTTP GET request',
-      category: ToolCategory.HTTP,
+      category: ToolCategories.HTTP,
       parameters: {
         type: 'object',
         properties: {
@@ -263,7 +275,7 @@ export class BuiltInTools {
       id: 'http_post',
       name: 'HTTP POST',
       description: 'Send HTTP POST request',
-      category: ToolCategory.HTTP,
+      category: ToolCategories.HTTP,
       parameters: {
         type: 'object',
         properties: {
@@ -309,7 +321,7 @@ export class BuiltInTools {
       id: 'git_status',
       name: 'Git Status',
       description: 'Get git repository status',
-      category: ToolCategory.GIT,
+      category: ToolCategories.GIT,
       parameters: {
         type: 'object',
         properties: {
@@ -340,7 +352,7 @@ export class BuiltInTools {
       id: 'git_commit',
       name: 'Git Commit',
       description: 'Commit changes to git',
-      category: ToolCategory.GIT,
+      category: ToolCategories.GIT,
       parameters: {
         type: 'object',
         properties: {
@@ -380,7 +392,7 @@ export class BuiltInTools {
       id: 'git_log',
       name: 'Git Log',
       description: 'Get git commit history',
-      category: ToolCategory.GIT,
+      category: ToolCategories.GIT,
       parameters: {
         type: 'object',
         properties: {
@@ -415,7 +427,7 @@ export class BuiltInTools {
       id: 'code_search',
       name: 'Search Code',
       description: 'Search for text in files',
-      category: ToolCategory.CODE,
+      category: ToolCategories.CODE,
       parameters: {
         type: 'object',
         properties: {
@@ -439,7 +451,7 @@ export class BuiltInTools {
       id: 'code_analyze',
       name: 'Analyze Code',
       description: 'Analyze code structure',
-      category: ToolCategory.CODE,
+      category: ToolCategories.CODE,
       parameters: {
         type: 'object',
         properties: {
@@ -475,8 +487,8 @@ export class BuiltInTools {
 
   public getCategoryToolCounts(): Record<ToolCategory, number> {
     const counts = {} as Record<ToolCategory, number>;
-    Object.values(ToolCategory).forEach(cat => {
-      counts[cat as ToolCategory] = 0;
+    (Object.values(ToolCategories) as ToolCategory[]).forEach(cat => {
+      counts[cat] = 0;
     });
 
     this.tools.forEach(tool => {

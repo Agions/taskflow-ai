@@ -1,7 +1,22 @@
+
 /**
  * Tool 类型定义
  * TaskFlow AI v4.0 - Unified Tool Types
  */
+
+/**
+ * Tool 类别常量
+ */
+export const ToolCategories = {
+  FILESYSTEM: 'filesystem',
+  SHELL: 'shell',
+  HTTP: 'http',
+  GIT: 'git',
+  DATABASE: 'database',
+  CODE: 'code',
+  AI: 'ai',
+  CUSTOM: 'custom',
+} as const;
 
 /**
  * JSON Schema 定义

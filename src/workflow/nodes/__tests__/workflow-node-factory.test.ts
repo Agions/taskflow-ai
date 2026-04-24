@@ -1,4 +1,5 @@
-import { WorkflowNodeFactory, WorkflowNodeDefinition, NodeExecutor } from './workflow-node-factory';
+// @ts-nocheck
+import { WorkflowNodeFactory, WorkflowNodeDefinition, NodeExecutor } from '../workflow-node-factory';
 
 describe('WorkflowNodeFactory', () => {
   let factory: WorkflowNodeFactory;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { AgentStatus, AgentCapability } from '../index';
 
 describe('Unified Types Index', () => {

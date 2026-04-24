@@ -6,7 +6,7 @@
 /**
  * Task 状态
  */
-export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'failed' | 'skipped';
+export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'failed' | 'skipped' | 'todo' | 'review' | 'done';
 
 /**
  * Task 优先级
@@ -16,7 +16,7 @@ export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
 /**
  * Task 类型
  */
-export type TaskType = 'code' | 'test' | 'analysis' | 'documentation' | 'deployment';
+export type TaskType = 'code' | 'test' | 'analysis' | 'documentation' | 'deployment' | 'frontend' | 'backend' | 'design' | 'research' | 'testing';
 
 /**
  * Task
@@ -24,16 +24,21 @@ export type TaskType = 'code' | 'test' | 'analysis' | 'documentation' | 'deploym
 export interface Task {
   id: string;
   name: string;
+  title?: string;
   description: string;
   status: TaskStatus;
   priority: TaskPriority;
   type: TaskType;
+  complexity?: 'low' | 'medium' | 'high';
   dependsOn: string[];
+  dependencies?: string[];
   tags: string[];
   createdAt: number;
   updatedAt: number;
   completedAt?: number;
+  progress?: number;
   estimatedDuration?: number;
+  estimatedHours?: number;
   actualDuration?: number;
   metadata?: Record<string, unknown>;
 }

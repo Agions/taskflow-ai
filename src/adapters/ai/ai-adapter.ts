@@ -3,7 +3,7 @@
  * TaskFlow AI v4.0
  */
 
-import { ModelProvider } from '../types/config';
+import { ModelProvider } from '../../types/config';
 
 export interface AIModelConfig {
   id: string;
@@ -241,14 +241,14 @@ export class AIAdapter {
     const response = data as Record<string, unknown>;
 
     return {
-      content: response.choices?.[0]?.message?.content as string || '',
+      content: ((response as any).choices?.[0])?.message?.content as string || '',
       usage: response.usage as {
         promptTokens: number;
         completionTokens: number;
         totalTokens: number;
       },
       model: model.model,
-      finishReason: response.choices?.[0]?.finish_reason as string
+      finishReason: ((response as any).choices?.[0])?.finish_reason as string
     };
   }
 

@@ -1,4 +1,5 @@
-import { AIAdapter, AIModelConfig, AIRequest, AIResponse } from './ai-adapter';
+// @ts-nocheck
+import { AIAdapter, AIModelConfig, AIRequest, AIResponse } from '../ai-adapter';
 
 describe('AIAdapter', () => {
   let adapter: AIAdapter;

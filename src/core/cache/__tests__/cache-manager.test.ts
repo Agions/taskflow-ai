@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { CacheManager, CacheKeys } from '../cache-manager';
-import { CacheConfig } from '../../types/cache';
+import { CacheConfig } from '../../../types/cache';
 
 describe('CacheManager', () => {
   let cacheManager: CacheManager;

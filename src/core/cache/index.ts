@@ -4,3 +4,4 @@
  */
 
 export * from './cache-manager';
+export { CacheConfig, CacheEntry } from './cache-manager';

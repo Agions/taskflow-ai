@@ -3,7 +3,7 @@
  * TaskFlow AI v4.0
  */
 
-import { WorkflowNodeDefinition, NodeExecutor } from '../../types/workflow';
+import { WorkflowNodeDefinition, NodeExecutor, NodeContext } from '../../types/workflow';
 
 export class BuiltInNodes {
   private nodes: Map<string, WorkflowNodeDefinition> = new Map();

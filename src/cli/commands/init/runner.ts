@@ -60,6 +60,14 @@ export async function runInit(options: InitOptions): Promise<void> {
     }
 
     const config: TaskFlowConfig = {
+      workspace: process.cwd(),
+      environment: 'development',
+      models: [],
+      cache: { enabled: false, l1: { enabled: false, maxSize: 0, ttl: 0 }, l2: { enabled: false, ttl: 0 } },
+      logging: { level: 'info', console: true, format: 'text' },
+      plugins: { enabled: [], directory: './plugins', autoLoad: false },
+      extensions: { agents: { directory: './agents', autoDiscover: false }, tools: { directory: './tools', autoDiscover: false }, workflows: { directory: './workflows', autoDiscover: false } },
+      security: { enableCommandWhitelist: false, enablePrivateIPRestriction: false, enablePathTraversalProtection: true, enableCredentialMasking: true },
       ...DEFAULT_CONFIG,
       projectName: projectInfo.projectName,
       version: projectInfo.version,
@@ -67,7 +75,7 @@ export async function runInit(options: InitOptions): Promise<void> {
     };
 
     await createProjectStructure(config);
-    await saveConfig(config);
+    await saveConfig(config as any);
     await createExampleFiles(config.projectName);
 
     spinner.succeed(chalk.green('项目初始化完成！'));

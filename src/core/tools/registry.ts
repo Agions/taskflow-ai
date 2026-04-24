@@ -4,7 +4,8 @@
  */
 
 import { getLogger } from '../../utils/logger';
-import { getEventBus, TaskFlowEvent } from '../events';
+import { getEventBus } from '../events';
+import { TaskFlowEvent } from '../../types/event';
 import {
   Tool,
   ToolCategory,
@@ -251,10 +252,11 @@ export class ToolRegistry {
     };
 
     this.eventBus.emit({
-      type: TaskFlowEvent.STEP_COMPLETE, // 复用步骤完成事件
+      type: TaskFlowEvent.TASK_COMPLETED, // 复用任务完成事件
       payload: event,
       timestamp: Date.now(),
       source: 'ToolRegistry',
+      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     });
   }
 

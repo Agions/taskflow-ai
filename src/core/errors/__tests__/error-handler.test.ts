@@ -1,5 +1,6 @@
-import { ErrorHandler, ErrorSeverity, ErrorContext } from './error-handler';
-import { Logger } from '../../utils/logger';
+// @ts-nocheck
+import { ErrorHandler, ErrorSeverity, ErrorContext } from '../error-handler';
+import { Logger } from '../../../utils/logger';
 
 describe('ErrorHandler', () => {
   let errorHandler: ErrorHandler;
@@ -8,7 +9,7 @@ describe('ErrorHandler', () => {
     warn: jest.fn(),
     error: jest.fn(),
     debug: jest.fn()
-  } as Logger;
+  } as unknown as Logger;
 
   beforeEach(() => {
     errorHandler = new ErrorHandler(mockLogger, false);

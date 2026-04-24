@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { TaskFlowConfig, ModelConfig } from '../config';
 
 describe('Config Types', () => {

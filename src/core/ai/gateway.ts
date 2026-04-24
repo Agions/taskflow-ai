@@ -1,6 +1,7 @@
 import { getLogger } from '../../utils/logger';
 import { CacheManager, CacheKeys } from '../cache';
-import { getEventBus, TaskFlowEvent, AIRequestPayload, AIResponsePayload } from '../events';
+import { getEventBus } from '../events';
+import { TaskFlowEvent, AIRequestPayload, AIResponsePayload } from '../../types/event';
 import { RateLimiter, DEFAULT_LIMITS } from '../network/rate-limiter';
 
 const logger = getLogger('module');
@@ -116,12 +117,16 @@ export class ModelGateway {
     // 初始化缓存管理器
     if (this.enableCache) {
       this.cacheManager = new CacheManager({
-        enableL1: true,
-        enableL2: true,
-        l1MaxSize: 200,
-        l1MaxMemory: 20,
-        l1Ttl: 300, // 5 分钟
-        l2Ttl: 86400, // 24 小时
+        enabled: true,
+        l1: {
+          enabled: true,
+          maxSize: 200,
+          ttl: 300, // 5 分钟
+        },
+        l2: {
+          enabled: true,
+          ttl: 86400, // 24 小时
+        },
       });
       logger.info('ModelGateway 缓存已启用');
     }
@@ -140,7 +145,7 @@ export class ModelGateway {
       .update(content + model)
       .digest('hex')
       .slice(0, 32);
-    return CacheKeys.aiResponse(hash);
+    return CacheKeys.aiResponse(hash, model);
   }
 
   /** 添加模型 */
@@ -252,6 +257,7 @@ export class ModelGateway {
         payload: { cacheType: 'l1', key: cacheKey },
         timestamp: Date.now(),
         source: 'ModelGateway',
+        id: `event-${Date.now()}`,
       });
 
       // 发送 AI 响应事件 (缓存)
@@ -260,6 +266,7 @@ export class ModelGateway {
         modelName: model.modelName,
         responseLength: cached.choices?.[0]?.message?.content?.length ?? 0,
         duration: 0,
+        cached: true,
         tokens: cached.usage
           ? {
               prompt: cached.usage.prompt_tokens,
@@ -275,6 +282,7 @@ export class ModelGateway {
         payload: responsePayload,
         timestamp: Date.now(),
         source: 'ModelGateway',
+        id: `event-${Date.now()}`,
       });
 
       return {
@@ -300,6 +308,7 @@ export class ModelGateway {
       },
       timestamp: Date.now(),
       source: 'ModelGateway',
+        id: `event-${Date.now()}`,
     });
 
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
@@ -327,6 +336,7 @@ export class ModelGateway {
           modelName: model.modelName,
           responseLength: response.choices?.[0]?.message?.content?.length ?? 0,
           duration: Date.now() - startTime,
+          cached: false,
           tokens: response.usage
             ? {
                 prompt: response.usage.prompt_tokens,
@@ -342,6 +352,7 @@ export class ModelGateway {
           payload: responsePayload,
           timestamp: Date.now(),
           source: 'ModelGateway',
+        id: `event-${Date.now()}`,
         });
 
         return {
@@ -407,7 +418,7 @@ export class ModelGateway {
     const results: Array<{ modelId: string; success: boolean; latency: number; error?: string }> =
       [];
 
-    for (const [modelId, adapter] of this.adapters) {
+    for (const [modelId, adapter] of Array.from(this.adapters.entries())) {
       const result = await adapter.test();
       results.push({
         modelId,

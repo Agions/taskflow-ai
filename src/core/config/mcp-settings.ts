@@ -22,12 +22,12 @@ export class MCPSettingsManager {
       throw createTaskFlowError('config', ERROR_CODES.CONFIG_NOT_FOUND, '配置文件不存在');
     }
 
-    config.mcpSettings = {
-      ...config.mcpSettings,
+    config.mcpSettings! = {
+      ...config.mcpSettings!,
       ...mcpSettings,
     };
 
-    await this.operations.saveConfig(config);
+    await this.operations.saveConfig(config as any);
   }
 
   /**
@@ -63,11 +63,11 @@ export class MCPSettingsManager {
       throw createTaskFlowError('config', ERROR_CODES.CONFIG_NOT_FOUND, '配置文件不存在');
     }
 
-    config.mcpSettings.security = {
-      ...config.mcpSettings.security,
+    (((config.mcpSettings as any)?.security ?? {}) ?? {}) = {
+      ...(((config.mcpSettings as any)?.security ?? {}) ?? {}),
       ...securitySettings,
     };
 
-    await this.operations.saveConfig(config);
+    await this.operations.saveConfig(config as any);
   }
 }

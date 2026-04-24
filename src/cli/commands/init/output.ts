@@ -19,7 +19,7 @@ export function showNextSteps(config: TaskFlowConfig): void {
   console.log(chalk.gray('  3. 查看项目状态: ') + chalk.blue('taskflow status'));
   console.log(chalk.gray('  4. 生成可视化报告: ') + chalk.blue('taskflow visualize'));
 
-  if (config.aiModels.length > 0) {
+  if (config.aiModels!.length > 0) {
     console.log(chalk.gray('  5. 启动MCP服务器: ') + chalk.blue('taskflow mcp start'));
   }
 

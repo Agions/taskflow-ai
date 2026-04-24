@@ -35,6 +35,15 @@ export enum TaskFlowEvent {
   // 系统事件
   SYSTEM_INIT = 'system.init',
   SYSTEM_SHUTDOWN = 'system.shutdown',
+
+  // 缓存事件
+  CACHE_HIT = 'cache.hit',
+  CACHE_MISS = 'cache.miss',
+
+  // AI 事件
+  AI_REQUEST = 'ai.request',
+  AI_RESPONSE = 'ai.response',
+  AI_ERROR = 'ai.error',
 }
 
 /**
@@ -58,6 +67,7 @@ export type EventHandler<T = unknown> = (event: Event<T>) => void | Promise<void
  * 事件监听器配置
  */
 export interface EventListenerConfig {
+  id: string;
   handler: EventHandler;
   once?: boolean;
   priority?: number;
@@ -83,4 +93,38 @@ export interface EventSubscription {
   event: string;
   handler: EventHandler;
   once: boolean;
+}
+
+/**
+ * AI 请求载荷
+ */
+export interface AIRequestPayload {
+  modelId: string;
+  modelName: string;
+  promptLength: number;
+  cacheKey: string;
+}
+
+/**
+ * AI 响应载荷
+ */
+export interface AIResponsePayload {
+  modelId: string;
+  modelName: string;
+  responseLength: number;
+  duration: number;
+  cached: boolean;
+  tokens?: number | { prompt: number; completion: number; total: number };
+  cacheHit?: boolean;
+  cost?: number;
+}
+
+/**
+ * Workflow 事件载荷
+ */
+export interface WorkflowEventPayload {
+  workflowId: string;
+  executionId: string;
+  status: string;
+  timestamp: number;
 }

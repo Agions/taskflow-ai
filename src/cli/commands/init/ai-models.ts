@@ -96,6 +96,8 @@ export async function configureAIModels(): Promise<AIModelConfig[]> {
       modelName: modelConfig.modelName,
       apiKey: modelConfig.apiKey,
       priority: modelConfig.priority,
+      id: `model-${Date.now()}`,
+      capabilities: ['chat'],
       enabled: true,
       maxTokens: 4000,
       temperature: 0.7,

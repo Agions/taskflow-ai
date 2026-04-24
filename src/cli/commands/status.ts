@@ -178,7 +178,7 @@ async function runStatus(options: StatusOptions) {
           {
             project: { name: config.projectName, version: config.version },
             aiModels: { total: configStats.aiModelsCount, enabled: configStats.enabledModelsCount },
-            mcp: { enabled: configStats.mcpEnabled, port: config.mcpSettings?.port },
+            mcp: { enabled: configStats.mcpEnabled, port: config.mcpSettings!?.port },
             lastModified: configStats.lastModified,
           },
           null,
@@ -201,9 +201,9 @@ async function runStatus(options: StatusOptions) {
     console.log(chalk.gray('  已配置模型: ') + chalk.yellow(configStats.aiModelsCount));
     console.log(chalk.gray('  启用的模型: ') + chalk.green(configStats.enabledModelsCount));
 
-    if (config.aiModels.length > 0) {
+    if (config.aiModels!.length > 0) {
       console.log(chalk.gray('  模型列表:'));
-      config.aiModels.forEach((model, index) => {
+      config.aiModels!.forEach((model, index) => {
         const status = model.enabled ? chalk.green('●') : chalk.red('○');
         console.log(
           chalk.gray(`    ${index + 1}. `) +
@@ -220,12 +220,12 @@ async function runStatus(options: StatusOptions) {
     if (configStats.mcpEnabled) {
       console.log(
         chalk.gray('  地址: ') +
-          chalk.blue(`http://${config.mcpSettings.host}:${config.mcpSettings.port}`)
+          chalk.blue(`http://${config.mcpSettings!.host}:${config.mcpSettings!.port}`)
       );
-      console.log(chalk.gray('  工具数量: ') + chalk.yellow(config.mcpSettings.tools.length));
+      console.log(chalk.gray('  工具数量: ') + chalk.yellow(config.mcpSettings!.tools.length));
       console.log(
         chalk.gray('  安全模式: ') +
-          (config.mcpSettings.security.authRequired ? chalk.green('启用') : chalk.yellow('禁用'))
+          (config.mcpSettings!.security.authRequired ? chalk.green('启用') : chalk.yellow('禁用'))
       );
     }
 

@@ -91,7 +91,7 @@ export function generateGanttChart(
     data: data.tasks.map(
       (task: Task): GanttTaskItem => ({
         id: task.id,
-        name: task.title,
+        name: (task.title ?? task.name ?? ""),
         start: new Date().toISOString().split('T')[0],
         duration: task.estimatedHours || 8,
         progress: task.progress || 0,
@@ -176,7 +176,7 @@ export function generateTimelineChart(
     title: '项目时间线',
     data: data.tasks.map(
       (task: Task): TimelineTaskItem => ({
-        name: task.title,
+        name: (task.title ?? task.name ?? ""),
         start: new Date().toISOString(),
         end: new Date(Date.now() + (task.estimatedHours || 8) * 60 * 60 * 1000).toISOString(),
         type: task.type,

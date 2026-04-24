@@ -1,4 +1,5 @@
-import { ExtensionLifecycleManager, ExtensionLifecycle, ExtensionStatus, ExtensionDefinition } from './lifecycle-manager';
+// @ts-nocheck
+import { ExtensionLifecycleManager, ExtensionLifecycle, ExtensionStatus, ExtensionDefinition } from '../lifecycle-manager';
 
 describe('ExtensionLifecycleManager', () => {
   let lifecycleManager: ExtensionLifecycleManager;

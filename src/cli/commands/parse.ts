@@ -84,7 +84,7 @@ async function runParse(filePath: string, options: ParseCommandOptions): Promise
 
     spinner.succeed(chalk.green('解析完成！'));
 
-    const totalHours = tasks.reduce((sum: number, task: Task) => sum + task.estimatedHours, 0);
+    const totalHours = tasks.reduce((sum: number, task: Task) => sum + (task.estimatedHours ?? 0), 0);
 
     console.log(chalk.cyan('\n📊 解析结果:'));
     console.log(chalk.gray('  文档标题: ') + chalk.white(prdDocument.title));
@@ -118,7 +118,7 @@ async function saveResults(
     tasks,
     summary: {
       totalTasks: tasks.length,
-      totalHours: tasks.reduce((sum: number, task: Task) => sum + task.estimatedHours, 0),
+      totalHours: tasks.reduce((sum: number, task: Task) => sum + (task.estimatedHours ?? 0), 0),
       generatedAt: new Date().toISOString(),
     },
   };
@@ -163,7 +163,7 @@ ${tasks
 - **类型**: ${task.type}
 - **优先级**: ${task.priority}
 - **复杂度**: ${task.complexity}
-- **预估工时**: ${task.estimatedHours} 小时
+- **预估工时**: ${(task.estimatedHours ?? 0)} 小时
 - **状态**: ${task.status}
 - **描述**: ${task.description}
 

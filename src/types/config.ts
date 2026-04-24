@@ -4,18 +4,65 @@
  */
 
 /**
+ * MCP 设置
+ */
+export interface MCPSettings {
+  enabled?: boolean;
+  port?: number;
+  host?: string;
+  serverName?: string;
+  version?: string;
+  capabilities?: string[];
+  security: {
+    enableAuth?: boolean;
+    allowedOrigins?: string[];
+    authRequired?: boolean;
+    rateLimit?: {
+      requestsPerMinute: number;
+      tokensPerMinute: number;
+    };
+    sandbox?: {
+      enabled: boolean;
+      timeout: number;
+    };
+  };
+  tools: unknown[];
+  resources: unknown[];
+}
+
+/**
+ * AI 模型配置 (兼容旧代码)
+ * @deprecated 使用 ModelConfig 替代
+ */
+export interface AIModelConfig extends ModelConfig {
+  provider: AIProvider;
+  maxTokens?: number;
+  endpoint?: string;
+  temperature?: number;
+}
+
+/**
+ * AI 提供商 (兼容旧代码)
+ */
+export type AIProvider = ModelProvider;
+
+/**
  * TaskFlow AI 配置
  */
 export interface TaskFlowConfig {
   version: string;
   workspace: string;
   environment: 'development' | 'staging' | 'production';
+  projectName?: string;
   models: ModelConfig[];
+  /** @deprecated 使用 models 替代 */
+  aiModels?: AIModelConfig[];
   cache: CacheConfig;
   logging: LoggingConfig;
   plugins: PluginsConfig;
   extensions: ExtensionsConfig;
   security: SecurityConfig;
+  mcpSettings?: MCPSettings;
 }
 
 /**

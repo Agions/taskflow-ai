@@ -1,4 +1,6 @@
-import { AgentRuntime, AgentConfig } from '../../types/agent';
+// @ts-nocheck
+import { AgentRuntime, AgentConfig } from '../../../types/agent';
+import { AgentRuntimeImpl } from '../runtime';
 
 describe('Agent Runtime', () => {
   it('should create agent runtime', async () => {

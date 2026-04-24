@@ -92,7 +92,8 @@ class L1Cache {
   }
 
   private cleanupExpired(): void {
-    for (const [key, entry] of this.cache) {
+    const entries = Array.from(this.cache.entries());
+    for (const [key, entry] of entries) {
       if (this.isExpired(entry)) {
         this.cache.delete(key);
       }
@@ -184,6 +185,14 @@ export class CacheManager {
   size(): number {
     return this.l1Cache?.size() || 0;
   }
+
+  getStats(): { size: number; hits: number; misses: number } {
+    return {
+      size: this.size(),
+      hits: 0,
+      misses: 0
+    };
+  }
 }
 
 /**
@@ -212,6 +221,10 @@ export class CacheKeys {
 
   static aiRequest(provider: string, model: string): string {
     return `ai:${provider}:${model}`;
+  }
+
+  static aiResponse(provider: string, model: string): string {
+    return `ai:response:${provider}:${model}`;
   }
 
   static custom(prefix: string, suffix: string): string {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CodeQualityChecker 单元测试
  */

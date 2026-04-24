@@ -24,7 +24,7 @@ export class ConfigImportExportManager {
 
     const exportConfig = {
       ...config,
-      aiModels: config.aiModels.map(model => ({
+      aiModels: config.aiModels!.map(model => ({
         ...model,
         apiKey: '***', // 隐藏API密钥
       })),
@@ -49,7 +49,7 @@ export class ConfigImportExportManager {
       },
     };
 
-    await this.operations.saveConfig(mergedConfig);
+    await this.operations.saveConfig(mergedConfig as any);
   }
 
   /**
@@ -63,6 +63,6 @@ export class ConfigImportExportManager {
    * 重置配置为默认值
    */
   async resetConfig(): Promise<void> {
-    await this.operations.saveConfig(DEFAULT_CONFIG);
+    await this.operations.saveConfig(DEFAULT_CONFIG as any);
   }
 }

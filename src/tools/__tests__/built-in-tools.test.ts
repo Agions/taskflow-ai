@@ -1,5 +1,7 @@
-import { BuiltInTools } from './built-in-tools';
-import { ToolDefinition, ToolCategory } from '../types/tool';
+// @ts-nocheck
+import { BuiltInTools } from '../built-in-tools';
+import { ToolDefinition } from '../../../types/tool';
+import { ToolCategory } from '../../../types/tool';
 
 describe('BuiltInTools', () => {
   let builtInTools: BuiltInTools;

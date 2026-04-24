@@ -113,7 +113,7 @@ program
     };
 
     // AIModelConfig doesn't have id, so we need a type-safe search
-    const models = config.aiModels || [];
+    const models = config.aiModels! || [];
     const existingIndex = models.findIndex(
       m => (m as AIModelConfig & { id?: string }).id === newModel.id
     );
@@ -124,7 +124,7 @@ program
       models.push(newModel as AIModelConfig);
       console.log(chalk.green(`添加新模型: ${newModel.id}`));
     }
-    config.aiModels = models;
+    config.aiModels! = models;
 
     await saveConfig(config);
     gateway = null;
@@ -145,14 +145,14 @@ program
       return;
     }
 
-    const models = config.aiModels as (AIModelConfig & { id?: string })[];
+    const models = config.aiModels! as (AIModelConfig & { id?: string })[];
     const index = models.findIndex(m => m.id === options.id);
     if (index < 0) {
       console.log(chalk.yellow(`未找到模型: ${options.id}`));
       return;
     }
 
-    config.aiModels.splice(index, 1);
+    config.aiModels!.splice(index, 1);
     await saveConfig(config);
 
     console.log(chalk.green(`已移除模型: ${options.id}`));

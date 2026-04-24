@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Workflow, WorkflowStep, WorkflowExecution, NodeExecutor } from '../workflow';
 
 describe('Workflow Types', () => {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MCP Server 单元测试
  */

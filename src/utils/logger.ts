@@ -56,31 +56,31 @@ export class Logger {
     this.context = { ...this.context, ...context };
   }
 
-  debug(message: string, context?: LoggerContext): void {
+  debug(message: string, context?: LoggerContext | unknown): void {
     if (this.level > LogLevel.DEBUG) return;
 
-    const entry = this.log(LogLevel.DEBUG, message, context);
+    const entry = this.log(LogLevel.DEBUG, message, context as LoggerContext);
     this.output(entry);
   }
 
-  info(message: string, context?: LoggerContext): void {
+  info(message: string, context?: LoggerContext | unknown): void {
     if (this.level > LogLevel.INFO) return;
 
-    const entry = this.log(LogLevel.INFO, message, context);
+    const entry = this.log(LogLevel.INFO, message, context as LoggerContext);
     this.output(entry);
   }
 
-  warn(message: string, context?: LoggerContext): void {
+  warn(message: string, context?: LoggerContext | unknown): void {
     if (this.level > LogLevel.WARN) return;
 
-    const entry = this.log(LogLevel.WARN, message, context);
+    const entry = this.log(LogLevel.WARN, message, context as LoggerContext);
     this.output(entry);
   }
 
-  error(message: string, context?: LoggerContext): void {
+  error(message: string, context?: LoggerContext | unknown): void {
     if (this.level > LogLevel.ERROR) return;
 
-    const entry = this.log(LogLevel.ERROR, message, context);
+    const entry = this.log(LogLevel.ERROR, message, context as LoggerContext);
     this.output(entry);
   }
 
@@ -164,3 +164,10 @@ export const log = {
   warn: (message: string, context?: LoggerContext) => logger.warn(message, context),
   error: (message: string, context?: LoggerContext) => logger.error(message, context)
 };
+
+/**
+ * 获取 Logger 实例（兼容旧代码）
+ */
+export function getLogger(source: string, context?: LoggerContext): Logger {
+  return Logger.getInstance(source, context);
+}

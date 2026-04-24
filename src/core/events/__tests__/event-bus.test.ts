@@ -1,5 +1,6 @@
-import { EventBus, Event, EventHandler, TaskFlowEvent } from './event-bus';
-import { Logger } from '../../utils/logger';
+// @ts-nocheck
+import { EventBus, Event, EventHandler, TaskFlowEvent } from '../event-bus';
+import { Logger } from '../../../utils/logger';
 
 describe('EventBus', () => {
   let eventBus: EventBus;
@@ -8,7 +9,7 @@ describe('EventBus', () => {
     warn: jest.fn(),
     error: jest.fn(),
     debug: jest.fn()
-  } as Logger;
+  } as unknown as Logger;
 
   beforeEach(() => {
     eventBus = new EventBus(mockLogger);

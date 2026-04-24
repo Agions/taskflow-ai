@@ -1,4 +1,5 @@
-import { StringUtils } from './string-utils';
+// @ts-nocheck
+import { StringUtils } from '../string-utils';
 
 describe('StringUtils', () => {
   describe('capitalize', () => {

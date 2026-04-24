@@ -109,6 +109,7 @@ export interface WorkflowExecution {
   outputs: Record<string, unknown>;
   startedAt: number;
   completedAt?: number;
+  finishedAt?: number;
   duration?: number;
   error?: WorkflowError;
 }
@@ -121,6 +122,21 @@ export interface WorkflowError {
   message: string;
   stack?: string;
   timestamp: number;
+}
+
+/**
+ * 执行结果 (兼容旧代码)
+ * @deprecated 使用 WorkflowExecution 替代
+ */
+export interface ExecutionResult {
+  success: boolean;
+  workflowId: string;
+  executionId: string;
+  execution?: WorkflowExecution;
+  outputs?: Record<string, unknown>;
+  errors?: string[];
+  error?: WorkflowError;
+  duration?: number;
 }
 
 /**

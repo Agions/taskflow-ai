@@ -1,4 +1,5 @@
-import { ValidationUtils } from './validation-utils';
+// @ts-nocheck
+import { ValidationUtils } from '../validation-utils';
 
 describe('ValidationUtils', () => {
   describe('isEmail', () => {

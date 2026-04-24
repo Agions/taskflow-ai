@@ -4,7 +4,8 @@
  */
 
 import { getLogger } from '../utils/logger';
-import { getEventBus, TaskFlowEvent } from '../core/events';
+import { getEventBus } from '../core/events';
+import { TaskFlowEvent } from '../types/event';
 import {
   TaskFlowPlugin,
   PluginManifest,
@@ -75,6 +76,7 @@ export class PluginManager {
             payload: data,
             timestamp: Date.now(),
             source: 'Plugin',
+            id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           });
         },
         on: (event: string, handler: (data: unknown) => void) => {
@@ -115,10 +117,10 @@ export class PluginManager {
 
     // 监听各种事件并触发插件钩子
     const hookMap: Record<string, TaskFlowEvent[]> = {
-      beforeWorkflowExecute: [TaskFlowEvent.WORKFLOW_START],
-      afterWorkflowComplete: [TaskFlowEvent.WORKFLOW_COMPLETE],
-      beforeStepExecute: [TaskFlowEvent.STEP_START],
-      afterStepComplete: [TaskFlowEvent.STEP_COMPLETE],
+      beforeWorkflowExecute: [TaskFlowEvent.WORKFLOW_STARTED],
+      afterWorkflowComplete: [TaskFlowEvent.WORKFLOW_COMPLETED],
+      beforeStepExecute: [TaskFlowEvent.TASK_STARTED],
+      afterStepComplete: [TaskFlowEvent.TASK_COMPLETED],
       onAIRequest: [TaskFlowEvent.AI_REQUEST],
       onAIResponse: [TaskFlowEvent.AI_RESPONSE],
       onCacheHit: [TaskFlowEvent.CACHE_HIT],

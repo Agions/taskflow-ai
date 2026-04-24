@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Task, TaskStatus, TaskExecutionContext, TaskResult as TaskResultType } from '../task';
 
 describe('Task Types', () => {

@@ -15,12 +15,14 @@ import { Logger } from '../../utils/logger';
  * TaskFlow AI v4.0
  */
 export class AgentRuntimeImpl implements AgentRuntime {
+  id: string;
   private logger: Logger;
   private config: AgentConfig;
   private state: AgentState;
   private memory: AgentMemory;
 
   constructor(config: AgentConfig) {
+    this.id = config.id;
     this.config = config;
     this.logger = Logger.getInstance(`Agent(${config.id})`);
     this.memory = {

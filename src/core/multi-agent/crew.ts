@@ -3,7 +3,8 @@
  */
 
 import { getLogger } from '../../utils/logger';
-import { getEventBus, TaskFlowEvent } from '../events';
+import { getEventBus } from '../events';
+import { TaskFlowEvent } from '../../types/event';
 import {
   CrewConfig,
   Crew,
@@ -520,10 +521,11 @@ export class AgentCrew {
    */
   private emitEvent(crewId: string, type: string, data: Record<string, unknown>): void {
     this.eventBus.emit({
-      type: TaskFlowEvent.WORKFLOW_COMPLETE, // 复用工作流事件
+      type: TaskFlowEvent.WORKFLOW_COMPLETED, // 复用工作流事件
       payload: { crewId, type, ...data },
       timestamp: Date.now(),
       source: 'AgentCrew',
+      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     });
 
     if (crewId.startsWith('crew-')) {

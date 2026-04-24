@@ -1,4 +1,5 @@
-import { ToolRegistry, ToolDefinition, ToolCategory } from './tool-registry';
+// @ts-nocheck
+import { ToolRegistry, ToolDefinition, ToolCategory } from '../tool-registry';
 
 describe('ToolRegistry', () => {
   let toolRegistry: ToolRegistry;

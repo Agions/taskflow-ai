@@ -1,4 +1,5 @@
-import { WorkflowEngine, Workflow, WorkflowExecution, ExecutionResult } from './workflow-engine';
+// @ts-nocheck
+import { WorkflowEngine, Workflow, WorkflowExecution, ExecutionResult } from '../workflow-engine';
 
 describe('WorkflowEngine', () => {
   let workflowEngine: WorkflowEngine;

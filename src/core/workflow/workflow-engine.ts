@@ -11,11 +11,11 @@ import {
   NodeOutput,
   WorkflowStatus,
   StepStatus
-} from '../types/workflow';
-import { Logger } from '../utils/logger';
+} from '../../types/workflow';
+import { Logger } from '../../utils/logger';
 import { CacheManager, CacheKeys } from '../cache';
 import { getEventBus } from '../events';
-import { EventHandler } from '../types/event';
+import { EventHandler } from '../../types/event';
 
 export class WorkflowEngine {
   private logger: Logger;
@@ -78,6 +78,8 @@ export class WorkflowEngine {
       const duration = Date.now() - startTime;
       const result: ExecutionResult = {
         success: true,
+        workflowId: workflow.id,
+        executionId,
         execution,
         duration,
         outputs: execution.outputs,
@@ -101,6 +103,8 @@ export class WorkflowEngine {
       const duration = Date.now() - startTime;
       const result: ExecutionResult = {
         success: false,
+        workflowId: workflow.id,
+        executionId,
         execution,
         duration,
         outputs: {},
@@ -144,8 +148,9 @@ export class WorkflowEngine {
   cleanup(): void {
     const now = Date.now();
     const oneHour = 3600000;
+    const executions = Array.from(this.executions.entries());
 
-    for (const [id, execution] of this.executions) {
+    for (const [id, execution] of executions) {
       if (execution.completedAt && (now - execution.completedAt) > oneHour) {
         this.executions.delete(id);
       }
@@ -290,10 +295,51 @@ export class WorkflowEngine {
   private emitWorkflowError(workflow: Workflow, executionId: string, result: ExecutionResult): void {
     this.eventBus.emit({
       type: 'workflow.error' as any,
-      payload: { workflowId: workflow.id, executionId, errors: result.errors },
+      payload: { workflowId: workflow.id, executionId, errors: result.errors || [] },
       timestamp: Date.now(),
       source: 'WorkflowEngine',
       id: `event-${Date.now()}`
     });
+  }
+
+  /**
+   * 暂停工作流执行
+   */
+  pause(executionId: string): boolean {
+    const execution = this.executions.get(executionId);
+    if (!execution) {
+      this.logger.warn(`Execution not found: ${executionId}`);
+      return false;
+    }
+    if (execution.status === 'running') {
+      execution.status = 'paused';
+      this.logger.info(`Paused workflow execution: ${executionId}`);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * 恢复工作流执行
+   */
+  resume(executionId: string): boolean {
+    const execution = this.executions.get(executionId);
+    if (!execution) {
+      this.logger.warn(`Execution not found: ${executionId}`);
+      return false;
+    }
+    if (execution.status === 'paused') {
+      execution.status = 'running';
+      this.logger.info(`Resumed workflow execution: ${executionId}`);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * 列出所有执行
+   */
+  listExecutions(): WorkflowExecution[] {
+    return Array.from(this.executions.values());
   }
 }

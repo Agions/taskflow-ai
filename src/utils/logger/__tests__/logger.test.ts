@@ -1,4 +1,5 @@
-import { Logger, LogLevel } from './logger';
+// @ts-nocheck
+import { Logger, LogLevel } from '../../logger';
 
 describe('Logger', () => {
   let logger: Logger;

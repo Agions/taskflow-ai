@@ -1,6 +1,7 @@
 import { getLogger } from '../../utils/logger';
 import { CacheManager, CacheKeys } from '../cache';
-import { getEventBus, TaskFlowEvent, WorkflowEventPayload } from '../events';
+import { getEventBus } from '../events';
+import { TaskFlowEvent, WorkflowEventPayload } from '../../types/event';
 
 /**
  * 工作流引擎控制器
@@ -26,12 +27,9 @@ export class WorkflowEngine {
   constructor() {
     this.logger = Logger.getInstance('WorkflowEngine');
     this.cacheManager = new CacheManager({
-      enableL1: true,
-      enableL2: true,
-      l1MaxSize: 100,
-      l1MaxMemory: 10,
-      l1Ttl: 600, // 10 分钟
-      l2Ttl: 86400, // 24 小时
+      enabled: true,
+      l1: { enabled: true, maxSize: 100, ttl: 600 },
+      l2: { enabled: true, ttl: 86400 },
     });
     logger.info('WorkflowEngine 缓存已启用');
   }
@@ -53,15 +51,16 @@ export class WorkflowEngine {
       // 发送工作流完成事件 (缓存)
       const payload: WorkflowEventPayload = {
         workflowId: workflow.id,
-        workflowName: workflow.name,
         executionId: cachedResult.execution.id,
-        duration: Date.now() - startTime,
+        status: 'completed',
+        timestamp: Date.now(),
       };
       this.eventBus.emit({
-        type: TaskFlowEvent.WORKFLOW_COMPLETE,
+        type: TaskFlowEvent.WORKFLOW_COMPLETED,
         payload,
         timestamp: Date.now(),
         source: 'WorkflowEngine',
+        id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       });
 
       // 返回缓存结果的副本
@@ -94,14 +93,16 @@ export class WorkflowEngine {
     // 发送工作流开始事件
     const startPayload: WorkflowEventPayload = {
       workflowId: workflow.id,
-      workflowName: workflow.name,
       executionId: execution.id,
+      status: 'started',
+      timestamp: Date.now(),
     };
     this.eventBus.emit({
-      type: TaskFlowEvent.WORKFLOW_START,
+      type: TaskFlowEvent.WORKFLOW_STARTED,
       payload: startPayload,
       timestamp: Date.now(),
       source: 'WorkflowEngine',
+      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     });
 
     try {
@@ -134,15 +135,16 @@ export class WorkflowEngine {
       // 发送工作流完成事件
       const completePayload: WorkflowEventPayload = {
         workflowId: workflow.id,
-        workflowName: workflow.name,
         executionId: execution.id,
-        duration: result.duration,
+        status: 'completed',
+        timestamp: Date.now(),
       };
       this.eventBus.emit({
-        type: TaskFlowEvent.WORKFLOW_COMPLETE,
+        type: TaskFlowEvent.WORKFLOW_COMPLETED,
         payload: completePayload,
         timestamp: Date.now(),
         source: 'WorkflowEngine',
+        id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       });
 
       return result;
@@ -156,15 +158,16 @@ export class WorkflowEngine {
       // 发送工作流错误事件
       const errorPayload: WorkflowEventPayload = {
         workflowId: workflow.id,
-        workflowName: workflow.name,
         executionId: execution.id,
-        error: execution.error,
+        status: 'failed',
+        timestamp: Date.now(),
       };
       this.eventBus.emit({
-        type: TaskFlowEvent.WORKFLOW_ERROR,
+        type: TaskFlowEvent.WORKFLOW_FAILED,
         payload: errorPayload,
         timestamp: Date.now(),
         source: 'WorkflowEngine',
+        id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       });
 
       return {

@@ -8,8 +8,8 @@ import {
   ExtensionLifecycle,
   ExtensionType,
   ExtensionStatus
-} from '../types/extensions';
-import { Logger } from '../utils/logger';
+} from '../../types/extensions';
+import { Logger } from '../../utils/logger';
 import { getEventBus } from '../events';
 import { ExtensionRegistry } from './registry';
 

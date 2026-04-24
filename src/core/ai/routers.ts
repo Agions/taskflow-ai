@@ -105,7 +105,7 @@ export class SmartRouter extends BaseRouter {
     }
 
     // 排序
-    const ranked = [...scoredModels.values()].sort((a, b) => b.score - a.score);
+    const ranked = Array.from(scoredModels.values()).sort((a, b) => b.score - a.score);
     const selectedId = preferredModel ?? ranked[0]?.model.id;
 
     return {

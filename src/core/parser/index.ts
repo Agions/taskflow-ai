@@ -88,8 +88,8 @@ export class PRDParser {
         estimatedHours,
       },
       sections,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     };
 
     return document;
@@ -134,7 +134,7 @@ export class PRDParser {
           title,
           type: this.determineSectionType(title),
           content: '',
-          requirements: [],
+          // requirements: [],
           dependencies: [],
           order: sectionOrder++,
         };

@@ -119,8 +119,8 @@ export class TaskDecomposer {
       tags: [],
       subtasks: [],
       progress: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     } as unknown as ProjectTask);
 
     if (feature.length > 50) {
@@ -138,8 +138,8 @@ export class TaskDecomposer {
         tags: [],
         subtasks: [],
         progress: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
       } as unknown as ProjectTask);
     }
 
@@ -185,7 +185,7 @@ export class TaskDecomposer {
     for (const task of tasks) {
       const base = baseHours[task.type] ?? 8;
       const lengthFactor = Math.max(0.5, Math.min(2, task.description.length / 100));
-      task.estimatedHours = Math.round(base * lengthFactor);
+      (task.estimatedHours ?? 0) = Math.round(base * lengthFactor);
     }
   }
 
@@ -287,10 +287,10 @@ export class HourEstimator {
     const byPriority: Record<string, number> = {};
 
     for (const task of tasks) {
-      total += task.estimatedHours;
+      total += (task.estimatedHours ?? 0);
 
-      byType[task.type] = (byType[task.type] || 0) + task.estimatedHours;
-      byPriority[task.priority] = (byPriority[task.priority] || 0) + task.estimatedHours;
+      byType[task.type] = (byType[task.type] || 0) + (task.estimatedHours ?? 0);
+      byPriority[task.priority] = (byPriority[task.priority] || 0) + (task.estimatedHours ?? 0);
     }
 
     return { total, byType, byPriority };
