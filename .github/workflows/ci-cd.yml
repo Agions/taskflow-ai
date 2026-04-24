@@ -1,36 +1,15 @@
-name: TaskFlow AI CI/CD Pipeline
+name: Hello World Test
 on:
   push:
     branches: [main]
 
 jobs:
-  basic-checks:
-    name: Basic Checks
+  hello-world:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        
-    - name: Install dependencies
-      run: npm ci --no-audit --no-fund
-      
-    - name: Run ESLint
-      run: echo "ESLint completed"
-      
-    - name: TypeScript check
-      run: echo "TypeScript check completed"
-      
-    - name: Prettier check
-      run: echo "Prettier check completed"
-      
-    - name: Run tests
-      run: echo "Tests completed"
-      
-    - name: Build project
-      run: echo "Build completed"
+    - name: Say Hello
+      run: echo "Hello from GitHub Actions!"
