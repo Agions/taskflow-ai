@@ -27,7 +27,7 @@ export class StringUtils {
   static snakeCase(str: string): string {
     return str
       .replace(/([A-Z])/g, '_$1')
-      .replace(/^-/, '')
+      .replace(/^_+/, '')
       .toLowerCase();
   }
 
