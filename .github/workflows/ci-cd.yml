@@ -195,7 +195,7 @@ jobs:
 
       - name: Generate changelog
         run: |
-          git log --pretty=format:"%h - %s (%an)" ${GITHUB_REF_NAME}..HEAD > CHANGELOG.tmp
+          git log --pretty=format:"%h - %s (%an)" ${{ github.ref_name }}..HEAD > CHANGELOG.tmp
           echo "## What's Changed" > CHANGELOG.md
           cat CHANGELOG.tmp >> CHANGELOG.md
           rm CHANGELOG.tmp
