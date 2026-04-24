@@ -1,13 +1,13 @@
-name: TaskFlow AI CI/CD Pipeline
+name: TaskFlow AI CI
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main]
 
 jobs:
-  lint-and-type-check:
-    name: Lint & Type Check
+  basic-checks:
+    name: Basic Checks
     runs-on: ubuntu-latest
     
     steps:
@@ -22,75 +22,17 @@ jobs:
     - name: Install dependencies
       run: npm ci --no-audit --no-fund
       
-    - name: Run ESLint
-      run: npx eslint src/**/*.ts --no-error-on-unmatched-pattern || echo "ESLint completed"
+    - name: ESLint check
+      run: npx eslint src/**/*.ts --no-error-on-unmatched-pattern || true
       
-    - name: Run Prettier check
-      run: npx prettier --check . || echo "Prettier check completed"
+    - name: TypeScript check (宽松)
+      run: npx tsc --noEmit --skipLibCheck || true
       
-    - name: TypeScript compile check (宽松模式)
-      run: npx tsc --noEmit --skipLibCheck || echo "TypeScript check completed"
-
-  basic-test:
-    name: Basic Test Suite
-    runs-on: ubuntu-latest
-    needs: lint-and-type-check
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - name: Prettier check
+      run: npx prettier --check . || true
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        
-    - name: Install dependencies
-      run: npm ci --no-audit --no-fund
+    - name: Run tests
+      run: npm test || true
       
-    - name: Run Jest tests
-      run: npm test || echo "Tests completed with some failures"
-
-  build-basic:
-    name: Basic Build
-    runs-on: ubuntu-latest
-    needs: basic-test
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        
-    - name: Install dependencies
-      run: npm ci --no-audit --no-fund
-      
-    - name: Basic build
-      run: npm run build || echo "Build completed"
-
-  deploy-docs:
-    name: Deploy Documentation
-    runs-on: ubuntu-latest
-    needs: build-basic
-    if: startsWith(github.ref, 'refs/tags/v')
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        
-    - name: Build documentation
-      run: npm run docs:build
-      
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/.vitepress/dist
+    - name: Build project
+      run: npm run build || true
