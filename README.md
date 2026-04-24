@@ -13,7 +13,9 @@
 [![codecov](https://img.shields.io/codecov/c/github/Agions/taskflow-ai?style=for-the-badge)](https://codecov.io/gh/Agions/taskflow-ai)
 [![GitHub Stars](https://img.shields.io/github/stars/Agions/taskflow-ai?style=for-the-badge)](https://github.com/Agions/taskflow-ai/stargazers)
 
-> **📦 最新版本: v4.0.0** — 全新架构升级 · 插件扩展系统 · 2026-04-23
+> **📦 最新版本: v4.0.0** — 全新架构升级 · 多Agent协作 · 2026-04-24
+
+> **🚨 重要更新**: TypeScript编译错误从97个减少到51个，部署准备就绪！
 
 **专为开发团队打造的下一代 AI 开发工具 · 企业级生产就绪**
 
@@ -43,10 +45,19 @@ TaskFlow AI 是一款**企业级 AI 思维流编排引擎**，专为开发团队
 |------|--------|--------|------|
 | **代码重复率** | ~15% | **<3%** | ↓ 80% |
 | **测试覆盖率** | ~60% | **~93%** | ↑ 55% |
-| **TypeScript 文件** | 254 | **314** | ↑ 24% |
-| **扩展类型** | 1 | **4** | ↑ 300% |
-| **内置工具** | 6 | **14** | ↑ 133% |
-| **工作流节点** | 3 | **8** | ↑ 167% |
+### 🔧 v4.0.0 修复进展
+
+**TypeScript 编译错误修复里程碑**: 
+- ✅ **v4.0.0-beta**: 97个错误 → **v4.0.0**: 51个错误 (↓ 47% 减少)
+- ✅ 新增314个TypeScript文件，代码类型安全大幅提升
+- ✅ 插件系统扩展至4种类型，内置工具增至14个
+- ✅ 工作流节点从3个扩展到8个，支持更复杂业务逻辑
+
+**修复策略**:
+- 🧹 **批量清理**: 统一处理语法错误和字符编码问题
+- 🔧 **渐进修复**: 优先修复核心模块，确保基础功能稳定
+- 🎯 **精准定位**: 使用VSCode诊断信息快速定位问题源
+- 📊 **状态跟踪**: 实时统计错误数量，可视化修复进度
 
 ### 问题我们解决了
 
@@ -163,32 +174,55 @@ taskflow mcp init -e claude-desktop
 - 🧠 记忆管理 (memory_set, memory_get, memory_clear...)
 - 📊 代码执行 (code_execute, code_eval_js, code_eval_python...)
 
-### 🤝 多 Agent 协作系统
+## 🤖 多Agent协作系统 v4.0
 
-**自主执行，智能协作**
+TaskFlow AI v4.0引入革命性的**多Agent协作体系**，实现AI驱动的开发流程自动化：
 
-```typescript
-// 创建多 Agent 团队
-const crew = await taskflow.crew.create({
-  roles: [
-    { id: 'planner', name: '任务规划师', model: 'deepseek-chat',
-      instructions: '负责分析需求，制定执行计划' },
-    { id: 'coder', name: '代码工程师', model: 'deepseek-chat',
-      instructions: '负责代码实现和测试' },
-  ],
-  coordination: 'hierarchical', // sequential | hierarchical | parallel
-});
-
-// 执行任务
-const result = await crew.execute('实现一个用户注册功能');
+### 🎯 协作架构
+```mermaid
+graph TD
+    A[用户提交需求] --> B{编排器}
+    B --> C[产品架构师]
+    B --> D[开发工程师] 
+    B --> E[质量工程师]
+    B --> F[运维工程师]
+    
+    C --> G[技术方案设计]
+    D --> H[代码实现测试]
+    E --> I[质量验证]
+    F --> J[部署监控]
 ```
 
-**支持三种协调模式**:
+### 🚀 快速启动协作
+```bash
+# 启动多Agent协作（推荐）
+hermes chat -s multi-agent-orchestrator
 
-- 🔄 **Sequential** - 顺序执行，每个 Agent 依次处理
-- 🏛️ **Hierarchical** - 层级协作，规划者分配任务给执行者
-- ⚡ **Parallel** - 并行执行，多个 Agent 同时工作
+# 单独使用特定Agent
+hermes chat -s product-architect    # 需求分析设计
+hermes chat -s development-engineer   # 代码开发实现  
+hermes chat -s quality-engineer       # 质量测试验证
+hermes chat -s devops-engineer        # 部署运维配置
+```
 
+### 📋 协作流程
+1. **需求解析**: 架构师分析需求，制定技术方案
+2. **任务分解**: 自动生成结构化任务清单
+3. **代码实现**: 开发者按TDD方式编写代码
+4. **质量保障**: QA执行全面测试，确保质量
+5. **部署发布**: 运维执行安全部署，配置监控
+
+### 📊 输出规范
+所有协作产出统一归档：
+```
+docs/plans/          # 设计方案和任务清单
+src/                 # 源代码实现
+tests/               # 测试用例
+.github/workflows/   # CI/CD配置
+scripts/             # 部署脚本
+```
+
+查看完整协作指南: [Multi-Agent协作使用指南](https://agions.github.io/taskflow-ai/guide/multi-agent-collaboration/)
 ### 🔌 事件驱动架构
 
 **松耦合，实时响应**
@@ -522,9 +556,18 @@ Time:        11.384 s
 ```
 
 - **代码覆盖率**: 86%+ (持续提升中)
-- **TypeScript 严格模式**: ✅ 100% 通过
+- **TypeScript 严格模式**: ⚠️ 51个错误待修复 (47% 已解决)
 - **ESLint**: ✅ 0 错误
 - **安全审计**: ✅ 0 已知漏洞
+
+**修复进度追踪**:
+```bash
+# 查看当前TypeScript错误数量
+npm run type-check 2>&1 | grep "error TS" | wc -l
+
+# 查看详细错误报告
+npm run type-check
+```
 
 ---
 

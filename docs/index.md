@@ -16,6 +16,9 @@ hero:
       text: '📖 开发者指南'
       link: /DEVELOPER_GUIDE
     - theme: alt
+      text: '🤖 Multi-Agent协作'
+      link: /multi-agent-collaboration
+    - theme: alt
       text: '💻 GitHub'
       link: https://github.com/agions/taskflow-ai
 
@@ -43,12 +46,28 @@ features:
   - icon: 🤝
     title: 多 Agent 协作
     details: 自主目标执行，AI 反思机制，多 Agent 消息传递和任务分发，短期/长期记忆系统
-    link: /guide/advanced-features
+    link: /multi-agent-collaboration
 
   - icon: 🔌
     title: MCP 集成
     details: 支持 Cursor、Windsurf、Trae、Claude Desktop，动态工具注册，企业级安全策略
     link: /guide/mcp-setup
+
+  - icon: 🛡️
+    title: TypeScript修复进展
+    details: 从97个编译错误减少到51个，代码质量显著提升
+    link: /type-script-fixes
+
+  - icon: 📊
+    title: 质量工程
+    details: 全面的测试覆盖、性能监控和安全防护体系
+    link: /quality-guide
+
+  - icon: ⚙️
+    title: 运维部署
+    details: 容器化部署、CI/CD流水线、自动化监控告警
+    link: /devops-guide
+
 ---
 
 <script setup>
