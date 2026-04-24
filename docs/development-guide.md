@@ -1,5 +1,7 @@
 # 👨‍💻 开发工程师最佳实践 v4.0
 
+**[English Version 🇺🇸](./DEVELOPER_GUIDE.md)**
+
 TaskFlow AI v4.0为开发工程师提供了完整的工具链和规范，确保代码质量和团队协作效率。
 
 ## 🎯 开发流程规范

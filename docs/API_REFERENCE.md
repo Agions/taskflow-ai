@@ -1,5 +1,7 @@
 # TaskFlow AI v4.0 API Reference
 
+**[中文版 🇨🇳](./api-reference.md)**
+
 ## Core Modules
 
 ### @taskflow-ai/types

@@ -1,5 +1,7 @@
 # TaskFlow AI v4.0 Developer Guide
 
+**[中文版 🇨🇳](./development-guide.md)**
+
 ## Table of Contents
 
 1. [Quick Start](#quick-start)

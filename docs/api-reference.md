@@ -1,5 +1,7 @@
 # TaskFlow AI API 文档
 
+**[English Version 🇺🇸](./API_REFERENCE.md)**
+
 ## 概述
 
 TaskFlow AI 提供了丰富的API接口，包括CLI命令行接口和MCP服务器接口。本文档详细描述了所有可用的API和配置选项。
