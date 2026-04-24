@@ -11,37 +11,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Debug - List files
-        run: |
-          ls -la
-          cat jest.config.js
-          cat tsconfig.test.json
+        run: npm ci
 
       - name: Run tests
-        run: pnpm exec jest --config jest.config.js --verbose 2>&1 || true
-
-      - name: Debug - Check test results
-        run: |
-          echo "Exit code: $?"
-          ls -la
+        run: npm test
 
       - name: Build
-        run: |
-          pnpm exec tsc -p tsconfig.build.json 2>&1 || echo "Build failed with exit code $?"
+        run: npm run build
 
       - name: Publish to npm
-        run: pnpm publish --access public --no-git-checks
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
