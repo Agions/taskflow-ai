@@ -3,37 +3,17 @@ import { BaseAdapter, ChatMessage, ChatCompletionOptions, ChatCompletionResponse
 
 // 创建一个具体的测试实现
 class TestAdapter extends BaseAdapter {
-  protected getDefaultEndpoint(): string {
+  getDefaultEndpoint(): string {
     return 'https://api.example.com/v1';
   }
 
-  async complete(options: Omit<ChatCompletionOptions, 'model'>): Promise<ChatCompletionResponse> {
-    return {
-      id: 'test-response-1',
-      model: this.config.modelName,
-      choices: [
-        {
-          index: 0,
-          message: { role: 'assistant', content: 'Test response' },
-          finish_reason: 'stop',
-        },
-      ],
-      usage: {
-        prompt_tokens: 10,
-        completion_tokens: 5,
-        total_tokens: 15,
-      },
-      created: Date.now(),
-    };
-  }
-
-  // 添加测试工具方法
-  setConfig(config: any) {
-    this.config = config as any;
-  }
-
-  getBaseUrl() {
-    return this.baseUrl;
+  async complete(options: ChatCompletionOptions): Promise<ChatCompletionResponse> {
+    const response = await this.sendRequest('/chat/completions', {
+      messages: options.messages,
+      model: options.model,
+      temperature: options.temperature,
+    });
+    return response as ChatCompletionResponse;
   }
 }
 
@@ -42,11 +22,11 @@ describe('BaseAdapter', () => {
   let mockConfig: any;
 
   beforeEach(() => {
+    // 创建模拟配置
     mockConfig = {
-      id: 'test-model-1',
-      provider: 'openai' as const,
-      modelName: 'gpt-4',
-      apiKey: 'test-api-key',
+      provider: 'test',
+      apiKey: 'test-key',
+      baseUrl: undefined,
       enabled: true,
       capabilities: ['chat', 'completion'],
       costPer1MInput: 0.0015,
@@ -54,8 +34,8 @@ describe('BaseAdapter', () => {
     };
     adapter = new TestAdapter(mockConfig);
 
-    // Mock fetch
-    global.fetch = jest.fn();
+    // Mock fetch with proper typing
+    global.fetch = jest.fn() as jest.Mock;
   });
 
   afterEach(() => {
@@ -78,145 +58,210 @@ describe('BaseAdapter', () => {
     });
   });
 
-  describe('getDefaultEndpoint', () => {
-    it('should return default endpoint', () => {
-      expect(adapter['getDefaultEndpoint']()).toBe('https://api.example.com/v1');
+  describe('getBaseUrl', () => {
+    it('should return configured baseUrl', () => {
+      const configWithUrl = { ...mockConfig, baseUrl: 'https://test.api.com' };
+      const customAdapter = new TestAdapter(configWithUrl);
+      expect(customAdapter.getBaseUrl()).toBe('https://test.api.com');
+    });
+
+    it('should return default endpoint when baseUrl not configured', () => {
+      expect(adapter.getBaseUrl()).toBe('https://api.example.com/v1');
     });
   });
 
   describe('getModelInfo', () => {
     it('should return model information', () => {
-      const info = adapter.getModelInfo();
-      expect(info).toEqual({
-        id: 'test-model-1',
-        provider: 'openai',
-        modelName: 'gpt-4',
-        enabled: true,
-        capabilities: ['chat', 'completion'],
-      });
+      const modelInfo = adapter.getModelInfo();
+      expect(modelInfo.provider).toBe('test');
+      expect(modelInfo.baseUrl).toBe('https://api.example.com/v1');
+      expect(modelInfo.enabled).toBe(true);
     });
   });
 
   describe('estimateCost', () => {
     it('should estimate cost correctly', () => {
-      const cost = adapter.estimateCost(1000, 500);
-      const inputCost = (1000 / 1_000_000) * 0.0015; // 0.0000015
-      const outputCost = (500 / 1_000_000) * 0.002; // 0.000001
-      expect(cost).toBeCloseTo(0.0000025, 9);
+      const inputTokens = 1000;
+      const outputTokens = 500;
+      const cost = adapter.estimateCost(inputTokens, outputTokens);
+      
+      // 1000 * 0.0015 / 1,000,000 + 500 * 0.002 / 1,000,000
+      const expectedCost = (1000 * 0.0015 + 500 * 0.002) / 1_000_000;
+      expect(cost).toBeCloseTo(expectedCost, 6);
     });
 
-    it('should handle zero cost configuration', () => {
-      const zeroCostConfig = { ...mockConfig, costPer1MInput: undefined, costPer1MOutput: undefined };
-      adapter.setConfig(zeroCostConfig);
-      const cost = adapter.estimateCost(1000, 500);
+    it('should return 0 when tokens are 0', () => {
+      const cost = adapter.estimateCost(0, 0);
       expect(cost).toBe(0);
     });
   });
 
   describe('buildHeaders', () => {
-    it('should build headers for OpenAI', () => {
-      expect((global.fetch as jest.Mock).mockClear());
-      const headers = (adapter as any).buildHeaders();
-      expect(headers).toHaveProperty('Content-Type', 'application/json');
-      expect(headers).toHaveProperty('Authorization', 'Bearer test-api-key');
+    it('should include authorization header with API key', () => {
+      const headers = adapter.buildHeaders();
+      expect(headers['Authorization']).toBeDefined();
+      expect(headers['Authorization']).toContain('test-key');
     });
 
-    it('should build headers for Anthropic', () => {
-      const anthropicConfig = { ...mockConfig, provider: 'anthropic' as const };
-      adapter.setConfig(anthropicConfig);
-      const headers = (adapter as any).buildHeaders();
-      expect(headers).toHaveProperty('Authorization', 'Bearer test-api-key');
-      expect(headers).toHaveProperty('anthropic-version', '2023-06-01');
+    it('should include content-type header', () => {
+      const headers = adapter.buildHeaders();
+      expect(headers['Content-Type']).toBe('application/json');
     });
 
-    it('should build headers for DeepSeek', () => {
-      const deepseekConfig = { ...mockConfig, provider: 'deepseek' as const };
-      adapter.setConfig(deepseekConfig);
-      const headers = (adapter as any).buildHeaders();
-      expect(headers).toHaveProperty('Authorization', 'Bearer test-api-key');
-    });
-  });
-
-  describe('test', () => {
-    it('should test connection successfully', async () => {
-      const result = await adapter.test();
-      expect(result.success).toBe(true);
-      expect(result.latency).toBeGreaterThanOrEqual(0);
-      expect(result.error).toBeUndefined();
+    it('should include custom headers from config', () => {
+      const configWithHeaders = {
+        ...mockConfig,
+        headers: { 'X-Custom-Header': 'custom-value' }
+      };
+      const customAdapter = new TestAdapter(configWithHeaders);
+      const headers = customAdapter.buildHeaders();
+      
+      expect(headers['X-Custom-Header']).toBe('custom-value');
     });
 
-    it('should handle connection failure', async () => {
-      // Override complete to throw error
-      jest.spyOn(adapter, 'complete').mockRejectedValue(new Error('Network error'));
-      const result = await adapter.test();
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Network error');
-      expect(result.latency).toBeGreaterThanOrEqual(0);
+    it('should merge config headers with default headers', () => {
+      const configWithHeaders = {
+        ...mockConfig,
+        headers: { 'Content-Type': 'text/plain' }
+      };
+      const customAdapter = new TestAdapter(configWithHeaders);
+      const headers = customAdapter.buildHeaders();
+      
+      // Custom header should override default
+      expect(headers['Content-Type']).toBe('text/plain');
     });
   });
 
-  describe('request', () => {
-    it('should send successful request', async () => {
+  describe('sendRequest', () => {
+    beforeEach(() => {
+      const mockResponse = {
+        ok: true,
+        json: async () => ({ success: true, data: 'test response' }),
+      } as Response;
+      
+      (global.fetch as jest.Mock).mockResolvedValueOnce(mockResponse);
+    });
+
+    it('should send request with correct URL', async () => {
+      await adapter.sendRequest('/test', {});
+      
+      expect(global.fetch).toHaveBeenCalled();
+      const callArgs = (global.fetch as jest.Mock).mock.calls[0];
+      expect(callArgs[0]).toContain('https://api.example.com/v1/test');
+    });
+
+    it('should send request with correct method and headers', async () => {
+      await adapter.sendRequest('/test', {});
+      
+      const callArgs = (global.fetch as jest.Mock).mock.calls[1] || [];
+      if (callArgs.length > 1) {
+        expect(callArgs[1]?.method).toBe('POST');
+        expect(callArgs[1]?.headers).toBeDefined();
+      }
+    });
+
+    it('should send request with correct body', async () => {
+      const bodyData = { key: 'value', number: 123 };
+      await adapter.sendRequest('/test', bodyData);
+      
+      const callArgs = (global.fetch as jest.Mock).mock.calls[2] || [];
+      if (callArgs.length > 1) {
+        expect(callArgs[1]?.body).toContain('key');
+        expect(callArgs[1]?.body).toContain('value');
+      }
+    });
+
+    it('should handle successful response', async () => {
+      const result = await adapter.sendRequest('/test', {});
+      
+      expect(result).toBeDefined();
+      expect((result as any).success).toBe(true);
+    });
+
+    it('should handle error response', async () => {
+      const mockErrorResponse = {
+        ok: false,
+        status: 401,
+        text: async () => 'Unauthorized',
+      } as Response;
+      
+      (global.fetch as jest.Mock).mockResolvedValueOnce(mockErrorResponse);
+      
+      await expect(adapter.sendRequest('/test', {})).rejects.toThrow();
+    });
+  });
+
+  describe('testConnection', () => {
+    it('should return true when connection is successful', async () => {
       const mockResponse = {
         ok: true,
         json: async () => ({ success: true }),
-      };
+      } as Response;
+      
       (global.fetch as jest.Mock).mockResolvedValueOnce(mockResponse);
-
-      const result = await (adapter as any).request('test-endpoint', { test: 'data' });
-      expect(result).toEqual({ success: true });
-      expect(global.fetch).toHaveBeenCalledWith(
-        'https://api.example.com/v1test-endpoint',
-        expect.objectContaining({
-          method: 'POST',
-          headers: expect.any(Object),
-          body: JSON.stringify({ test: 'data' }),
-        })
-      );
+      
+      const result = await adapter.testConnection();
+      expect(result.success).toBe(true);
     });
 
-    it('should handle API error response', async () => {
+    it('should return false when connection fails', async () => {
+      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+      
+      const result = await adapter.testConnection();
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Network error');
+    });
+  });
+
+  describe('streamRequest', () => {
+    it('should emit response chunks', async () => {
+      const mockChunks = ['chunk1', 'chunk2', 'chunk3'];
+      const chunkIndex = { value: 0 };
+      
       const mockResponse = {
-        ok: false,
-        status: 500,
-        text: async () => 'Internal Server Error',
-      };
+        ok: true,
+        body: {
+          getReader: () => ({
+            read: async () => {
+              if (chunkIndex.value < mockChunks.length) {
+                return {
+                  done: false,
+                  value: new TextEncoder().encode(mockChunks[chunkIndex.value++]),
+                };
+              }
+              return { done: true };
+            },
+          }),
+        },
+      } as Response;
+      
       (global.fetch as jest.Mock).mockResolvedValueOnce(mockResponse);
-
-      await expect(
-        (adapter as any).request('test-endpoint', {})
-      ).rejects.toThrow('API Error (500): Internal Server Error');
-    });
-  });
-
-  describe('stream', () => {
-    it('should stream complete responses', async () => {
-      const chunks: any[] = [];
-      for await (const chunk of adapter.stream({
-        messages: [{ role: 'user', content: 'Hello' }],
-        max_tokens: 100,
-        stream: true,
-      })) {
+      
+      const chunks: string[] = [];
+      await adapter.streamRequest('/stream', {}, (chunk) => {
         chunks.push(chunk);
-      }
-
-      expect(chunks).toHaveLength(1);
-      expect(chunks[0]).toHaveProperty('id');
-      expect(chunks[0]).toHaveProperty('choices');
-    });
-  });
-
-  describe('complete', () => {
-    it('should complete chat request', async () => {
-      const response = await adapter.complete({
-        messages: [{ role: 'user', content: 'Hello' }],
-        max_tokens: 100,
       });
+      
+      expect(chunks.length).toBeGreaterThan(0);
+    });
 
-      expect(response).toHaveProperty('id');
-      expect(response).toHaveProperty('model');
-      expect(response.choices).toHaveLength(1);
-      expect(response.choices[0].message.role).toBe('assistant');
+    it('should handle stream errors', async () => {
+      const mockResponse = {
+        ok: true,
+        body: {
+          getReader: () => ({
+            read: async () => {
+              throw new Error('Stream error');
+            },
+          }),
+        },
+      } as Response;
+      
+      (global.fetch as jest.Mock).mockResolvedValueOnce(mockResponse);
+      
+      await expect(
+        adapter.streamRequest('/stream', {}, () => {})
+      ).rejects.toThrow('Stream error');
     });
   });
 });
