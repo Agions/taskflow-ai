@@ -21,7 +21,7 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Build
-        run: npm run build --ignore-scripts
+        run: npm run build:fast --ignore-scripts
 
       - name: Publish to npm
         run: npm publish --access public
