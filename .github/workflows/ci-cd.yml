@@ -183,7 +183,7 @@ jobs:
       - name: Verify version consistency
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          TAG_VERSION=${{ github.ref }} # refs/tags/v1.0.0
           if [ "$VERSION" != "$TAG_VERSION" ]; then
             echo "Version mismatch: package.json has $VERSION but tag is v$TAG_VERSION"
             exit 1
