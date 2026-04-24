@@ -3,9 +3,16 @@
  * TaskFlow AI v4.0
  */
 
-import { ToolDefinition, ToolCategory, ToolResult } from '../types/tool';
+import { ToolDefinition, ToolCategory, ToolResult, ToolCategories } from '../types/tool';
 import { Logger } from '../utils/logger';
 import { getEventBus } from '../core/events';
+
+/**
+ * ToolCategory 值数组
+ */
+const TOOL_CATEGORY_VALUES: ToolCategory[] = [
+  'filesystem', 'shell', 'http', 'git', 'database', 'code', 'ai', 'custom'
+];
 
 export interface ToolRegistration {
   definition: ToolDefinition;
@@ -26,8 +33,8 @@ export class ToolRegistry {
   }
 
   private initializeCategories(): void {
-    Object.values(ToolCategory).forEach(category => {
-      this.byCategory.set(category as ToolCategory, new Set());
+    TOOL_CATEGORY_VALUES.forEach(category => {
+      this.byCategory.set(category, new Set());
     });
   }
 

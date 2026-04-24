@@ -2,7 +2,7 @@
  * 优化帮助信息展示
  */
 
-import chalk from 'chalk';
+import chalk = require('chalk');
 import boxen from 'boxen';
 import { theme } from './theme';
 import { animations } from './animations';

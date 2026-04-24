@@ -4,10 +4,10 @@ import { getLogger } from '../../utils/logger';
  */
 
 import { Command } from 'commander';
-import chalk from 'chalk';
-import ora from 'ora';
-import path from 'path';
-import fs from 'fs-extra';
+import chalk = require('chalk');
+import ora = require('ora');
+import path = require('path');
+import fs = require('fs-extra');
 import { ConfigManager } from '../../core/config';
 import { CLI_SYMBOLS } from '../../constants';
 

@@ -4,7 +4,7 @@ import { getLogger } from '../../utils/logger';
  * 支持 .docx 格式
  */
 
-import fs from 'fs-extra';
+import fs = require('fs-extra');
 import { Logger } from '../../utils/logger';
 const logger = getLogger('core/parser/word');
 

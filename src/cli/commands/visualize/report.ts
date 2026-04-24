@@ -2,8 +2,8 @@
  * 报告生成器
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { ChartData } from './charts';
 
 /** 报告生成选项 */

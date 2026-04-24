@@ -3,7 +3,7 @@
  * 提供渐变、彩虹、脉冲等视觉效果
  */
 
-import chalk from 'chalk';
+import chalk = require('chalk');
 import gradient from 'gradient-string';
 
 // ==================== 渐变主题 ====================

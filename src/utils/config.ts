@@ -2,7 +2,7 @@
  * 配置工具函数
  */
 
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { TaskFlowConfig } from '../types';
 import { REGEX_PATTERNS } from '../constants';
 

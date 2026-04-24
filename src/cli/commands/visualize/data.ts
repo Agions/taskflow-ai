@@ -5,8 +5,8 @@ const logger = getLogger('cli/commands/visualize/data');
  * 数据加载器
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { Task } from '../../../types/task';
 import { VisualizationData } from './charts';
 

@@ -2,9 +2,9 @@
  * Flow create 命令
  */
 
-import chalk from 'chalk';
-import fs from 'fs-extra';
-import path from 'path';
+import chalk = require('chalk');
+import fs = require('fs-extra');
+import path = require('path');
 import { getTemplate } from './templates';
 
 interface CreateOptions {

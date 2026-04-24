@@ -2,7 +2,7 @@
  * 升级命令 - 检查并更新版本
  */
 
-import chalk from 'chalk';
+import chalk = require('chalk');
 import { execSync } from 'child_process';
 import fs from 'fs';
 

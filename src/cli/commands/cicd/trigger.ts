@@ -2,8 +2,8 @@
  * CI/CD trigger 命令
  */
 
-import chalk from 'chalk';
-import ora from 'ora';
+import chalk = require('chalk');
+import ora = require('ora');
 import { createIntegration, validateToken, detectRepo } from './engine';
 
 interface TriggerOptions {

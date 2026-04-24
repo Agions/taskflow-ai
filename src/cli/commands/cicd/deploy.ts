@@ -2,8 +2,8 @@
  * CI/CD deploy 命令
  */
 
-import chalk from 'chalk';
-import ora from 'ora';
+import chalk = require('chalk');
+import ora = require('ora');
 import { isInitialized, loadConfig, createIntegration, validateToken, detectRepo } from './engine';
 
 interface DeployOptions {

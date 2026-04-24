@@ -7,8 +7,8 @@ import { execSync } from 'child_process';
 import { ToolResponse, toolOk, toolError } from '../tools/types';
 const logger = getLogger('mcp/server/executor');
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 
 interface TerminalArgs {
   command: string;

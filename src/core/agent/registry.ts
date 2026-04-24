@@ -43,6 +43,7 @@ export class AgentRegistry {
       ...definition.defaultConfig,
       ...config,
       id: config.id || `${agentType}-${Date.now()}`,
+      name: config.name || definition.name,
       capabilities: config.capabilities || definition.capabilities,
       tools: config.tools || [],
       memory: config.memory || {

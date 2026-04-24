@@ -3,8 +3,8 @@ import { getLogger } from '../../../utils/logger';
  * Agent 运行器
  */
 
-import chalk from 'chalk';
-import ora from 'ora';
+import chalk = require('chalk');
+import ora = require('ora');
 import { AgentStateMachine } from '../../../agent/state-machine';
 import { AgentConfig, AgentContext, PRDDocument } from '../../../agent/types';
 import type { AgentState } from '../../../agent/state-machine/types';

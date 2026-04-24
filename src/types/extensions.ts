@@ -6,7 +6,7 @@
 /**
  * ExtensionType 类型别名（向后兼容）
  */
-export type ExtensionType = 'plugin' | 'agent' | 'tool' | 'workflow';
+export type ExtensionType = 'plugin' | 'agent' | 'tool' | 'workflow' | 'command' | 'ui' | 'middleware';
 
 /**
  * Extension 类型常量
@@ -15,7 +15,10 @@ export const ExtensionTypes = {
   COMMAND: 'command',
   TOOL: 'tool',
   PLUGIN: 'plugin',
-  AGENT: 'agent'
+  AGENT: 'agent',
+  WORKFLOW: 'workflow',
+  UI: 'ui',
+  MIDDLEWARE: 'middleware'
 } as const;
 
 /**
@@ -25,8 +28,24 @@ export enum ExtensionStatus {
   LOADED = 'loaded',
   ACTIVE = 'active',
   INACTIVE = 'inactive',
-  ERROR = 'error'
+  ERROR = 'error',
+  PENDING = 'pending',
+  LOADING = 'loading',
+  DISPOSED = 'disposed'
 }
+
+/**
+ * ExtensionStatus 值数组
+ */
+export const EXTENSION_STATUS_VALUES: ExtensionStatus[] = [
+  ExtensionStatus.PENDING,
+  ExtensionStatus.LOADING,
+  ExtensionStatus.LOADED,
+  ExtensionStatus.ACTIVE,
+  ExtensionStatus.INACTIVE,
+  ExtensionStatus.ERROR,
+  ExtensionStatus.DISPOSED
+];
 
 /**
  * 扩展定义

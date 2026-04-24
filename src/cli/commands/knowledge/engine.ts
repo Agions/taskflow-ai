@@ -2,8 +2,8 @@
  * Knowledge 命令引擎
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { KnowledgeBaseConfig } from '../../../knowledge/types';
 import { EmbeddingManager } from '../../../knowledge/embedding';
 import { VectorStoreManager } from '../../../knowledge/storage';

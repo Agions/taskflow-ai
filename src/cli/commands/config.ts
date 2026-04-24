@@ -3,7 +3,7 @@
  */
 
 import { Command } from 'commander';
-import chalk from 'chalk';
+import chalk = require('chalk');
 
 export function configCommand(program: Command) {
   program

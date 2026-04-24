@@ -3,10 +3,10 @@
  */
 
 import { Command } from 'commander';
-import chalk from 'chalk';
+import chalk = require('chalk');
 import { execSync } from 'child_process';
 import fs from 'fs';
-import path from 'path';
+import path = require('path');
 
 export function doctorCommand(program: Command) {
   program

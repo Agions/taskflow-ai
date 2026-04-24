@@ -4,7 +4,7 @@ import { getLogger } from '../../utils/logger';
  */
 
 import { Command } from 'commander';
-import chalk from 'chalk';
+import chalk = require('chalk');
 import { MCPServer } from '../../mcp/server';
 import { ConfigManager } from '../../core/config';
 import { generateAllConfigs, exportConfig, EditorConfig } from '../../mcp/config/generator';

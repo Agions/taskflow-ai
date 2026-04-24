@@ -4,8 +4,8 @@ import { getLogger } from '../../utils/logger';
  * PRD 模板、工作流模板、任务模板
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { Logger } from '../../utils/logger';
 const logger = getLogger('core/plugin/template');
 

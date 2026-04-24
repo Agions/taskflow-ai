@@ -3,7 +3,7 @@
  */
 
 import inquirer from 'inquirer';
-import chalk from 'chalk';
+import chalk = require('chalk');
 import { AIProvider, AIModelConfig } from '../../../types';
 import { AI_PROVIDERS } from '../../../constants';
 

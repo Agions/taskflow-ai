@@ -4,15 +4,15 @@ import { getLogger } from '../../utils/logger';
  */
 
 import { Command } from 'commander';
-import chalk from 'chalk';
-import ora from 'ora';
-import path from 'path';
-import fs from 'fs-extra';
+import chalk = require('chalk');
+import ora = require('ora');
+import path = require('path');
+import fs = require('fs-extra');
 import { PRDParser } from '../../core/parser';
-import { TaskGenerator } from '../../core/tasks';
+import { TaskGenerator } from '../../agent/planning/task-generator';
 import { ConfigManager } from '../../core/config';
-import { PRDDocument } from '../../types/prd';
-import { Task } from '../../types/task';
+import { PRDDocument } from '../../types';
+import { Task } from '../../types';
 const logger = getLogger('cli/commands/parse');
 
 /** Parse 命令选项 */
@@ -76,8 +76,10 @@ async function runParse(filePath: string, options: ParseCommandOptions): Promise
     let tasks: Task[] = [];
     if (options.tasks !== false) {
       spinner.text = '正在生成任务...';
-      const taskGenerator = new TaskGenerator(config);
-      tasks = await taskGenerator.generateTasks(prdDocument);
+      const taskGenerator = new TaskGenerator({
+        complete: async (prompt: string) => prompt,
+      });
+      tasks = await taskGenerator.generate(prdDocument);
     }
 
     const outputPath = await saveResults(prdDocument, tasks, options);

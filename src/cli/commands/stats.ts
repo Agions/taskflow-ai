@@ -3,12 +3,12 @@ import { getLogger } from '../../utils/logger';
  * 统计命令 - 显示项目统计信息
  */
 
-import chalk from 'chalk';
+import chalk = require('chalk');
 import { execSync } from 'child_process';
 const logger = getLogger('cli/commands/stats');
 
 import fs from 'fs';
-import path from 'path';
+import path = require('path');
 
 export const statsCommand = {
   name: 'stats',

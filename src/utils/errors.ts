@@ -10,7 +10,7 @@ import { ERROR_CODES } from '../constants';
  */
 export function createTaskFlowError(
   type: string,
-  code: string,
+  code: number,
   message: string,
   context?: Record<string, any>
 ): TaskFlowError {
@@ -127,7 +127,7 @@ export function validateFilePath(filePath: string): void {
 export class AsyncErrorBoundary {
   private handlers: Map<ErrorType, (error: TaskFlowError) => void> = new Map();
 
-  onError(type: string, handler: (error: TaskFlowError) => void): void {
+  onError(type: ErrorType, handler: (error: TaskFlowError) => void): void {
     this.handlers.set(type, handler);
   }
 
@@ -136,7 +136,7 @@ export class AsyncErrorBoundary {
       return await fn();
     } catch (error) {
       if (isTaskFlowError(error)) {
-        const handler = this.handlers.get(error.type);
+        const handler = this.handlers.get(error.type as ErrorType);
         if (handler) {
           handler(error);
           return Promise.reject(error);

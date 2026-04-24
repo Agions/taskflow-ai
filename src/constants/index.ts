@@ -159,45 +159,55 @@ export const DEFAULT_COLORS = [
 ];
 
 export const ERROR_CODES = {
-  CONFIG_NOT_FOUND: 'CONFIG_NOT_FOUND',
-  CONFIG_INVALID: 'CONFIG_INVALID',
-  CONFIG_PARSE_ERROR: 'CONFIG_PARSE_ERROR',
+  CONFIG_NOT_FOUND: 1001,
+  CONFIG_INVALID: 1002,
+  CONFIG_PARSE_ERROR: 1003,
 
-  FILE_NOT_FOUND: 'FILE_NOT_FOUND',
-  FILE_READ_ERROR: 'FILE_READ_ERROR',
-  FILE_WRITE_ERROR: 'FILE_WRITE_ERROR',
+  FILE_NOT_FOUND: 2001,
+  FILE_READ_ERROR: 2002,
+  FILE_WRITE_ERROR: 2003,
 
-  PRD_PARSE_ERROR: 'PRD_PARSE_ERROR',
-  PRD_FORMAT_UNSUPPORTED: 'PRD_FORMAT_UNSUPPORTED',
-  PRD_CONTENT_INVALID: 'PRD_CONTENT_INVALID',
+  UNSUPPORTED_FORMAT: 2004,
 
-  AI_MODEL_ERROR: 'AI_MODEL_ERROR',
-  AI_API_ERROR: 'AI_API_ERROR',
-  AI_RATE_LIMIT: 'AI_RATE_LIMIT',
-  AI_TIMEOUT: 'AI_TIMEOUT',
+  PRD_PARSE_ERROR: 3001,
+  PRD_FORMAT_UNSUPPORTED: 3002,
+  PRD_CONTENT_INVALID: 3003,
 
-  MCP_SERVER_ERROR: 'MCP_SERVER_ERROR',
-  MCP_TOOL_ERROR: 'MCP_TOOL_ERROR',
-  MCP_RESOURCE_ERROR: 'MCP_RESOURCE_ERROR',
+  AI_MODEL_ERROR: 4001,
+  AI_API_ERROR: 4002,
+  AI_RATE_LIMIT: 4003,
+  AI_TIMEOUT: 4004,
 
-  VALIDATION_ERROR: 'VALIDATION_ERROR',
-  REQUIRED_FIELD_MISSING: 'REQUIRED_FIELD_MISSING',
-  INVALID_FORMAT: 'INVALID_FORMAT',
+  MCP_SERVER_ERROR: 5001,
+  MCP_TOOL_ERROR: 5002,
+  MCP_RESOURCE_ERROR: 5003,
 
-  NETWORK_ERROR: 'NETWORK_ERROR',
-  CONNECTION_TIMEOUT: 'CONNECTION_TIMEOUT',
+  VALIDATION_ERROR: 6001,
+  REQUIRED_FIELD_MISSING: 6002,
+  INVALID_FORMAT: 6003,
 
-  PLUGIN_NOT_FOUND: 'PLUGIN_NOT_FOUND',
-  PLUGIN_LOAD_ERROR: 'PLUGIN_LOAD_ERROR',
-  PLUGIN_EXECUTION_ERROR: 'PLUGIN_EXECUTION_ERROR',
+  NETWORK_ERROR: 7001,
+  CONNECTION_TIMEOUT: 7002,
+
+  PLUGIN_NOT_FOUND: 8001,
+  PLUGIN_LOAD_ERROR: 8002,
+  PLUGIN_EXECUTION_ERROR: 8003,
 } as const;
 
 import { TaskFlowConfig } from '../types';
 
-export const DEFAULT_CONFIG = {
+export const DEFAULT_CONFIG: TaskFlowConfig = {
   projectName: '',
   version: '1.0.0',
+  workspace: '',
+  environment: 'development',
+  models: [],
   aiModels: [],
+  cache: { enabled: false, l1: { enabled: false, maxSize: 0, ttl: 0 }, l2: { enabled: false, ttl: 0 } },
+  logging: { level: 'info', console: true, format: 'text' },
+  plugins: { enabled: [], directory: './plugins', autoLoad: false },
+  extensions: { agents: { directory: './agents', autoDiscover: false }, tools: { directory: './tools', autoDiscover: false }, workflows: { directory: './workflows', autoDiscover: false } },
+  security: { enableCommandWhitelist: false, enablePrivateIPRestriction: false, enablePathTraversalProtection: true, enableCredentialMasking: true },
   mcpSettings: {
     enabled: true,
     port: MCP_CONFIG.DEFAULT_PORT,
@@ -209,21 +219,17 @@ export const DEFAULT_CONFIG = {
       authRequired: false,
       allowedOrigins: ['*'],
       rateLimit: {
-        enabled: true,
-        maxRequests: MCP_CONFIG.MAX_REQUESTS_PER_MINUTE,
-        windowMs: 60000,
+        requestsPerMinute: MCP_CONFIG.MAX_REQUESTS_PER_MINUTE,
+        tokensPerMinute: 10000,
       },
       sandbox: {
         enabled: true,
         timeout: 30000,
-        memoryLimit: 512 * 1024 * 1024, // 512MB
       },
     },
     tools: [],
     resources: [],
   },
-  outputFormats: ['json', 'markdown'],
-  plugins: [],
 };
 
 export const CLI_COLORS = {

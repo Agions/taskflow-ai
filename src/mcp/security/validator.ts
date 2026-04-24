@@ -5,7 +5,7 @@ const logger = getLogger('mcp/security/validator');
  * 安全验证工具
  */
 
-import path from 'path';
+import path = require('path');
 
 /**
  * 允许的命令白名单

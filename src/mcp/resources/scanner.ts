@@ -3,8 +3,8 @@ import { getLogger } from '../../utils/logger';
  * 资源扫描器
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { MCPResource } from './types';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('mcp/resources/scanner');

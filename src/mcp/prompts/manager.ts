@@ -3,8 +3,8 @@
  * 管理AI提示模板和生成智能提示
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { Logger } from '../../utils/logger';
 import { MCPPrompt, PromptRenderOptions, PromptArguments, MCPPromptManagerConfig } from './types';
 import { defaultPrompts } from './defaults';

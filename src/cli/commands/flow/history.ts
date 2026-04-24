@@ -2,7 +2,7 @@
  * Flow history 命令
  */
 
-import chalk from 'chalk';
+import chalk = require('chalk');
 import { getEngine } from './engine';
 
 interface HistoryOptions {

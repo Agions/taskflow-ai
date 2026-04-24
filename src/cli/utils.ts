@@ -3,7 +3,7 @@
  * 减少命令文件中的重复代码
  */
 
-import chalk from 'chalk';
+import chalk = require('chalk');
 
 export const log = {
   info: (msg: string) => console.log(chalk.cyan(msg)),

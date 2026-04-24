@@ -4,8 +4,8 @@
  */
 
 import { Command } from 'commander';
-import chalk from 'chalk';
-import fs from 'fs-extra';
+import chalk = require('chalk');
+import fs = require('fs-extra');
 import { templateManager } from '../../core/plugin';
 
 const program = new Command('template');

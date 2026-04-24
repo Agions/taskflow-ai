@@ -2,8 +2,8 @@
  * Marketplace search 命令
  */
 
-import chalk from 'chalk';
-import ora from 'ora';
+import chalk = require('chalk');
+import ora = require('ora');
 import { RegistryManager } from '../../../marketplace/registry';
 import { SearchOptions } from '../../../marketplace/types';
 

@@ -111,7 +111,7 @@ export class ValidationUtils {
     for (const [field, expectedType] of Object.entries(schema)) {
       const value = obj[field];
 
-      if (value === undefined || value === null) return;
+      if (value === undefined || value === null) continue;
 
       const actualType = typeof value;
       if (actualType !== expectedType) {

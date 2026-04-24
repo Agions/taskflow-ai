@@ -2,8 +2,8 @@
  * 项目结构创建
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { TaskFlowConfig } from '../../../types';
 import { CONFIG_DIR, DEFAULT_CONFIG } from '../../../constants';
 
@@ -41,7 +41,7 @@ export async function saveConfig(config: TaskFlowConfig): Promise<void> {
  * 创建示例文件
  */
 export async function createExampleFiles(
-  projectName: string = DEFAULT_CONFIG.projectName
+  projectName: string
 ): Promise<void> {
   const examplePRD = `# 示例PRD文档
 

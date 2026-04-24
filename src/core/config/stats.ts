@@ -2,7 +2,7 @@
  * 配置统计信息
  */
 
-import fs from 'fs-extra';
+import fs = require('fs-extra');
 import { ConfigStats } from './types';
 import { ConfigOperations } from './operations';
 
@@ -32,9 +32,9 @@ export class ConfigStatsManager {
 
     return {
       hasConfig: true,
-      aiModelsCount: config?.aiModels.length || 0,
-      enabledModelsCount: config?.aiModels.filter(m => m.enabled).length || 0,
-      mcpEnabled: config?.mcpSettings.enabled || false,
+      aiModelsCount: config?.aiModels?.length || 0,
+      enabledModelsCount: config?.aiModels?.filter(m => m.enabled)?.length || 0,
+      mcpEnabled: config?.mcpSettings?.enabled || false,
       lastModified: stats.mtime,
     };
   }

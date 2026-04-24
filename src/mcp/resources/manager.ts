@@ -4,8 +4,8 @@ import { getLogger } from '../../utils/logger';
  * 管理项目中的各种资源，如任务、项目、配置等
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { Logger } from '../../utils/logger';
 import { MCPResource } from './types';
 import { defaultResources } from './defaults';

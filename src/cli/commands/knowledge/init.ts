@@ -2,9 +2,9 @@
  * Knowledge init 命令
  */
 
-import path from 'path';
-import chalk from 'chalk';
-import ora from 'ora';
+import path = require('path');
+import chalk = require('chalk');
+import ora = require('ora');
 import { KnowledgeBaseConfig } from '../../../knowledge/types';
 import { saveConfig, createEngine } from './engine';
 

@@ -30,8 +30,8 @@ interface PluginPackageJson {
  * 插件加载器
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { Logger, getLogger } from '../../utils/logger';
 import { Plugin, PluginContext, PluginHooks } from './types';
 const logger = getLogger('core/plugin/manager');

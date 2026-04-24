@@ -2,8 +2,8 @@
  * 配置备份与恢复
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { CONFIG_FILE } from '../../constants';
 import { createTaskFlowError } from '../../utils/errors';
 import { ERROR_CODES } from '../../constants';

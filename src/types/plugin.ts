@@ -113,3 +113,108 @@ export interface PluginAPI {
   tools: PluginTools;
   ui: PluginUI;
 }
+
+/**
+ * 插件配置 API
+ */
+export interface PluginConfig {
+  get<T = unknown>(key: string, defaultValue?: T): T;
+  set<T = unknown>(key: string, value: T): void;
+  has(key: string): boolean;
+  delete(key: string): void;
+  clear(): void;
+}
+
+/**
+ * 插件文件系统 API
+ */
+export interface PluginFilesystem {
+  readFile(path: string): Promise<string>;
+  writeFile(path: string, content: string): Promise<void>;
+  exists(path: string): Promise<boolean>;
+  readdir(path: string): Promise<string[]>;
+  mkdir(path: string): Promise<void>;
+  rm(path: string): Promise<void>;
+}
+
+/**
+ * 插件 HTTP API
+ */
+export interface PluginHTTP {
+  get(url: string, options?: Record<string, unknown>): Promise<unknown>;
+  post(url: string, data: unknown, options?: Record<string, unknown>): Promise<unknown>;
+  put(url: string, data: unknown, options?: Record<string, unknown>): Promise<unknown>;
+  delete(url: string, options?: Record<string, unknown>): Promise<unknown>;
+}
+
+/**
+ * 插件数据库 API
+ */
+export interface PluginDatabase {
+  query<T = unknown>(sql: string, params?: unknown[]): Promise<T[]>;
+  execute(sql: string, params?: unknown[]): Promise<number>;
+}
+
+/**
+ * 插件存储 API
+ */
+export interface PluginStorage {
+  get<T = unknown>(key: string): Promise<T | undefined>;
+  set<T = unknown>(key: string, value: T): Promise<void>;
+  delete(key: string): Promise<void>;
+  clear(): Promise<void>;
+}
+
+/**
+ * 插件事件 API
+ */
+export interface PluginEvents {
+  emit(event: string, data?: unknown): void;
+  on(event: string, handler: (data: unknown) => void): void;
+  off(event: string, handler: (data: unknown) => void): void;
+}
+
+/**
+ * 插件命令 API
+ */
+export interface PluginCommands {
+  register(name: string, handler: (args: string[]) => Promise<string>): void;
+  unregister(name: string): boolean;
+  execute(name: string, args: string[]): Promise<string>;
+}
+
+/**
+ * 插件工作流 API
+ */
+export interface PluginWorkflows {
+  register(workflow: unknown): void;
+  unregister(name: string): boolean;
+  execute(name: string, context?: unknown): Promise<unknown>;
+}
+
+/**
+ * 插件代理 API
+ */
+export interface PluginAgents {
+  create(config: unknown): Promise<string>;
+  destroy(id: string): Promise<void>;
+  execute(id: string, task: string): Promise<unknown>;
+}
+
+/**
+ * 插件工具 API
+ */
+export interface PluginTools {
+  register(tool: unknown): void;
+  unregister(name: string): boolean;
+  execute(name: string, params?: unknown): Promise<unknown>;
+}
+
+/**
+ * 插件 UI API
+ */
+export interface PluginUI {
+  showNotification(message: string, type?: string): void;
+  showDialog(title: string, message: string): Promise<boolean>;
+  showInput(prompt: string): Promise<string>;
+}

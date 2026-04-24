@@ -4,8 +4,8 @@ import { getLogger } from '../../../utils/logger';
  */
 
 import { Command } from 'commander';
-import chalk from 'chalk';
-import ora from 'ora';
+import chalk = require('chalk');
+import ora = require('ora');
 import { generateCharts, VisualizationData, VisualizationOptions } from './charts';
 import { generateReport, ReportOptions } from './report';
 import { findDataFiles, loadProjectData, showVisualizationStats } from './data';

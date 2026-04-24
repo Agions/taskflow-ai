@@ -2,7 +2,7 @@
  * CI/CD template 命令
  */
 
-import chalk from 'chalk';
+import chalk = require('chalk');
 import { GitHubActionsIntegration } from '../../../cicd/github';
 
 interface TemplateOptions {

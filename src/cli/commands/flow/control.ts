@@ -2,7 +2,7 @@
  * Flow 控制命令 (pause/resume)
  */
 
-import chalk from 'chalk';
+import chalk = require('chalk');
 import { getEngine } from './engine';
 
 /**

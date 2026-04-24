@@ -4,7 +4,7 @@
  */
 
 import { Command } from 'commander';
-import chalk from 'chalk';
+import chalk = require('chalk');
 import { ModelGateway, ModelConfig, DEFAULT_MODELS } from '../../core/ai';
 import { loadConfig, saveConfig } from '../../core/config';
 import { TaskFlowConfig, AIModelConfig } from '../../types';

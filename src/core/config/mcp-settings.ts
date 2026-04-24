@@ -56,7 +56,7 @@ export class MCPSettingsManager {
    * 更新MCP安全设置
    */
   async updateSecuritySettings(
-    securitySettings: Partial<TaskFlowConfig['mcpSettings']['security']>
+    securitySettings: Partial<NonNullable<TaskFlowConfig['mcpSettings']>['security']>
   ): Promise<void> {
     const config = await this.operations.loadConfig();
     if (!config) {
@@ -65,8 +65,13 @@ export class MCPSettingsManager {
 
     const security = config.mcpSettings?.security ?? {};
     Object.assign(security, securitySettings);
+    
     if (config.mcpSettings) {
       config.mcpSettings.security = security;
+    } else {
+      config.mcpSettings = {
+        security: security as any,
+      } as any;
     }
 
     await this.operations.saveConfig(config as any);

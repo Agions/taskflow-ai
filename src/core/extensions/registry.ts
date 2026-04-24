@@ -5,9 +5,17 @@
 
 import {
   ExtensionType,
-  ExtensionDefinition
+  ExtensionDefinition,
+  ExtensionTypes
 } from '../../types/extensions';
 import { Logger } from '../../utils/logger';
+
+/**
+ * ExtensionType 值数组
+ */
+const EXTENSION_TYPE_VALUES: ExtensionType[] = [
+  'plugin', 'agent', 'tool', 'workflow', 'command', 'ui', 'middleware'
+];
 
 /**
  * 扩展注册表实现
@@ -20,10 +28,8 @@ export class ExtensionRegistry {
   constructor() {
     this.logger = Logger.getInstance('ExtensionRegistry');
     // 初始化类型索引
-    Object.values(ExtensionType).forEach(type => {
-      if (typeof type === 'string') {
-        this.byType.set(type as ExtensionType, new Set());
-      }
+    EXTENSION_TYPE_VALUES.forEach(type => {
+      this.byType.set(type, new Set());
     });
   }
 

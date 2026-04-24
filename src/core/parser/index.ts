@@ -7,11 +7,11 @@ export * from './enhanced';
 export * from './word';
 export * from './pdf';
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import MarkdownIt from 'markdown-it';
 import { PRDDocument, PRDSection, TaskFlowConfig } from '../../types';
-import { SUPPORTED_PRD_FORMATS } from '../../constants';
+import { SUPPORTED_PRD_FORMATS, ERROR_CODES } from '../../constants';
 import { createTaskFlowError } from '../../utils/errors';
 import { Logger } from '../../utils/logger';
 const logger = getLogger('core/parser/index');
@@ -37,12 +37,12 @@ export class PRDParser {
 
     try {
       if (!(await fs.pathExists(filePath))) {
-        throw createTaskFlowError('parsing', 'FILE_NOT_FOUND', `文件不存在: ${filePath}`);
+        throw createTaskFlowError('parsing', ERROR_CODES.FILE_NOT_FOUND, `文件不存在: ${filePath}`);
       }
 
       const ext = path.extname(filePath).toLowerCase();
       if (!SUPPORTED_PRD_FORMATS.includes(ext as any)) {
-        throw createTaskFlowError('parsing', 'UNSUPPORTED_FORMAT', `不支持的文件格式: ${ext}`);
+        throw createTaskFlowError('parsing', ERROR_CODES.UNSUPPORTED_FORMAT, `不支持的文件格式: ${ext}`);
       }
 
       const content = await fs.readFile(filePath, 'utf-8');
@@ -88,8 +88,8 @@ export class PRDParser {
         estimatedHours,
       },
       sections,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     return document;

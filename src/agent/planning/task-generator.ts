@@ -4,7 +4,7 @@ const logger = getLogger('module');
  * 任务生成器
  */
 
-import { PRDDocument, Task, RequirementAnalysis, TaskType, TaskPriority } from '../types';
+import { PRDDocument, Task, TaskType, TaskPriority, TaskStatus } from '../../types';
 
 interface AIService {
   complete(prompt: string, options?: unknown): Promise<string>;
@@ -13,8 +13,8 @@ interface AIService {
 export class TaskGenerator {
   constructor(private ai: AIService) {}
 
-  async generate(prd: PRDDocument, analysis: RequirementAnalysis): Promise<Task[]> {
-    const prompt = this.buildTaskGenerationPrompt(prd, analysis);
+  async generate(prd: PRDDocument): Promise<Task[]> {
+    const prompt = this.buildTaskGenerationPrompt(prd);
 
     try {
       const response = await this.ai.complete(prompt, {
@@ -29,23 +29,17 @@ export class TaskGenerator {
     }
   }
 
-  private buildTaskGenerationPrompt(prd: PRDDocument, analysis: RequirementAnalysis): string {
-    const features = analysis.features.map(f => `- ${f.name}: ${f.description}`).join('\n');
-
+  private buildTaskGenerationPrompt(prd: PRDDocument): string {
     return `Generate tasks for the following PRD:
 
 Title: ${prd.title}
-Description: ${prd.description}
-
-Features:
-${features}
 
 Generate tasks in JSON format:
 [
   {
     "title": "Task title",
     "description": "Task description",
-    "type": "code|file|shell|analysis|design|test",
+    "type": "code|test|analysis|design|documentation|deployment",
     "priority": "high|medium|low",
     "estimate": 2
   }
@@ -66,19 +60,16 @@ Generate tasks in JSON format:
     const now = new Date();
     return taskData.map((data, index) => ({
       id: `task-${index + 1}`,
+      name: data.title || `Task ${index + 1}`,
       title: data.title || `Task ${index + 1}`,
       description: data.description || '',
       type: (data.type as TaskType) || 'code',
-      status: 'pending' as const,
+      status: (data.status as TaskStatus) || 'pending',
       priority: (data.priority as TaskPriority) || 'medium',
-      estimate: data.estimate || 2,
-      dependencies: data.dependencies || [],
-      metadata: {
-        source: prd.title,
-        tags: [],
-      },
-      createdAt: now,
-      updatedAt: now,
+      dependsOn: data.dependsOn || [],
+      tags: data.tags || [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     }));
   }
 
@@ -87,16 +78,16 @@ Generate tasks in JSON format:
     return [
       {
         id: 'task-1',
+        name: `Implement ${prd.title}`,
         title: `Implement ${prd.title}`,
-        description: prd.description || 'Implementation task',
+        description: 'Implementation task',
         type: 'code',
         status: 'pending',
         priority: 'high',
-        estimate: 4,
-        dependencies: [],
-        metadata: { source: prd.title, tags: [] },
-        createdAt: now,
-        updatedAt: now,
+        dependsOn: [],
+        tags: [],
+createdAt: Date.now(),
+      updatedAt: Date.now(),
       },
     ];
   }

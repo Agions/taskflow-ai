@@ -2,10 +2,10 @@
  * 初始化运行器
  */
 
-import chalk from 'chalk';
-import ora from 'ora';
-import path from 'path';
-import fs from 'fs-extra';
+import chalk = require('chalk');
+import ora = require('ora');
+import path = require('path');
+import fs = require('fs-extra');
 import inquirer from 'inquirer';
 import { TaskFlowConfig } from '../../../types';
 import { CONFIG_DIR, CONFIG_FILE, DEFAULT_CONFIG } from '../../../constants';
@@ -60,15 +60,8 @@ export async function runInit(options: InitOptions): Promise<void> {
     }
 
     const config: TaskFlowConfig = {
-      workspace: process.cwd(),
-      environment: 'development',
-      models: [],
-      cache: { enabled: false, l1: { enabled: false, maxSize: 0, ttl: 0 }, l2: { enabled: false, ttl: 0 } },
-      logging: { level: 'info', console: true, format: 'text' },
-      plugins: { enabled: [], directory: './plugins', autoLoad: false },
-      extensions: { agents: { directory: './agents', autoDiscover: false }, tools: { directory: './tools', autoDiscover: false }, workflows: { directory: './workflows', autoDiscover: false } },
-      security: { enableCommandWhitelist: false, enablePrivateIPRestriction: false, enablePathTraversalProtection: true, enableCredentialMasking: true },
       ...DEFAULT_CONFIG,
+      workspace: process.cwd(),
       projectName: projectInfo.projectName,
       version: projectInfo.version,
       aiModels,
@@ -76,7 +69,7 @@ export async function runInit(options: InitOptions): Promise<void> {
 
     await createProjectStructure(config);
     await saveConfig(config as any);
-    await createExampleFiles(config.projectName);
+    await createExampleFiles(config.projectName || 'taskflow-project');
 
     spinner.succeed(chalk.green('项目初始化完成！'));
     showNextSteps(config);

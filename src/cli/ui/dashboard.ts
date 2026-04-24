@@ -3,7 +3,7 @@
  * 用于显示项目状态概览
  */
 
-import chalk from 'chalk';
+import chalk = require('chalk');
 import boxen from 'boxen';
 import { theme } from './index';
 

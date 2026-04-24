@@ -4,7 +4,7 @@
  */
 
 import { Command } from 'commander';
-import chalk from 'chalk';
+import chalk = require('chalk');
 import { pluginManager } from '../../core/plugin';
 
 const program = new Command('plugin');

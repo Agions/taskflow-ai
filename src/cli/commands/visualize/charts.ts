@@ -195,7 +195,7 @@ export function generateKanbanChart(
   data: VisualizationData,
   options: VisualizationOptions
 ): ChartData {
-  const columns: TaskStatus[] = ['todo', 'in-progress', 'review', 'done'];
+  const columns: TaskStatus[] = ['todo', 'in_progress', 'review', 'done'];
   const kanbanData: KanbanColumn[] = columns.map(status => ({
     name: status,
     tasks: data.tasks.filter((task: Task) => task.status === status),

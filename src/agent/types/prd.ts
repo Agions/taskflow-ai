@@ -16,6 +16,21 @@ export interface PRDDocument {
   requirements: Requirement[];
   acceptanceCriteria: string[];
   metadata: PRDMetadata;
+  version?: string;
+  filePath?: string;
+  sections?: PRDSection[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+/**
+ * PRD 章节
+ */
+export interface PRDSection {
+  title: string;
+  content: string;
+  order?: number;
+  level?: 'h1' | 'h2' | 'h3' | 'h4';
 }
 
 /**

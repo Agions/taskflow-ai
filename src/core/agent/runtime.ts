@@ -128,7 +128,7 @@ export class AgentRuntimeImpl implements AgentRuntime {
   }
 
   async destroy(): Promise<void> {
-    this.state.status = 'destroyed';
+    this.state.status = 'failed';
     this.logger.info('Agent destroyed');
   }
 

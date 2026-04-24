@@ -4,7 +4,7 @@
  */
 
 import { Command } from 'commander';
-import chalk from 'chalk';
+import chalk = require('chalk');
 import { ThoughtChainManager, createRenderer } from '../../core/thought';
 import { loadConfig } from '../../core/config';
 import type { AIModelConfig } from '../../types/config';

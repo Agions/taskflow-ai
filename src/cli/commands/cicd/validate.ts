@@ -2,8 +2,8 @@
  * CI/CD validate 命令
  */
 
-import chalk from 'chalk';
-import ora from 'ora';
+import chalk = require('chalk');
+import ora = require('ora');
 import { isInitialized, loadConfig, createIntegration } from './engine';
 
 interface ValidateOptions {

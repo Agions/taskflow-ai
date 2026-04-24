@@ -2,10 +2,10 @@
  * Knowledge index 命令
  */
 
-import path from 'path';
-import fs from 'fs-extra';
-import chalk from 'chalk';
-import ora from 'ora';
+import path = require('path');
+import fs = require('fs-extra');
+import chalk = require('chalk');
+import ora = require('ora');
 import { createEngine, isInitialized } from './engine';
 
 interface IndexOptions {

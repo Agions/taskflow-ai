@@ -2,8 +2,8 @@
  * 配置核心操作
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { TaskFlowConfig, AIModelConfig } from '../../types';
 import { CONFIG_DIR, CONFIG_FILE, DEFAULT_CONFIG, ERROR_CODES } from '../../constants';
 import { createTaskFlowError } from '../../utils/errors';
@@ -44,13 +44,11 @@ export class ConfigOperations {
         );
       }
 
-      if (config.aiModels!) {
-        config.aiModels! = await Promise.all(
-          config.aiModels!.map(async model => ({
-            ...model,
-            apiKey: await decryptApiKeys(model.apiKey),
-          }))
-        );
+      if (config.aiModels && config.aiModels.length > 0) {
+        const model = config.aiModels[0];
+        if (model.apiKey) {
+          model.apiKey = await decryptApiKeys(model.apiKey);
+        }
       }
 
       return config;
@@ -91,7 +89,7 @@ export class ConfigOperations {
         configToSave.aiModels = await Promise.all(
           configToSave.aiModels.map(async model => ({
             ...model,
-            apiKey: await encryptApiKeys(model.apiKey),
+            apiKey: model.apiKey ? await encryptApiKeys(model.apiKey) : undefined,
           }))
         );
       }
@@ -113,33 +111,38 @@ export class ConfigOperations {
    * 合并默认配置
    */
   private mergeWithDefaults(config: Partial<TaskFlowConfig>): TaskFlowConfig {
-    return {
-    workspace: projectPath || process.cwd(),
-    environment: 'development',
-    models: [],
-    cache: { enabled: false, l1: { enabled: false, maxSize: 0, ttl: 0 }, l2: { enabled: false, ttl: 0 } },
-    logging: { level: 'info', console: true, format: 'text' },
-    plugins: { enabled: [], directory: './plugins', autoLoad: false },
-    extensions: { agents: { directory: './agents', autoDiscover: false }, tools: { directory: './tools', autoDiscover: false }, workflows: { directory: './workflows', autoDiscover: false } },
-    security: { enableCommandWhitelist: false, enablePrivateIPRestriction: false, enablePathTraversalProtection: true, enableCredentialMasking: true },
-      ...DEFAULT_CONFIG,
-      ...config,
-      mcpSettings: {
-        ...DEFAULT_CONFIG.mcpSettings,
-        ...(config.mcpSettings! || {}),
-        security: {
-          ...DEFAULT_CONFIG.mcpSettings.security,
-          ...(config.mcpSettings!?.security || {}),
-          rateLimit: { requestsPerMinute: 60, tokensPerMinute: 10000,
-            ...DEFAULT_CONFIG.mcpSettings.security.rateLimit,
-            ...(config.mcpSettings!?.security?.rateLimit || {}),
-          },
-          sandbox: {
-            ...DEFAULT_CONFIG.mcpSettings.security.sandbox,
-            ...(config.mcpSettings!?.security?.sandbox || {}),
-          },
+    const defaults = DEFAULT_CONFIG as TaskFlowConfig;
+    
+    // 安全地获取嵌套属性
+    const getNestedValue = (obj: any, path: string, defaultValue: any) => {
+      return path.split('.').reduce((current, key) => 
+        current && current[key] !== undefined ? current[key] : defaultValue, obj);
+    };
+
+    // 安全合并 mcpSettings
+    const mergedMcpSettings = {
+      ...defaults.mcpSettings,
+      ...config.mcpSettings,
+      tools: config.mcpSettings?.tools ?? defaults.mcpSettings?.tools ?? [],
+      resources: config.mcpSettings?.resources ?? defaults.mcpSettings?.resources ?? [],
+      security: {
+        ...(defaults.mcpSettings?.security || {}),
+        ...(config.mcpSettings?.security || {}),
+        rateLimit: {
+          ...getNestedValue(defaults, 'mcpSettings.security.rateLimit', {}),
+          ...getNestedValue(config, 'mcpSettings.security.rateLimit', {}),
+        },
+        sandbox: {
+          ...getNestedValue(defaults, 'mcpSettings.security.sandbox', {}),
+          ...getNestedValue(config, 'mcpSettings.security.sandbox', {}),
         },
       },
+    };
+
+    return {
+      ...defaults,
+      ...config,
+      mcpSettings: mergedMcpSettings,
     };
   }
 

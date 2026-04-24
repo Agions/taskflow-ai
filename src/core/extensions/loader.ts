@@ -3,7 +3,7 @@
  * TaskFlow AI v4.0
  */
 
-import { ExtensionDefinition, ExtensionType } from '../../types/extensions';
+import { ExtensionDefinition, ExtensionType, ExtensionTypes } from '../../types/extensions';
 import { Logger } from '../../utils/logger';
 
 /**
@@ -35,7 +35,7 @@ export class ExtensionLoader {
 
     // 模拟实现
     const definition: ExtensionDefinition<T> = {
-      type: ExtensionType.AGENT,
+      type: ExtensionTypes.AGENT,
       id: 'loaded-from-file',
       version: '1.0.0',
       name: 'Loaded Extension',
@@ -58,7 +58,7 @@ export class ExtensionLoader {
     // 模拟实现 - 实际中会扫描目录
     const definitions: ExtensionDefinition<T>[] = [
       {
-        type: ExtensionType.AGENT,
+        type: ExtensionTypes.AGENT,
         id: 'agent-from-dir',
         version: '1.0.0',
         name: 'Agent From Directory',

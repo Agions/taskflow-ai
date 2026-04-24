@@ -131,7 +131,12 @@ export class BuiltInNodes {
       },
       executor: async (input: Record<string, unknown>, context: NodeContext) => {
         const sources = input.sources as unknown[];
-        const merged = sources.reduce((acc, src) => ({ ...acc, ...(src as Record<string, unknown>) }), {});
+        const merged = sources.reduce((acc: Record<string, any>, src: unknown): Record<string, any> => {
+          if (src && typeof src === 'object' && !Array.isArray(src)) {
+            return { ...acc, ...src };
+          }
+          return acc;
+        }, {});
         return {
           success: true,
           output: { merged },

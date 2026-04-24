@@ -4,8 +4,8 @@ import { getLogger } from '../../utils/logger';
  * 数据提供者
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { Logger } from '../../utils/logger';
 import { Task, TaskStatus, TaskType } from '../../types/task';
 import { AIModelConfig } from '../../types';

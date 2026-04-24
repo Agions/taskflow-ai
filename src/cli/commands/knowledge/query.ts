@@ -2,8 +2,8 @@
  * Knowledge query 命令
  */
 
-import chalk from 'chalk';
-import ora from 'ora';
+import chalk = require('chalk');
+import ora = require('ora');
 import { createEngine, isInitialized } from './engine';
 import type { DocumentMetadata } from '../../../knowledge/types';
 

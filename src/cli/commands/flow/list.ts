@@ -2,9 +2,9 @@
  * Flow list 命令
  */
 
-import chalk from 'chalk';
-import fs from 'fs-extra';
-import path from 'path';
+import chalk = require('chalk');
+import fs = require('fs-extra');
+import path = require('path');
 import { getParser } from './engine';
 
 interface ListOptions {
@@ -37,7 +37,8 @@ export async function executeList(options: ListOptions): Promise<void> {
     try {
       const content = await fs.readFile(filePath, 'utf-8');
       const format: 'yaml' | 'json' = file.endsWith('.yaml') ? 'yaml' : 'json';
-      const workflow = null.parse(content, format);
+      const parser = getParser();
+      const workflow = parser.parse(content, format);
 
       console.log(`  ${chalk.cyan(workflow.name)} (v${workflow.version})`);
       console.log(`    文件: ${file}`);

@@ -2,8 +2,8 @@
  * 初始化输出
  */
 
-import chalk from 'chalk';
-import path from 'path';
+import chalk = require('chalk');
+import path = require('path');
 import { TaskFlowConfig } from '../../../types';
 import { CONFIG_DIR } from '../../../constants';
 

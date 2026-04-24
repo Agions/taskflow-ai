@@ -4,7 +4,7 @@ import { getLogger } from '../../../utils/logger';
  */
 
 import { Command } from 'commander';
-import chalk from 'chalk';
+import chalk = require('chalk');
 import { runInit } from './runner';
 const logger = getLogger('cli/commands/init/index');
 

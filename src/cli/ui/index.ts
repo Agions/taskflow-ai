@@ -3,7 +3,7 @@
  * 提供精美的终端界面组件
  */
 
-import chalk from 'chalk';
+import chalk = require('chalk');
 import ora, { Ora } from 'ora';
 import boxen from 'boxen';
 import figlet from 'figlet';

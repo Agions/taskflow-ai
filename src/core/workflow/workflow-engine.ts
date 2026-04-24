@@ -49,7 +49,7 @@ export class WorkflowEngine {
 
     // 尝试从缓存获取
     const cachedResult = this.cacheManager.get<ExecutionResult>(cacheKey);
-    if (cachedResult && cachedResult.success) {
+    if (cachedResult && cachedResult.success && cachedResult.execution?.id) {
       this.logger.info(`Workflow cache hit: ${workflow.name}`);
       this.emitWorkflowComplete(workflow, cachedResult.execution.id, Date.now() - startTime);
       return { ...cachedResult, duration: Date.now() - startTime };

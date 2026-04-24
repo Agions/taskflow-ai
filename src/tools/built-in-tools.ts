@@ -54,7 +54,7 @@ export class BuiltInTools {
         const encoding = params.encoding as string || 'utf-8';
 
         try {
-          const content = await fs.readFile(filepath, encoding);
+          const content = await fs.readFile(filepath, encoding as BufferEncoding);
           return { success: true, output: content };
         } catch (error) {
           return {

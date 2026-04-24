@@ -4,7 +4,9 @@ import { getLogger } from '../../utils/logger';
  * 使用 AI 分析 PRD 并生成任务计划
  */
 
-import { PRDDocument, TaskPlan, Task, Dependency } from '../types';
+import { PRDDocument, TaskPlan } from '../types';
+import { Task } from '../../types/task';
+import { Dependency } from '../types';
 import { RequirementAnalyzer } from './analyzer';
 import { TaskGenerator } from './task-generator';
 import { DependencyAnalyzer } from './dependency-analyzer';
@@ -33,17 +35,50 @@ export class PlanningEngine {
     logger.info('🧠 Analyzing PRD with AI...');
 
     const analysis = await this.analyzer.analyze(prd);
-    const tasks = await this.taskGenerator.generate(prd, analysis);
-    const dependencies = this.dependencyAnalyzer.analyze(tasks);
-    const criticalPath = this.dependencyAnalyzer.calculateCriticalPath(tasks, dependencies);
-    const totalEstimate = tasks.reduce((sum, t) => sum + t.estimate, 0);
+    const prdForGenerator: any = {
+      ...prd,
+      version: prd.version || '1.0.0',
+      filePath: prd.filePath || '',
+      sections: prd.sections || [],
+      createdAt: prd.createdAt || new Date().toISOString(),
+      updatedAt: prd.updatedAt || new Date().toISOString(),
+    };
+    const tasks = await this.taskGenerator.generate(prdForGenerator);
+    const agentTasks = this.convertToAgentTasks(tasks);
+    const dependencies = this.dependencyAnalyzer.analyze(agentTasks);
+    const criticalPath = this.dependencyAnalyzer.calculateCriticalPath(agentTasks, dependencies);
+    const totalEstimate = tasks.reduce((sum, t) => sum + (t.estimatedHours || 0), 0);
 
     return {
-      tasks,
+      tasks: agentTasks,
       dependencies,
       totalEstimate,
       criticalPath,
     };
+  }
+
+  private convertToAgentTasks(tasks: Task[]): import('../types').Task[] {
+    return tasks.map(task => ({
+      id: task.id,
+      title: task.title || task.name,
+      description: task.description,
+      type: task.type as any,
+      status: task.status as any,
+      priority: task.priority as any,
+      estimate: task.estimatedHours || 0,
+      assignee: undefined,
+      dependencies: task.dependsOn || [],
+      outputPath: undefined,
+      metadata: {
+        framework: undefined,
+        language: undefined,
+        template: undefined,
+        source: (task.metadata?.source || '') as string,
+        tags: task.tags || [],
+      },
+      createdAt: new Date(task.createdAt),
+      updatedAt: new Date(task.updatedAt),
+    }));
   }
 
   async createPlan(requirements: string): Promise<TaskPlan> {

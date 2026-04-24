@@ -7,11 +7,17 @@ import {
   ExtensionDefinition,
   ExtensionLifecycle,
   ExtensionType,
-  ExtensionStatus
+  ExtensionStatus,
+  EXTENSION_STATUS_VALUES
 } from '../../types/extensions';
 import { Logger } from '../../utils/logger';
 import { getEventBus } from '../events';
 import { ExtensionRegistry } from './registry';
+
+// ExtensionType 值数组
+const EXTENSION_TYPE_VALUES: ExtensionType[] = [
+  'plugin', 'agent', 'tool', 'workflow', 'command', 'ui', 'middleware'
+];
 
 export interface ExtensionState {
   definition: ExtensionDefinition;
@@ -261,11 +267,11 @@ export class ExtensionLifecycleManager {
       byType: {} as Record<ExtensionType, number>
     };
 
-    Object.values(ExtensionStatus).forEach(status => {
+    EXTENSION_STATUS_VALUES.forEach(status => {
       stats.byStatus[status] = 0;
     });
 
-    Object.values(ExtensionType).forEach(type => {
+    EXTENSION_TYPE_VALUES.forEach(type => {
       stats.byType[type as ExtensionType] = 0;
     });
 

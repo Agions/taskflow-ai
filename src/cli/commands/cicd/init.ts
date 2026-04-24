@@ -2,8 +2,8 @@
  * CI/CD init 命令
  */
 
-import chalk from 'chalk';
-import ora from 'ora';
+import chalk = require('chalk');
+import ora = require('ora');
 import { GitHubActionsConfig } from '../../../cicd/types';
 import { saveConfig, detectRepo } from './engine';
 

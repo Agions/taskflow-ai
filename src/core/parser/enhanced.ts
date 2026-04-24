@@ -3,8 +3,8 @@
  * 支持 Word、PDF 格式，更智能的任务拆分
  */
 
-import path from 'path';
-import fs from 'fs-extra';
+import path = require('path');
+import fs = require('fs-extra');
 import { PRDDocument, PRDSection, Task as ProjectTask } from '../../types';
 import { SUPPORTED_PRD_FORMATS } from '../../constants';
 import { createTaskFlowError } from '../../utils/errors';
@@ -119,8 +119,8 @@ export class TaskDecomposer {
       tags: [],
       subtasks: [],
       progress: 0,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     } as unknown as ProjectTask);
 
     if (feature.length > 50) {
@@ -138,8 +138,8 @@ export class TaskDecomposer {
         tags: [],
         subtasks: [],
         progress: 0,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
+createdAt: new Date(),
+      updatedAt: new Date(),
       } as unknown as ProjectTask);
     }
 
@@ -174,7 +174,6 @@ export class TaskDecomposer {
     const baseHours: Partial<Record<ProjectTask['type'], number>> = {
       frontend: 8,
       backend: 8,
-      database: 8,
       design: 4,
       testing: 4,
       documentation: 2,

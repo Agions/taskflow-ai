@@ -2,7 +2,7 @@
  * 颜色主题定义
  */
 
-import chalk from 'chalk';
+import chalk = require('chalk');
 
 // ==================== 颜色主题 ====================
 

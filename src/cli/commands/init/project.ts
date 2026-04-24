@@ -3,7 +3,7 @@
  */
 
 import inquirer from 'inquirer';
-import path from 'path';
+import path = require('path');
 
 /**
  * 收集项目信息
