@@ -44,7 +44,7 @@ graph LR
 
 ```bash
 # 启动编排器
-hermes chat -s multi-agent-orchestrator
+taskflow agent run orchestrator
 
 # 输入你的需求
 "帮我设计并实现一个用户认证系统，支持：
@@ -67,7 +67,7 @@ hermes chat -s multi-agent-orchestrator
 #### 1. 需求分析和架构设计
 
 ```bash
-hermes chat -s product-architect
+taskflow agent run architect
 ```
 
 **示例对话：**
@@ -88,7 +88,7 @@ Agent：我来帮你分析需求。请确认几个关键点：
 #### 2. 代码开发
 
 ```bash
-hermes chat -s development-engineer
+taskflow agent run developer
 ```
 
 **示例对话：**
@@ -109,7 +109,7 @@ Agent：收到，我将按照TDD方式开发：
 #### 3. 质量测试
 
 ```bash
-hermes chat -s quality-engineer
+taskflow agent run quality
 ```
 
 **示例对话：**
@@ -130,7 +130,7 @@ Agent：收到，执行以下测试：
 #### 4. 部署发布
 
 ```bash
-hermes chat -s devops-engineer
+taskflow agent run devops
 ```
 
 **示例对话：**
@@ -257,9 +257,9 @@ vim /home/agentuser/.openclaw/workspace/skills/development-engineer/SKILL.md
 
 ```bash
 # 使用cron定期执行
-hermes cron create "0 9 * * *" \
+taskflow schedule create "0 9 * * *" \
   --prompt "检查所有待处理任务，协调Agent完成" \
-  --skill multi-agent-orchestrator
+  --agent orchestrator
 ```
 
 ## 📊 协作效果统计
@@ -283,9 +283,9 @@ hermes cron create "0 9 * * *" \
 
 ```bash
 # 检查skill是否正确加载
-hermes skills list
+taskflow agent list
 
-# 重新加载skill
+# 重新加载Agent
 /skill multi-agent-orchestrator
 ```
 
@@ -293,7 +293,7 @@ hermes skills list
 
 ```bash
 # 查看当前任务状态
-hermes sessions list
+taskflow task list
 
 # 手动推进任务
 "@编排器 任务ID:xxx 状态异常，请检查"
@@ -333,5 +333,5 @@ ls -la docs/plans/
 **开始使用：**
 ```bash
 cd /home/agentuser/.openclaw/workspace/
-hermes chat -s multi-agent-orchestrator
+taskflow agent run orchestrator
 ```

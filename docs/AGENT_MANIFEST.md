@@ -303,7 +303,7 @@ Example interactions with this agent
 EOF
 
 # 注册到系统
-hermes skills reload
+taskflow agent reload
 ```
 
 ### 2. 调整Agent权重
@@ -338,13 +338,13 @@ weights:
 ### Agent状态查询
 ```bash
 # 查看所有Agent状态
-hermes agents status
+taskflow agent status
 
 # 获取特定Agent详情
-hermes agent info development-engineer
+taskflow agent info developer
 
 # 查看Agent工作负载
-hermes metrics agent-load
+taskflow metrics agent-load
 ```
 
 ### 日志分析
@@ -356,7 +356,7 @@ tail -f /var/log/taskflow/agents/*.log
 grep -r "ERROR" /var/log/taskflow/agents/ | head -20
 
 # 性能监控
-watch -n 10 "ps aux | grep hermes | grep -v grep"
+watch -n 10 "ps aux | grep taskflow | grep -v grep"
 ```
 
 ## 📚 相关文档

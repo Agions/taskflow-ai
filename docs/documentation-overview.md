@@ -288,11 +288,11 @@ fi
 ### 紧急问题处理
 ```bash
 # 快速定位问题
-hermes chat -s product-architect
+taskflow agent run architect
 > "文档体系有问题需要帮助"
 
 # 或联系特定专家
-hermes chat -s development-engineer
+taskflow agent run developer
 > "开发文档有疑问需要澄清"
 ```
 

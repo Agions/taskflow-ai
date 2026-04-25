@@ -196,13 +196,13 @@ graph TD
 ### 🚀 快速启动协作
 ```bash
 # 启动多Agent协作（推荐）
-hermes chat -s multi-agent-orchestrator
+taskflow agent run orchestrator
 
 # 单独使用特定Agent
-hermes chat -s product-architect    # 需求分析设计
-hermes chat -s development-engineer   # 代码开发实现  
-hermes chat -s quality-engineer       # 质量测试验证
-hermes chat -s devops-engineer        # 部署运维配置
+taskflow agent run architect          # 需求分析设计
+taskflow agent run developer          # 代码开发实现  
+taskflow agent run quality            # 质量测试验证
+taskflow agent run devops             # 部署运维配置
 ```
 
 ### 📋 协作流程
