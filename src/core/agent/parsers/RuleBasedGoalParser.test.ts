@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from '@jest/globals';
-import { RuleBasedGoalParser } from './RuleBasedGoalParser';
+import { RuleBasedGoalParser } from './rule-based-goal-parser';
 
 describe('RuleBasedGoalParser', () => {
   let parser: RuleBasedGoalParser;

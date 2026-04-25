@@ -18,7 +18,7 @@ import {
 } from './types';
 import { Logger } from '../../utils/logger';
 import { toolRegistry } from '../../mcp/tools/registry';
-import { RuleBasedGoalParser } from './parsers/RuleBasedGoalParser';
+import { RuleBasedGoalParser } from './parsers/rule-based-goal-parser';
 
 const logger = Logger.getInstance('core/agent/core');
 

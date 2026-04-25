@@ -1,5 +1,12 @@
-// @ts-nocheck
-import { WorkflowEngine, Workflow, WorkflowExecution, ExecutionResult } from '../workflow-engine';
+import {
+  Workflow,
+  WorkflowExecution,
+  ExecutionResult,
+  WorkflowStep,
+  TaskStepConfig,
+  WorkflowStatus
+} from '../../../types/workflow';
+import { WorkflowEngine } from '../workflow-engine';
 
 describe('WorkflowEngine', () => {
   let workflowEngine: WorkflowEngine;
@@ -22,7 +29,7 @@ describe('WorkflowEngine', () => {
     const execution = await workflowEngine.execute(workflow);
 
     expect(execution).toBeDefined();
-    expect(execution.execution.id).toBeDefined();
+    expect(execution.execution?.id).toBeDefined();
   });
 
   it('should execute workflow with steps', async () => {
@@ -64,7 +71,7 @@ describe('WorkflowEngine', () => {
     };
 
     const result = await workflowEngine.execute(workflow);
-    const execution = workflowEngine.getExecution(result.execution.id);
+    const execution = workflowEngine.getExecution(result.execution?.id || '');
 
     expect(execution).toBeDefined();
     expect(execution?.workflowId).toBe('test-workflow');
@@ -82,9 +89,9 @@ describe('WorkflowEngine', () => {
     };
 
     const result = await workflowEngine.execute(workflow);
-    workflowEngine.cancel(result.execution.id);
+    workflowEngine.cancel(result.execution?.id || '');
 
-    const execution = workflowEngine.getExecution(result.execution.id);
+    const execution = workflowEngine.getExecution(result.execution?.id || '');
     expect(execution?.status).toBe('cancelled');
   });
 });

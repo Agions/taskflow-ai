@@ -45,9 +45,9 @@ describe('Extensions Types', () => {
   });
 
   it('should have correct extension types', () => {
-    expect(ExtensionType.PLUGIN).toBe('plugin');
-    expect(ExtensionType.AGENT).toBe('agent');
-    expect(ExtensionType.TOOL).toBe('tool');
-    expect(ExtensionType.WORKFLOW).toBe('workflow');
+    expect(ExtensionTypes.PLUGIN).toBe('plugin');
+    expect(ExtensionTypes.AGENT).toBe('agent');
+    expect(ExtensionTypes.TOOL).toBe('tool');
+    expect(ExtensionTypes.WORKFLOW).toBe('workflow');
   });
 });

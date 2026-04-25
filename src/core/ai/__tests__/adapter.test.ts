@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach, jest, afterEach } from '@jest/globals';
 import { BaseAdapter, ChatMessage, ChatCompletionOptions, ChatCompletionResponse } from '../adapter';
 

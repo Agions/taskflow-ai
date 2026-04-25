@@ -10,7 +10,7 @@ describe('ExtensionRegistry', () => {
 
   it('should register an extension', () => {
     const definition: ExtensionDefinition = {
-      type: ExtensionType.AGENT,
+      type: ExtensionTypes.AGENT,
       id: 'test-agent',
       version: '1.0.0',
       name: 'Test Agent',
@@ -23,7 +23,7 @@ describe('ExtensionRegistry', () => {
 
   it('should get an extension', () => {
     const definition: ExtensionDefinition = {
-      type: ExtensionType.AGENT,
+      type: ExtensionTypes.AGENT,
       id: 'test-agent',
       version: '1.0.0',
       name: 'Test Agent',
@@ -39,7 +39,7 @@ describe('ExtensionRegistry', () => {
 
   it('should unregister an extension', () => {
     const definition: ExtensionDefinition = {
-      type: ExtensionType.AGENT,
+      type: ExtensionTypes.AGENT,
       id: 'test-agent',
       version: '1.0.0',
       name: 'Test Agent',
@@ -55,7 +55,7 @@ describe('ExtensionRegistry', () => {
 
   it('should get all extensions of a type', () => {
     const agentDef: ExtensionDefinition = {
-      type: ExtensionType.AGENT,
+      type: ExtensionTypes.AGENT,
       id: 'test-agent',
       version: '1.0.0',
       name: 'Test Agent',
@@ -63,7 +63,7 @@ describe('ExtensionRegistry', () => {
     };
 
     const toolDef: ExtensionDefinition = {
-      type: ExtensionType.TOOL,
+      type: ExtensionTypes.TOOL,
       id: 'test-tool',
       version: '1.0.0',
       name: 'Test Tool',
@@ -73,8 +73,8 @@ describe('ExtensionRegistry', () => {
     registry.register(agentDef);
     registry.register(toolDef);
 
-    const agents = registry.getAll(ExtensionType.AGENT);
-    const tools = registry.getAll(ExtensionType.TOOL);
+    const agents = registry.getAll(ExtensionTypes.AGENT);
+    const tools = registry.getAll(ExtensionTypes.TOOL);
 
     expect(agents.length).toBe(1);
     expect(tools.length).toBe(1);
@@ -82,7 +82,7 @@ describe('ExtensionRegistry', () => {
 
   it('should clear all extensions', () => {
     const definition: ExtensionDefinition = {
-      type: ExtensionType.AGENT,
+      type: ExtensionTypes.AGENT,
       id: 'test-agent',
       version: '1.0.0',
       name: 'Test Agent',

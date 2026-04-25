@@ -1,6 +1,6 @@
 /**
- * Tool Registry - 工具注册表
- * 统一管理和发现工具
+ * 性能优化的 ToolRegistry
+ * TaskFlow AI v4.0
  */
 
 import { getLogger } from '../../utils/logger';
@@ -24,55 +24,97 @@ const logger = getLogger('tools');
  * 内置工具列表
  */
 export const BUILT_IN_TOOLS: BuiltInToolInfo[] = [
-  // 文件操作
   { name: 'file_read', category: 'filesystem', description: '读取文件内容' },
   { name: 'file_write', category: 'filesystem', description: '写入文件内容' },
   { name: 'file_search', category: 'filesystem', description: '搜索文件' },
   { name: 'file_list', category: 'filesystem', description: '列出目录文件' },
-
-  // 命令执行
   { name: 'bash', category: 'system', description: '执行 Bash 命令' },
   { name: 'git', category: 'system', description: '执行 Git 命令' },
-
-  // 网络
   { name: 'http_request', category: 'network', description: '发送 HTTP 请求' },
   { name: 'web_search', category: 'network', description: '网络搜索' },
-
-  // 代码
   { name: 'code_search', category: 'code', description: '代码搜索' },
   { name: 'code_analysis', category: 'code', description: '代码分析' },
-
-  // 数据库
   { name: 'db_query', category: 'database', description: '执行数据库查询' },
 ];
 
 /**
- * 工具注册表
+ * 缓存的工具信息（避免重复计算）
+ */
+interface CachedToolInfo {
+  tool: Tool;
+  lowercaseName: string;
+  lowercaseDescription: string;
+  lowercaseTags: string[];
+}
+
+/**
+ * 性能优化的工具注册表
  */
 export class ToolRegistry {
-  private tools: Map<string, Tool> = new Map();
+  private tools: Map<string, CachedToolInfo> = new Map();
+  private toolsByCategory: Map<ToolCategory, Set<string>> = new Map(); // 按类别索引
   private toolCalls: Map<string, ToolCall> = new Map();
   private eventBus = getEventBus();
   private maxCallHistory: number;
 
-  constructor(maxCallHistory: number = 100) {
+  // 性能配置
+  private readonly MAX_CALL_HISTORY = 500;
+  private readonly TOOL_CALL_TTL = 7200000; // 2小时
+
+  // 性能指标
+  private metrics = {
+    totalCalls: 0,
+    successfulCalls: 0,
+    failedCalls: 0,
+    cacheHits: 0,
+    cacheMisses: 0,
+    averageExecutionTime: 0
+  };
+
+  constructor(maxCallHistory: number = 500) {
     this.maxCallHistory = maxCallHistory;
     logger.info('ToolRegistry 初始化');
+    this.initializeCategoryIndex();
   }
 
   /**
-   * 注册工具
+   * 初始化类别索引
+   */
+  private initializeCategoryIndex(): void {
+    const categories: ToolCategory[] = ['filesystem', 'system', 'network', 'code', 'database', 'custom'];
+    for (const category of categories) {
+      this.toolsByCategory.set(category, new Set());
+    }
+  }
+
+  /**
+   * 注册工具（优化版）
    */
   register(tool: Tool): void {
     if (this.tools.has(tool.name)) {
       logger.warn(`工具 ${tool.name} 已存在，将被覆盖`);
     }
-    this.tools.set(tool.name, tool);
+
+    // 创建缓存的工具信息
+    const cachedInfo: CachedToolInfo = {
+      tool,
+      lowercaseName: tool.name.toLowerCase(),
+      lowercaseDescription: tool.description.toLowerCase(),
+      lowercaseTags: (tool.tags || []).map(tag => tag.toLowerCase())
+    };
+
+    this.tools.set(tool.name, cachedInfo);
+
+    // 更新类别索引
+    if (this.toolsByCategory.has(tool.category)) {
+      this.toolsByCategory.get(tool.category)!.add(tool.name);
+    }
+
     logger.debug(`工具注册: ${tool.name} [${tool.category}]`);
   }
 
   /**
-   * 批量注册工具
+   * 批量注册工具（优化版）
    */
   registerMany(tools: Tool[]): void {
     for (const tool of tools) {
@@ -82,48 +124,80 @@ export class ToolRegistry {
   }
 
   /**
-   * 获取工具
+   * 获取工具（优化版）
    */
   get(name: string): Tool | undefined {
-    return this.tools.get(name);
+    const cached = this.tools.get(name);
+    return cached?.tool;
   }
 
   /**
    * 获取所有工具
    */
   getAll(): Tool[] {
-    return Array.from(this.tools.values());
+    // 优化：避免创建临时数组
+    const result: Tool[] = [];
+    for (const cached of this.tools.values()) {
+      result.push(cached.tool);
+    }
+    return result;
   }
 
   /**
-   * 按类别获取工具
+   * 按类别获取工具（优化版）
    */
   getByCategory(category: ToolCategory): Tool[] {
-    return this.getAll().filter(t => t.category === category);
+    const categoryTools = this.toolsByCategory.get(category);
+    if (!categoryTools) return [];
+
+    const result: Tool[] = [];
+    for (const name of categoryTools) {
+      const cached = this.tools.get(name);
+      if (cached) {
+        result.push(cached.tool);
+      }
+    }
+    return result;
   }
 
   /**
-   * 搜索工具
+   * 搜索工具（优化版）
    */
   search(query: string): Tool[] {
     const lower = query.toLowerCase();
-    return this.getAll().filter(
-      t =>
-        t.name.toLowerCase().includes(lower) ||
-        t.description.toLowerCase().includes(lower) ||
-        t.tags?.some(tag => tag.toLowerCase().includes(lower))
-    );
+    const result: Tool[] = [];
+
+    // 优化：使用预计算的缓存信息
+    for (const cached of this.tools.values()) {
+      if (
+        cached.lowercaseName.includes(lower) ||
+        cached.lowercaseDescription.includes(lower) ||
+        cached.lowercaseTags.some(tag => tag.includes(lower))
+      ) {
+        result.push(cached.tool);
+      }
+    }
+
+    return result;
   }
 
   /**
    * 移除工具
    */
   unregister(name: string): boolean {
+    const cached = this.tools.get(name);
+    if (cached) {
+      // 从类别索引中移除
+      const categoryTools = this.toolsByCategory.get(cached.tool.category);
+      if (categoryTools) {
+        categoryTools.delete(name);
+      }
+    }
     return this.tools.delete(name);
   }
 
   /**
-   * 执行工具
+   * 执行工具（性能优化版）
    */
   async execute(
     name: string,
@@ -131,16 +205,21 @@ export class ToolRegistry {
     context: ToolContext,
     options?: ToolExecuteOptions
   ): Promise<ToolResult> {
-    const tool = this.tools.get(name);
-    if (!tool) {
+    const startTime = Date.now();
+    this.metrics.totalCalls++;
+
+    const cached = this.tools.get(name);
+    if (!cached) {
+      this.metrics.failedCalls++;
       return {
         success: false,
         error: `工具 ${name} 不存在`,
+        duration: Date.now() - startTime,
       };
     }
 
-    const callId = `call-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-    const startTime = Date.now();
+    const tool = cached.tool;
+    const callId = this.generateCallId(name);
 
     const toolCall: ToolCall = {
       id: callId,
@@ -152,9 +231,10 @@ export class ToolRegistry {
 
     this.toolCalls.set(callId, toolCall);
     this.trimCallHistory();
+    this.cleanupOldCalls(); // 新增：清理旧调用
 
-    // 发送开始事件
-    this.emitToolEvent('tool_call_start', name, callId, params);
+    // 异步发送开始事件
+    this.emitToolEventAsync('tool_call_start', name, callId, params);
 
     try {
       const timeout = options?.timeout || tool.timeout || 30000;
@@ -165,14 +245,19 @@ export class ToolRegistry {
         try {
           const result = await this.executeWithTimeout(tool.handler, params, context, timeout);
 
+          const duration = Date.now() - startTime;
           toolCall.endTime = Date.now();
           toolCall.result = result;
 
-          // 发送完成事件
-          this.emitToolEvent('tool_call_complete', name, callId, undefined, result);
+          // 更新性能指标
+          this.metrics.successfulCalls++;
+          this.updateExecutionMetrics(duration);
 
-          logger.debug(`工具执行成功: ${name} (${toolCall.endTime - startTime}ms)`);
-          return result;
+          // 异步发送完成事件
+          this.emitToolEventAsync('tool_call_complete', name, callId, undefined, result);
+
+          logger.debug(`工具执行成功: ${name} (${duration}ms)`);
+          return { ...result, duration };
         } catch (error) {
           lastError = error instanceof Error ? error : new Error(String(error));
 
@@ -181,35 +266,64 @@ export class ToolRegistry {
               `工具 ${name} 执行失败，${attempt + 1}/${maxRetries} 重试:`,
               lastError.message
             );
-            await this.sleep(Math.pow(2, attempt) * 100); // 指数退避
+            await this.sleep(Math.pow(2, attempt) * 100);
           }
         }
       }
 
       // 所有重试都失败
+      this.metrics.failedCalls++;
+      const duration = Date.now() - startTime;
       const errorResult: ToolResult = {
         success: false,
         error: lastError?.message || '执行失败',
-        duration: Date.now() - startTime,
+        duration,
       };
       toolCall.endTime = Date.now();
       toolCall.result = errorResult;
 
-      this.emitToolEvent('tool_call_error', name, callId, undefined, undefined, lastError?.message);
+      this.emitToolEventAsync('tool_call_error', name, callId, undefined, undefined, lastError?.message);
 
       return errorResult;
     } catch (error) {
+      this.metrics.failedCalls++;
+      const duration = Date.now() - startTime;
       const errorResult: ToolResult = {
         success: false,
         error: error instanceof Error ? error.message : String(error),
-        duration: Date.now() - startTime,
+        duration,
       };
       toolCall.endTime = Date.now();
       toolCall.result = errorResult;
 
-      this.emitToolEvent('tool_call_error', name, callId, undefined, undefined, errorResult.error);
+      this.emitToolEventAsync('tool_call_error', name, callId, undefined, undefined, errorResult.error);
 
       return errorResult;
+    }
+  }
+
+  /**
+   * 优化：高效生成调用ID
+   */
+  private generateCallId(toolName: string): string {
+    return `call-${toolName}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  }
+
+  /**
+   * 清理旧调用（新增）
+   */
+  private cleanupOldCalls(): void {
+    const now = Date.now();
+    const toDelete: string[] = [];
+
+    for (const [id, call] of this.toolCalls.entries()) {
+      if (call.endTime && now - call.endTime > this.TOOL_CALL_TTL) {
+        toDelete.push(id);
+      }
+    }
+
+    for (const id of toDelete) {
+      this.toolCalls.delete(id);
     }
   }
 
@@ -231,9 +345,9 @@ export class ToolRegistry {
   }
 
   /**
-   * 发送工具事件
+   * 异步发送工具事件（优化版）
    */
-  private emitToolEvent(
+  private emitToolEventAsync(
     type: 'tool_call_start' | 'tool_call_complete' | 'tool_call_error',
     toolName: string,
     callId: string,
@@ -241,22 +355,24 @@ export class ToolRegistry {
     result?: ToolResult,
     error?: string
   ): void {
-    const event: ToolCallEvent = {
-      type,
-      toolName,
-      toolCallId: callId,
-      params,
-      result,
-      error,
-      timestamp: Date.now(),
-    };
+    setImmediate(() => {
+      const event: ToolCallEvent = {
+        type,
+        toolName,
+        toolCallId: callId,
+        params,
+        result,
+        error,
+        timestamp: Date.now(),
+      };
 
-    this.eventBus.emit({
-      type: TaskFlowEvent.TASK_COMPLETED, // 复用任务完成事件
-      payload: event,
-      timestamp: Date.now(),
-      source: 'ToolRegistry',
-      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      this.eventBus.emit({
+        type: TaskFlowEvent.TASK_COMPLETED,
+        payload: event,
+        timestamp: Date.now(),
+        source: 'ToolRegistry',
+        id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      });
     });
   }
 
@@ -264,23 +380,21 @@ export class ToolRegistry {
    * 获取调用历史
    */
   getCallHistory(limit?: number): ToolCall[] {
+    // 优化：避免创建临时数组多次
     const calls = Array.from(this.toolCalls.values()).sort((a, b) => b.startTime - a.startTime);
     return limit ? calls.slice(0, limit) : calls;
   }
 
   /**
-   * 获取调用统计
+   * 获取调用统计（优化版）
    */
   getStats(): {
     totalTools: number;
     byCategory: Record<ToolCategory, number>;
     totalCalls: number;
     successRate: number;
+    averageExecutionTime: number;
   } {
-    const tools = this.getAll();
-    const calls = Array.from(this.toolCalls.values());
-    const successful = calls.filter(c => c.result?.success).length;
-
     const byCategory: Record<ToolCategory, number> = {
       filesystem: 0,
       system: 0,
@@ -290,29 +404,42 @@ export class ToolRegistry {
       custom: 0,
     };
 
-    for (const tool of tools) {
-      byCategory[tool.category]++;
+    // 优化：使用类别索引统计
+    for (const [category, tools] of this.toolsByCategory.entries()) {
+      byCategory[category] = tools.size;
     }
 
+    const totalCalls = this.metrics.totalCalls;
+
     return {
-      totalTools: tools.length,
+      totalTools: this.tools.size,
       byCategory,
-      totalCalls: calls.length,
-      successRate: calls.length > 0 ? successful / calls.length : 0,
+      totalCalls,
+      successRate: totalCalls > 0 ? this.metrics.successfulCalls / totalCalls : 0,
+      averageExecutionTime: this.metrics.averageExecutionTime,
     };
   }
 
   /**
-   * 清理调用历史
+   * 更新执行指标
+   */
+  private updateExecutionMetrics(duration: number): void {
+    // 使用移动平均
+    this.metrics.averageExecutionTime =
+      this.metrics.averageExecutionTime * 0.9 + duration * 0.1;
+  }
+
+  /**
+   * 清理调用历史（优化版）
    */
   private trimCallHistory(): void {
     if (this.toolCalls.size > this.maxCallHistory) {
-      const sorted = Array.from(this.toolCalls.entries()).sort(
-        (a, b) => b[1].startTime - a[1].startTime
-      );
+      // 优化：只查找需要的数量
+      const sorted = Array.from(this.toolCalls.entries())
+        .sort((a, b) => a[1].startTime - b[1].startTime)
+        .slice(0, this.toolCalls.size - this.maxCallHistory);
 
-      const toDelete = sorted.slice(this.maxCallHistory);
-      for (const [id] of toDelete) {
+      for (const [id] of sorted) {
         this.toolCalls.delete(id);
       }
     }
@@ -323,8 +450,17 @@ export class ToolRegistry {
    */
   clear(): void {
     this.tools.clear();
+    this.toolsByCategory.clear();
+    this.initializeCategoryIndex();
     this.toolCalls.clear();
     logger.info('ToolRegistry 已清除');
+  }
+
+  /**
+   * 获取性能指标
+   */
+  getMetrics() {
+    return { ...this.metrics };
   }
 
   /**

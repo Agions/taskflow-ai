@@ -63,3 +63,6 @@ taskflow/
 REFORM_PLAN*.md
 junit.xml
 docs/plans/
+
+# Internal reports
+docs/reports/

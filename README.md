@@ -528,7 +528,7 @@ $ taskflow parse requirements.md --visualize
 - 🏗️ **架构设计**: 系统设计、最佳实践
 - 🧪 **测试指南**: 单元测试、集成测试、E2E
 - 🚀 **部署指南**: Docker、K8s、CI/CD
-- 🔧 **故障排除**: 常见问题、性能优化
+- 🔧 **故障排除**: 常见问题、性能优化 ([PERFORMANCE_GUIDE.md](./PERFORMANCE_GUIDE.md))
 
 **访问**: https://agions.github.io/taskflow-ai/
 

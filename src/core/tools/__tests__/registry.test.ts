@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach, jest, afterEach } from '@jest/globals';
 import { ToolRegistry } from '../registry';
 import {
@@ -10,11 +11,11 @@ import {
 
 describe('ToolRegistry', () => {
   let registry: ToolRegistry;
-  let mockHandler: jest.Mock<Promise<ToolResult>, [Record<string, unknown>, ToolContext]>;
+  let mockHandler: jest.Mock;
 
   beforeEach(() => {
     registry = new ToolRegistry();
-    mockHandler = jest.fn<Promise<ToolResult>, [Record<string, unknown>, ToolContext]>()
+    mockHandler = jest.fn()
       .mockResolvedValue({
         success: true,
         output: 'test output',

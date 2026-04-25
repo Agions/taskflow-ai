@@ -179,7 +179,12 @@ export interface AgentStep {
   step: number;
   type: 'thought' | 'action' | 'observation' | 'reflection';
   content: string;
+  reasoning?: string;
+  tool?: string;
+  toolInput?: Record<string, unknown>;
+  toolResult?: unknown;
   timestamp: number;
+  duration?: number;
   result?: unknown;
 }
 
@@ -238,3 +243,39 @@ export interface AgentDefinition {
  * Agent 验证器
  */
 export type AgentValidator = (config: AgentConfig) => ValidationResult;
+
+/**
+ * Agent 执行记录
+ */
+export interface AgentExecution {
+  id: string;
+  agentId: string;
+  task: AgentTask;
+  steps: AgentStep[];
+  currentStep: number;
+  status: AgentStatus;
+  startedAt: number;
+  finishedAt?: number;
+  checkpoint?: ExecutionCheckpoint;
+}
+
+/**
+ * 执行检查点
+ */
+export interface ExecutionCheckpoint {
+  stepIndex: number;
+  subgoalIndex: number;
+  state: Record<string, unknown>;
+}
+
+/**
+ * 反思结果
+ */
+export interface ReflectionResult {
+  success: boolean;
+  insights: string[];
+  improvements: string[];
+}
+
+
+

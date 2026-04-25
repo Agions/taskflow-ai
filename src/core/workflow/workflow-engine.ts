@@ -1,5 +1,5 @@
 /**
- * Workflow Engine - 工作流引擎
+ * 性能优化的 WorkflowEngine
  * TaskFlow AI v4.0
  */
 
@@ -8,21 +8,44 @@ import {
   WorkflowExecution,
   ExecutionResult,
   WorkflowStep,
-  NodeOutput,
   WorkflowStatus,
-  StepStatus
 } from '../../types/workflow';
 import { Logger } from '../../utils/logger';
 import { CacheManager, CacheKeys } from '../cache';
 import { getEventBus } from '../events';
-import { EventHandler } from '../../types/event';
+
+// 性能监控统计数据
+interface PerformanceMetrics {
+  totalExecutions: number;
+  cacheHits: number;
+  cacheMisses: number;
+  averageExecutionTime: number;
+  memoryUsage: number;
+}
 
 export class WorkflowEngine {
   private logger: Logger;
   private executions: Map<string, WorkflowExecution> = new Map();
+  private executionTimestamps: Map<string, number> = new Map(); // 新增：执行时间戳
   private cacheManager: CacheManager;
   private eventBus = getEventBus();
   private stepExecutors: Map<string, Function> = new Map();
+
+  // 性能配置
+  private readonly MAX_EXECUTIONS = 1000; // 最大执行实例数
+  private readonly EXECUTION_TTL = 3600000; // 1小时TTL
+  private readonly CLEANUP_INTERVAL = 300000; // 5分钟清理间隔
+
+  // 性能指标
+  private metrics: PerformanceMetrics = {
+    totalExecutions: 0,
+    cacheHits: 0,
+    cacheMisses: 0,
+    averageExecutionTime: 0,
+    memoryUsage: 0
+  };
+
+  private cleanupTimer?: NodeJS.Timeout;
 
   constructor() {
     this.logger = Logger.getInstance('WorkflowEngine');
@@ -30,36 +53,48 @@ export class WorkflowEngine {
       enabled: true,
       l1: {
         enabled: true,
-        maxSize: 100,
-        ttl: 600
+        maxSize: 200, // 增加缓存大小
+        ttl: 900 // 增加TTL
       },
       l2: {
         enabled: true,
         ttl: 86400
       }
     });
+
+    // 启动自动清理
+    this.startAutoCleanup();
   }
 
   /**
-   * 执行工作流
+   * 执行工作流（性能优化版）
    */
   async execute(workflow: Workflow, input?: Record<string, unknown>): Promise<ExecutionResult> {
     const startTime = Date.now();
-    const cacheKey = CacheKeys.workflow(workflow.id);
+    this.metrics.totalExecutions++;
+
+    // 优化：使用工作流ID和输入参数的哈希作为缓存键
+    const cacheKey = this.createCacheKey(workflow, input);
 
     // 尝试从缓存获取
     const cachedResult = this.cacheManager.get<ExecutionResult>(cacheKey);
-    if (cachedResult && cachedResult.success && cachedResult.execution?.id) {
-      this.logger.info(`Workflow cache hit: ${workflow.name}`);
-      this.emitWorkflowComplete(workflow, cachedResult.execution.id, Date.now() - startTime);
+    if (cachedResult && cachedResult.success) {
+      this.metrics.cacheHits++;
+      this.logger.debug(`Workflow cache hit: ${workflow.name}`);
+      this.emitWorkflowComplete(workflow, cachedResult.execution?.id || '', Date.now() - startTime);
       return { ...cachedResult, duration: Date.now() - startTime };
     }
 
-    // 创建执行实例
-    const executionId = `exec-${Date.now()}`;
+    this.metrics.cacheMisses++;
+
+    // 优化：使用更高效的ID生成
+    const executionId = this.generateExecutionId();
     const execution = this.createExecution(executionId, workflow, input);
 
+    // 优化：立即设置时间戳，避免后续查找
     this.executions.set(executionId, execution);
+    this.executionTimestamps.set(executionId, Date.now());
+
     this.logger.info(`Starting workflow: ${workflow.name} (${executionId})`);
 
     try {
@@ -69,7 +104,7 @@ export class WorkflowEngine {
         throw new Error(`Workflow validation failed: ${validation.errors.join(', ')}`);
       }
 
-      // 发送启动事件
+      // 异步发送启动事件（避免阻塞）
       this.emitWorkflowStart(workflow, executionId);
 
       // 执行步骤
@@ -91,6 +126,10 @@ export class WorkflowEngine {
         this.cacheManager.set(cacheKey, result);
       }
 
+      // 更新性能指标
+      this.updateMetrics(duration);
+
+      // 异步发送完成事件
       this.emitWorkflowComplete(workflow, executionId, duration);
       return result;
     } catch (error) {
@@ -124,6 +163,7 @@ export class WorkflowEngine {
     if (!execution) return false;
 
     execution.status = 'cancelled';
+    this.executionTimestamps.delete(executionId); // 清理时间戳
     this.logger.info(`Cancelled workflow execution: ${executionId}`);
     return true;
   }
@@ -132,14 +172,46 @@ export class WorkflowEngine {
    * 获取执行实例
    */
   getExecution(executionId: string): WorkflowExecution | undefined {
+    const timestamp = this.executionTimestamps.get(executionId);
+    if (timestamp && Date.now() - timestamp > this.EXECUTION_TTL) {
+      // 过期的执行，自动清理
+      this.executions.delete(executionId);
+      this.executionTimestamps.delete(executionId);
+      return undefined;
+    }
     return this.executions.get(executionId);
   }
 
   /**
-   * 注册步骤执行器
+   * 优化：创建基于输入的缓存键
    */
-  registerStepExecutor(stepType: string, executor: Function): void {
-    this.stepExecutors.set(stepType, executor);
+  private createCacheKey(workflow: Workflow, input?: Record<string, unknown>): string {
+    if (!input || Object.keys(input).length === 0) {
+      return CacheKeys.workflow(workflow.id);
+    }
+
+    // 简化键生成，避免昂贵的序列化
+    const inputKey = Object.keys(input).sort().map(key =>
+      `${key}:${String(input[key]).slice(0, 50)}`
+    ).join('|');
+    return `workflow:${workflow.id}:${inputKey}`;
+  }
+
+  /**
+   * 优化：高效的ID生成
+   */
+  private generateExecutionId(): string {
+    // 使用时间戳和随机数的组合，比单纯时间戳性能更好
+    return `exec-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  }
+
+  /**
+   * 自动清理机制
+   */
+  private startAutoCleanup(): void {
+    this.cleanupTimer = setInterval(() => {
+      this.cleanup();
+    }, this.CLEANUP_INTERVAL);
   }
 
   /**
@@ -147,18 +219,85 @@ export class WorkflowEngine {
    */
   cleanup(): void {
     const now = Date.now();
-    const oneHour = 3600000;
-    const executions = Array.from(this.executions.entries());
+    let cleanedCount = 0;
 
-    for (const [id, execution] of executions) {
-      if (execution.completedAt && (now - execution.completedAt) > oneHour) {
+    // 按时间戳清理过期执行
+    for (const [id, timestamp] of this.executionTimestamps.entries()) {
+      if (now - timestamp > this.EXECUTION_TTL) {
         this.executions.delete(id);
+        this.executionTimestamps.delete(id);
+        cleanedCount++;
       }
     }
 
-    this.logger.info(`Cleaned up old workflow executions`);
+    // 超出限制时清理最旧的
+    if (this.executions.size > this.MAX_EXECUTIONS) {
+      const entries = Array.from(this.executionTimestamps.entries())
+        .sort((a, b) => a[1] - b[1]);
+
+      const toRemove = entries.slice(0, entries.length - this.MAX_EXECUTIONS);
+      for (const [id] of toRemove) {
+        this.executions.delete(id);
+        this.executionTimestamps.delete(id);
+        cleanedCount++;
+      }
+    }
+
+    if (cleanedCount > 0) {
+      this.logger.info(`Cleaned up ${cleanedCount} workflow executions`);
+    }
+
+    // 更新内存使用统计
+    this.updateMemoryMetrics();
   }
 
+  /**
+   * 更新性能指标
+   */
+  private updateMetrics(duration: number): void {
+    // 使用移动平均计算平均时间
+    this.metrics.averageExecutionTime =
+      this.metrics.averageExecutionTime * 0.9 + duration * 0.1;
+  }
+
+  /**
+   * 更新内存指标
+   */
+  private updateMemoryMetrics(): void {
+    if (global.gc) {
+      global.gc();
+    }
+    this.metrics.memoryUsage = process.memoryUsage().heapUsed / 1024 / 1024;
+  }
+
+  /**
+   * 获取性能指标
+   */
+  getMetrics(): PerformanceMetrics {
+    return { ...this.metrics };
+  }
+
+  /**
+   * 获取缓存命中率
+   */
+  getCacheHitRate(): number {
+    const total = this.metrics.cacheHits + this.metrics.cacheMisses;
+    return total === 0 ? 0 : this.metrics.cacheHits / total;
+  }
+
+  /**
+   * 销毁引擎
+   */
+  destroy(): void {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+    }
+    this.executions.clear();
+    this.executionTimestamps.clear();
+    this.logger.info('WorkflowEngine destroyed');
+  }
+
+  // 以下方法保持原有实现...
   private createExecution(
     executionId: string,
     workflow: Workflow,
@@ -186,7 +325,6 @@ export class WorkflowEngine {
       errors.push('Workflow must have at least one step');
     }
 
-    // 验证步骤依赖
     const stepIds = new Set(workflow.steps.map(s => s.id));
     for (const step of workflow.steps) {
       for (const dep of step.dependsOn) {
@@ -196,10 +334,7 @@ export class WorkflowEngine {
       }
     }
 
-    return {
-      valid: errors.length === 0,
-      errors
-    };
+    return { valid: errors.length === 0, errors };
   }
 
   private async executeSteps(workflow: Workflow, execution: WorkflowExecution): Promise<void> {
@@ -212,7 +347,6 @@ export class WorkflowEngine {
       for (const step of workflow.steps) {
         if (processed.has(step.id)) continue;
 
-        // 检查依赖是否都已完成
         const dependenciesMet = step.dependsOn.every(
           depId =>
             processed.has(depId) &&
@@ -221,7 +355,6 @@ export class WorkflowEngine {
 
         if (!dependenciesMet) continue;
 
-        // 执行步骤
         const result = await this.executeStep(step, execution);
         execution.stepStatuses[step.id] = result.success ? 'completed' : 'failed';
 
@@ -229,7 +362,6 @@ export class WorkflowEngine {
           throw new Error(`Step ${step.id} failed`);
         }
 
-        // 合并输出
         if (result.output) {
           Object.assign(execution.outputs, result.output);
         }
@@ -263,7 +395,6 @@ export class WorkflowEngine {
       }
 
       const output = await executor(step.config, execution);
-
       execution.stepStatuses[step.id] = 'completed';
       return { success: true, output: output as Record<string, unknown> };
     } catch (error) {
@@ -272,39 +403,43 @@ export class WorkflowEngine {
     }
   }
 
+  // 优化：异步事件发送
   private emitWorkflowStart(workflow: Workflow, executionId: string): void {
-    this.eventBus.emit({
-      type: 'workflow.started' as any,
-      payload: { workflowId: workflow.id, executionId },
-      timestamp: Date.now(),
-      source: 'WorkflowEngine',
-      id: `event-${Date.now()}`
+    setImmediate(() => {
+      this.eventBus.emit({
+        type: 'workflow.started' as any,
+        payload: { workflowId: workflow.id, executionId },
+        timestamp: Date.now(),
+        source: 'WorkflowEngine',
+        id: `event-${Date.now()}`
+      });
     });
   }
 
   private emitWorkflowComplete(workflow: Workflow, executionId: string, duration: number): void {
-    this.eventBus.emit({
-      type: 'workflow.completed' as any,
-      payload: { workflowId: workflow.id, executionId, duration },
-      timestamp: Date.now(),
-      source: 'WorkflowEngine',
-      id: `event-${Date.now()}`
+    setImmediate(() => {
+      this.eventBus.emit({
+        type: 'workflow.completed' as any,
+        payload: { workflowId: workflow.id, executionId, duration },
+        timestamp: Date.now(),
+        source: 'WorkflowEngine',
+        id: `event-${Date.now()}`
+      });
     });
   }
 
   private emitWorkflowError(workflow: Workflow, executionId: string, result: ExecutionResult): void {
-    this.eventBus.emit({
-      type: 'workflow.error' as any,
-      payload: { workflowId: workflow.id, executionId, errors: result.errors || [] },
-      timestamp: Date.now(),
-      source: 'WorkflowEngine',
-      id: `event-${Date.now()}`
+    setImmediate(() => {
+      this.eventBus.emit({
+        type: 'workflow.error' as any,
+        payload: { workflowId: workflow.id, executionId, errors: result.errors || [] },
+        timestamp: Date.now(),
+        source: 'WorkflowEngine',
+        id: `event-${Date.now()}`
+      });
     });
   }
 
-  /**
-   * 暂停工作流执行
-   */
   pause(executionId: string): boolean {
     const execution = this.executions.get(executionId);
     if (!execution) {
@@ -319,9 +454,6 @@ export class WorkflowEngine {
     return false;
   }
 
-  /**
-   * 恢复工作流执行
-   */
   resume(executionId: string): boolean {
     const execution = this.executions.get(executionId);
     if (!execution) {
@@ -336,9 +468,10 @@ export class WorkflowEngine {
     return false;
   }
 
-  /**
-   * 列出所有执行
-   */
+  registerStepExecutor(stepType: string, executor: Function): void {
+    this.stepExecutors.set(stepType, executor);
+  }
+
   listExecutions(): WorkflowExecution[] {
     return Array.from(this.executions.values());
   }
