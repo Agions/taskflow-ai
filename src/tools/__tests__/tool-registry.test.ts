@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { ToolRegistry, ToolDefinition, ToolCategory } from '../tool-registry';
+import { ToolRegistry, ToolDefinition } from '../tool-registry';
 
 describe('ToolRegistry', () => {
   let toolRegistry: ToolRegistry;
@@ -13,7 +12,7 @@ describe('ToolRegistry', () => {
       id: 'test-tool',
       name: 'Test Tool',
       description: 'A test tool',
-      category: ToolCategory.CUSTOM,
+      category: 'custom',
       parameters: { type: 'object', properties: {}, required: [] },
       execute: async () => ({ success: true, output: {} })
     };
@@ -27,7 +26,7 @@ describe('ToolRegistry', () => {
       id: 'test-tool',
       name: 'Test Tool',
       description: 'A test tool',
-      category: ToolCategory.CUSTOM,
+      category: 'custom',
       parameters: { type: 'object', properties: {}, required: [] },
       execute: async () => ({ success: true, output: {} })
     };
@@ -44,7 +43,7 @@ describe('ToolRegistry', () => {
       id: 'file-tool',
       name: 'File Tool',
       description: 'File operations',
-      category: ToolCategory.FILESYSTEM,
+      category: 'filesystem',
       parameters: { type: 'object', properties: {}, required: [] },
       execute: async () => ({ success: true, output: {} })
     };
@@ -53,7 +52,7 @@ describe('ToolRegistry', () => {
       id: 'shell-tool',
       name: 'Shell Tool',
       description: 'Shell operations',
-      category: ToolCategory.SHELL,
+      category: 'shell',
       parameters: { type: 'object', properties: {}, required: [] },
       execute: async () => ({ success: true, output: {} })
     };
@@ -61,8 +60,8 @@ describe('ToolRegistry', () => {
     toolRegistry.register(tool1);
     toolRegistry.register(tool2);
 
-    const fileTools = toolRegistry.listByCategory(ToolCategory.FILESYSTEM);
-    const shellTools = toolRegistry.listByCategory(ToolCategory.SHELL);
+    const fileTools = toolRegistry.listByCategory('filesystem');
+    const shellTools = toolRegistry.listByCategory('shell');
 
     expect(fileTools.length).toBe(1);
     expect(shellTools.length).toBe(1);
@@ -73,7 +72,7 @@ describe('ToolRegistry', () => {
       id: 'test-tool',
       name: 'Test Tool',
       description: 'A test tool',
-      category: ToolCategory.CUSTOM,
+      category: 'custom',
       parameters: { type: 'object', properties: {}, required: [] },
       execute: async () => ({ success: true, output: {} })
     };

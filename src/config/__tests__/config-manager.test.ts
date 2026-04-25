@@ -1,5 +1,4 @@
-// @ts-nocheck
-
+import { ConfigManager } from '../config-manager';
 
 describe('ConfigManager', () => {
   let configManager: ConfigManager;

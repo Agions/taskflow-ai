@@ -7,6 +7,9 @@ import { ToolDefinition, ToolCategory, ToolResult, ToolCategories } from '../typ
 import { Logger } from '../utils/logger';
 import { getEventBus } from '../core/events';
 
+// Re-export commonly used types
+export type { ToolDefinition, ToolCategory };
+
 /**
  * ToolCategory 值数组
  */

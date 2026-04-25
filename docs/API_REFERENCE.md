@@ -1,957 +1,404 @@
-# TaskFlow AI v4.0 API Reference
+# TaskFlow AI v4.0 - API Reference
 
-**[中文版 🇨🇳](./api-reference.md)**
+## Overview
+
+TaskFlow AI v4.0 provides a comprehensive TypeScript API for building intelligent workflow automation systems.
+
+## Core Types
+
+### Agent Types
+
+**AgentStatus**
+```typescript
+type AgentStatus = 'idle' | 'thinking' | 'executing' | 'waiting' | 'reflecting' | 'completed' | 'failed';
+```
+
+**AgentCapability**
+```typescript
+type AgentCapability = 'reasoning' | 'code' | 'search' | 'tool_use' | 'collaboration' | 'planning' | 'verification';
+```
+
+**AgentConfig**
+```typescript
+interface AgentConfig {
+  id: string;
+  name: string;
+  description?: string;
+  capabilities: AgentCapability[];
+  model?: string;
+  tools: string[];
+  memory: AgentMemoryConfig;
+  goalParser?: GoalParser;
+  reflectionEnabled?: boolean;
+  maxStepsPerGoal?: number;
+  customSettings?: Record<string, unknown>;
+}
+```
+
+**AgentRuntime**
+```typescript
+interface AgentRuntime {
+  id: string;
+  execute(task: AgentTask): Promise<TaskResult>;
+  getState(): AgentState;
+  getConfig(): AgentConfig;
+  updateConfig(config: Partial<AgentConfig>): Promise<void>;
+  reset(): Promise<void>;
+  destroy(): Promise<void>;
+  addMessage(message: AgentMessage): void;
+  getMessages(limit?: number): AgentMessage[];
+}
+```
+
+### Workflow Types
+
+**WorkflowStatus**
+```typescript
+type WorkflowStatus = 'created' | 'running' | 'paused' | 'completed' | 'failed' | 'cancelled';
+```
+
+**Workflow**
+```typescript
+interface Workflow {
+  id: string;
+  name: string;
+  description: string;
+  steps: WorkflowStep[];
+  variables: Record<string, unknown>;
+  status: WorkflowStatus;
+  created: number;
+  updated?: number;
+  version?: string;
+  tags?: string[];
+}
+```
+
+**WorkflowExecution**
+```typescript
+interface WorkflowExecution {
+  id: string;
+  workflowId: string;
+  status: WorkflowStatus;
+  currentStep?: string;
+  stepStatuses: Record<string, StepStatus>;
+  variables: Record<string, unknown>;
+  outputs: Record<string, unknown>;
+  startedAt: number;
+  completedAt?: number;
+  finishedAt?: number;
+  duration?: number;
+  error?: WorkflowError;
+}
+```
+
+### Tool Types
+
+**ToolCategory**
+```typescript
+type ToolCategory = 'filesystem' | 'shell' | 'http' | 'git' | 'database' | 'code' | 'ai' | 'custom';
+```
+
+**ToolRegistry**
+```typescript
+class ToolRegistry {
+  register(definition: ToolDefinition): void;
+  get(toolId: string): ToolDefinition | undefined;
+  has(toolId: string): boolean;
+  listAll(): ToolDefinition[];
+  listByCategory(category: ToolCategory): ToolDefinition[];
+  unregister(toolId: string): boolean;
+  recordUsage(toolId: string): void;
+  getStats(toolId: string): object;
+  clear(): void;
+}
+```
+
+### Configuration Types
+
+**TaskFlowConfig**
+```typescript
+interface TaskFlowConfig {
+  version: string;
+  workspace: string;
+  environment: 'development' | 'staging' | 'production';
+  projectName?: string;
+  models: ModelConfig[];
+  models?: AIModelConfig[];
+  cache: CacheConfig;
+  logging: LoggingConfig;
+  plugins: PluginsConfig;
+  extensions: ExtensionsConfig;
+  security: SecurityConfig;
+  mcpSettings?: MCPSettings;
+}
+```
+
+**CacheConfig**
+```typescript
+interface CacheConfig {
+  enabled: boolean;
+  l1: {
+    enabled: boolean;
+    maxSize: number;
+    ttl: number;
+  };
+  l2: {
+    enabled: boolean;
+    ttl: number;
+  };
+}
+```
 
 ## Core Modules
 
-### @taskflow-ai/types
+### Agent Runtime
 
-Type definitions for TaskFlow AI.
-
-#### Agent Types
-
+**Usage Example:**
 ```typescript
-interface IAgent {
-  id: string;
-  name: string;
-  type: AgentType;
-  description: string;
-  capabilities: AgentCapability[];
-  config: AgentConfig;
-  execute(task: ITask, context: ExecutionContext): Promise<TaskResult>;
-}
+import { AgentConfig, AgentTask, AgentRuntimeImpl } from './core/agent';
 
-enum AgentType {
-  Assistant = 'assistant',
-  Coder = 'coder',
-  Researcher = 'researcher',
-  Orchestrator = 'orchestrator',
-  Custom = 'custom',
-}
+const config: AgentConfig = {
+  id: 'agent-1',
+  name: 'Research Agent',
+  capabilities: ['reasoning', 'search', 'tool_use'],
+  tools: ['web-search', 'file-read'],
+  memory: {
+    maxShortTerm: 50,
+    maxLongTerm: 1000
+  }
+};
 
-enum AgentCapability {
-  CodeGeneration = 'code_generation',
-  DataAnalysis = 'data_analysis',
-  DocumentProcessing = 'document_processing',
-  WorkflowExecution = 'workflow_execution',
-  ToolCalling = 'tool_calling',
-  MemoryManagement = 'memory_management',
-  MultiAgentCoordination = 'multi_agent_coordination',
-}
-
-interface AgentConfig {
-  aiProvider: string;
-  model: string;
-  temperature?: number;
-  maxTokens?: number;
-  timeout?: number;
-  retryPolicy?: RetryPolicy;
-  memoryConfig?: MemoryConfig;
-}
+const runtime = new AgentRuntimeImpl(config);
+const result = await runtime.execute({
+  id: 'task-1',
+  description: 'Analyze data',
+  status: 'pending',
+  createdAt: Date.now()
+});
 ```
 
-#### Task Types
+### Workflow Engine
 
+**Usage Example:**
 ```typescript
-interface ITask {
-  id: string;
-  type: TaskType;
-  description: string;
-  input: any;
-  status: TaskStatus;
-  priority: TaskPriority;
-  createdAt: Date;
-  startedAt?: Date;
-  completedAt?: Date;
-  result?: TaskResult;
-}
+import { Workflow, WorkflowEngine } from './core/workflow';
 
-enum TaskType {
-  CodeGeneration = 'code_generation',
-  DataAnalysis = 'data_analysis',
-  DocumentProcessing = 'document_processing',
-  ToolExecution = 'tool_execution',
-  Custom = 'custom',
-}
+const workflow: Workflow = {
+  id: 'workflow-1',
+  name: 'Data Pipeline',
+  description: 'Process data from input to output',
+  steps: [
+    {
+      id: 'step-1',
+      type: 'task',
+      name: 'Input',
+      config: {
+        taskId: 'input-task',
+        input: { source: '/data/input' }
+      },
+      dependsOn: []
+    }
+  ],
+  variables: {},
+  status: 'created',
+  created: Date.now()
+};
 
-enum TaskStatus {
-  Pending = 'pending',
-  Running = 'running',
-  Completed = 'completed',
-  Failed = 'failed',
-  Cancelled = 'cancelled',
-}
-
-enum TaskPriority {
-  Low = 'low',
-  Medium = 'medium',
-  High = 'high',
-  Critical = 'critical',
-}
-
-interface TaskResult {
-  success: boolean;
-  output?: any;
-  error?: Error;
-  metadata?: TaskMetadata;
-}
+const engine = new WorkflowEngine();
+const execution = await engine.execute(workflow);
 ```
 
-#### Workflow Types
+### Tool Registration
 
+**Usage Example:**
 ```typescript
-interface IWorkflow {
-  id: string;
-  name: string;
-  version: string;
-  description: string;
-  nodes: WorkflowNode[];
-  edges: WorkflowEdge[];
-  config?: WorkflowConfig;
-  execute(input: any, context: ExecutionContext): Promise<WorkflowResult>;
-}
+import { ToolRegistry, ToolDefinition } from './tools/tool-registry';
 
-interface WorkflowNode {
-  id: string;
-  type: string;
-  config: any;
-  metadata?: NodeMetadata;
-}
+const registry = new ToolRegistry();
 
-interface WorkflowEdge {
-  from: string;
-  to: string;
-  condition?: EdgeCondition;
-  metadata?: EdgeMetadata;
-}
+const customTool: ToolDefinition = {
+  id: 'custom-tool',
+  name: 'Custom Tool',
+  description: 'A custom tool',
+  category: 'custom',
+  parameters: {
+    type: 'object',
+    properties: {},
+    required: []
+  },
+  execute: async (params, context) => {
+    return { success: true, output: { result: 'custom' } };
+  }
+};
 
-interface WorkflowResult {
-  success: boolean;
-  output: any;
-  executionTime: number;
-  nodeResults: Map<string, NodeResult>;
-}
+registry.register(customTool);
 ```
 
-#### Tool Types
+## Event System
 
+**Event Bus**
 ```typescript
-interface ITool {
-  id: string;
-  name: string;
-  version: string;
-  description: string;
-  category: ToolCategory;
-  tags: string[];
-  schema: ToolSchema;
-  execute(input: ToolInput, context: ExecutionContext): Promise<ToolOutput>;
-  validate(input: ToolInput): Promise<boolean>;
-}
-
-enum ToolCategory {
-  FileSystem = 'filesystem',
-  Network = 'network',
-  Database = 'database',
-  CodeAnalysis = 'code_analysis',
-  Infrastructure = 'infrastructure',
-  Custom = 'custom',
-}
-
-interface ToolInput {
-  [key: string]: any;
-}
-
-interface ToolOutput {
-  success: boolean;
-  data?: any;
-  error?: string;
-  metadata?: {
-    executionTime: number;
-    memoryUsage?: number;
-  };
-}
-
-interface ToolSchema {
-  type: 'object';
-  properties: { [key: string]: PropertySchema };
-  required?: string[];
-}
-```
-
-#### Plugin Types
-
-```typescript
-interface IPlugin<T = any> {
-  id: string;
-  name: string;
-  version: string;
-  description: string;
-  author: string;
-  metadata: PluginMetadata;
-
-  onLoad(registry: ExtensionRegistry, config?: T): Promise<void>;
-  onUnload(): Promise<void>;
-
-  // Optional hooks
-  onActivate?(): Promise<void>;
-  onDeactivate?(): Promise<void>;
-}
-
-interface PluginMetadata {
-  minVersion: string;
-  maxVersion?: string;
-  dependencies?: string[];
-}
-```
-
-#### Extension Types
-
-```typescript
-interface IExtension<T = any> {
-  id: string;
-  type: ExtensionType;
-  metadata: ExtensionMetadata;
-  implementation: T;
-
-  // Lifecycle
-  load(): Promise<void>;
-  activate(): Promise<void>;
-  deactivate(): Promise<void>;
-  unload(): Promise<void>;
-}
-
-enum ExtensionType {
-  Plugin = 'plugin',
-  Agent = 'agent',
-  Tool = 'tool',
-  Workflow = 'workflow',
-}
-
-interface ExtensionMetadata {
-  name: string;
-  version: string;
-  description: string;
-  author: string;
-  [key: string]: any;
-}
-```
-
----
-
-### @taskflow-ai/core/agent
-
-Agent runtime and management.
-
-#### AgentRuntimeImpl
-
-Main agent runtime implementation.
-
-```typescript
-class AgentRuntimeImpl implements IAgentRuntime {
-  constructor(config: RuntimeConfig);
-
-  // Agent management
-  registerAgent(agent: IAgent): Promise<void>;
-  unregisterAgent(agentId: string): Promise<void>;
-  getAgent(agentId: string): Promise<IAgent>;
-  listAgents(): Promise<IAgent[]>;
-
-  // Task execution
-  execute(task: ITask, agentId: string): Promise<TaskResult>;
-  executeBatch(tasks: ITask[], agentId: string): Promise<TaskResult[]>;
-
-  // Lifecycle
-  start(): Promise<void>;
-  stop(): Promise<void>;
-}
-```
-
----
-
-### @taskflow-ai/core/extensions
-
-Extension system core.
-
-#### ExtensionRegistry
-
-Central registry for all extensions.
-
-```typescript
-class ExtensionRegistry {
-  private static instance: ExtensionRegistry;
-
-  static getInstance(): ExtensionRegistry;
-
-  // Registration
-  register<T>(type: ExtensionType, extension: IExtension<T>): Promise<void>;
-  unregister(type: ExtensionType, id: string): Promise<void>;
-
-  // Retrieval
-  get<T>(type: ExtensionType, id: string): Promise<IExtension<T>>;
-  list(type: ExtensionType): Promise<IExtension[]>;
-  has(type: ExtensionType, id: string): Promise<boolean>;
-
-  // Lifecycle
-  activate(type: ExtensionType, id: string): Promise<void>;
-  deactivate(type: ExtensionType, id: string): Promise<void>;
-}
-```
-
-#### ExtensionLoader
-
-Dynamic extension loader.
-
-```typescript
-class ExtensionLoader {
-  // Load from file
-  loadFromFile<T>(
-    type: ExtensionType,
-    filePath: string,
-    config?: any
-  ): Promise<IExtension<T>>;
-
-  // Load from npm package
-  loadFromPackage<T>(
-    type: ExtensionType,
-    packageName: string,
-    config?: any
-  ): Promise<IExtension<T>>;
-
-  // Load from directory
-  loadFromDirectory<T>(
-    type: ExtensionType,
-    directory: string,
-    config?: any
-  ): Promise<IExtension<T>[]>;
-}
-```
-
-#### ExtensionLifecycleManager
-
-Manages extension lifecycle.
-
-```typescript
-class ExtensionLifecycleManager {
-  // Lifecycle hooks
-  onLoad(extension: IExtension): Promise<void>;
-  onActivate(extension: IExtension): Promise<void>;
-  onDeactivate(extension: IExtension): Promise<void>;
-  onUnload(extension: IExtension): Promise<void>;
-
-  // Status
-  getStatus(extensionId: string): Promise<ExtensionStatus>;
-}
-```
-
----
-
-### @taskflow-ai/core/events
-
-Event-driven architecture.
-
-#### EventBus
-
-Main event bus implementation.
-
-```typescript
-class EventBus {
-  private static instance: EventBus;
-
-  static getInstance(): EventBus;
-
-  // Publishing
-  publish<T>(event: string, payload: T): Promise<void>;
-
-  // Subscribing
-  subscribe<T>(
-    event: string,
-    handler: EventHandler<T>
-  ): { unsubscribe: () => void };
-
-  // Unsubscribing
-  unsubscribe(event: string, handler: EventHandler): void;
-
-  // Event history
-  getHistory(event?: string, limit?: number): EventRecord[];
-}
-
-type EventHandler<T> = (payload: T) => void | Promise<void>;
-
-interface EventRecord {
-  id: string;
-  event: string;
-  payload: any;
-  timestamp: Date;
-}
-```
-
----
-
-### @taskflow-ai/core/cache
-
-Dual-layer caching system.
-
-#### CacheManager
-
-Cache manager with L1 and L2 caching.
-
-```typescript
-class CacheManager {
-  private static instance: CacheManager;
-
-  static getInstance(): CacheManager;
-
-  // Cache operations
-  get<T>(key: string): Promise<T | null>;
-  set<T>(key: string, value: T, options?: CacheOptions): Promise<void>;
-  delete(key: string): Promise<void>;
-  clear(): Promise<void>;
-
-  // Cache stats
-  getStats(): Promise<CacheStats>;
-  getHitRate(): Promise<number>;
-
-  // Cache warming
-  warm(key: string, value: any): Promise<void>;
-  warmBatch(entries: Array<{ key: string; value: any }>): Promise<void>;
-}
-
-interface CacheOptions {
-  ttl?: number; // Time to live in seconds
-  tags?: string[]; // Cache tags for invalidation
-  priority?: CachePriority;
-}
-
-enum CachePriority {
-  High = 'high',
-  Medium = 'medium',
-  Low = 'low',
-}
-
-interface CacheStats {
-  hits: number;
-  misses: number;
-  size: number;
-  l1Size: number;
-  l2Size: number;
-}
-```
-
----
-
-### @taskflow-ai/core/errors
-
-Error handling system.
-
-#### ErrorHandler
-
-Structured error handling.
-
-```typescript
-class ErrorHandler {
-  private static instance: ErrorHandler;
-
-  static getInstance(): ErrorHandler;
-
-  // Error handling
-  handle(error: Error, context?: ErrorContext): HandledError;
-  report(error: Error, context?: ErrorContext): Promise<void>;
-
-  // Error history
-  getHistory(filters?: ErrorFilters): ErrorRecord[];
-}
-
-enum ErrorSeverity {
-  Info = 'info',
-  Warning = 'warning',
-  Error = 'error',
-  Critical = 'critical',
-}
-
-interface HandledError {
-  error: Error;
-  severity: ErrorSeverity;
-  message: string;
-  suggestions: string[];
-  context: ErrorContext;
-}
-
-interface ErrorContext {
-  component: string;
-  operation: string;
-  input?: any;
-  metadata?: { [key: string]: any };
-}
-```
-
----
-
-### @taskflow-ai/core/workflow
-
-Workflow execution engine.
-
-#### WorkflowEngine
-
-Main workflow execution engine.
-
-```typescript
-class WorkflowEngine {
-  constructor(config: EngineConfig);
-
-  // Registration
-  registerWorkflow(workflow: IWorkflow): Promise<void>;
-  unregisterWorkflow(workflowId: string): Promise<void>;
-  getWorkflow(workflowId: string): Promise<IWorkflow>;
-
-  // Execution
-  execute(
-    workflowId: string,
-    input: any,
-    options?: ExecutionOptions
-  ): Promise<WorkflowResult>;
-
-  executeBatch(
-    workflowId: string,
-    inputs: any[],
-    options?: ExecutionOptions
-  ): Promise<WorkflowResult[]>;
-
-  // Lifecycle
-  start(): Promise<void>;
-  stop(): Promise<void>;
-}
-
-interface ExecutionOptions {
-  timeout?: number;
-  maxConcurrency?: number;
-  enableCache?: boolean;
-  enableLogging?: boolean;
-}
-```
-
----
-
-### @taskflow-ai/workflow/nodes
-
-Workflow node implementations.
-
-#### WorkflowNodeFactory
-
-Factory for creating workflow nodes.
-
-```typescript
-class WorkflowNodeFactory {
-  private static instance: WorkflowNodeFactory;
-
-  static getInstance(): WorkflowNodeFactory;
-
-  // Node registration
-  registerNode(type: string, nodeFactory: NodeFactoryDefinition): void;
-  unregisterNode(type: string): void;
-  hasNode(type: string): boolean;
-
-  // Node creation
-  createNode(nodeConfig: WorkflowNode): IWorkflowNode;
-
-  // Built-in nodes
-  getBuiltInNodeTypes(): string[];
-}
-
-interface IWorkflowNode {
-  execute(context: NodeExecutionContext): Promise<NodeResult>;
-  validate(config: any): ValidationResult;
-}
-```
-
-#### Built-in Nodes
-
-##### Core Nodes
-- `task`: Execute a task with a tool
-- `parallel`: Execute multiple branches in parallel
-
-##### Data Nodes
-- `transform`: Transform data using a function
-- `merge`: Merge outputs from multiple nodes
-
-##### Control Nodes
-- `condition`: Conditional branching
-- `loop`: Iterative execution
-
-##### Integration Nodes
-- `api_call`: Make API calls
-- `agent_task`: Execute agent tasks
-
----
-
-### @taskflow-ai/tools
-
-Tool management system.
-
-#### ToolRegistry
-
-Central tool registry.
-
-```typescript
-class ToolRegistry {
-  private static instance: ToolRegistry;
-
-  static getInstance(): ToolRegistry;
-
-  // Registration
-  register(tool: ITool): Promise<void>;
-  unregister(toolId: string): Promise<void>;
-
-  // Retrieval
-  get(toolId: string): Promise<ITool>;
-  list(category?: ToolCategory): Promise<ITool[]>;
-  has(toolId: string): Promise<boolean>;
-
-  // Execution
-  execute(toolId: string, input: ToolInput): Promise<ToolOutput>;
-  executeBatch(tasks: ToolExecutionTask[]): Promise<ToolOutput[]>;
-}
-```
-
-#### Built-in Tools
-
-##### FileSystem Tools
-- `fs_read`: Read file contents
-- `fs_write`: Write data to file
-- `fs_list`: List directory contents
-- `fs_exists`: Check if file/directory exists
-- `fs_delete`: Delete file/directory
-
-##### Shell Tools
-- `shell_exec`: Execute shell command
-
-##### Network Tools
-- `http_get`: HTTP GET request
-- `http_post`: HTTP POST request
-
-##### Git Tools
-- `git_status`: Get git status
-- `git_commit`: Commit changes
-- `git_log`: Get commit log
-
-##### Code Analysis Tools
-- `code_search`: Search code
-- `code_analyze`: Analyze code
-
----
-
-### @taskflow-ai/adapters
-
-External system adapters.
-
-#### AIAdapter
-
-AI provider adapter.
-
-```typescript
-class AIAdapter {
-  constructor(config: AIAdapterConfig);
-
-  // Generation
-  generate(options: GenerateOptions): Promise<AIResponse>;
-  generateStream(options: GenerateOptions): AsyncIterable<AIResponse>;
-
-  // Models
-  listModels(): Promise<AIModel[]>;
-  getModel(modelId: string): Promise<AIModel>;
-
-  // Provider info
-  getProvider(): AIProvider;
-}
-
-interface AIAdapterConfig {
-  provider: 'openai' | 'anthropic' | 'deepseek' | 'zhipu';
-  apiKey: string;
-  model?: string;
-  baseUrl?: string;
-  options?: { [key: string]: any };
-}
-```
-
-#### StorageAdapter
-
-Storage provider adapter.
-
-```typescript
-class StorageAdapter {
-  constructor(config: StorageAdapterConfig);
-
-  // CRUD operations
-  save(key: string, value: any, options?: SaveOptions): Promise<void>;
-  get(key: string): Promise<any>;
-  delete(key: string): Promise<void>;
-
-  // Queries
-  query(criteria: QueryCriteria): Promise<any[]>;
-
-  // Batch operations
-  saveBatch(entries: Array<{ key: string; value: any }>): Promise<void>;
-  getBatch(keys: string[]): Promise<any[]>;
-}
-```
-
-#### ProtocolAdapter
-
-Communication protocol adapter.
-
-```typescript
-class ProtocolAdapter {
-  constructor(config: ProtocolAdapterConfig);
-
-  // Connection
-  connect(): Promise<void>;
-  disconnect(): Promise<void>;
-  isConnected(): boolean;
-
-  // Messaging
-  send(message: any): Promise<void>;
-  on(event: string, handler: Handler): void;
-  off(event: string, handler: Handler): void;
-}
-```
-
----
-
-### @taskflow-ai/utils
-
-Utility functions.
-
-#### Logger
-
-Structured logging.
-
-```typescript
-class Logger {
-  static getInstance(options?: LoggerOptions): Logger;
-
-  // Logging methods
-  info(message: string, context?: any): void;
-  warn(message: string, context?: any): void;
-  error(message: string, context?: any): void;
-  debug(message: string, context?: any): void;
-
-  // Level management
-  setLevel(level: LogLevel): void;
-  getLevel(): LogLevel;
-}
-
-enum LogLevel {
-  Debug = 'debug',
-  Info = 'info',
-  Warn = 'warn',
-  Error = 'error',
-}
-```
-
-#### ValidationUtils
-
-Validation utilities.
-
-```typescript
-class ValidationUtils {
-  static validateInput(schema: ToolSchema, input: any): ValidationResult;
-  static isValidEmail(email: string): boolean;
-  static isValidUrl(url: string): boolean;
-  static sanitize(input: string): string;
-}
-```
-
-#### StringUtils
-
-String utilities.
-
-```typescript
-class StringUtils {
-  static capitalize(str: string): string;
-  static camelize(str: string): string;
-  static slugify(str: string): string;
-  static truncate(str: string, length: number): string;
-  static isAlphaNumeric(str: string): boolean;
-}
-```
-
----
-
-### @taskflow-ai/config
-
-Configuration management.
-
-#### ConfigManager
-
-Configuration manager.
-
-```typescript
-class ConfigManager {
-  private static instance: ConfigManager;
-
-  static getInstance(): ConfigManager;
-
-  // Config loading
-  load(path: string): Promise<Config>;
-  loadFromString(content: string): Config;
-
-  // Config access
-  get(path: string): any;
-  set(path: string, value: any): void;
-  has(path: string): boolean;
-
-  // Validation
-  validate(schema: ConfigSchema): ValidationResult;
-}
-
-interface Config {
-  [key: string]: string | number | boolean | object | Config;
-}
-```
-
----
-
-## Event API
-
-### Events
-
-The EventBus publishes these events:
-
-| Event | Payload | Description |
-|-------|---------|-------------|
-| `extension:loaded` | `{ id, type }` | Extension loaded |
-| `extension:activated` | `{ id, type }` | Extension activated |
-| `extension:deactivated` | `{ id, type }` | Extension deactivated |
-| `extension:error` | `{ id, type, error }` | Extension error |
-| `task:started` | `{ taskId, agentId }` | Task started |
-| `task:completed` | `{ taskId, result }` | Task completed |
-| `task:failed` | `{ taskId, error }` | Task failed |
-| `workflow:started` | `{ workflowId, input }` | Workflow started |
-| `workflow:completed` | `{ workflowId, result }` | Workflow completed |
-| `workflow:failed` | `{ workflowId, error }` | Workflow failed |
-| `tool:executed` | `{ toolId, result }` | Tool executed |
-| `agent:registered` | `{ agentId }` | Agent registered |
-
-### Example
-
-```typescript
-import { EventBus } from 'taskflow-ai/core/events/event-bus';
-
-const bus = EventBus.getInstance();
-
-// Subscribe to events
-bus.subscribe('task:completed', (payload) => {
-  console.log('Task completed:', payload.taskId);
+import { getEventBus } from './core/events';
+
+const eventBus = getEventBus();
+
+eventBus.emit({
+  type: 'task.completed',
+  payload: { taskId: 'task-1', result: 'success' },
+  timestamp: Date.now(),
+  source: 'workflow-engine',
+  id: 'event-1'
 });
 
-// Publish events
-await bus.publish('extension:loaded', { id: 'my-tool', type: 'tool' });
+eventBus.on('task.completed', (event) => {
+  console.log('Task completed:', event.payload);
+});
 ```
 
----
+## Extensions
+
+### Plugin System
+
+**Plugin Manifest**
+```typescript
+interface PluginManifest {
+  name: string;
+  version: string;
+  description: string;
+  author: string;
+  main: string;
+  dependencies?: Record<string, string>;
+  hooks?: string[];
+  permissions?: string[];
+  tags?: string[];
+}
+```
+
+**Plugin Hooks**
+```typescript
+type HookHandler = (context: HookContext) => Promise<HookResult> | HookResult;
+
+interface HookResult {
+  continue: boolean;
+  data?: Record<string, unknown>;
+  error?: string;
+}
+```
+
+## Performance Optimization
+
+### Caching
+
+**L1 Cache** - Fast in-memory cache with TTL
+```typescript
+const l1Cache = new L1Cache(100, 600); // max 100 items, 10min TTL
+l1Cache.set('key', { data: 'value' });
+const value = l1Cache.get('key');
+```
+
+**L2 Cache** - Slower but larger cache
+```typescript
+const l2Cache = new L2Cache(3600); // 1 hour TTL
+l2Cache.set('key', { data: 'value' });
+const value = l2Cache.get('key');
+```
+
+### Concurrency
+
+**Async Task Execution**
+```typescript
+const tasks = Array.from({ length: 10 }, (_, i) => 
+  executeTask(i)
+);
+
+const results = await Promise.allSettled(tasks);
+```
+
+**Rate Limiting**
+```typescript
+import { RateLimiter } from './utils/rate-limiter';
+
+const limiter = new RateLimiter(10, 1000); // 10 requests per second
+
+await limiter.acquire();
+// Execute your request
+```
+
+## Error Handling
+
+**Custom Errors**
+```typescript
+class TaskFlowError extends Error {
+  code: number;
+  constructor(message: string, code: number) {
+    super(message);
+    this.name = 'TaskFlowError';
+    this.code = code;
+  }
+}
+
+throw new TaskFlowError('Invalid configuration', 400);
+```
 
 ## Type Guards
 
-### Extension Type Guards
-
+**Agent Status Guard**
 ```typescript
-import { isPlugin, isAgent, isTool, isWorkflow } from 'taskflow-ai/types/extensions';
+function isActiveStatus(status: AgentStatus): status is 'thinking' | 'executing' {
+  return status === 'thinking' || status === 'executing';
+}
 
-if (isPlugin(ext)) {
-  // ext is IPlugin
-} else if (isAgent(ext)) {
-  // ext is IAgent
-} else if (isTool(ext)) {
-  // ext is ITool
-} else if (isWorkflow(ext)) {
-  // ext is IWorkflow
+if (isActiveStatus(state.status)) {
+  // Handle active states
 }
 ```
 
-### Status Type Guards
+## Constants and Utilities
 
+**Built-in Plugin Names**
 ```typescript
-import { isSuccess, isFailed, isPending } from 'taskflow-ai/types/status';
+import { BUILTIN_PLUGINS } from './plugins/types';
 
-if (isSuccess(status)) {
-  // Handle success
-} else if (isFailed(status)) {
-  // Handle failure
-} else if (isPending(status)) {
-  // Handle pending
-}
+BUILTIN_PLUGINS.CACHE; // '@taskflow/cache'
+BUILTIN_PLUGINS.TELEMETRY; // '@taskflow/telemetry'
 ```
 
----
-
-## Constants
-
-### Agent Defaults
-
+**Tool Categories**
 ```typescript
-const AGENT_DEFAULTS = {
-  temperature: 0.7,
-  maxTokens: 4096,
-  timeout: 30000,
-  retryAttempts: 3,
-} as const;
+import { ToolCategories } from './types/tool';
+
+ToolCategories.FILESYSTEM; // 'filesystem'
+ToolCategories.SHELL; // 'shell'
 ```
 
-### Cache Defaults
+## Best Practices
 
-```typescript
-const CACHE_DEFAULTS = {
-  ttl: 3600, // 1 hour
-  maxSize: 1000,
-} as const;
-```
+1. **Always validate configuration** using the ConfigManager
+2. **Use proper error handling** with try-catch blocks
+3. **Implement proper cleanup** in destroy/reset methods
+4. **Use caching** for frequently accessed data
+5. **Set appropriate timeouts** for long-running operations
+6. **Use event listeners** for monitoring system state
+7. **Follow TDD principles** - write tests before implementation
+8. **Type-safe API calls** using TypeScript interfaces
 
-### Workflow Defaults
+## Migration Guide
 
-```typescript
-const WORKFLOW_DEFAULTS = {
-  maxConcurrency: 10,
-  timeout: 300000, // 5 minutes
-} as const;
-```
+**From v3.x to v4.0**
 
----
+1. **Updated imports** - Use unified types from `src/types/`
+2. **Agent Runtime** - New AgentRuntime interface replacing AgentCore
+3. **Workflow Engine** - Updated WorkflowExecution API
+4. **Cache System** - New L1/L2 caching with TTL support
+5. **Plugin Hooks** - Updated HookContext and HookResult interfaces
 
-## Error Classes
+## Version Information
 
-### ExtensionError
+- **Current Version**: 4.0.0
+- **TypeScript Version**: 5.9+
+- **Node.js Version**: 18+
+- **Test Framework**: Jest 29.7.0+
 
-```typescript
-class ExtensionError extends Error {
-  constructor(message: string, public extensionId: string);
-}
-```
+## Support
 
-### ValidationError
-
-```typescript
-class ValidationError extends Error {
-  constructor(message: string, public field: string);
-}
-```
-
-### ExecutionError
-
-```typescript
-class ExecutionError extends Error {
-  constructor(message: string, public operation: string);
-}
-```
-
-### TimeoutError
-
-```typescript
-class TimeoutError extends Error {
-  constructor(message: string, public timeout: number);
-}
-```
-
----
-
-## License
-
-MIT License - see [LICENSE](../LICENSE) for details.
+For detailed usage examples and troubleshooting, see the [Developer Guide](./DEVELOPER_GUIDE.md).

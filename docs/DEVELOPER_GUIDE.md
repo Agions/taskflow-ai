@@ -1,858 +1,589 @@
-# TaskFlow AI v4.0 Developer Guide
+# TaskFlow AI v4.0 - Developer Guide
 
-**[中文版 🇨🇳](./development-guide.md)**
-
-## Table of Contents
-
-1. [Quick Start](#quick-start)
-2. [Architecture Overview](#architecture-overview)
-3. [Extension Development](#extension-development)
-4. [Plugin Development](#plugin-development)
-5. [Custom Agent Development](#custom-agent-development)
-6. [Custom Tool Development](#custom-tool-development)
-7. [Workflow Development](#workflow-development)
-8. [Adapters](#adapters)
-9. [Testing](#testing)
-10. [Best Practices](#best-practices)
-
----
-
-## Quick Start
+## Getting Started
 
 ### Installation
 
 ```bash
-npm install taskflow-ai@4.0.0
+npm install @taskflow/ai
+# or
+pnpm add @taskflow/ai
 ```
 
-### Basic Usage
+### Quick Start
 
 ```typescript
-import { ExtensionRegistry } from 'taskflow-ai';
-import { AIProviderAdapter } from 'taskflow-ai/adapters/ai';
+import { TaskFlowAI } from '@taskflow/ai';
 
-// Initialize extension registry
-const registry = ExtensionRegistry.getInstance();
-
-// Register a tool
-await registry.register('tool', {
-  id: 'hello-world',
-  name: 'Hello World Tool',
-  version: '1.0.0',
-  execute: async (input) => {
-    return { message: `Hello, ${input.name}!` };
-  },
+// Initialize TaskFlow AI
+const taskflow = new TaskFlowAI({
+  workspace: './workspace',
+  models: [
+    {
+      id: 'gpt-4',
+      provider: 'openai',
+      modelName: 'gpt-4',
+      enabled: true,
+      priority: 1,
+      capabilities: ['chat', 'function_calling']
+    }
+  ]
 });
 
-// Execute workflow
-const workflow = await registry.getWorkflow('my-workflow');
-await workflow.execute({ /* input */ });
-```
+// Execute a task
+const result = await taskflow.execute({
+  description: 'Research modern web frameworks'
+});
 
----
+console.log(result.output);
+```
 
 ## Architecture Overview
 
 ### Core Components
 
+1. **Agent Runtime** - Manages AI agent lifecycle
+2. **Workflow Engine** - Executes complex workflows
+3. **Tool Registry** - Manages available tools
+4. **Event System** - Handles event-driven communication
+5. **Cache Layer** - L1/L2 caching for performance
+6. **Extension System** - Plugin/Agent/Tool/Workflow extensions
+
+### Module Structure
+
 ```
 src/
-├── types/              # Unified type system
-│   ├── agent.ts       # Agent type definitions
-│   ├── task.ts        # Task type definitions
-│   ├── workflow.ts    # Workflow type definitions
-│   ├── tool.ts        # Tool type definitions
-│   ├── plugin.ts      # Plugin type definitions
-│   ├── event.ts       # Event type definitions
-│   └── ...
-├── core/              # Core infrastructure
-│   ├── agent/        # Agent runtime
-│   ├── extensions/   # Extension system
-│   ├── events/       # Event bus
-│   ├── cache/        # Cache manager
-│   ├── errors/       # Error handler
-│   └── workflow/     # Workflow engine
-├── adapters/         # External integrations
-│   ├── ai/          # AI provider adapters
-│   ├── storage/     # Storage adapters
-│   └── protocol/    # Protocol adapters
-├── tools/            # Built-in tools
-├── workflow/         # Workflow nodes and factory
-├── utils/            # Utilities
-└── config/           # Configuration management
+├── core/           # Core functionality
+│   ├── agent/      # Agent runtime and coordination
+│   ├── workflow/   # Workflow execution engine
+│   ├── tools/      # Tool registry and management
+│   ├── events/     # Event bus and handlers
+│   ├── cache/      # Caching layer
+│   ├── ai/         # AI adapter integration
+│   └── extensions/ # Extension system
+├── types/          # Unified type definitions
+├── tools/          # Built-in tools
+├── adapters/       # External service adapters
+├── cli/            # Command-line interface
+├── mcp/            # MCP integration
+└── utils/          # Utility functions
 ```
-
-### Type System
-
-The type system is the foundation of TaskFlow AI v4.0:
-
-```typescript
-// Agent Types
-import { IAgent, AgentConfig, AgentStatus } from 'taskflow-ai/types/agent';
-
-// Task Types
-import { ITask, TaskStatus, TaskPriority } from 'taskflow-ai/types/task';
-
-// Workflow Types
-import { IWorkflow, WorkflowNode, WorkflowEdge } from 'taskflow-ai/types/workflow';
-
-// Tool Types
-import { ITool, ToolInput, ToolOutput } from 'taskflow-ai/types/tool';
-
-// Plugin Types
-import { IPlugin, PluginMetadata } from 'taskflow-ai/types/plugin';
-```
-
----
 
 ## Extension Development
 
-### Extension Registry
+### 1. Plugin Development
 
-The `ExtensionRegistry` is the central point for registering all extensions:
-
+**Create a Plugin Manifest**
 ```typescript
-import { ExtensionRegistry, ExtensionType } from 'taskflow-ai/core/extensions/registry';
-
-const registry = ExtensionRegistry.getInstance();
-
-// Check if extension is registered
-const exists = await registry.has('tool', 'my-tool');
-
-// Get extension
-const tool = await registry.get('tool', 'my-tool');
-
-// List all extensions by type
-const tools = await registry.list('tool');
-
-// Unregister extension
-await registry.unregister('tool', 'my-tool');
+// plugins/my-plugin/package.json
+{
+  "name": "@taskflow/my-plugin",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "taskflow": {
+    "name": "My Plugin",
+    "description": "A sample plugin",
+    "hooks": ["beforeWorkflowExecute", "afterTaskComplete"],
+    "permissions": ["read:workspace"]
+  }
+}
 ```
 
-### Extension Lifecycle
-
-Extensions go through a lifecycle:
-
-```
-load -> validate -> install -> activate -> running -> deactivate -> uninstall
-```
-
-Each phase emits events:
-
+**Implement Plugin Interface**
 ```typescript
-import { EventBus } from 'taskflow-ai/core/events/event-bus';
+// plugins/my-plugin/src/index.ts
+import type { TaskFlowPlugin } from '@taskflow/core';
 
-const bus = EventBus.getInstance();
-
-bus.on('extension:loaded', (ext) => console.log('Loaded:', ext.id));
-bus.on('extension:activated', (ext) => console.log('Activated:', ext.id));
-bus.on('extension:error', (err) => console.error('Error:', err));
-```
-
----
-
-## Plugin Development
-
-### Creating a Plugin
-
-A plugin is a package that can contain multiple extensions:
-
-```typescript
-import { IPlugin } from 'taskflow-ai/types/plugin';
-
-const myPlugin: IPlugin = {
-  id: 'my-plugin',
-  name: 'My Plugin',
-  version: '1.0.0',
-  description: 'My awesome plugin',
-  author: 'Your Name',
-  metadata: {
-    minVersion: '4.0.0',
-    maxVersion: '5.0.0',
+export const plugin: TaskFlowPlugin = {
+  manifest: {
+    name: 'my-plugin',
+    version: '1.0.0',
+    description: 'My Custom Plugin',
+    author: 'Your Name',
+    main: 'dist/index.js'
   },
-  async onLoad(registry) {
-    // Register tools
-    await registry.register('tool', myTool);
-
-    // Register agents
-    await registry.register('agent', myAgent);
+  
+  async onLoad(context) {
+    console.log('Plugin loaded');
   },
+  
+  async onEnable() {
+    console.log('Plugin enabled');
+  },
+  
+  async onDisable() {
+    console.log('Plugin disabled');
+  },
+  
   async onUnload() {
-    // Cleanup
+    console.log('Plugin unloaded');
   },
-};
-
-export default myPlugin;
-```
-
-### Plugin Configuration
-
-Plugins can accept configuration:
-
-```typescript
-interface MyPluginConfig {
-  apiKey: string;
-  maxRetries: number;
-}
-
-const myPlugin: IPlugin<MyPluginConfig> = {
-  // ... other properties
-  async onLoad(registry, config) {
-    // Use config.apiKey, config.maxRetries
-  },
+  
+  hooks: {
+    beforeWorkflowExecute: async (context) => {
+      console.log('Workflow about to execute');
+      return { continue: true, data: {} };
+    }
+  }
 };
 ```
 
----
+### 2. Custom Agent Development
 
-## Custom Agent Development
-
-### Agent Definition
-
+**Create Agent Definition**
 ```typescript
-import { IAgent, AgentType, AgentCapability } from 'taskflow-ai/types/agent';
+// src/extensions/agents/research-agent.ts
+import type { AgentDefinition, AgentConfig } from '../../types/agent';
 
-const myAgent: IAgent = {
-  id: 'my-agent',
-  name: 'My Agent',
-  type: AgentType.Custom,
-  description: 'My custom agent',
-
-  // Capabilities
-  capabilities: [
-    AgentCapability.CodeGeneration,
-    AgentCapability.DataAnalysis,
-  ],
-
-  // Configuration
-  config: {
-    aiProvider: 'openai',
-    model: 'gpt-4',
-    temperature: 0.7,
-    maxTokens: 4096,
+const researchAgent: AgentDefinition = {
+  type: 'research',
+  name: 'Research Agent',
+  description: 'Specializes in research tasks',
+  capabilities: ['reasoning', 'search', 'tool_use'],
+  defaultConfig: {
+    capabilities: ['reasoning', 'search', 'tool_use'],
+    tools: ['web-search', 'document-analyzer'],
+    memory: {
+      maxShortTerm: 100,
+      maxLongTerm: 2000
+    },
+    reflectionEnabled: true,
+    maxStepsPerGoal: 25
   },
-
-  // Execution logic
-  async execute(task, context) {
-    // Implement agent logic
-    return {
-      status: 'success',
-      result: 'Task completed',
-    };
-  },
+  
+  factory: async (config: AgentConfig) => {
+    const runtime = new AgentRuntimeImpl(config);
+    
+    // Add custom research logic
+    runtime.addMessage({
+      id: 'init',
+      role: 'system',
+      content: 'You are a research assistant specialized in finding and analyzing information.',
+      timestamp: Date.now()
+    });
+    
+    return runtime;
+  }
 };
 
-// Register agent
-await registry.register('agent', myAgent);
+export { researchAgent };
 ```
 
-### Agent State Management
-
-Agents can maintain state:
-
+**Register Custom Agent**
 ```typescript
-class StatefulAgent implements IAgent {
-  private state: Map<string, any> = new Map();
+import { getExtensionRegistry } from './core/extensions';
 
-  setState(key: string, value: any): void {
-    this.state.set(key, value);
-  }
-
-  getState(key: string): any {
-    return this.state.get(key);
-  }
-
-  clearState(): void {
-    this.state.clear();
-  }
-}
+const registry = getExtensionRegistry();
+registry.registerAgent('research', researchAgent);
 ```
 
----
+### 3. Custom Tool Development
 
-## Custom Tool Development
-
-### Tool Definition
-
+**Create Tool Definition**
 ```typescript
-import { ITool, ToolSchema } from 'taskflow-ai/types/tool';
+// src/extensions/tools/date-calculator.ts
+import type { ToolDefinition, ToolContext } from '../../types/tool';
 
-const myTool: ITool = {
-  id: 'my-tool',
-  name: 'My Tool',
-  version: '1.0.0',
-  description: 'My custom tool',
-
-  // Input schema
-  schema: {
+export const dateCalculator: ToolDefinition = {
+  id: 'date-calculator',
+  name: 'Date Calculator',
+  description: 'Calculate dates and time intervals',
+  category: 'code',
+  parameters: {
     type: 'object',
     properties: {
-      input: { type: 'string' },
-      options: { type: 'object' },
+      operation: {
+        type: 'string',
+        enum: ['add', 'subtract', 'difference']
+      },
+      startDate: { type: 'string', format: 'date' },
+      days: { type: 'number' }
     },
-    required: ['input'],
+    required: ['operation', 'startDate']
   },
-
-  // Execute function
-  async execute(input, context) {
-    // Process input
-    const result = process(input);
-
-    // Return output
+  permissions: [],
+  
+  execute: async (params, context: ToolContext) => {
+    const { operation, startDate, days = 0 } = params as any;
+    const start = new Date(startDate);
+    let result;
+    
+    switch (operation) {
+      case 'add':
+        result = new Date(start.getTime() + days * 24 * 60 * 60 * 1000);
+        break;
+      case 'subtract':
+        result = new Date(start.getTime() - days * 24 * 60 * 60 * 1000);
+        break;
+      default:
+        throw new Error(`Unknown operation: ${operation}`);
+    }
+    
     return {
       success: true,
-      data: result,
-      metadata: {
-        executionTime: performance.now(),
-      },
+      output: { result: result.toISOString() }
     };
-  },
-
-  // Validation
-  async validate(input) {
-    if (!input.input) {
-      throw new Error('Input is required');
-    }
-    return true;
-  },
-};
-
-// Register tool
-await registry.register('tool', myTool);
-```
-
-### Tool Categories
-
-Tools can be categorized:
-
-```typescript
-import { ToolCategory } from 'taskflow-ai/types/tool';
-
-const myTool: ITool = {
-  // ... other properties
-  category: ToolCategory.FileSystem,
-  tags: ['file', 'io', 'storage'],
+  }
 };
 ```
 
-Available categories:
-- `FileSystem`: File system operations
-- `Network`: HTTP/REST operations
-- `Database`: Database operations
-- `CodeAnalysis`: Code analysis
-- `Infrastructure`: Infrastructure as code
-- `Custom`: Custom tools
-
----
-
-## Workflow Development
-
-### Workflow Definition
-
+**Register Tool**
 ```typescript
-import { IWorkflow, WorkflowNode, WorkflowEdge } from 'taskflow-ai/types/workflow';
+import { getToolRegistry } from './tools/tool-registry';
 
-const myWorkflow: IWorkflow = {
-  id: 'my-workflow',
-  name: 'My Workflow',
-  version: '1.0.0',
-  description: 'My custom workflow',
+const registry = getToolRegistry();
+registry.register(dateCalculator);
+```
 
-  // Define nodes
-  nodes: [
+### 4. Custom Workflow Development
+
+**Create Workflow Definition**
+```typescript
+// src/extensions/workflows/data-pipeline.ts
+import type { Workflow } from '../../types/workflow';
+
+export const dataPipelineWorkflow: Workflow = {
+  id: 'data-pipeline',
+  name: 'Data Pipeline Workflow',
+  description: 'Process data from input to output with validation',
+  steps: [
     {
-      id: 'node1',
+      id: 'input',
       type: 'task',
+      name: 'Load Input Data',
       config: {
-        toolId: 'my-tool',
-        input: { /* ... */ },
+        taskId: 'file-read',
+        input: { path: '${inputPath}' }
       },
+      dependsOn: []
     },
     {
-      id: 'node2',
-      type: 'parallel',
+      id: 'validate',
+      type: 'task',
+      name: 'Validate Data',
       config: {
-        branches: [
-          { /* branch 1 */ },
-          { /* branch 2 */ },
-        ],
+        taskId: 'data-validator',
+        input: { schema: '${validationSchema}' }
       },
+      dependsOn: ['input']
     },
-  ],
-
-  // Define edges (connections)
-  edges: [
     {
-      from: 'node1',
-      to: 'node2',
-      condition: (output) => output.success,
+      id: 'process',
+      type: 'task',
+      name: 'Process Data',
+      config: {
+        taskId: 'data-processor',
+        input: { processor: '${processorType}' }
+      },
+      dependsOn: ['validate']
     },
+    {
+      id: 'check-success',
+      type: 'condition',
+      name: 'Check Processing Result',
+      config: {
+        expression: '${processResult.success} === true',
+        trueBranch: 'output',
+        falseBranch: 'error-handler'
+      },
+      dependsOn: ['process']
+    }
   ],
-
-  // Execute
-  async execute(input, context) {
-    // Workflow execution logic
-    // This is handled by WorkflowEngine
+  variables: {
+    inputPath: '/data/input.json',
+    validationSchema: 'data-schema',
+    processorType: 'transform'
   },
+  status: 'created',
+  created: Date.now(),
+  version: '1.0.0',
+  tags: ['pipeline', 'data-processing']
 };
 ```
 
-### Workflow Node Types
-
-Built-in node types:
-
-#### 1. Task Node
+**Register Workflow**
 ```typescript
-{
-  id: 'task1',
-  type: 'task',
-  config: {
-    toolId: 'my-tool',
-    input: { /* tool input */ },
-    timeout: 30000, // 30 seconds
-  },
-}
+import { getWorkflowRegistry } from './core/workflow';
+
+const registry = getWorkflowRegistry();
+registry.register('data-pipeline', dataPipelineWorkflow);
 ```
 
-#### 2. Parallel Node
-```typescript
-{
-  id: 'parallel1',
-  type: 'parallel',
-  config: {
-    branches: [
-      { /* branch configuration */ },
-      { /* branch configuration */ },
-    ],
-    maxConcurrency: 5,
-  },
-}
-```
+## Testing Guide
 
-#### 3. Condition Node
-```typescript
-{
-  id: 'condition1',
-  type: 'condition',
-  config: {
-    expression: 'output.success && output.status === "ok"',
-    trueBranch: 'nextNode1',
-    falseBranch: 'nextNode2',
-  },
-}
-```
-
-#### 4. Loop Node
-```typescript
-{
-  id: 'loop1',
-  type: 'loop',
-  config: {
-    loopCondition: 'output.hasMore',
-    maxIterations: 100,
-    body: { /* loop body node */ },
-  },
-}
-```
-
-#### 5. Transform Node
-```typescript
-{
-  id: 'transform1',
-  type: 'transform',
-  config: {
-    transform: (input) => ({
-      processed: input.data.toUpperCase(),
-      timestamp: Date.now(),
-    }),
-  },
-}
-```
-
-#### 6. Merge Node
-```typescript
-{
-  id: 'merge1',
-  type: 'merge',
-  config: {
-    mergeStrategy: 'all', // or 'any', 'first'
-  },
-}
-```
-
-#### 7. API Call Node
-```typescript
-{
-  id: 'api1',
-  type: 'api_call',
-  config: {
-    url: 'https://api.example.com/endpoint',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: { /* ... */ },
-  },
-}
-```
-
-#### 8. Agent Task Node
-```typescript
-{
-  id: 'agent1',
-  type: 'agent_task',
-  config: {
-    agentId: 'my-agent',
-    task: {
-      description: 'Analyze this data',
-      payload: { /* ... */ },
-    },
-  },
-}
-```
-
-### Custom Workflow Nodes
-
-You can register custom node types:
+### Unit Testing
 
 ```typescript
-import { WorkflowNodeFactory } from 'taskflow-ai/workflow/nodes/factory';
+// src/core/agent/__tests__/runtime.test.ts
+import { AgentRuntimeImpl } from '../runtime';
 
-const factory = WorkflowNodeFactory.getInstance();
-
-factory.registerNode('custom_node', {
-  execute: async (config, context) => {
-    // Custom node logic
-    return { /* output */ };
-  },
-  validate: (config) => {
-    // Validation logic
-  },
-});
-```
-
----
-
-## Adapters
-
-### AI Adapter
-
-AI adapters provide a unified interface for different AI providers:
-
-```typescript
-import { AIProviderAdapter } from 'taskflow-ai/adapters/ai/adapter';
-
-const adapter = new AIProviderAdapter({
-  provider: 'openai',
-  apiKey: 'your-api-key',
-  model: 'gpt-4',
-});
-
-const response = await adapter.generate({
-  messages: [{ role: 'user', content: 'Hello!' }],
-  options: {
-    temperature: 0.7,
-    maxTokens: 1000,
-  },
-});
-```
-
-Supported providers:
-- `openai`: OpenAI GPT models
-- `anthropic`: Anthropic Claude models
-- `deepseek`: DeepSeek models
-- `zhipu`: Zhipu AI models
-
-### Storage Adapter
-
-Storage adapters provide a unified interface for different storage backends:
-
-```typescript
-import { StorageAdapter } from 'taskflow-ai/adapters/storage/adapter';
-
-const storage = new StorageAdapter({
-  provider: 's3',
-  config: {
-    accessKeyId: '...',
-    secretAccessKey: '...',
-    bucket: 'my-bucket',
-  },
-});
-
-// Save data
-await storage.save('key', { data: 'value' });
-
-// Retrieve data
-const data = await storage.get('key');
-
-// Delete data
-await storage.delete('key');
-```
-
-Supported providers:
-- `local`: File system storage
-- `s3`: AWS S3
-- `postgresql`: PostgreSQL database
-
-### Protocol Adapter
-
-Protocol adapters handle communication protocols:
-
-```typescript
-import { ProtocolAdapter } from 'taskflow-ai/adapters/protocol/adapter';
-
-const protocol = new ProtocolAdapter({
-  provider: 'websocket',
-  url: 'ws://localhost:8080',
-});
-
-// Connect
-await protocol.connect();
-
-// Send message
-await protocol.send({ type: 'message', data: { /* ... */ } });
-
-// Receive messages
-protocol.on('message', (msg) => console.log(msg));
-```
-
-Supported protocols:
-- `http`: REST API
-- `websocket`: WebSocket
-
----
-
-## Testing
-
-### Unit Tests
-
-```typescript
-import { describe, it, expect } from '@jest/globals';
-import { myTool } from './my-tool';
-
-describe('MyTool', () => {
-  it('should process input correctly', async () => {
-    const result = await myTool.execute({ input: 'test' });
-    expect(result.success).toBe(true);
-    expect(result.data).toBeDefined();
+describe('AgentRuntime', () => {
+  let runtime: AgentRuntimeImpl;
+  
+  beforeEach(() => {
+    runtime = new AgentRuntimeImpl({
+      id: 'test-agent',
+      name: 'Test Agent',
+      capabilities: ['reasoning'],
+      tools: [],
+      memory: { maxShortTerm: 50, maxLongTerm: 1000 }
+    });
   });
-
-  it('should validate input', async () => {
-    await expect(myTool.validate({})).rejects.toThrow();
+  
+  afterEach(async () => {
+    await runtime.destroy();
   });
-});
-```
-
-### Integration Tests
-
-```typescript
-import { ExtensionRegistry } from 'taskflow-ai/core/extensions/registry';
-
-describe('Extension Integration', () => {
-  it('should register and execute tool', async () => {
-    const registry = ExtensionRegistry.getInstance();
-    await registry.register('tool', myTool);
-
-    const tool = await registry.get('tool', 'my-tool');
-    const result = await tool.execute({ input: 'test' });
-
+  
+  it('should execute task successfully', async () => {
+    const result = await runtime.execute({
+      id: 'task-1',
+      description: 'Test task',
+      status: 'pending',
+      createdAt: Date.now()
+    });
+    
     expect(result.success).toBe(true);
   });
 });
 ```
 
-### Test Coverage
+### Integration Testing
 
-Run tests with coverage:
+```typescript
+// __tests__/integration/workflow.test.ts
+import { WorkflowEngine } from '../src/core/workflow';
+import { getToolRegistry } from '../src/tools/tool-registry';
+
+describe('Workflow Integration', () => {
+  it('should execute complete workflow', async () => {
+    const engine = new WorkflowEngine();
+    const workflow = createTestWorkflow();
+    
+    const result = await engine.execute(workflow);
+    
+    expect(result.success).toBe(true);
+    expect(result.execution.finishedAt).toBeDefined();
+  });
+});
+```
+
+### Performance Testing
+
+```typescript
+// __tests__/performance/cache.test.ts
+describe('Cache Performance', () => {
+  it('should handle 10,000 cache operations in under 100ms', () => {
+    const cache = new L1Cache(10000, 600);
+    const startTime = Date.now();
+    
+    for (let i = 0; i < 10000; i++) {
+      cache.set(`key-${i}`, { value: `value-${i}` });
+    }
+    
+    const duration = Date.now() - startTime;
+    expect(duration).toBeLessThan(100);
+  });
+});
+```
+
+## Configuration Management
+
+### Environment Variables
 
 ```bash
-npm run test:coverage
+# .env
+TASKFLOW_ENVIRONMENT=development
+TASKFLOW_LOG_LEVEL=info
+TASKFLOW_CACHE_ENABLED=true
+TASKFLOW_API_KEY=your-api-key
 ```
 
-Target: 95% coverage
+### Configuration Loading
 
----
+```typescript
+import { ConfigManager } from './config/config-manager';
+
+const configManager = ConfigManager.getInstance();
+
+// Load from file
+await configManager.load('./config/taskflow.config.json');
+
+// Update configuration
+configManager.updateConfig({
+  cache: {
+    enabled: true,
+    l1: { enabled: true, maxSize: 100, ttl: 600 },
+    l2: { enabled: false, ttl: 3600 }
+  }
+});
+
+// Get model configuration
+const model = configManager.getModel('gpt-4');
+```
 
 ## Best Practices
 
-### 1. Type Safety
-
-Always use TypeScript types:
-
-```typescript
-// Good
-import { ITool } from 'taskflow-ai/types/tool';
-
-const tool: ITool = { /* ... */ };
-
-// Bad (avoid `any`)
-const tool: any = { /* ... */ }; // ❌
-```
-
-### 2. Error Handling
-
-Always handle errors properly:
+### 1. Error Handling
 
 ```typescript
 try {
-  const result = await tool.execute(input);
+  const result = await runtime.execute(task);
+  if (!result.success) {
+    throw new Error(`Task execution failed: ${result.error}`);
+  }
 } catch (error) {
-  if (error instanceof ValidationError) {
-    console.error('Validation error:', error.message);
-  } else if (error instanceof ExecutionError) {
-    console.error('Execution error:', error.message);
-  } else {
-    console.error('Unknown error:', error);
+  logger.error('Task execution error', { error, taskId: task.id });
+  // Handle error appropriately
+}
+```
+
+### 2. Resource Management
+
+```typescript
+class AgentManager {
+  private agents: Map<string, AgentRuntime> = new Map();
+  
+  async createAgent(config: AgentConfig): Promise<string> {
+    const runtime = new AgentRuntimeImpl(config);
+    this.agents.set(config.id, runtime);
+    return config.id;
+  }
+  
+  async destroyAgent(agentId: string): Promise<void> {
+    const runtime = this.agents.get(agentId);
+    if (runtime) {
+      await runtime.destroy();
+      this.agents.delete(agentId);
+    }
+  }
+  
+  async cleanupAll(): Promise<void> {
+    const destroyPromises = Array.from(this.agents.entries())
+      .map(([id, runtime]) => runtime.destroy());
+    
+    await Promise.all(destroyPromises);
+    this.agents.clear();
   }
 }
 ```
 
-### 3. Resource Management
-
-Clean up resources:
+### 3. Caching Strategy
 
 ```typescript
-class MyTool implements ITool {
-  private connection: Connection;
+// Use cache for expensive operations
+async function fetchWithCache<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+  // Check L1 cache
+  const cached = l1Cache.get<T>(key);
+  if (cached) return cached;
+  
+  // Fetch data
+  const data = await fetcher();
+  
+  // Store in L1 cache
+  l1Cache.set(key, data);
+  
+  return data;
+}
 
-  async initialize() {
-    this.connection = await Connection.create();
+// Promote hot data to L1
+async function getFrequentlyUsedData(key: string): Promise<Data> {
+  let data = l1Cache.get<Data>(key);
+  
+  if (!data) {
+    // Check L2 cache
+    data = await l2Cache.get<Data>(key);
+    
+    if (data && isHotKey(key)) {
+      // Promote to L1
+      l1Cache.set(key, data);
+    }
   }
+  
+  return data;
+}
+```
 
-  async cleanup() {
-    if (this.connection) {
-      await this.connection.close();
+### 4. Concurrency Control
+
+```typescript
+class ConcurrencyManager {
+  private runningTasks = new Set<string>();
+  private maxConcurrent = 10;
+  
+  async execute<T>(taskId: string, task: () => Promise<T>): Promise<T> {
+    while (this.runningTasks.size >= this.maxConcurrent) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    this.runningTasks.add(taskId);
+    
+    try {
+      return await task();
+    } finally {
+      this.runningTasks.delete(taskId);
     }
   }
 }
 ```
 
-### 4. Logging
-
-Use structured logging:
-
-```typescript
-import { Logger } from 'taskflow-ai/utils/logger';
-
-const logger = Logger.getInstance({ context: 'MyTool' });
-
-logger.info('Tool execution started', { input });
-logger.error('Tool execution failed', { error });
-```
-
-### 5. Caching
-
-Use caching for expensive operations:
-
-```typescript
-import { CacheManager } from 'taskflow-ai/core/cache/manager';
-
-const cache = CacheManager.getInstance();
-
-const cached = await cache.get('my-key');
-if (cached) {
-  return cached;
-}
-
-const result = await expensiveOperation();
-await cache.set('my-key', result, { ttl: 3600 }); // 1 hour TTL
-```
-
-### 6. Event-Driven Architecture
-
-Use events for loose coupling:
-
-```typescript
-import { EventBus } from 'taskflow-ai/core/events/event-bus';
-
-const bus = EventBus.getInstance();
-
-// Publish event
-bus.publish('tool:executed', { toolId, result });
-
-// Subscribe to event
-bus.subscribe('tool:executed', (event) => {
-  console.log('Tool executed:', event.toolId);
-});
-```
-
-### 7. Async/Await
-
-Always use async/await for async operations:
-
-```typescript
-// Good
-async function myFunction() {
-  const result = await doSomething();
-  return result;
-}
-
-// Bad (avoid callbacks)
-function myFunction(callback) {
-  doSomething().then(result => callback(result)); // ❌
-}
-```
-
----
-
-## Performance Tips
-
-1. **Use caching** for expensive operations
-2. **Batch requests** when possible
-3. **Use streaming** for large datasets
-4. **Limit concurrency** to avoid resource exhaustion
-5. **Profile your code** with performance tools
-
----
-
 ## Troubleshooting
 
-### Extension Not Loading
+### Common Issues
 
-```typescript
-// Check if extension is registered
-const exists = await registry.has('tool', 'my-tool');
-console.log('Extension exists:', exists);
+**Issue: Agent not responding**
+- Check agent status using `runtime.getState()`
+- Verify task configuration
+- Check logs for error messages
 
-// Check if extension is activated
-const ext = await registry.get('tool', 'my-tool');
-console.log('Extension status:', ext.status);
-```
+**Issue: Workflow execution timeout**
+- Increase timeout in workflow configuration
+- Check for inefficient steps
+- Enable performance monitoring
 
-### Workflow Execution Failed
+**Issue: Cache not working**
+- Verify cache is enabled in configuration
+- Check TTL settings
+- Monitor cache hit rate
+
+### Debug Mode
 
 ```typescript
 // Enable debug logging
-Logger.getInstance().setLevel('debug');
+import { Logger } from './utils/logger';
 
-// Check workflow definition
-console.log('Workflow nodes:', workflow.nodes);
-console.log('Workflow edges:', workflow.edges);
+Logger.setLevel('debug');
+
+// Run with debug environment
+TASKFLOW_ENVIRONMENT=development TASKFLOW_LOG_LEVEL=debug npm start
 ```
 
-### Tool Execution Timeout
+## Performance Tips
 
-```typescript
-// Increase timeout
-const tool: ITool = {
-  // ... other properties
-  config: {
-    timeout: 60000, // 60 seconds
-  },
-};
-```
-
----
+1. **Enable caching** for frequently accessed data
+2. **Use parallel execution** for independent tasks
+3. **Optimize database queries** with proper indexing
+4. **Implement rate limiting** for external APIs
+5. **Monitor memory usage** and clean up resources
+6. **Use async/await** properly to avoid blocking
+7. **Batch operations** when possible
+8. **Cache expensive computations**
 
 ## Resources
 
-- **API Reference**: [docs/api-reference.md](./api-reference.md)
-- **Examples**: [examples/](../examples/)
-- **Migration Guide**: [docs/migration-guide.md](./migration-guide.md)
-- **Community**: [GitHub Discussions](https://github.com/Agions/taskflow-ai/discussions)
+- [API Reference](./API_REFERENCE.md)
+- [Performance Guide](./PERFORMANCE_GUIDE.md)
+- [Examples](./examples/)
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Changelog](CHANGELOG.md)
+
+## Get Help
+
+- GitHub Issues: [github.com/taskflow/ai/issues](https://github.com/taskflow/ai/issues)
+- Discord Community: [discord.gg/taskflow](https://discord.gg/taskflow)
+- Email: [support@taskflow.ai](mailto:support@taskflow.ai)
 
 ---
 
-## License
-
-MIT License - see [LICENSE](../LICENSE) for details.
+**Version**: 4.0.0  
+**Last Updated**: 2025-04-25  
+**License**: MIT
