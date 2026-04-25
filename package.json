@@ -148,12 +148,12 @@
     "xstate": "^5.28.0",
     "zustand": "^5.0.11"
   },
-"devDependencies": {
+  "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@playwright/test": "^1.58.2",
     "@release-it/conventional-changelog": "10.0.6",
     "@types/chalk": "^0.4.31",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.25.0",
     "@types/cli-spinners": "^1.3.3",
     "@types/conf": "^2.1.0",
     "@types/cors": "^2.8.17",
