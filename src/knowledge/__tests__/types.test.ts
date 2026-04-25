@@ -1,259 +1,213 @@
 /**
- * Knowledge Types Tests
- * TaskFlow AI v4.0
+ * Knowledge Base Types Tests - TaskFlow AI v4.0
  */
 
 import type {
-  Document,
-  DocumentMetadata,
-  DocumentType,
-  DocumentChunk,
-  ChunkMetadata,
-  RetrievalResult,
-  RetrievalOptions,
-  FilterCondition,
-  EmbeddingModel,
-  VectorStore,
-  KnowledgeBaseConfig
+  Document, DocumentMetadata, DocumentType, DocumentChunk, ChunkMetadata,
+  RetrievalResult, RetrievedChunk, RetrievalOptions, FilterCondition,
+  EmbeddingModel, VectorStore, VectorStoreConnection,
+  KnowledgeBaseConfig, IndexStatus, QAResult, Source,
+  KnowledgeStats, SyncConfig, KnowledgeContext,
 } from '../types';
 
+const ALL_DOC_TYPES: DocumentType[] = [
+  'prd','code','markdown','api-doc','design','requirement','task','conversation','other',
+];
+
 describe('Knowledge Types', () => {
-  describe('DocumentType', () => {
-    it('should support prd document type', () => {
-      const type: DocumentType = 'prd';
-      expect(type).toBe('prd');
+  describe('Document', () => {
+    it('should create valid document', () => {
+      const d: Document = {
+        id: 'doc-1', content: 'Hello world',
+        metadata: { title: 'Hello', source: 'test.md', type: 'markdown', tags: [] },
+        createdAt: new Date(), updatedAt: new Date(),
+      };
+      expect(d.metadata.title).toBe('Hello');
     });
 
-    it('should support code document type', () => {
-      const type: DocumentType = 'code';
-      expect(type).toBe('code');
-    });
-
-    it('should support markdown document type', () => {
-      const type: DocumentType = 'markdown';
-      expect(type).toBe('markdown');
-    });
-
-    it('should support api-doc document type', () => {
-      const type: DocumentType = 'api-doc';
-      expect(type).toBe('api-doc');
+    it('should support embedding', () => {
+      const d: Document = {
+        id: 'doc-2', content: '',
+        metadata: { title: '', source: '', type: 'code', tags: [] },
+        embedding: [0.1, 0.2, 0.3],
+        createdAt: new Date(), updatedAt: new Date(),
+      };
+      expect(d.embedding).toHaveLength(3);
     });
   });
 
   describe('DocumentMetadata', () => {
-    it('should create complete metadata', () => {
-      const metadata: DocumentMetadata = {
-        title: 'API Documentation',
-        source: '/docs/api.md',
-        type: 'api-doc',
-        tags: ['api', 'documentation', 'rest'],
-        author: 'Agions',
-        project: 'TaskFlow AI',
-        version: '1.0.0'
+    it('should support optional fields', () => {
+      const m: DocumentMetadata = {
+        title: 'Test', source: 'file.ts', type: 'code', tags: ['js'],
+        author: 'Agions', project: 'taskflow', version: '1.0',
+        chunkIndex: 0, totalChunks: 5,
       };
-
-      expect(metadata.title).toBe('API Documentation');
-      expect(metadata.author).toBe('Agions');
-      expect(metadata.tags).toContain('api');
-    });
-
-    it('should create minimal metadata', () => {
-      const metadata: DocumentMetadata = {
-        title: 'Simple Document',
-        source: '/docs/simple.md',
-        type: 'markdown',
-        tags: []
-      };
-
-      expect(metadata.title).toBe('Simple Document');
-      expect(metadata.tags).toHaveLength(0);
+      expect(m.totalChunks).toBe(5);
     });
   });
 
-  describe('Document', () => {
-    it('should create complete document', () => {
-      const document: Document = {
-        id: 'doc-123',
-        content: 'This is the document content.',
-        metadata: {
-          title: 'Test Document',
-          source: '/test.md',
-          type: 'markdown',
-          tags: ['test']
-        },
-        embedding: [0.1, 0.2, 0.3],
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date('2024-01-15')
-      };
-
-      expect(document.id).toBe('doc-123');
-      expect(document.content).toBe('This is the document content.');
-      expect(document.embedding).toBeDefined();
-      expect(document.embedding).toHaveLength(3);
+  describe('DocumentType', () => {
+    it('should have 9 types', () => {
+      expect(ALL_DOC_TYPES).toHaveLength(9);
     });
   });
 
   describe('DocumentChunk', () => {
-    it('should create document chunk', () => {
-      const chunk: DocumentChunk = {
-        id: 'chunk-789',
-        documentId: 'doc-123',
-        content: 'This is a chunk of the document.',
-        embedding: [0.4, 0.5, 0.6],
-        metadata: {
-          title: 'Test Document',
-          source: '/test.md',
-          type: 'markdown',
-          tags: ['test']
-        },
-        index: 0
+    it('should create valid chunk', () => {
+      const c: DocumentChunk = {
+        id: 'ch-1', documentId: 'doc-1', content: 'part',
+        embedding: [0.1], metadata: { title: '', source: '', type: 'markdown', tags: [] },
+        index: 0,
       };
+      expect(c.index).toBe(0);
+    });
 
-      expect(chunk.id).toBe('chunk-789');
-      expect(chunk.documentId).toBe('doc-123');
-      expect(chunk.index).toBe(0);
+    it('should support chunkMetadata', () => {
+      const c: DocumentChunk = {
+        id: 'ch-2', documentId: 'doc-1', content: '',
+        embedding: [], metadata: { title: '', source: '', type: 'markdown', tags: [] },
+        index: 1,
+        chunkMetadata: { start: 0, end: 100, overlap: 20, tokenCount: 50, title: '', source: '', type: 'markdown', tags: [] },
+      };
+      expect(c.chunkMetadata?.tokenCount).toBe(50);
     });
   });
 
-  describe('ChunkMetadata', () => {
-    it('should create chunk metadata', () => {
-      const chunkMetadata: ChunkMetadata = {
-        start: 0,
-        end: 150,
-        overlap: 50,
-        tokenCount: 150,
-        title: 'Test Document',
-        source: '/test.md',
-        type: 'markdown',
-        tags: ['test']
-      };
+  describe('RetrievalResult', () => {
+    it('should create valid result', () => {
+      const r: RetrievalResult = { chunks: [], query: 'test', totalResults: 0, latency: 12 };
+      expect(r.latency).toBe(12);
+    });
+  });
 
-      expect(chunkMetadata.start).toBe(0);
-      expect(chunkMetadata.end).toBe(150);
-      expect(chunkMetadata.tokenCount).toBe(150);
+  describe('RetrievedChunk', () => {
+    it('should have score and distance', () => {
+      const rc: RetrievedChunk = {
+        chunk: {} as DocumentChunk, score: 0.95, distance: 0.05,
+      };
+      expect(rc.score).toBe(0.95);
     });
   });
 
   describe('RetrievalOptions', () => {
-    it('should create retrieval options', () => {
-      const filters: FilterCondition[] = [
-        {
-          field: 'type',
-          operator: 'eq',
-          value: 'api-doc'
-        }
-      ];
-
-      const options: RetrievalOptions = {
-        topK: 5,
-        threshold: 0.8,
-        filters,
-        rerank: true,
-        hybridSearch: false
+    it('should create options', () => {
+      const o: RetrievalOptions = {
+        topK: 5, threshold: 0.7, filters: [{ field: 'type', operator: 'eq', value: 'code' }],
+        rerank: true, hybridSearch: true,
       };
+      expect(o.topK).toBe(5);
+    });
+  });
 
-      expect(options.topK).toBe(5);
-      expect(options.threshold).toBe(0.8);
-      expect(options.filters).toHaveLength(1);
-      expect(options.filters![0].operator).toBe('eq');
+  describe('FilterCondition', () => {
+    it('should support 8 operators', () => {
+      const ops: FilterCondition['operator'][] = ['eq','ne','gt','gte','lt','lte','in','contains'];
+      expect(ops).toHaveLength(8);
     });
   });
 
   describe('EmbeddingModel', () => {
-    it('should create embedding model config', () => {
-      const model: EmbeddingModel = {
-        name: 'text-embedding-ada-002',
-        provider: 'openai',
-        dimensions: 1536,
-        maxTokens: 8191,
-        batchSize: 100
-      };
-
-      expect(model.name).toBe('text-embedding-ada-002');
-      expect(model.provider).toBe('openai');
-      expect(model.dimensions).toBe(1536);
-      expect(model.batchSize).toBe(100);
-    });
-
-    it('should create local embedding model', () => {
-      const model: EmbeddingModel = {
-        name: 'all-MiniLM-L6-v2',
-        provider: 'local',
-        dimensions: 384,
-        maxTokens: 512,
-        batchSize: 32
-      };
-
-      expect(model.provider).toBe('local');
-      expect(model.dimensions).toBe(384);
+    it('should support 4 providers', () => {
+      const p: EmbeddingModel['provider'][] = ['openai','local','huggingface','custom'];
+      expect(p).toHaveLength(4);
     });
   });
 
   describe('VectorStore', () => {
-    it('should create vector store config', () => {
-      const vectorStore: VectorStore = {
-        name: 'main-store',
-        type: 'chroma',
-        connection: {
-          path: '/data/vectorstore',
-          collection: 'documents'
-        }
-      };
-
-      expect(vectorStore.type).toBe('chroma');
-      expect(vectorStore.connection.path).toBe('/data/vectorstore');
-    });
-
-    it('should create remote vector store', () => {
-      const vectorStore: VectorStore = {
-        name: 'pinecone-store',
-        type: 'pinecone',
-        connection: {
-          url: 'https://index.pinecone.io',
-          apiKey: 'sk-xxx',
-          collection: 'vectors'
-        }
-      };
-
-      expect(vectorStore.type).toBe('pinecone');
-      expect(vectorStore.connection.apiKey).toBeDefined();
+    it('should support 5 types', () => {
+      const types: VectorStore['type'][] = ['lancedb','chroma','pinecone','weaviate','qdrant'];
+      expect(types).toHaveLength(5);
     });
   });
 
   describe('KnowledgeBaseConfig', () => {
-    it('should create complete knowledge base configuration', () => {
-      const embeddingModel: EmbeddingModel = {
-        name: 'text-embedding-ada-002',
-        provider: 'openai',
-        dimensions: 1536,
-        maxTokens: 8191,
-        batchSize: 100
+    it('should create valid config', () => {
+      const c: KnowledgeBaseConfig = {
+        embeddingModel: { name: 'text-embedding-3-small', provider: 'openai', dimensions: 1536, maxTokens: 8192, batchSize: 100 },
+        vectorStore: { name: 'local', type: 'lancedb', connection: { path: './vectors' } },
+        chunkSize: 1000, chunkOverlap: 200, indexName: 'default', autoIndex: true,
       };
-
-      const vectorStore: VectorStore = {
-        name: 'default-store',
-        type: 'chroma',
-        connection: {
-          path: '/data/vectorstore',
-          collection: 'documents'
-        }
-      };
-
-      const config: KnowledgeBaseConfig = {
-        embeddingModel,
-        vectorStore,
-        chunkSize: 512,
-        chunkOverlap: 50,
-        indexName: 'taskflow-kb',
-        autoIndex: true
-      };
-
-      expect(config.chunkSize).toBe(512);
-      expect(config.chunkOverlap).toBe(50);
-      expect(config.indexName).toBe('taskflow-kb');
-      expect(config.autoIndex).toBe(true);
-      expect(config.embeddingModel.provider).toBe('openai');
-      expect(config.vectorStore.type).toBe('chroma');
+      expect(c.chunkSize).toBe(1000);
     });
+  });
+
+  describe('IndexStatus', () => {
+    it('should create valid status', () => {
+      const s: IndexStatus = { totalDocuments: 10, totalChunks: 50, indexedAt: new Date(), lastUpdated: new Date(), size: 1024000 };
+      expect(s.size).toBe(1024000);
+    });
+  });
+
+  describe('QAResult', () => {
+    it('should create valid result', () => {
+      const r: QAResult = {
+        answer: 'Yes', sources: [], confidence: 0.92, latency: 45,
+      };
+      expect(r.confidence).toBe(0.92);
+    });
+  });
+
+  describe('Source', () => {
+    it('should create valid source', () => {
+      const s: Source = {
+        documentId: 'doc-1', title: 'Test', content: 'data', score: 0.9,
+        metadata: { title: '', source: '', type: 'markdown', tags: [] },
+      };
+      expect(s.score).toBe(0.9);
+    });
+  });
+
+  describe('KnowledgeStats', () => {
+    it('should create valid stats', () => {
+      const s: KnowledgeStats = {
+        documents: 10, chunks: 50, size: 1024000, queries: 100, avgLatency: 12,
+        topTags: ['code'], documentTypes: {} as Record<DocumentType, number>,
+      };
+      expect(s.avgLatency).toBe(12);
+    });
+  });
+
+  describe('SyncConfig', () => {
+    it('should create valid config', () => {
+      const c: SyncConfig = {
+        watch: true, interval: 60, includePatterns: ['**/*.md'], excludePatterns: ['node_modules/**'], autoIndex: true,
+      };
+      expect(c.interval).toBe(60);
+    });
+  });
+
+  describe('KnowledgeContext', () => {
+    it('should create valid context', () => {
+      const c: KnowledgeContext = { relevantDocs: [], summary: 'Summary', suggestions: ['Try A'] };
+      expect(c.suggestions).toHaveLength(1);
+    });
+  });
+});
+
+describe('Knowledge Modules', () => {
+  it('KnowledgeRetrievalEngine should be importable', async () => {
+    const mod = await import('../retrieval');
+    expect(mod.KnowledgeRetrievalEngine).toBeDefined();
+  });
+
+  it('EmbeddingManager should be importable', async () => {
+    const mod = await import('../embedding');
+    expect(mod.EmbeddingManager).toBeDefined();
+  });
+
+  it('VectorStoreManager should be importable', async () => {
+    const mod = await import('../storage');
+    expect(mod.VectorStoreManager).toBeDefined();
+  });
+
+  it('DocumentChunker should be importable', async () => {
+    const mod = await import('../retrieval/chunker');
+    expect(mod.DocumentChunker).toBeDefined();
+  });
+
+  it('DocumentScanner should be importable', async () => {
+    const mod = await import('../retrieval/scanner');
+    expect(mod.DocumentScanner).toBeDefined();
   });
 });

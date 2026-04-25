@@ -1,206 +1,176 @@
 /**
- * CI/CD Types Tests
- * TaskFlow AI v4.0
+ * CI/CD Types Tests - TaskFlow AI v4.0
  */
 
 import type {
-  CIProvider,
-  PipelineConfig,
-  PipelineTrigger,
-  PipelineStage,
-  PipelineJob,
-  PipelineStep
+  CIProvider, PipelineConfig, PipelineTrigger, PipelineStage,
+  PipelineJob, PipelineStep, CacheConfig, NotificationConfig,
+  GitHubActionsConfig, GitHubPermissions, GitHubConcurrency,
+  ValidationResult, ValidationError, ValidationWarning, PipelineStatus,
+  TaskSyncConfig, TaskFieldMapping, PRReviewConfig, DeployConfig,
+  DeployEnvironment, DeployStrategy, DeployStep, HealthCheckConfig,
+  CIIntegrationConfig,
 } from '../types';
+
+const ALL_CI_PROVIDERS: CIProvider[] = ['github','gitlab','jenkins','azure','circleci','travis'];
+const ALL_TRIGGER_TYPES: PipelineTrigger['type'][] = ['push','pr','schedule','manual','webhook'];
+const ALL_NOTIFY_TYPES: NotificationConfig['type'][] = ['slack','email','webhook','github'];
+const ALL_DEPLOY_TYPES: DeployStrategy['type'][] = ['rolling','blue-green','canary'];
+const ALL_SYNC_PROVIDERS: TaskSyncConfig['provider'][] = ['jira','linear','asana','trello','github'];
 
 describe('CI/CD Types', () => {
   describe('CIProvider', () => {
-    it('should support github provider', () => {
-      const provider: CIProvider = 'github';
-      expect(provider).toBe('github');
+    it('should support 6 providers', () => {
+      expect(ALL_CI_PROVIDERS).toHaveLength(6);
     });
+  });
 
-    it('should support gitlab provider', () => {
-      const provider: CIProvider = 'gitlab';
-      expect(provider).toBe('gitlab');
-    });
-
-    it('should support jenkins provider', () => {
-      const provider: CIProvider = 'jenkins';
-      expect(provider).toBe('jenkins');
+  describe('PipelineConfig', () => {
+    it('should create valid config', () => {
+      const c: PipelineConfig = {
+        provider: 'github', name: 'ci-pipeline',
+        triggers: [{ type: 'push' }],
+        stages: [{ name: 'test', jobs: [] }],
+        environment: { NODE_ENV: 'test' },
+        secrets: ['GITHUB_TOKEN'],
+        notifications: [],
+      };
+      expect(c.provider).toBe('github');
     });
   });
 
   describe('PipelineTrigger', () => {
-    it('should create push trigger', () => {
-      const trigger: PipelineTrigger = {
-        type: 'push',
-        branches: ['main', 'develop']
-      };
-      expect(trigger.type).toBe('push');
-      expect(trigger.branches).toContain('main');
+    it('should support 5 types', () => {
+      expect(ALL_TRIGGER_TYPES).toHaveLength(5);
     });
 
-    it('should create pull request trigger', () => {
-      const trigger: PipelineTrigger = {
-        type: 'pr'
+    it('should have optional fields', () => {
+      const t: PipelineTrigger = {
+        type: 'push', branches: ['main'], paths: ['src/**'], cron: '0 0 * * *',
       };
-      expect(trigger.type).toBe('pr');
-    });
-
-    it('should create schedule trigger', () => {
-      const trigger: PipelineTrigger = {
-        type: 'schedule',
-        cron: '0 0 * * *'
-      };
-      expect(trigger.type).toBe('schedule');
-      expect(trigger.cron).toBeDefined();
+      expect(t.branches).toHaveLength(1);
     });
   });
 
-  describe('PipelineStep', () => {
-    it('should create basic step', () => {
-      const step: PipelineStep = {
-        name: 'Install dependencies',
-        command: 'npm install'
+  describe('PipelineStage', () => {
+    it('should create stage with optional parallel/needs', () => {
+      const s: PipelineStage = {
+        name: 'build', jobs: [], parallel: true, needs: ['test'],
+        condition: 'success()',
       };
-      expect(step.name).toBe('Install dependencies');
-      expect(step.command).toBe('npm install');
-    });
-
-    it('should create step with working directory', () => {
-      const step: PipelineStep = {
-        name: 'Build',
-        command: 'npm run build',
-        workingDirectory: './frontend'
-      };
-      expect(step.workingDirectory).toBe('./frontend');
-    });
-
-    it('should create step that continues on error', () => {
-      const step: PipelineStep = {
-        name: 'Cleanup',
-        command: 'rm -rf .*',
-        continueOnError: true
-      };
-      expect(step.continueOnError).toBe(true);
+      expect(s.parallel).toBe(true);
     });
   });
 
   describe('PipelineJob', () => {
     it('should create job with steps', () => {
-      const steps: PipelineStep[] = [
-        { name: 'Setup', command: 'node -v' },
-        { name: 'Install', command: 'npm ci' },
-        { name: 'Test', command: 'npm test' }
-      ];
-
-      const job: PipelineJob = {
-        name: 'test-job',
-        steps
+      const j: PipelineJob = {
+        name: 'lint', steps: [{ name: 'run', command: 'npm run lint' }],
+        runner: 'ubuntu-latest', timeout: 600, artifacts: ['dist/**'], cache: { key: 'npm', paths: ['node_modules'] },
       };
-
-      expect(job.name).toBe('test-job');
-      expect(job.steps).toHaveLength(3);
-    });
-
-    it('should create job with runner specification', () => {
-      const job: PipelineJob = {
-        name: 'build-job',
-        steps: [{ name: 'Build', command: 'npm run build' }],
-        runner: 'ubuntu-latest',
-        timeout: 3600
-      };
-
-      expect(job.runner).toBe('ubuntu-latest');
-      expect(job.timeout).toBe(3600);
+      expect(j.runner).toBe('ubuntu-latest');
     });
   });
 
-  describe('PipelineStage', () => {
-    it('should create sequential stage', () => {
-      const stage: PipelineStage = {
-        name: 'test',
-        jobs: [
-          {
-            name: 'unit-tests',
-            steps: [{ name: 'Run tests', command: 'npm test' }]
-          }
-        ]
-      };
-
-      expect(stage.name).toBe('test');
-      expect(stage.parallel).toBeUndefined();
-    });
-
-    it('should create parallel stage', () => {
-      const stage: PipelineStage = {
-        name: 'test-parallel',
-        parallel: true,
-        jobs: [
-          {
-            name: 'unit-tests',
-            steps: [{ name: 'Run unit tests', command: 'npm test:unit' }]
-          },
-          {
-            name: 'integration-tests',
-            steps: [{ name: 'Run integration tests', command: 'npm test:integration' }]
-          }
-        ]
-      };
-
-      expect(stage.parallel).toBe(true);
-      expect(stage.jobs).toHaveLength(2);
-    });
-
-    it('should create stage with dependencies', () => {
-      const stage: PipelineStage = {
-        name: 'deploy',
-        jobs: [
-          {
-            name: 'deploy-to-staging',
-            steps: [{ name: 'Deploy', command: 'npm run deploy:staging' }]
-          }
-        ],
-        needs: ['build', 'test']
-      };
-
-      expect(stage.needs).toContain('build');
-      expect(stage.needs).toContain('test');
+  describe('NotificationConfig', () => {
+    it('should support 4 types', () => {
+      expect(ALL_NOTIFY_TYPES).toHaveLength(4);
     });
   });
 
-  describe('PipelineConfig', () => {
-    it('should create complete pipeline configuration', () => {
-      const config: PipelineConfig = {
-        provider: 'github',
-        name: 'my-pipeline',
-        triggers: [
-          { type: 'push', branches: ['main'] },
-          { type: 'pr' }
-        ],
-        stages: [
-          {
-            name: 'test',
-            jobs: [
-              {
-                name: 'test-job',
-                steps: [{ name: 'Test', command: 'npm test' }]
-              }
-            ]
-          }
-        ],
-        environment: {
-          NODE_VERSION: '18'
-        },
-        secrets: ['API_KEY', 'DB_PASSWORD'],
-        notifications: []
+  describe('GitHubActionsConfig', () => {
+    it('should extend PipelineConfig', () => {
+      const c: GitHubActionsConfig = {
+        provider: 'github', name: 'gh-pipeline',
+        triggers: [], stages: [],
+        environment: {}, secrets: [], notifications: [],
+        workflowFile: '.github/workflows/ci.yml',
+        permissions: { contents: 'write', pullRequests: 'write' },
       };
-
-      expect(config.provider).toBe('github');
-      expect(config.triggers).toHaveLength(2);
-      expect(config.stages).toHaveLength(1);
-      expect(config.environment.NODE_VERSION).toBe('18');
-      expect(config.secrets).toContain('API_KEY');
+      expect(c.permissions?.contents).toBe('write');
     });
+  });
+
+  describe('GitHubPermissions', () => {
+    it('should support readable value', () => {
+      const p: GitHubPermissions = { contents: 'read', issues: 'write', pullRequests: 'read' };
+      expect(p.contents).toBe('read');
+    });
+  });
+
+  describe('ValidationResult', () => {
+    it('should create valid and invalid results', () => {
+      const valid: ValidationResult = { valid: true, errors: [], warnings: [] };
+      const invalid: ValidationResult = { valid: false, errors: [{ field: 'name', message: 'Required', code: 'REQUIRED' }], warnings: [] };
+      expect(invalid.errors).toHaveLength(1);
+    });
+  });
+
+  describe('PipelineStatus', () => {
+    it('should support 6 statuses', () => {
+      const s: PipelineStatus['status'][] = ['pending','running','success','failure','cancelled','skipped'];
+      expect(s).toHaveLength(6);
+    });
+  });
+
+  describe('TaskSyncConfig', () => {
+    it('should support 5 providers', () => {
+      expect(ALL_SYNC_PROVIDERS).toHaveLength(5);
+    });
+
+    it('should create sync config', () => {
+      const c: TaskSyncConfig = {
+        enabled: true, provider: 'jira', projectKey: 'TF',
+        mappings: [], bidirectional: true, autoCreate: true, autoClose: false,
+      };
+      expect(c.projectKey).toBe('TF');
+    });
+  });
+
+  describe('DeployStrategy', () => {
+    it('should support 3 types', () => {
+      expect(ALL_DEPLOY_TYPES).toHaveLength(3);
+    });
+  });
+
+  describe('HealthCheckConfig', () => {
+    it('should create health check', () => {
+      const h: HealthCheckConfig = { endpoint: '/health', interval: 30, timeout: 5, retries: 3 };
+      expect(h.interval).toBe(30);
+    });
+  });
+
+  describe('CIIntegrationConfig', () => {
+    it('should create full config with optional sections', () => {
+      const c: CIIntegrationConfig = {
+        provider: 'github', repository: 'taskflow-ai/taskflow', branch: 'main', token: 'ghp_xxx',
+        pipeline: { provider: 'github', name: '', triggers: [], stages: [], environment: {}, secrets: [], notifications: [] },
+        taskSync: { enabled: false, provider: 'github', projectKey: '', mappings: [], bidirectional: false, autoCreate: false, autoClose: false },
+        prReview: { enabled: true, autoReview: false, reviewers: ['Agions'], requiredChecks: ['test'], aiReview: true },
+      };
+      expect(c.prReview?.aiReview).toBe(true);
+    });
+  });
+});
+
+describe('CI/CD Modules', () => {
+  it('GitHubApiClient should be importable', async () => {
+    const mod = await import('../github/api-client');
+    expect(mod.GitHubApiClient).toBeDefined();
+  });
+
+  it('GitHubWorkflowGenerator should be importable', async () => {
+    const mod = await import('../github/workflow-generator');
+    expect(mod.GitHubWorkflowGenerator).toBeDefined();
+  });
+
+  it('GitHubConfigValidator should be importable', async () => {
+    const mod = await import('../github/validator');
+    expect(mod.GitHubConfigValidator).toBeDefined();
+  });
+
+  it('GitHubActionsIntegration should be importable', async () => {
+    const mod = await import('../github');
+    expect(mod.GitHubActionsIntegration).toBeDefined();
   });
 });

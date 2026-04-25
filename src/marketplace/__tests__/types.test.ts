@@ -1,324 +1,153 @@
-
 /**
- * Marketplace Types Tests
- * TaskFlow AI v4.0
+ * Marketplace Types Tests - TaskFlow AI v4.0
  */
 
 import type {
-  ToolPackage,
-  ToolCategory,
-  MarketTool,
-  ToolExample,
-  PackageMetadata,
-  SearchResult,
-  SearchOptions,
-  InstallResult,
-  VersionInfo,
-  MarketplaceConfig,
-  Registry
+  ToolPackage, ToolCategory, MarketTool, ToolExample, ToolPermission,
+  PackageMetadata, Registry, InstallResult, PublishConfig,
+  SearchOptions, SearchResult, VersionInfo, DependencyTree,
+  MarketplaceConfig, PackageManifest,
 } from '../types';
 
+const ALL_CATEGORIES: ToolCategory[] = [
+  'git','jira','slack','github','gitlab','notion','confluence',
+  'linear','asana','trello','database','api','file','shell','ai','other',
+];
+
 describe('Marketplace Types', () => {
-  describe('ToolCategory', () => {
-    it('should support git category', () => {
-      const category: ToolCategory = 'git';
-      expect(category).toBe('git');
+  describe('ToolPackage', () => {
+    it('should create valid package', () => {
+      const pkg: ToolPackage = {
+        id: 'pkg-1', name: 'test-pkg', description: 'A test package',
+        version: '1.0.0', author: 'Agions', license: 'MIT',
+        keywords: ['test'], categories: ['api'],
+        mcpVersion: '1.0', tools: [], dependencies: {},
+        metadata: { createdAt: new Date(), updatedAt: new Date(), downloads: 0, rating: 0, reviews: 0, verified: false, official: false },
+      };
+      expect(pkg.license).toBe('MIT');
     });
 
-    it('should support jira category', () => {
-      const category: ToolCategory = 'jira';
-      expect(category).toBe('jira');
-    });
-
-    it('should support slack category', () => {
-      const category: ToolCategory = 'slack';
-      expect(category).toBe('slack');
-    });
-
-    it('should support github category', () => {
-      const category: ToolCategory = 'github';
-      expect(category).toBe('github');
-    });
-
-    it('should support ai category', () => {
-      const category: ToolCategory = 'ai';
-      expect(category).toBe('ai');
+    it('should support optional fields', () => {
+      const pkg: ToolPackage = {
+        id: 'pkg-2', name: 'full', description: '', version: '2.0.0',
+        author: '', license: 'Apache-2.0', keywords: [], categories: ['ai'],
+        repository: 'https://github.com/test', homepage: 'https://test.com',
+        bugs: 'https://github.com/test/issues', mcpVersion: '2.0',
+        tools: [], dependencies: {}, peerDependencies: { lodash: '^4.0' },
+        scripts: { build: 'tsc' },
+        metadata: { createdAt: new Date(), updatedAt: new Date(), downloads: 100, rating: 4.5, reviews: 20, verified: true, official: true },
+      };
+      expect(pkg.metadata.verified).toBe(true);
     });
   });
 
-  describe('ToolExample', () => {
-    it('should create tool example', () => {
-      const example: ToolExample = {
-        name: 'Get repository info',
-        description: 'Get repository information',
-        input: {
-          owner: 'openclaw',
-          repo: 'taskflow-ai'
-        },
-        output: {
-          name: 'taskflow-ai',
-          stars: 1234
-        }
-      };
-
-      expect(example.description).toBeDefined();
-      expect(example.input).toBeDefined();
-      expect(example.output).toBeDefined();
-      expect(example.name).toBeDefined();
+  describe('ToolCategory', () => {
+    it('should have 16 categories', () => {
+      expect(ALL_CATEGORIES).toHaveLength(16);
     });
   });
 
   describe('MarketTool', () => {
-    it('should create market tool with schemas', () => {
-      const tool: MarketTool = {
-        name: 'git-status',
-        description: 'Get current git repository status',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            path: { type: 'string' }
-          },
-          required: ['path']
-        },
-        outputSchema: {
-          type: 'object',
-          properties: {
-            branch: { type: 'string' },
-            changes: { type: 'array' }
-          }
-        },
-        handler: './handlers/git.ts::status'
+    it('should create valid tool', () => {
+      const t: MarketTool = {
+        name: 'read', description: 'Read file', inputSchema: { type: 'object' }, handler: 'fs-read',
       };
-
-      expect(tool.name).toBe('git-status');
-      expect(tool.inputSchema).toBeDefined();
-      expect(tool.outputSchema).toBeDefined();
+      expect(t.handler).toBe('fs-read');
     });
   });
 
   describe('PackageMetadata', () => {
-    it('should create complete package metadata', () => {
-      const metadata: PackageMetadata = {
-        downloads: 50000,
-        rating: 4.5,
-        reviews: 120,
-        verified: true,
-        official: true,
-        createdAt: new Date('2023-06-01'),
-        updatedAt: new Date('2024-01-15')
+    it('should create valid metadata', () => {
+      const m: PackageMetadata = {
+        createdAt: new Date(), updatedAt: new Date(), downloads: 50,
+        rating: 4.2, reviews: 10, verified: false, official: false,
       };
-
-      expect(metadata.downloads).toBe(50000);
-      expect(metadata.rating).toBe(4.5);
-      expect(metadata.verified).toBe(true);
-      expect(metadata.official).toBe(true);
-    });
-
-    it('should create minimal package metadata', () => {
-      const metadata: PackageMetadata = {
-        downloads: 0,
-        rating: 0,
-        reviews: 0,
-        verified: false,
-        official: false,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      expect(metadata.downloads).toBe(0);
-      expect(metadata.verified).toBe(false);
+      expect(m.rating).toBe(4.2);
     });
   });
 
-  describe('ToolPackage', () => {
-    it('should create complete tool package', () => {
-      const toolPackage: ToolPackage = {
-        id: 'marketplace-git-tools',
-        name: 'Git Tools',
-        description: 'Comprehensive git integration tools',
-        version: '1.2.0',
-        author: 'Agions',
-        license: 'MIT',
-        keywords: ['git', 'version-control'],
-        categories: ['git'],
-        repository: 'https://github.com/example/git-tools',
-        mcpVersion: '1.0.0',
-        tools: [
-          {
-            name: 'git-status',
-            description: 'Get git status',
-            inputSchema: { type: 'object' },
-            handler: './handlers/status.ts'
-          }
-        ],
-        dependencies: {
-          'simple-git': '^3.0.0'
-        },
-        metadata: {
-          downloads: 10000,
-          rating: 4.8,
-          reviews: 50,
-          verified: true,
-          official: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      };
-
-      expect(toolPackage.id).toBe('marketplace-git-tools');
-      expect(toolPackage.version).toBe('1.2.0');
-      expect(toolPackage.tools).toHaveLength(1);
-      expect(toolPackage.dependencies['simple-git']).toBe('^3.0.0');
+  describe('Registry', () => {
+    it('should support 3 types', () => {
+      const types: Registry['type'][] = ['npm', 'git', 'local'];
+      expect(types).toHaveLength(3);
     });
+  });
 
-    it('should create package with peer dependencies', () => {
-      const toolPackage: ToolPackage = {
-        id: 'slack-integration',
-        name: 'Slack Integration',
-        description: 'Slack message tools',
-        version: '2.0.0',
-        author: 'Team',
-        license: 'Apache-2.0',
-        keywords: ['slack', 'messaging'],
-        categories: ['slack'],
-        mcpVersion: '1.0.0',
-        tools: [],
-        dependencies: {},
-        peerDependencies: {
-          '@slack/web-api': '^7.0.0'
-        },
-        metadata: {
-          downloads: 5000,
-          rating: 4.2,
-          reviews: 20,
-          verified: false,
-          official: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
+  describe('InstallResult', () => {
+    it('should create success result', () => {
+      const r: InstallResult = {
+        success: true, package: {} as ToolPackage, installedTools: ['t1'],
+        warnings: ['Deprecated'],
       };
-
-      expect(toolPackage.peerDependencies).toBeDefined();
-      expect(toolPackage.peerDependencies!['@slack/web-api']).toBe('^7.0.0');
+      expect(r.warnings).toHaveLength(1);
     });
   });
 
   describe('SearchOptions', () => {
-    it('should create basic search options', () => {
-      const options: SearchOptions = {
-        query: 'git tools',
-        limit: 10,
-        sortBy: 'downloads'
+    it('should create options with all filters', () => {
+      const o: SearchOptions = {
+        query: 'git', category: 'git', author: 'Agions',
+        verified: true, official: false, sortBy: 'downloads', limit: 20,
       };
-
-      expect(options.query).toBe('git tools');
-      expect(options.limit).toBe(10);
-      expect(options.sortBy).toBe('downloads');
-    });
-
-    it('should create search options with filters', () => {
-      const options: SearchOptions = {
-        category: 'git',
-        verified: true,
-        official: false,
-        sortBy: 'rating'
-      };
-
-      expect(options.category).toBe('git');
-      expect(options.verified).toBe(true);
+      expect(o.sortBy).toBe('downloads');
     });
   });
 
   describe('SearchResult', () => {
-    it('should create search result', () => {
-      const result: SearchResult = {
-        packages: [
-          {
-            id: 'test-package',
-            name: 'Test Package',
-            description: 'A test package',
-            version: '1.0.0',
-            author: 'Test',
-            license: 'MIT',
-            keywords: [],
-            categories: [],
-            mcpVersion: '1.0.0',
-            tools: [],
-            dependencies: {},
-            metadata: {
-              downloads: 0,
-              rating: 0,
-              reviews: 0,
-              verified: false,
-              official: false,
-              createdAt: new Date(),
-              updatedAt: new Date()
-            }
-          }
-        ],
-        total: 1,
-        page: 1,
-        pageSize: 10
-      };
-
-      expect(result.packages).toHaveLength(1);
-      expect(result.total).toBe(1);
-      expect(result.page).toBe(1);
-      expect(result.pageSize).toBe(10);
-    });
-  });
-
-  describe('MarketplaceConfig', () => {
-    it('should create marketplace configuration', () => {
-      const registries: Registry[] = [
-        {
-          name: 'official',
-          url: 'https://marketplace.taskflow.ai',
-          type: 'npm',
-          packages: []
-        }
-      ];
-
-      const config: MarketplaceConfig = {
-        defaultRegistry: 'https://marketplace.taskflow.ai',
-        registries,
-        cacheDir: '/tmp/taskflow-marketplace',
-        autoUpdate: true,
-        verifySignatures: true
-      };
-
-      expect(config.defaultRegistry).toBe('https://marketplace.taskflow.ai');
-      expect(config.autoUpdate).toBe(true);
-      expect(config.verifySignatures).toBe(true);
-      expect(config.registries).toHaveLength(1);
+    it('should create valid result', () => {
+      const r: SearchResult = { packages: [], total: 0, page: 1, pageSize: 20 };
+      expect(r.page).toBe(1);
     });
   });
 
   describe('VersionInfo', () => {
-    it('should create version information', () => {
-      const versionInfo: VersionInfo = {
-        version: '1.2.0',
-        changelog: '- Added new feature\n- Fixed bug',
-        publishedAt: new Date('2024-01-15'),
-        deprecated: false
+    it('should support deprecation', () => {
+      const v: VersionInfo = {
+        version: '1.0.0', changelog: 'First', publishedAt: new Date(),
+        deprecated: true, deprecatedMessage: 'Use v2',
       };
-
-      expect(versionInfo.version).toBe('1.2.0');
-      expect(versionInfo.deprecated).toBe(false);
-      expect(versionInfo.changelog).toContain('Added new feature');
+      expect(v.deprecated).toBe(true);
     });
+  });
 
-    it('should create deprecated version info', () => {
-      const versionInfo: VersionInfo = {
-        version: '1.0.0',
-        changelog: 'Initial release',
-        publishedAt: new Date('2023-01-01'),
-        deprecated: true,
-        deprecatedMessage: 'Please upgrade to v2.0.0'
+  describe('DependencyTree', () => {
+    it('should create recursive tree', () => {
+      const tree: DependencyTree = {
+        name: 'root', version: '1.0',
+        dependencies: [{ name: 'child', version: '0.1', dependencies: [] }],
       };
-
-      expect(versionInfo.deprecated).toBe(true);
-      expect(versionInfo.deprecatedMessage).toBe('Please upgrade to v2.0.0');
+      expect(tree.dependencies).toHaveLength(1);
     });
+  });
+
+  describe('MarketplaceConfig', () => {
+    it('should create valid config', () => {
+      const c: MarketplaceConfig = {
+        defaultRegistry: 'npm', registries: [], cacheDir: '.cache',
+        autoUpdate: true, verifySignatures: false,
+      };
+      expect(c.autoUpdate).toBe(true);
+    });
+  });
+
+  describe('PackageManifest', () => {
+    it('should create valid manifest', () => {
+      const m: PackageManifest = {
+        name: 'test', versions: {}, 'dist-tags': { latest: '1.0.0' }, time: {},
+      };
+      expect(m['dist-tags'].latest).toBe('1.0.0');
+    });
+  });
+});
+
+describe('Marketplace Modules', () => {
+  it('MarketplaceRegistry should be importable', async () => {
+    const mod = await import('../registry');
+    expect(mod).toBeDefined();
+  });
+
+  it('PackageInstaller should be importable', async () => {
+    const mod = await import('../installer');
+    expect(mod).toBeDefined();
   });
 });

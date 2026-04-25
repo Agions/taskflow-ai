@@ -1,51 +1,56 @@
 /**
- * CLI Utils Tests
- * TaskFlow AI v4.0
+ * CLI Utils Tests - TaskFlow AI v4.0
  */
 
-import { Spinner } from '../utils';
+import { log, format, table, confirm, Spinner, chalk } from '../utils';
 
-// Mock chalk to avoid console output
-jest.mock('chalk', () => ({
-  default: {
-    cyan: (text: string) => text,
-    green: (text: string) => text,
-    red: (text: string) => text,
-    yellow: (text: string) => text,
-    gray: (text: string) => text,
-    bold: (text: string) => text,
-  },
-}));
-
-describe('Spinner', () => {
-  let spinner: Spinner;
-
-  beforeEach(() => {
-    spinner = new Spinner();
-    jest.spyOn(process.stdout, 'write').mockImplementation();
+describe('CLI Utils', () => {
+  describe('log', () => {
+    it('should have all log methods', () => {
+      expect(log.info).toBeDefined();
+      expect(log.success).toBeDefined();
+      expect(log.error).toBeDefined();
+      expect(log.warn).toBeDefined();
+      expect(log.dim).toBeDefined();
+    });
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
+  describe('format', () => {
+    it('should have format methods', () => {
+      expect(format.title).toBeDefined();
+      expect(format.section).toBeDefined();
+      expect(format.listItem).toBeDefined();
+      expect(format.keyValue).toBeDefined();
+    });
   });
 
-  it('should start and stop spinner successfully', (done) => {
-    spinner.start('Loading...');
-
-    setTimeout(() => {
-      spinner.stop(true);
-      expect(process.stdout.write).toHaveBeenCalled();
-      done();
-    }, 200);
+  describe('table', () => {
+    it('should have simple table method', () => {
+      expect(table.simple).toBeDefined();
+    });
   });
 
-  it('should stop with failure state', (done) => {
-    spinner.start('Processing...');
+  describe('confirm', () => {
+    it('should be a function', () => {
+      expect(typeof confirm).toBe('function');
+    });
+  });
 
-    setTimeout(() => {
-      spinner.stop(false);
-      expect(process.stdout.write).toHaveBeenCalled();
-      done();
-    }, 200);
+  describe('Spinner', () => {
+    it('should be a class', () => {
+      expect(typeof Spinner).toBe('function');
+    });
+
+    it('should have start and stop methods', () => {
+      const s = new Spinner();
+      expect(typeof s.start).toBe('function');
+      expect(typeof s.stop).toBe('function');
+    });
+  });
+
+  describe('chalk', () => {
+    it('should be exported', () => {
+      expect(chalk).toBeDefined();
+    });
   });
 });

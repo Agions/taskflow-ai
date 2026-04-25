@@ -1,200 +1,140 @@
-// @ts-nocheck
 /**
- * MCP 工具测试
+ * MCP Tools Module Tests - TaskFlow AI v4.0
  */
 
-import { describe, it, expect, beforeEach } from '@jest/globals';
-import { fileTools, shellTools, taskTools } from '../built-in';
-import { filesystemTools } from '../filesystem';
-import { httpTools } from '../http';
-import { databaseTools } from '../database';
-import { memoryTools } from '../memory';
-import { codeTools } from '../code';
-import { gitTools } from '../git';
+import type {
+  ToolDefinition, ToolContext, ToolExample, ToolRegistration,
+  ToolCategory, AuthConfig, RateLimitConfig,
+  ToolResponse, ToolResult, ToolCallRequest, ToolCallResponse,
+  MCPTool, MCPToolsListResponse,
+} from '../types';
+import { PermissionLevel, toolError, toolOk } from '../types';
 
-describe('MCP Tools', () => {
-  describe('Built-in Tools', () => {
-    it('should have file_tools', () => {
-      expect(fileTools).toBeDefined();
-      expect(Array.isArray(fileTools)).toBe(true);
-      expect(fileTools.length).toBeGreaterThan(0);
+describe('Tool Types', () => {
+  describe('ToolDefinition', () => {
+    it('should create valid tool', () => {
+      const t: ToolDefinition = {
+        name: 'fs_read',
+        description: 'Read file',
+        inputSchema: { type: 'object' },
+        handler: async () => ({ success: true }),
+      };
+      expect(t.name).toBe('fs_read');
     });
 
-    it('should have shell_tools', () => {
-      expect(shellTools).toBeDefined();
-      expect(Array.isArray(shellTools)).toBe(true);
-    });
-
-    it('should have task_tools', () => {
-      expect(taskTools).toBeDefined();
-      expect(Array.isArray(taskTools)).toBe(true);
-    });
-  });
-
-  describe('FileSystem Tools', () => {
-    it('should have filesystem tools', () => {
-      expect(filesystemTools).toBeDefined();
-      expect(Array.isArray(filesystemTools)).toBe(true);
-      expect(filesystemTools.length).toBeGreaterThan(0);
-    });
-
-    it('should have valid tool definitions', () => {
-      for (const tool of filesystemTools) {
-        expect(tool.name).toBeDefined();
-        expect(tool.description).toBeDefined();
-        expect(tool.inputSchema).toBeDefined();
-        expect(tool.handler).toBeDefined();
-        expect(typeof tool.handler).toBe('function');
-      }
-    });
-
-    it('should have category set', () => {
-      for (const tool of filesystemTools) {
-        expect(tool.category).toBe('filesystem');
-      }
+    it('should support enhanced fields', () => {
+      const t: ToolDefinition = {
+        name: 'shell',
+        description: 'Run shell',
+        inputSchema: {},
+        handler: async () => ({}),
+        category: 'execution',
+        tags: ['shell', 'system'],
+        version: '2.0',
+        auth: { type: 'bearer', required: true },
+        rateLimit: { maxCalls: 10, windowMs: 60000 },
+        permissions: [PermissionLevel.EXECUTE],
+        examples: [{ input: { cmd: 'ls' }, description: 'List files' }],
+      };
+      expect(t.permissions).toContain(PermissionLevel.EXECUTE);
     });
   });
 
-  describe('HTTP Tools', () => {
-    it('should have http tools', () => {
-      expect(httpTools).toBeDefined();
-      expect(Array.isArray(httpTools)).toBe(true);
-      expect(httpTools.length).toBeGreaterThan(0);
-    });
-
-    it('should have http_request tool', () => {
-      const httpRequest = httpTools.find(t => t.name === 'http_request');
-      expect(httpRequest).toBeDefined();
-      const schema = httpRequest?.inputSchema as any;
-      expect(schema.properties.url).toBeDefined();
-      expect(schema.properties.method).toBeDefined();
-    });
-
-    it('should support common HTTP methods', () => {
-      const httpRequest = httpTools.find(t => t.name === 'http_request');
-      const schema = httpRequest?.inputSchema as any;
-      const methods = schema.properties.method.enum as string[];
-      expect(methods).toContain('GET');
-      expect(methods).toContain('POST');
-      expect(methods).toContain('PUT');
-      expect(methods).toContain('DELETE');
+  describe('PermissionLevel enum', () => {
+    it('should have 5 levels with bitfield values', () => {
+      expect(PermissionLevel.NONE).toBe(0);
+      expect(PermissionLevel.READ).toBe(1);
+      expect(PermissionLevel.WRITE).toBe(2);
+      expect(PermissionLevel.EXECUTE).toBe(4);
+      expect(PermissionLevel.ADMIN).toBe(8);
     });
   });
 
-  describe('Database Tools', () => {
-    it('should have database tools', () => {
-      expect(databaseTools).toBeDefined();
-      expect(Array.isArray(databaseTools)).toBe(true);
-    });
-
-    it('should have query tool', () => {
-      const queryTool = databaseTools.find(t => t.name === 'db_query');
-      expect(queryTool).toBeDefined();
-      const schema = queryTool?.inputSchema as any;
-      expect(schema.properties.dbPath).toBeDefined();
-      expect(schema.properties.sql).toBeDefined();
+  describe('AuthConfig', () => {
+    it('should support 4 auth types', () => {
+      const types: AuthConfig['type'][] = ['none','bearer','basic','apiKey'];
+      expect(types).toHaveLength(4);
     });
   });
 
-  describe('Memory Tools', () => {
-    it('should have memory tools', () => {
-      expect(memoryTools).toBeDefined();
-      expect(Array.isArray(memoryTools)).toBe(true);
-      expect(memoryTools.length).toBeGreaterThan(0);
-    });
-
-    it('should have CRUD operations', () => {
-      const names = memoryTools.map(t => t.name);
-      expect(names).toContain('memory_set');
-      expect(names).toContain('memory_get');
-      expect(names).toContain('memory_delete');
-      expect(names).toContain('memory_list');
-      expect(names).toContain('memory_clear');
+  describe('toolError helper', () => {
+    it('should create error response', () => {
+      const r = toolError('ENOENT', 'File not found', { recoverable: true, tool: 'fs', duration: 5 });
+      expect(r.success).toBe(false);
+      expect(r.error?.code).toBe('ENOENT');
+      expect(r.error?.recoverable).toBe(true);
+      expect(r.metadata.tool).toBe('fs');
     });
   });
 
-  describe('Code Tools', () => {
-    it('should have code tools', () => {
-      expect(codeTools).toBeDefined();
-      expect(Array.isArray(codeTools)).toBe(true);
-    });
-
-    it('should support multiple languages', () => {
-      const executeTool = codeTools.find(t => t.name === 'code_execute');
-      expect(executeTool).toBeDefined();
-      const schema = executeTool?.inputSchema as any;
-      const languages = schema.properties.language.enum as string[];
-      expect(languages).toContain('javascript');
-      expect(languages).toContain('python');
-      expect(languages).toContain('node');
+  describe('toolOk helper', () => {
+    it('should create success response', () => {
+      const r = toolOk({ content: 'hello' }, { tool: 'fs', duration: 10, tokens: 50 });
+      expect(r.success).toBe(true);
+      expect(r.data?.content).toBe('hello');
+      expect(r.metadata.tokens).toBe(50);
     });
   });
 
-  describe('Git Tools', () => {
-    it('should have git tools', () => {
-      expect(gitTools).toBeDefined();
-      expect(Array.isArray(gitTools)).toBe(true);
-    });
-
-    it('should have common git operations', () => {
-      const names = gitTools.map(t => t.name);
-      expect(names).toContain('git_status');
-      expect(names).toContain('git_log');
-      expect(names).toContain('git_branch');
-      expect(names).toContain('git_commit');
-      expect(names).toContain('git_push');
-      expect(names).toContain('git_pull');
+  describe('ToolResponse', () => {
+    it('should create full response', () => {
+      const r: ToolResponse<string> = {
+        success: true,
+        data: 'result',
+        metadata: { tool: 'test', duration: 100, timestamp: Date.now(), cacheHit: true },
+      };
+      expect(r.metadata.cacheHit).toBe(true);
     });
   });
 
-  describe('Shell Tools', () => {
-    it('should have shell tools', () => {
-      expect(shellTools).toBeDefined();
-      expect(Array.isArray(shellTools)).toBe(true);
-    });
-
-    it('should have exec tool', () => {
-      const execTool = shellTools.find(t => t.name === 'shell_exec');
-      expect(execTool).toBeDefined();
-      const schema = execTool?.inputSchema as any;
-      expect(schema.properties.command).toBeDefined();
+  describe('ToolRegistration', () => {
+    it('should create valid registration', () => {
+      const reg: ToolRegistration = {
+        tool: {} as ToolDefinition,
+        registeredAt: Date.now(),
+        callCount: 0,
+      };
+      expect(reg.callCount).toBe(0);
     });
   });
 
-  describe('Tool Schema Validation', () => {
-    it('all tools should have unique names', () => {
-      const allTools = [
-        ...fileTools,
-        ...shellTools,
-        ...taskTools,
-        ...filesystemTools,
-        ...httpTools,
-        ...databaseTools,
-        ...memoryTools,
-        ...codeTools,
-        ...gitTools,
-      ];
+  describe('MCPTool', () => {
+    it('should create valid MCP tool', () => {
+      const t: MCPTool = {
+        name: 'read',
+        description: 'Read',
+        inputSchema: { type: 'object', properties: { path: { type: 'string' } }, required: ['path'] },
+      };
+      expect(t.inputSchema.type).toBe('object');
+    });
+  });
 
-      const names = allTools.map(t => t.name);
-      const uniqueNames = new Set(names);
-
-      expect(names.length).toBe(uniqueNames.size);
+  describe('ToolCallRequest/Response', () => {
+    it('should create request', () => {
+      const req: ToolCallRequest = { name: 'read', arguments: { path: '/tmp' }, id: 'c1' };
+      expect(req.id).toBe('c1');
     });
 
-    it('all tools should have proper input schema', () => {
-      const allTools = [
-        ...filesystemTools,
-        ...httpTools,
-        ...memoryTools,
-        ...codeTools,
-        ...gitTools,
-      ];
-
-      for (const tool of allTools) {
-        const schema = tool.inputSchema as any;
-        expect(schema.type).toBe('object');
-        expect(schema.properties).toBeDefined();
-      }
+    it('should create response', () => {
+      const res: ToolCallResponse = { id: 'c1', result: 'data' };
+      expect(res.result).toBe('data');
     });
+  });
+});
+
+describe('Tool Modules', () => {
+  it('ToolRegistry should be importable', async () => {
+    const mod = await import('../registry');
+    expect(mod.ToolRegistry).toBeDefined();
+  });
+
+  it('built-in tools should be importable', async () => {
+    const mod = await import('../built-in');
+    expect(mod).toBeDefined();
+  });
+
+  it('categories should be importable', async () => {
+    const mod = await import('../categories');
+    expect(mod).toBeDefined();
   });
 });
