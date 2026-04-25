@@ -3,7 +3,7 @@
  * TaskFlow AI v4.0
  */
 
-import type { CacheConfig, CacheEntry } from '../core/cache/cache-manager';
+import type { CacheConfig, CacheEntry } from '../cache-manager';
 
 describe('Cache Optimization', () => {
   describe('LRU Eviction Policy', () => {
