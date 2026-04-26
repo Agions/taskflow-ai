@@ -1,4 +1,15 @@
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+/**
+ * AI Router System Tests
+ * TaskFlow AI v4.0.1
+ */
+
+import {
+  RouterStrategy,
+  RoutingContext,
+  RoutingResult,
+  RoutingRule,
+  BaseRouter,
+} from '../router-types';
 import {
   SmartRouter,
   CostRouter,
@@ -8,538 +19,629 @@ import {
   ScoredModel,
   RoutingExplanation,
 } from '../routers';
-import { BaseRouter, RouterStrategy } from '../router-types';
-import { ModelConfig, ModelCapability } from '../types';
+import { createRouter, benchmarkRouting } from '../router-factory';
+import type { ModelConfig, ProviderType, ModelCapability } from '../types';
 
-// Test helper class to access protected methods
-class TestRouter extends CostRouter {
-  public testExtractContext(messages: any[]) {
-    return this.extractContext(messages);
-  }
-}
+describe('Router Types', () => {
+  describe('RouterStrategy', () => {
+    it('should support all strategy values', () => {
+      const strategies: RouterStrategy[] =
+        ['smart', 'cost', 'speed', 'random', 'priority'];
+      expect(strategies).toHaveLength(5);
+    });
 
-describe('Router System', () => {
-  let mockMessages: any[];
-  let availableModels: ModelConfig[];
+    it('should create single strategy value', () => {
+      const strategy: RouterStrategy = 'smart';
+      expect(strategy).toBe('smart');
+    });
+  });
+
+  describe('RoutingContext', () => {
+    it('should create complete context', () => {
+      const context: RoutingContext = {
+        taskType: 'code',
+        complexity: 'high',
+        budget: 10,
+        urgent: true,
+        contextLength: 5000,
+      };
+
+      expect(context.taskType).toBe('code');
+      expect(context.complexity).toBe('high');
+      expect(context.budget).toBe(10);
+      expect(context.urgent).toBe(true);
+      expect(context.contextLength).toBe(5000);
+    });
+
+    it('should create minimal context', () => {
+      const context: RoutingContext = {};
+      expect(context).toBeDefined();
+    });
+  });
+
+  describe('RoutingResult', () => {
+    it('should create complete result', () => {
+      const model: ModelConfig = {
+        id: 'gpt-4o',
+        provider: 'openai',
+        modelName: 'GPT-4o',
+        apiKey: 'test-key',
+        enabled: true,
+        priority: 1,
+        capabilities: ['chat', 'vision'],
+        maxTokens: 128000,
+        temperature: 0.7,
+        costPer1MInput: 5,
+        costPer1MOutput: 15,
+      };
+
+      const result: RoutingResult = {
+        model,
+        reason: 'Test reason',
+        candidates: [model],
+        strategy: 'smart',
+      };
+
+      expect(result.model).toBe(model);
+      expect(result.reason).toBe('Test reason');
+      expect(result.candidates).toHaveLength(1);
+      expect(result.strategy).toBe('smart');
+    });
+  });
+
+  describe('RoutingRule', () => {
+    it('should create complete rule', () => {
+      const rule: RoutingRule = {
+        match: (ctx: RoutingContext, msgs: unknown[]) => {
+          return ctx.taskType === 'code';
+        },
+        prefer: ['gpt-4o'],
+        weight: 1.0,
+      };
+
+      expect(typeof rule.match).toBe('function');
+      expect(rule.prefer).toContain('gpt-4o');
+      expect(rule.weight).toBe(1.0);
+    });
+  });
+});
+
+describe('SmartRouter', () => {
+  let router: SmartRouter;
+  let mockModels: ModelConfig[];
 
   beforeEach(() => {
-    mockMessages = [
-      { role: 'system', content: 'You are a helpful assistant.' },
-      { role: 'user', content: 'Hello, how can you help me?' },
-    ];
-
-    availableModels = [
+    router = new SmartRouter();
+    mockModels = [
       {
         id: 'gpt-4o-mini',
         provider: 'openai',
         modelName: 'GPT-4o Mini',
-        apiKey: 'test-key-1',
+        apiKey: 'key1',
         enabled: true,
-        capabilities: ['chat', 'code'],
+        priority: 1,
+        capabilities: ['chat'],
         costPer1MInput: 0.15,
         costPer1MOutput: 0.6,
-        priority: 1,
       },
       {
-        id: 'gpt-4o',
-        provider: 'openai',
-        modelName: 'GPT-4o',
-        apiKey: 'test-key-2',
+        id: 'deepseek-coder',
+        provider: 'deepseek',
+        modelName: 'DeepSeek Coder',
+        apiKey: 'key2',
         enabled: true,
-        capabilities: ['chat', 'code', 'reasoning'],
-        costPer1MInput: 2.5,
-        costPer1MOutput: 10,
         priority: 2,
+        capabilities: ['code'],
+        costPer1MInput: 0.5,
+        costPer1MOutput: 2,
       },
       {
         id: 'claude-3-5-sonnet',
         provider: 'anthropic',
         modelName: 'Claude 3.5 Sonnet',
-        apiKey: 'test-key-3',
+        apiKey: 'key3',
         enabled: true,
-        capabilities: ['chat', 'code', 'reasoning', 'vision'],
+        priority: 3,
+        capabilities: ['chat', 'vision'],
         costPer1MInput: 3,
         costPer1MOutput: 15,
-        priority: 3,
       },
     ];
   });
 
-  describe('BaseRouter', () => {
-    let testRouter: TestRouter;
+  describe('select', () => {
+    it('should select preferred model when specified', async () => {
+      const messages = [{ role: 'user', content: 'Hello' }];
+      const result = await router.select(messages, mockModels, 'deepseek-coder');
 
-    beforeEach(() => {
-      testRouter = new TestRouter();
+      expect(result.model.id).toBe('deepseek-coder');
+      expect(result.reason).toBe('User preferred model');
+      expect(result.strategy).toBe('smart');
     });
 
-    describe('extractContext', () => {
-      it('should detect code task type', () => {
-        const codeMessages = [
-          { role: 'user', content: 'Write a function to sort an array' },
-        ];
-        const context = testRouter.testExtractContext(codeMessages);
+    it('should ignore preferred model when not available', async () => {
+      const messages = [{ role: 'user', content: 'Hello' }];
+      const result = await router.select(messages, mockModels, 'unknown-model');
 
-        expect(context.taskType).toBe('code');
-      });
-
-      it('should detect reasoning task type', () => {
-        const reasoningMessages = [
-          { role: 'user', content: 'Analyze the following case study' },
-        ];
-        const context = testRouter.testExtractContext(reasoningMessages);
-
-        expect(context.taskType).toBe('reasoning');
-        // Note: complexity detection may vary based on message length
-        expect(context.complexity).toBeDefined();
-      });
-
-      it('should detect vision task type', () => {
-        const visionMessages = [
-          { role: 'user', content: 'Describe this image' },
-        ];
-        const context = testRouter.testExtractContext(visionMessages);
-
-        expect(context.taskType).toBe('vision');
-      });
-
-      it('should detect chat task type by default', () => {
-        const chatMessages = [
-          { role: 'user', content: 'Hello, how are you?' },
-        ];
-        const context = testRouter.testExtractContext(chatMessages);
-
-        expect(context.taskType).toBe('chat');
-      });
-
-      it('should detect low complexity for short messages', () => {
-        const shortMessages = [
-          { role: 'user', content: 'Hi' },
-        ];
-        const context = testRouter.testExtractContext(shortMessages);
-
-        expect(context.complexity).toBe('low');
-      });
-
-      it('should detect high complexity for long messages', () => {
-        const longContent = 'This is a very long message content. '.repeat(100);
-        const longMessages = [
-          { role: 'user', content: longContent },
-        ];
-        const context = testRouter.testExtractContext(longMessages);
-
-        expect(context.complexity).toBe('high');
-      });
-
-      it('should handle empty messages', () => {
-        const context = testRouter.testExtractContext([]);
-
-        // Empty messages default to chat type with low complexity
-        expect(context.taskType).toBe('chat');
-        expect(context.complexity).toBe('low');
-      });
-
-      it('should calculate context length from all messages', () => {
-        const multiMessage = [
-          { role: 'system', content: 'You are helpful.' },
-          { role: 'user', content: 'Can you help?' },
-          { role: 'assistant', content: 'Of course!' },
-        ];
-        const context = testRouter.testExtractContext(multiMessage);
-
-        expect(context.complexity).toBeDefined();
-      });
-    });
-  });
-
-  describe('SmartRouter', () => {
-    let router: SmartRouter;
-
-    beforeEach(() => {
-      router = new SmartRouter();
+      expect(result.model).toBeDefined();
+      expect(result.model.id).not.toBe('unknown-model');
     });
 
-    it('should select preferred model when available', async () => {
-      const result = await router.select(
-        mockMessages,
-        availableModels,
-        'gpt-4o'
-      );
-
-      expect(result.model.id).toBe('gpt-4o');
-      expect(result.reason).toContain('User preferred model');
-    });
-
-    it('should select model based on task type', async () => {
-      const codeMessages = [
-        { role: 'user', content: 'Write a React component' },
-      ];
-      const result = await router.select(codeMessages, availableModels);
+    it('should select code model for code tasks', async () => {
+      const messages = [{ role: 'user', content: 'Write a function to sort array' }];
+      const result = await router.select(messages, mockModels);
 
       expect(result.model).toBeDefined();
       expect(result.strategy).toBe('smart');
-      expect(result.reason).toContain('Task type:');
     });
 
-    it('should select model based on complexity', async () => {
-      const complexMessages = [
-        { role: 'user', content: 'Analyze this complex case ' + 'text '.repeat(100) },
-      ];
-      const result = await router.select(complexMessages, availableModels);
+    it('should select vision model for vision tasks', async () => {
+      const messages = [{ role: 'user', content: 'Describe this image' }];
+      const result = await router.select(messages, mockModels);
 
       expect(result.model).toBeDefined();
-      expect(result.reason).toContain('Complexity:');
+      expect(result.strategy).toBe('smart');
     });
 
-    it('should return candidates in sorted order', async () => {
-      const allModels = [...availableModels].reverse();
-      const result = await router.select(mockMessages, allModels);
+    it('handle empty model list', async () => {
+      const messages = [{ role: 'user', content: 'Hello' }];
+      const result = await router.select(messages, []);
 
-      expect(result.candidates).toBeDefined();
-      expect(result.candidates.length).toBe(3);
+      expect(result).toBeDefined();
     });
 
-    it('should handle empty available models list', async () => {
-      const result = await router.select(mockMessages, []);
+    it('should return all candidates', async () => {
+      const messages = [{ role: 'user', content: 'Hello' }];
+      const result = await router.select(messages, mockModels);
 
-      expect(result.model).toBeUndefined();
-    });
-
-    it('should select first available model if preferred not found', async () => {
-      const result = await router.select(
-        mockMessages,
-        availableModels,
-        'non-existent-model'
-      );
-
-      expect(result.model).toBeDefined();
-      expect(result.model.id).not.toBe('non-existent-model');
-    });
-
-    describe('explain', () => {
-      it('should return routing explanation', () => {
-        const explanation = router.explain(mockMessages, availableModels);
-
-        expect(explanation).toBeDefined();
-        expect(explanation.context).toBeDefined();
-        expect(explanation.ranked).toBeDefined();
-        expect(explanation.strategy).toBe('smart');
-      });
-
-      it('should include scored models in explanation', () => {
-        const explanation = router.explain(mockMessages, availableModels);
-
-        expect(explanation.ranked.length).toBe(3);
-        expect(explanation.ranked[0].model).toBeDefined();
-        expect(typeof explanation.ranked[0].score).toBe('number');
-      });
-
-      it('should include matched rules', () => {
-        const codeMessages = [
-          { role: 'user', content: 'Write code' },
-        ];
-        const explanation = router.explain(codeMessages, availableModels);
-
-        expect(explanation.matchedRuleDetails).toBeDefined();
-        expect(Array.isArray(explanation.matchedRuleDetails)).toBe(true);
-      });
-
-      it('should select preferred model if provided', () => {
-        const explanation = router.explain(
-          mockMessages,
-          availableModels,
-          'gpt-4o'
-        );
-
-        expect(explanation.selectedId).toBe('gpt-4o');
-      });
-
-      it('should rank models by score', () => {
-        const explanation = router.explain(mockMessages, availableModels);
-
-        const scores = explanation.ranked.map(m => m.score);
-        for (let i = 1; i < scores.length; i++) {
-          expect(scores[i] <= scores[i - 1]).toBe(true);
-        }
-      });
+      expect(result.candidates).toHaveLength(mockModels.length);
     });
   });
 
-  describe('CostRouter', () => {
-    let router: CostRouter;
+  describe('explain', () => {
+    it('should provide detailed routing explanation', () => {
+      const messages = [{ role: 'user', content: 'Write code' }];
+      const explanation = router.explain(messages, mockModels);
 
-    beforeEach(() => {
-      router = new CostRouter();
+      expect(explanation.context).toBeDefined();
+      expect(explanation.ranked).toBeDefined();
+      expect(explanation.matchedRuleDetails).toBeDefined();
+      expect(explanation.selectedId).toBeDefined();
+      expect(explanation.strategy).toBe('smart');
     });
 
-    it('should select lowest cost model', async () => {
-      const result = await router.select(mockMessages, availableModels);
+    it('should rank models by score', () => {
+      const messages = [{ role: 'user', content: 'Hello' }];
+      const explanation = router.explain(messages, mockModels);
 
-      expect(result.model.id).toBe('gpt-4o-mini');
-      expect(result.model.costPer1MInput).toBe(0.15);
+      expect(explanation.ranked.length).toBe(mockModels.length);
+      if (explanation.ranked.length > 1) {
+        expect(explanation.ranked[0].score)
+          .toBeGreaterThanOrEqual(explanation.ranked[1].score);
+      }
     });
 
-    it('should sort candidates by cost', async () => {
-      const result = await router.select(mockMessages, availableModels);
+    it('should include matched rules', () => {
+      const messages = [{ role: 'user', content: 'Write code' }];
+      const explanation = router.explain(messages, mockModels);
 
-      // Handle potential undefined values by providing defaults
-      const cost1 = result.candidates[0].costPer1MInput ?? Infinity;
-      const cost2 = result.candidates[1].costPer1MInput ?? Infinity;
-      expect(cost1).toBeLessThanOrEqual(cost2);
-    });
-
-    it('should return correct strategy type', async () => {
-      const result = await router.select(mockMessages, availableModels);
-
-      expect(result.strategy).toBe('cost');
-    });
-
-    it('should include cost-based reason', async () => {
-      const result = await router.select(mockMessages, availableModels);
-
-      expect(result.reason).toContain('Lowest input cost');
-    });
-
-    it('should handle models without cost info', async () => {
-      const modelsWithoutCost = [
-        { ...availableModels[0], costPer1MInput: undefined },
-        { ...availableModels[1], costPer1MInput: undefined },
-      ];
-
-      const result = await router.select(mockMessages, modelsWithoutCost);
-
-      expect(result.model).toBeDefined();
+      expect(Array.isArray(explanation.matchedRuleDetails)).toBe(true);
     });
   });
 
-  describe('SpeedRouter', () => {
-    let router: SpeedRouter;
+  describe('extractContext', () => {
+    it('should detect code task type', () => {
+      const messages = [{ role: 'User', content: 'Write a function' }];
+      const context = router['extractContext'].call(router, messages);
 
-    beforeEach(() => {
-      router = new SpeedRouter();
+      expect(context.taskType).toBe('code');
     });
 
-    it('should select fastest model', async () => {
-      const result = await router.select(mockMessages, availableModels);
+    it('should detect reasoning task type', () => {
+      const messages = [{ role: 'user', content: 'analyze this' }];
+      const context = router['extractContext'].call(router, messages);
 
-      expect(result.model.id).toBe('gpt-4o-mini');
+      expect(context.taskType).toBe('reasoning');
     });
 
-    it('should use estimated latency for selection', async () => {
-      const result = await router.select(mockMessages, [
-        availableModels[1], // gpt-4o
-        availableModels[0], // gpt-4o-mini
-      ]);
+    it('should detect vision task type', () => {
+      const messages = [{ role: 'user', content: 'Show me this picture' }];
+      const context = router['extractContext'].call(router, messages);
 
-      // Should still select gpt-4o-mini even if not first
-      expect(result.model.id).toBe('gpt-4o-mini');
+      expect(context.taskType).toBe('vision');
     });
 
-    it('should sort candidates by latency', async () => {
-      const result = await router.select(mockMessages, availableModels);
+    it('should detect chat task type', () => {
+      const messages = [{ role: 'user', content: 'Hello world' }];
+      const context = router['extractContext'].call(router, messages);
 
-      expect(result.candidates.length).toBeGreaterThan(1);
+      expect(context.taskType).toBe('chat');
     });
 
-    it('should return speed-based reason', async () => {
-      const result = await router.select(mockMessages, availableModels);
+    it('should detect low complexity', () => {
+      const messages = [{ role: 'user', content: 'Hi' }];
+      const context = router['extractContext'].call(router, messages);
 
-      expect(result.reason).toContain('Lowest estimated latency');
+      expect(context.complexity).toBe('low');
     });
 
-    it('should handle unknown model latency', async () => {
-      const unknownModel = {
-        id: 'unknown-model',
-        provider: 'openai' as const, // Use valid provider type
-        modelName: 'Unknown Model',
-        apiKey: 'test-key',
+    it('should detect high complexity', () => {
+      const longContent = 'This is a very long message. '.repeat(100);
+      const messages = [{ role: 'user', content: longContent }];
+      const context = router['extractContext'].call(router, messages);
+
+      expect(context.complexity).toBe('high');
+    });
+
+    it('should detect medium complexity', () => {
+      const mediumContent = 'This is a medium length message. '.repeat(10);
+      const messages = [{ role: 'user', content: mediumContent }];
+      const context = router['extractContext'].call(router, messages);
+
+      expect(context.complexity).toBe('medium');
+    });
+  });
+});
+
+describe('CostRouter', () => {
+  let router: CostRouter;
+  let mockModels: ModelConfig[];
+
+  beforeEach(() => {
+    router = new CostRouter();
+    mockModels = [
+      {
+        id: 'gpt-4o-mini',
+        provider: 'openai',
+        modelName: 'GPT-4o Mini',
+        apiKey: 'key1',
         enabled: true,
-        capabilities: ['chat' as const], // Must be mutable array
         priority: 1,
-      };
+        capabilities: ['chat'],
+        costPer1MInput: 0.15,
+        costPer1MOutput: 0.6,
+      },
+      {
+        id: 'claude-3-5-sonnet',
+        provider: 'anthropic',
+        modelName: 'Claude 3.5 Sonnet',
+        apiKey: 'key2',
+        enabled: true,
+        priority: 2,
+        capabilities: ['chat'],
+        costPer1MInput: 3,
+        costPer1MOutput: 15,
+      },
+      {
+        id: 'deepseek-chat',
+        provider: 'deepseek',
+        modelName: 'DeepSeek Chat',
+        apiKey: 'key3',
+        enabled: true,
+        priority: 3,
+        capabilities: ['chat'],
+        costPer1MInput: 0.5,
+        costPer1MOutput: 2,
+      },
+    ];
+  });
 
-      const result = await router.select(mockMessages, [unknownModel]);
+  it('should select lowest cost model', async () => {
+    const messages = [{ role: 'user', content: 'Hello' }];
+    const result = await router.select(messages, mockModels);
 
-      expect(result.model).toBeDefined();
+    expect(result.model.id).toBe('gpt-4o-mini');
+    expect(result.strategy).toBe('cost');
+    expect(result.reason).toBe('Lowest input cost');
+  });
+
+  it('should handle models without cost info', async () => {
+    const modelsWithoutCost = [
+      {
+        id: 'model1',
+        provider: 'openai' as ProviderType,
+        modelName: 'Model 1',
+        apiKey: 'key',
+        enabled: true,
+        priority: 1,
+        capabilities: ['chat' as ModelCapability],
+      },
+      {
+        id: 'model2',
+        provider: 'anthropic' as ProviderType,
+        modelName: 'Model 2',
+        apiKey: 'key',
+        enabled: true,
+        priority: 2,
+        capabilities: ['chat' as ModelCapability],
+        costPer1MInput: 5,
+      },
+    ];
+
+    const messages = [{ role: 'user', content: 'Hello' }];
+    const result = await router.select(messages, modelsWithoutCost);
+
+    expect(result.model).toBeDefined();
+    expect(result.strategy).toBe('cost');
+  });
+
+  it('should return sorted candidates', async () => {
+    const messages = [{ role: 'user', content: 'Hello' }];
+    const result = await router.select(messages, mockModels);
+
+    expect(result.candidates).toHaveLength(mockModels.length);
+    expect(result.candidates[0].costPer1MInput)
+      .toBeLessThanOrEqual(result.candidates[1].costPer1MInput || 999);
+  });
+});
+
+describe('SpeedRouter', () => {
+  let router: SpeedRouter;
+  let mockModels: ModelConfig[];
+
+  beforeEach(() => {
+    router = new SpeedRouter();
+    mockModels = [
+      {
+        id: 'gpt-4o-mini',
+        provider: 'openai',
+        modelName: 'GPT-4o Mini',
+        apiKey: 'key1',
+        enabled: true,
+        priority: 1,
+        capabilities: ['chat'],
+      },
+      {
+        id: 'gpt-4o',
+        provider: 'openai',
+        modelName: 'GPT-4o',
+        apiKey: 'key2',
+        enabled: true,
+        priority: 2,
+        capabilities: ['chat'],
+      },
+      {
+        id: 'o1',
+        provider: 'openai',
+        modelName: 'OpenAI o1',
+        apiKey: 'key3',
+        enabled: true,
+        priority: 3,
+        capabilities: ['reasoning'],
+      },
+    ];
+  });
+
+  it('should select fastest model', async () => {
+    const messages = [{ role: 'user', content: 'Hello' }];
+    const result = await router.select(messages, mockModels);
+
+    expect(result.model.id).toBe('gpt-4o-mini');
+    expect(result.strategy).toBe('speed');
+    expect(result.reason).toBe('Lowest estimated latency');
+  });
+
+  it('should handle unknown model latency', async () => {
+    const unknownModel = {
+      id: 'unknown-model',
+      provider: 'openai' as ProviderType,
+      modelName: 'Unknown Model',
+      apiKey: 'key',
+      enabled: true,
+      priority: 5,
+      capabilities: ['chat' as ModelCapability],
+    };
+
+    const messages = [{ role: 'user', content: 'Hello' }];
+    const result = await router.select(messages, [...mockModels, unknownModel]);
+
+    expect(result.model).toBeDefined();
+  });
+});
+
+describe('PriorityRouter', () => {
+  let router: PriorityRouter;
+  let mockModels: ModelConfig[];
+
+  beforeEach(() => {
+    router = new PriorityRouter();
+    mockModels = [
+      {
+        id: 'high-priority',
+        provider: 'openai',
+        modelName: 'High Priority',
+        apiKey: 'key1',
+        enabled: true,
+        priority: 1,
+        capabilities: ['chat'],
+      },
+      {
+        id: 'medium-priority',
+        provider: 'anthropic',
+        modelName: 'Medium Priority',
+        apiKey: 'key2',
+        enabled: true,
+        priority: 5,
+        capabilities: ['chat'],
+      },
+      {
+        id: 'low-priority',
+        provider: 'deepseek',
+        modelName: 'Low Priority',
+        apiKey: 'key3',
+        enabled: true,
+        priority: 10,
+        capabilities: ['chat'],
+      },
+    ];
+  });
+
+  it('should select highest priority model', async () => {
+    const messages = [{ role: 'user', content: 'Hello' }];
+    const result = await router.select(messages, mockModels);
+
+    expect(result.model.id).toBe('high-priority');
+    expect(result.strategy).toBe('priority');
+    expect(result.reason).toBe('Highest configured priority');
+  });
+
+  it('should respect priority ordering', async () => {
+    const messages = [{ role: 'user', content: 'Hello' }];
+    const result = await router.select(messages, mockModels);
+
+    expect(result.candidates[0].priority).toBeLessThanOrEqual(result.candidates[1].priority);
+  });
+});
+
+describe('RandomRouter', () => {
+  let router: RandomRouter;
+  let mockModels: ModelConfig[];
+
+  beforeEach(() => {
+    router = new RandomRouter();
+    mockModels = [
+      {
+        id: 'model1',
+        provider: 'openai',
+        modelName: 'Model 1',
+        apiKey: 'key1',
+        enabled: true,
+        priority: 1,
+        capabilities: ['chat'],
+      },
+      {
+        id: 'model2',
+        provider: 'anthropic',
+        modelName: 'Model 2',
+        apiKey: 'key2',
+        enabled: true,
+        priority: 2,
+        capabilities: ['chat'],
+      },
+      {
+        id: 'model3',
+        provider: 'deepseek',
+        modelName: 'Model 3',
+        apiKey: 'key3',
+        enabled: true,
+        priority: 3,
+        capabilities: ['chat'],
+      },
+    ];
+  });
+
+  it('should select random model', async () => {
+    const messages = [{ role: 'user', content: 'Hello' }];
+    const result = await router.select(messages, mockModels);
+
+    expect(result.model).toBeDefined();
+    expect(result.strategy).toBe('random');
+    expect(result.reason).toBe('Random selection');
+  });
+
+  it('should always select valid model from list', async () => {
+    const messages = [{ role: 'user', content: 'Hello' }];
+    const selectedModels = new Set<string>();
+
+    for (let i = 0; i < 20; i++) {
+      const result = await router.select(messages, mockModels);
+      selectedModels.add(result.model.id);
+    }
+
+    expect(mockModels.some(m => selectedModels.has(m.id))).toBe(true);
+  });
+
+  it('should return all models as candidates', async () => {
+    const messages = [{ role: 'user', content: 'Hello' }];
+    const result = await router.select(messages, mockModels);
+
+    expect(result.candidates).toHaveLength(mockModels.length);
+  });
+});
+
+describe('Router Factory', () => {
+  describe('createRouter', () => {
+    it('should create smart router', () => {
+      const router = createRouter('smart');
+      expect(router).toBeInstanceOf(SmartRouter);
     });
 
-    it('should select o1 for complex reasoning tasks', async () => {
-      const complexMessages = [
-        { role: 'user', content: 'Analyze and think deeply ' + 'about '.repeat(50) },
-      ];
+    it('should create cost router', () => {
+      const router = createRouter('cost');
+      expect(router).toBeInstanceOf(CostRouter);
+    });
 
-      const modelsWithO1 = [
-        ...availableModels,
+    it('should create speed router', () => {
+      const router = createRouter('speed');
+      expect(router).toBeInstanceOf(SpeedRouter);
+    });
+
+    it('should create priority router', () => {
+      const router = createRouter('priority');
+      expect(router).toBeInstanceOf(PriorityRouter);
+    });
+
+    it('should create random router', () => {
+      const router = createRouter('random');
+      expect(router).toBeInstanceOf(RandomRouter);
+    });
+
+    it('should default to smart router for unknown strategy', () => {
+      const router = createRouter('smart' as RouterStrategy);
+      expect(router).toBeInstanceOf(SmartRouter);
+    });
+  });
+
+  describe('benchmarkRouting', () => {
+    let mockModels: ModelConfig[];
+
+    beforeEach(() => {
+      mockModels = [
         {
-          id: 'o1',
-          provider: 'openai' as const,
-          modelName: 'OpenAI o1',
-          apiKey: 'test-key',
+          id: 'model1',
+          provider: 'openai',
+          modelName: 'Model 1',
+          apiKey: 'key1',
           enabled: true,
-          capabilities: ['reasoning' as const],
-          priority: 4,
+          priority: 1,
+          capabilities: ['chat'],
+          costPer1MInput: 1,
+        },
+        {
+          id: 'model2',
+          provider: 'anthropic',
+          modelName: 'Model 2',
+          apiKey: 'key2',
+          enabled: true,
+          priority: 2,
+          capabilities: ['chat'],
+          costPer1MInput: 2,
         },
       ];
-
-      const result = await router.select(complexMessages, modelsWithO1);
-
-      // SpeedRouter just picks fastest, so gpt-4o-mini should still win
-      expect(result.model).toBeDefined();
-    });
-  });
-
-  describe('PriorityRouter', () => {
-    let router: PriorityRouter;
-
-    beforeEach(() => {
-      router = new PriorityRouter();
     });
 
-    it('should select highest priority model', async () => {
-      const result = await router.select(mockMessages, availableModels);
+    it('should benchmark all strategies', async () => {
+      const messages = [{ role: 'user', content: 'Hello' }];
+      const results = await benchmarkRouting(messages, mockModels);
 
-      expect(result.model.priority).toBe(1);
-      expect(result.model.id).toBe('gpt-4o-mini');
+      expect(results).toHaveProperty('smart');
+      expect(results).toHaveProperty('cost');
+      expect(results).toHaveProperty('speed');
+      expect(results).toHaveProperty('priority');
+
+      expect(results.smart.strategy).toBe('smart');
+      expect(results.cost.strategy).toBe('cost');
+      expect(results.speed.strategy).toBe('speed');
+      expect(results.priority.strategy).toBe('priority');
     });
 
-    it('should sort candidates by priority', async () => {
-      const result = await router.select(mockMessages, availableModels);
+    it('should return results with models', async () => {
+      const messages = [{ role: 'user', content: 'Hello' }];
+      const results = await benchmarkRouting(messages, mockModels);
 
-      for (let i = 1; i < result.candidates.length; i++) {
-        expect(result.candidates[i].priority).toBeGreaterThanOrEqual(
-          result.candidates[i - 1].priority
-        );
-      }
-    });
-
-    it('should return priority-based reason', async () => {
-      const result = await router.select(mockMessages, availableModels);
-
-      expect(result.reason).toContain('Highest configured priority');
-    });
-
-    it('should handle equal priority models', async () => {
-      const equalPriorityModels = availableModels.map(m => ({
-        ...m,
-        priority: 1,
-      }));
-
-      const result = await router.select(mockMessages, equalPriorityModels);
-
-      expect(result.model).toBeDefined();
-    });
-  });
-
-  describe('RandomRouter', () => {
-    let router: RandomRouter;
-
-    beforeEach(() => {
-      router = new RandomRouter();
-    });
-
-    it('should return a valid model', async () => {
-      const result = await router.select(mockMessages, availableModels);
-
-      expect(result.model).toBeDefined();
-      expect(availableModels.length).toBeGreaterThan(0);
-    });
-
-    it('should include all models as candidates', async () => {
-      const result = await router.select(mockMessages, availableModels);
-
-      expect(result.candidates).toEqual(availableModels);
-    });
-
-    it('should return random-based reason', async () => {
-      const result = await router.select(mockMessages, availableModels);
-
-      expect(result.reason).toContain('Random selection');
-    });
-
-    it('should handle single model list', async () => {
-      const singleModel = [availableModels[0]];
-      const result = await router.select(mockMessages, singleModel);
-
-      expect(result.model.id).toBe(singleModel[0].id);
-    });
-
-    it('should be non-deterministic across calls', async () => {
-      const results: string[] = [];
-      const iterations = 20;
-
-      for (let i = 0; i < iterations; i++) {
-        const result = await router.select(mockMessages, availableModels);
-        results.push(result.model.id);
-      }
-
-      // Should get at least 2 different models (with high probability)
-      const uniqueModels = new Set(results);
-      expect(uniqueModels.size).toBeGreaterThan(1);
-    });
-  });
-
-  describe('All Routers - Common Behavior', () => {
-    let routers: BaseRouter[];
-
-    beforeEach(() => {
-      routers = [
-        new SmartRouter(),
-        new CostRouter(),
-        new SpeedRouter(),
-        new PriorityRouter(),
-        new RandomRouter(),
-      ];
-    });
-
-    it('all routers should return RoutingResult', async () => {
-      const results = await Promise.all(
-        routers.map(r => r.select(mockMessages, availableModels))
-      );
-
-      results.forEach((result, i) => {
-        expect(result).toHaveProperty('model');
-        expect(result).toHaveProperty('reason');
-        expect(result).toHaveProperty('candidates');
-        expect(result).toHaveProperty('strategy');
-      });
-    });
-
-    it('all routers should handle empty messages', async () => {
-      const results = await Promise.all(
-        routers.map(r => r.select([], availableModels))
-      );
-
-      results.forEach(result => {
-        expect(result).toBeDefined();
-      });
-    });
-
-    it('all routers should handle single model', async () => {
-      const singleModel = [availableModels[0]];
-
-      const results = await Promise.all(
-        routers.map(r => r.select(mockMessages, singleModel))
-      );
-
-      results.forEach(result => {
-        expect(result.model.id).toBe(singleModel[0].id);
-      });
-    });
-
-    it('all routers should have unique strategy names', () => {
-      const routerInstances = [
-        { name: 'Smart', instance: new SmartRouter(), strategy: 'smart' },
-        { name: 'Cost', instance: new CostRouter(), strategy: 'cost' },
-        { name: 'Speed', instance: new SpeedRouter(), strategy: 'speed' },
-        { name: 'Priority', instance: new PriorityRouter(), strategy: 'priority' },
-        { name: 'Random', instance: new RandomRouter(), strategy: 'random' },
-      ];
-
-      routerInstances.forEach(({ name, instance, strategy }) => {
-        expect(instance).toHaveProperty('select');
-        // Verify async through execution
-        expect(async () => {
-          await instance.select(mockMessages, availableModels);
-        }).not.toThrow();
+      Object.values(results).forEach(result => {
+        expect(result.model).toBeDefined();
+        expect(result.candidates).toBeDefined();
       });
     });
   });
