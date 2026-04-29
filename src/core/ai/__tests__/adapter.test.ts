@@ -193,7 +193,7 @@ describe('BaseAdapter', () => {
     });
   });
 
-  describe('testConnection', () => {
+  describe('test', () => {
     it('should return true when connection is successful', async () => {
       const mockResponse = {
         ok: true,
@@ -202,14 +202,14 @@ describe('BaseAdapter', () => {
       
       (global.fetch as jest.Mock).mockResolvedValueOnce(mockResponse);
       
-      const result = await adapter.testConnection();
+      const result = await adapter.test();
       expect(result.success).toBe(true);
     });
 
     it('should return false when connection fails', async () => {
       (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
       
-      const result = await adapter.testConnection();
+      const result = await adapter.test();
       expect(result.success).toBe(false);
       expect(result.error).toBe('Network error');
     });

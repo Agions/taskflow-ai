@@ -136,10 +136,14 @@ export abstract class BaseAdapter {
   async test(): Promise<{ success: boolean; latency: number; error?: string }> {
     const start = Date.now();
     try {
-      await this.complete({
-        messages: [{ role: 'user', content: 'Hi' }],
-        max_tokens: 10,
-      } as Omit<ChatCompletionOptions, 'model'>);
+      await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: this.buildHeaders(),
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: 'Hi' }],
+          max_tokens: 10,
+        }),
+      });
       return { success: true, latency: Date.now() - start };
     } catch (error) {
       return {
@@ -156,9 +160,15 @@ export abstract class BaseAdapter {
       id: this.config.id,
       provider: this.config.provider,
       modelName: this.config.modelName,
+      baseUrl: this.baseUrl,
       enabled: this.config.enabled,
       capabilities: this.config.capabilities,
     };
+  }
+
+  /** 获取 base URL */
+  getBaseUrl(): string {
+    return this.baseUrl;
   }
 
   /** 估算成本 */
@@ -178,26 +188,20 @@ export abstract class BaseAdapter {
       'Content-Type': 'application/json',
     };
 
-    switch (this.config.provider) {
-      case 'openai':
-      case 'anthropic':
-        headers['Authorization'] = `Bearer ${this.config.apiKey}`;
-        if (this.config.provider === 'anthropic') {
-          headers['anthropic-version'] = '2023-06-01';
-        }
-        break;
-      case 'deepseek':
-        headers['Authorization'] = `Bearer ${this.config.apiKey}`;
-        break;
-      case 'zhipu':
-        headers['Authorization'] = `Bearer ${this.config.apiKey}`;
-        break;
-      case 'qwen':
-        headers['Authorization'] = `Bearer ${this.config.apiKey}`;
-        break;
+    // Add Authorization for any provider that has an apiKey
+    if (this.config.apiKey) {
+      if (this.config.provider === 'anthropic') {
+        headers['anthropic-version'] = '2023-06-01';
+      }
+      headers['Authorization'] = `Bearer ${this.config.apiKey}`;
     }
 
     return headers;
+  }
+
+  /** 发送请求 (alias for request) */
+  async sendRequest<T>(endpoint: string, body: unknown): Promise<T> {
+    return this.request<T>(endpoint, body);
   }
 
   /** 发送请求 */
