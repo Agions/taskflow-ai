@@ -1,5 +1,8 @@
+import { WorkflowNodeDefinition, NodeExecutor } from '../../../types/workflow';
+
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
-import { WorkflowNodeFactory, WorkflowNodeDefinition, NodeExecutor } from '../workflow-node-factory';
+import { WorkflowNodeFactory } from '../workflow-node-factory';
 
 describe('WorkflowNodeFactory', () => {
   let factory: WorkflowNodeFactory;
@@ -57,10 +60,10 @@ describe('WorkflowNodeFactory', () => {
           result: { type: 'number' }
         }
       },
-      executor: async (input, context) => {
+      executor: async (input: { value: number }, context) => {
         return {
           success: true,
-          output: { result: input.value! * 2 },
+          output: { result: input.value * 2 },
           nextSteps: []
         };
       }

@@ -3,6 +3,7 @@
  * TaskFlow AI v4.0.1
  */
 
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck - This test file uses generator-specific format that differs from PipelineStep types
 
 import { GitHubWorkflowGenerator } from '../workflow-generator';

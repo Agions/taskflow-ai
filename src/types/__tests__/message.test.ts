@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { MessageType, Message, MessageBus } from '../message';
 
 describe('Message Types', () => {

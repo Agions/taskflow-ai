@@ -1,5 +1,8 @@
-// @ts-nocheck
 import { ExtensionRegistry, ExtensionType, ExtensionDefinition } from '../registry';
+
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
+import { ExtensionTypes } from '@/types/extensions';
 
 describe('ExtensionRegistry', () => {
   let registry: ExtensionRegistry;

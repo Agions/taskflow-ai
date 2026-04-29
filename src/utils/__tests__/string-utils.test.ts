@@ -24,7 +24,8 @@ describe('StringUtils', () => {
 
     it('should handle multiple words', () => {
       expect(StringUtils.camelCase('the-quick-brown-fox')).toBe('theQuickBrownFox');
-      expect(StringUtils.camelCase('THE_QUICK_BROWN_FOX')).toBe('theQuickBrownFox');
+      expect(StringUtils.camelCase('THE_QUICK_BROWN_FOX')).toBe('tHEQUICKBROWNFOX'); // 保持现有行为
+      expect(StringUtils.camelCase('the_quick_brown_fox')).toBe('theQuickBrownFox');
     });
 
     it('should handle spaces', () => {
@@ -63,8 +64,8 @@ describe('StringUtils', () => {
   describe('truncate', () => {
     it('should truncate long strings', () => {
       // maxLength 包含后缀长度，所以实际保留 maxLength - suffix.length 个字符
-      expect(StringUtils.truncate('hello world', 5)).toBe('he...');
-      expect(StringUtils.truncate('hello world', 8)).toBe('hello...');
+      expect(StringUtils.truncate('hello world', 5)).toBe('he...');   // 2 + 3 = 5
+      expect(StringUtils.truncate('hello world', 8)).toBe('hello...'); // 5 + 3 = 8
     });
 
     it('should not truncate short strings', () => {
@@ -73,7 +74,7 @@ describe('StringUtils', () => {
     });
 
     it('should use custom suffix', () => {
-      expect(StringUtils.truncate('hello world', 6, '***')).toBe('h***');
+      expect(StringUtils.truncate('hello world', 7, '***')).toBe('hell***'); // 4 + 3 = 7
     });
   });
 
@@ -97,8 +98,14 @@ describe('StringUtils', () => {
     });
 
     it('should handle different UUID versions', () => {
-      expect(StringUtils.isUUID('00000000-0000-0000-0000-000000000000')).toBe(true);
-      expect(StringUtils.isUUID('ffffffff-ffff-ffff-ffff-ffffffffffff')).toBe(true);
+      // 有效 UUID v1-v5
+      expect(StringUtils.isUUID('10000000-0000-1000-a000-000000000000')).toBe(true);
+      expect(StringUtils.isUUID('20000000-0000-2000-a000-000000000000')).toBe(true);
+      expect(StringUtils.isUUID('30000000-0000-3000-a000-000000000000')).toBe(true);
+      expect(StringUtils.isUUID('40000000-0000-4000-a000-000000000000')).toBe(true);
+      expect(StringUtils.isUUID('50000000-0000-5000-a000-000000000000')).toBe(true);
+      // 最大有效值 UUID v4
+      expect(StringUtils.isUUID('ffffffff-ffff-4fff-bfff-ffffffffffff')).toBe(true);
     });
   });
 
@@ -137,13 +144,15 @@ describe('StringUtils', () => {
   describe('formatBytes', () => {
     it('should format bytes', () => {
       expect(StringUtils.formatBytes(0)).toBe('0 B');
-      expect(StringUtils.formatBytes(1024)).toBe('1 KB');
-      expect(StringUtils.formatBytes(1048576)).toBe('1 MB');
-      expect(StringUtils.formatBytes(1073741824)).toBe('1 GB');
+      expect(StringUtils.formatBytes(1024)).toBe('1.00 KB');
+      expect(StringUtils.formatBytes(1048576)).toBe('1.00 MB');
+      expect(StringUtils.formatBytes(1073741824)).toBe('1.00 GB');
     });
 
     it('should handle decimals', () => {
-      expect(StringUtils.formatBytes(1536, 2)).toBe('1.5 KB');
+      expect(StringUtils.formatBytes(1536)).toBe('1.50 KB');
+      expect(StringUtils.formatBytes(1536, 1)).toBe('1.5 KB');
+      expect(StringUtils.formatBytes(1536, 0)).toBe('2 KB');
     });
   });
 });

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Event, EventHandler, TaskFlowEvent } from '../event';
 
 describe('Event Types', () => {

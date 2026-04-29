@@ -210,7 +210,7 @@ describe('Constants', () => {
     });
     it('should have MCP settings', () => {
       expect(DEFAULT_CONFIG.mcpSettings).toBeDefined();
-      expect(DEFAULT_CONFIG.mcpSettings.enabled).toBe(true);
+      expect(DEFAULT_CONFIG.mcpSettings?.enabled).toBe(true);
     });
   });
 });

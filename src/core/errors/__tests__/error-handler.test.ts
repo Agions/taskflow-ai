@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { ErrorHandler, ErrorSeverity, ErrorContext } from '../error-handler';
 import { Logger } from '../../../utils/logger';
 

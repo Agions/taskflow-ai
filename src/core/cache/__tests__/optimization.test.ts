@@ -158,17 +158,17 @@ describe('Cache Optimization', () => {
       const l1Cache = new Map<string, CacheEntry>();
       const l2Cache = new Map<string, CacheEntry>();
 
-      // Item with low hit count
+      // Item with low hit count and old timestamp
       l1Cache.set('rare-key', {
         value: 'rare-value',
-        timestamp: Date.now(),
+        timestamp: Date.now() - 400000, // 6 minutes ago (meets condition)
         ttl: 600,
         hits: 2
       });
 
-      // Demote to L2 if hit count is low
-      const entry = l1Cache.get('rare-key');
-      if (entry && entry.hits < 5 && entry.timestamp < Date.now() - 300000) { // 5 minutes old
+      // Demote to L2 if hit count is low and entry is old
+      const entry = l1Cache.get('rare-key')!;
+      if (entry.hits < 5 && entry.timestamp < Date.now() - 300000) { // 5 minutes old
         l2Cache.set('rare-key', entry);
         l1Cache.delete('rare-key');
       }
@@ -219,8 +219,8 @@ describe('Cache Optimization', () => {
         });
       }
 
-      expect(cache.get('user-1')?.value.priority).toBe(10);
-      expect(cache.get('user-3')?.value.priority).toBe(5);
+      expect((cache.get('user-1')?.value as any).priority).toBe(10);
+      expect((cache.get('user-3')?.value as any).priority).toBe(5);
     });
   });
 

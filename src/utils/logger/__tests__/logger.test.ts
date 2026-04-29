@@ -1,38 +1,45 @@
-// @ts-nocheck
 import { Logger, LogLevel } from '../../logger';
 
 describe('Logger', () => {
   let logger: Logger;
-  let consoleSpy: jest.SpyInstance;
+  let consoleLogSpy: jest.SpyInstance;
+  let consoleWarnSpy: jest.SpyInstance;
+  let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
+    Logger.reset();
     logger = Logger.getInstance('test-logger');
     logger.setLevel(LogLevel.DEBUG);
-    consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
   });
 
   afterEach(() => {
-    consoleSpy.mockRestore();
+    consoleLogSpy.mockRestore();
+    consoleWarnSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
+    Logger.reset();
   });
 
   it('should log debug message', () => {
     logger.debug('Debug message');
-    expect(consoleSpy).toHaveBeenCalled();
+    expect(consoleLogSpy).toHaveBeenCalled();
   });
 
   it('should log info message', () => {
     logger.info('Info message', { data: 'test' });
-    expect(consoleSpy).toHaveBeenCalled();
+    expect(consoleLogSpy).toHaveBeenCalled();
   });
 
   it('should log warning message', () => {
     logger.warn('Warning message');
-    expect(consoleSpy).toHaveBeenCalled();
+    expect(consoleWarnSpy).toHaveBeenCalled();
   });
 
   it('should log error message', () => {
     logger.error('Error message');
-    expect(consoleSpy).toHaveBeenCalled();
+    expect(consoleErrorSpy).toHaveBeenCalled();
   });
 
   it('should filter messages below log level', () => {
@@ -44,16 +51,17 @@ describe('Logger', () => {
     logger.error('Error message');
 
     // Only error should be logged
-    expect(consoleSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleLogSpy).toHaveBeenCalledTimes(0);
+    expect(consoleWarnSpy).toHaveBeenCalledTimes(0);
   });
 
   it('should respect context', () => {
-    const contextLogger = Logger.getInstance('context', { userId: '123' });
+    const contextLogger = Logger.getInstance('context-test', { userId: '123' });
 
     contextLogger.info('Message with context');
-    expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining('userId'),
-      expect.anything()
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      expect.stringContaining('userId')
     );
   });
 });

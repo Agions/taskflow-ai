@@ -1,5 +1,7 @@
-// @ts-nocheck
 import { TaskFlowConfig, ModelConfig } from '../config';
+
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 
 describe('Config Types', () => {
   it('should create a valid config', () => {

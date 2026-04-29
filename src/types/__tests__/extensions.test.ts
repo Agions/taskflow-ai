@@ -1,10 +1,10 @@
-// @ts-nocheck
 import {
   ExtensionRegistry,
   ExtensionLifecycle,
   ExtensionLoader,
   ExtensionType
 } from '../extensions';
+import { ExtensionTypes } from '../extensions';
 
 describe('Extensions Types', () => {
   it('should define extension registry', () => {

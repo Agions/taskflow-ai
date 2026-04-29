@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { ToolDefinition, ToolExecutor, ToolContext, ToolResult as ToolResultType } from '../tool';
 
 describe('Tool Types', () => {

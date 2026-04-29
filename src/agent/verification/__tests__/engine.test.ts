@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * VerificationEngine 集成测试
  */

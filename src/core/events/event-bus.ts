@@ -12,6 +12,10 @@ import {
 } from '../../types/event';
 import { Logger } from '../../utils/logger';
 
+// Re-export types and enums for convenience
+export type { Event, EventHandler, EventListenerConfig };
+export { TaskFlowEvent };
+
 /**
  * 事件总线实现
  */

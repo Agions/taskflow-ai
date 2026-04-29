@@ -81,8 +81,8 @@ export class DataProviders {
           version: config.version || '1.0.0',
           description: 'TaskFlow AI managed project',
           createdAt: new Date().toISOString(),
-          aiModels: config.aiModels!?.length || 0,
-          mcpEnabled: config.mcpSettings!?.enabled || false,
+          aiModels: config.aiModels?.length || 0,
+          mcpEnabled: config.mcpSettings?.enabled || false,
         };
       }
 

@@ -1,4 +1,5 @@
-// @ts-nocheck
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck - Test adapter extends BaseAdapter with intentional mock implementations
 import { describe, it, expect, beforeEach, jest, afterEach } from '@jest/globals';
 import { BaseAdapter, ChatMessage, ChatCompletionOptions, ChatCompletionResponse } from '../adapter';
 

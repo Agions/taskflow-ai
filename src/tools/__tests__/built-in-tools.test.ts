@@ -1,5 +1,7 @@
-// @ts-nocheck
 import { BuiltInTools } from '../built-in-tools';
+
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 import { ToolDefinition, ToolCategory } from '../../types/tool';
 
 describe('BuiltInTools', () => {

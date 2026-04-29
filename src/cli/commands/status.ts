@@ -178,7 +178,7 @@ async function runStatus(options: StatusOptions) {
           {
             project: { name: config.projectName, version: config.version },
             aiModels: { total: configStats.aiModelsCount, enabled: configStats.enabledModelsCount },
-            mcp: { enabled: configStats.mcpEnabled, port: config.mcpSettings!?.port },
+            mcp: { enabled: configStats.mcpEnabled, port: config.mcpSettings?.port },
             lastModified: configStats.lastModified,
           },
           null,

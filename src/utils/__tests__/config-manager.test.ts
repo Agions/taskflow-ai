@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Config Manager 单元测试
  */

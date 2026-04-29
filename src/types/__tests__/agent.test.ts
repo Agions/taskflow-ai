@@ -1,5 +1,7 @@
-// @ts-nocheck
 import {
+
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
   AgentStatus,
   AgentCapability,
   AgentConfig,

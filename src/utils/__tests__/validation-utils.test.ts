@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { ValidationUtils } from '../validation-utils';
 
 describe('ValidationUtils', () => {

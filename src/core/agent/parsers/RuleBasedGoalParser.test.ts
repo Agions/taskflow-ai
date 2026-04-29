@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * RuleBasedGoalParser 测试
  */

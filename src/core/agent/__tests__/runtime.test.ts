@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { AgentRuntime, AgentConfig } from '../../../types/agent';
 import { AgentRuntimeImpl } from '../runtime';
 
