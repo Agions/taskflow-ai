@@ -227,7 +227,7 @@ export class ModelGateway {
       request.preferredModel
     );
 
-    const model = routing.model;
+    let model = routing.model;
     const adapter = this.adapters.get(model.id);
 
     if (!adapter) {
@@ -371,7 +371,7 @@ export class ModelGateway {
           const fallbackModels = this.enabledModels.filter(m => m.priority > model.priority);
           if (fallbackModels.length > 0) {
             const newModel = fallbackModels[0];
-            model.id !== newModel.id; // 更新模型
+            model = newModel; // 切换到备用模型
           }
         }
       }
