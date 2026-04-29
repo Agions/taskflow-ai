@@ -9,7 +9,6 @@ import ora = require('ora');
 import path = require('path');
 import fs = require('fs-extra');
 import { PRDParser } from '../../core/parser';
-import { TaskGenerator } from '../../agent/planning/task-generator';
 import { ConfigManager } from '../../core/config';
 import { PRDDocument } from '../../types';
 import { Task } from '../../types';
@@ -75,11 +74,9 @@ async function runParse(filePath: string, options: ParseCommandOptions): Promise
 
     let tasks: Task[] = [];
     if (options.tasks !== false) {
-      spinner.text = '正在生成任务...';
-      const taskGenerator = new TaskGenerator({
-        complete: async (prompt: string) => prompt,
-      });
-      tasks = await taskGenerator.generate(prdDocument);
+      spinner.text = '跳过任务生成（agent 功能已移除）...';
+      // Task Generator 已移除，返回空列表
+      tasks = [];
     }
 
     const outputPath = await saveResults(prdDocument, tasks, options);

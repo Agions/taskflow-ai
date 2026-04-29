@@ -187,49 +187,8 @@ export const shellTools: ToolDefinition[] = [
     },
     category: 'shell',
     tags: ['shell', 'test', 'which'],
-  },
-  {
-    name: 'shell_kill',
-    description: '终止进程（仅允许终止自身子进程）',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        pid: { type: 'number', description: '进程 ID' },
-        signal: { type: 'string', description: '信号 (SIGTERM/SIGKILL)', default: 'SIGTERM' },
-      },
-      required: ['pid'],
-    },
-    handler: async input => {
-      const pid = input.pid as number;
-      const signal = (input.signal as string) || 'SIGTERM';
-
-      // 安全检查：只能终止子进程
-      // 这里简化处理，实际应维护一个允许kill的pid列表
-      try {
-        process.kill(pid, signal);
-        return { success: true, pid, signal };
-      } catch (error: any) {
-        // ESRCH 表示进程不存在，EPERM 表示权限不足（这是我们想要的）
-        if (error.code === 'EPERM') {
-          return { success: false, error: '权限不足，无法终止该进程', pid };
-        }
-        if (error.code === 'ESRCH') {
-          return { success: false, error: '进程不存在', pid };
-        }
-        return {
-          success: false,
-          error:
-            error instanceof Error
-              ? error instanceof Error
-                ? error.message
-                : String(error)
-              : String(error),
-          pid,
-        };
-      }
-    },
-    category: 'shell',
-    tags: ['shell', 'kill', 'process'],
-    permissions: [PermissionLevel.EXECUTE],
-  },
+  }
+  // shell_kill 工具已移除 - 安全原因
+  // 原因：进程管理是操作系统的职责，MCP Server 不应提供进程终止功能
+  // 如果需要终止进程，请使用操作系统的进程管理工具（如 kill 命令）
 ];

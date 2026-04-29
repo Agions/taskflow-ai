@@ -15,13 +15,11 @@ import { statusCommand } from './commands/status';
 import { visualizeCommand } from './commands/visualize';
 import { mcpCommand } from './commands/mcp';
 import { configCommand } from './commands/config';
-import { agentCommand } from './commands/agent';
 import { marketplaceCommand } from './commands/marketplace';
 import { knowledgeCommand } from './commands/knowledge';
 import { cicdCommand } from './commands/cicd';
 import { modelCommand } from './commands/model';
 import { doctorCommand } from './commands/doctor';
-import { crewCommand } from './commands/crew';
 
 const program = new Command();
 
@@ -44,13 +42,11 @@ statusCommand(program);
 visualizeCommand(program);
 mcpCommand(program);
 configCommand(program);
-program.addCommand(agentCommand);
 program.addCommand(marketplaceCommand);
 program.addCommand(knowledgeCommand);
 program.addCommand(cicdCommand);
 program.addCommand(modelCommand);
 doctorCommand(program);
-program.addCommand(crewCommand);
 
 // 自定义帮助信息
 program.on('--help', () => {
@@ -100,15 +96,6 @@ program.on('--help', () => {
     emoji: ui.emojis.config,
     usage: 'taskflow config <command>',
     examples: ['taskflow config set', 'taskflow config get'],
-  });
-
-  helpDisplay.register({
-    name: 'agent',
-    description: 'Agent 管理',
-    category: 'AI',
-    emoji: ui.emojis.robot,
-    usage: 'taskflow agent <command>',
-    examples: ['taskflow agent start', 'taskflow agent status'],
   });
 
   helpDisplay.register({

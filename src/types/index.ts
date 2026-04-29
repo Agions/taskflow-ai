@@ -3,15 +3,6 @@
  * TaskFlow AI v4.0 - All type definitions in one place
  */
 
-// Agent types - 排除TaskResult，因为与task.ts冲突
-export type {
-  AgentStatus, AgentCapability, AgentMemoryConfig, AgentConfig,
-  GoalParser, Goal, Subgoal, ValidationResult, AgentTask, AgentState,
-  AgentMessage, AgentMemory, MemoryItem, AgentMetrics,
-  AgentStep, AgentRuntime, AgentFactory, AgentDefinition, AgentValidator,
-  TaskResult
-} from './agent';
-
 // Task types
 export * from './task';
 

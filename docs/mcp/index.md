@@ -1,107 +1,71 @@
-# MCP 工具
+# MCP Server 使用指南
 
-TaskFlow AI 内置强大的 MCP (Model Context Protocol) 工具集，支持主流代码编辑器的无缝集成。
+TaskFlow AI 提供完整的 MCP (Model Context Protocol) Server 实现，为 Claude、Cursor、Windsurf 等 AI 编辑器提供 38 个强大的工具能力。
 
-## 特性
+## 什么是 MCP？
 
-- 🚀 **40+ MCP 工具** - 覆盖文件、网络、数据库、代码执行等场景
-- 🎯 **一键集成** - 支持 Cursor、VSCode、Windsurf、Trae、Claude Desktop、Zed
-- 🔒 **安全沙箱** - 代码执行隔离，权限控制
-- ⚡ **高性能** - 基于原生 Node.js 实现
+MCP (Model Context Protocol) 是一个开放标准，允许 AI 模型与外部工具和服务进行交互。TaskFlow AI 的 MCP Server 实现了以下 MCP 标准：
 
-## 工具分类
+- ✅ **Tools** - 可执行的函数/命令集合
+- ✅ **Resources** - 文件、数据库等外部资源访问
+- ✅ **Prompts** - 预设的提示模板
+- ✅ **Events** - 实时事件通知系统
 
-| 分类         | 工具数 | 描述           |
-| ------------ | ------ | -------------- |
-| filesystem   | 10+    | 文件系统操作   |
-| http         | 4      | HTTP 请求      |
-| database     | 4      | SQLite 数据库  |
-| shell        | 4      | Shell 命令执行 |
-| git          | 7      | Git 版本控制   |
-| memory       | 6      | 短期记忆       |
-| code         | 4      | 代码执行       |
-| notification | 4      | 消息通知       |
+## 快速配置
 
-## 快速开始
+### Claude Desktop
 
-### 1. 安装
+1. **安装 TaskFlow AI**
 
 ```bash
 npm install -g taskflow-ai
-# 或
-pnpm add -g taskflow-ai
 ```
 
-### 2. 生成编辑器配置
-
-```bash
-# 生成所有编辑器配置
-taskflow mcp init
-
-# 只生成 Cursor 配置
-taskflow mcp init -e cursor
-
-# 指定输出目录
-taskflow mcp init -e all -o ~/.cursor
-```
-
-### 3. 查看可用工具
-
-```bash
-# 列出所有工具
-taskflow mcp tools
-
-# 按分类筛选
-taskflow mcp tools -c filesystem
-taskflow mcp tools -c http
-taskflow mcp tools -c shell
-```
-
-## 编辑器配置
-
-### Cursor
-
-```bash
-taskflow mcp init -e cursor
-```
-
-配置内容:
-
-```json
-{
-  "mcpServers": {
-    "taskflow-ai": {
-      "command": "npx",
-      "args": ["-y", "taskflow-ai@latest", "mcp", "start"],
-      "env": {
-        "TASKFLOW_API_KEY": "{{TASKFLOW_API_KEY}}"
-      }
-    }
-  }
-}
-```
-
-### Claude Desktop
+2. **自动配置**
 
 ```bash
 taskflow mcp init -e claude-desktop
 ```
 
-配置文件位置:
+3. **重启 Claude Desktop**
 
-- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Windows: `%APPDATA%/Claude/claude_desktop_config.json`
-
-### VSCode
-
-使用 VSCode MCP 扩展，然后添加配置:
+配置文件：`~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
 
 ```json
 {
   "mcpServers": {
-    "taskflow-ai": {
-      "command": "npx",
-      "args": ["-y", "taskflow-ai@latest", "mcp", "start"]
+    "taskflow": {
+      "command": "/usr/local/bin/taskflow",
+      "args": ["mcp", "start"]
+    }
+  }
+}
+```
+
+### Cursor
+
+1. **安装 TaskFlow AI**
+
+```bash
+npm install -g taskflow-ai
+```
+
+2. **自动配置**
+
+```bash
+taskflow mcp init -e cursor
+```
+
+3. **重启 Cursor**
+
+配置文件：`~/.cursor/mcp.json`
+
+```json
+{
+  "mcpServers": {
+    "taskflow": {
+      "command": "taskflow",
+      "args": ["mcp", "start"]
     }
   }
 }
@@ -109,164 +73,255 @@ taskflow mcp init -e claude-desktop
 
 ### Windsurf
 
+1. **安装 TaskFlow AI**
+
+```bash
+npm install -g taskflow-ai
+```
+
+2. **自动配置**
+
 ```bash
 taskflow mcp init -e windsurf
 ```
 
-### Trae
+3. **重启 Windsurf**
 
-```bash
-taskflow mcp init -e trae
-```
-
-## 工具详情
-
-### 文件系统工具
-
-| 工具名         | 描述           | 参数             |
-| -------------- | -------------- | ---------------- |
-| `fs_readDir`   | 读取目录内容   | path, options    |
-| `fs_mkdir`     | 创建目录       | path, options    |
-| `fs_remove`    | 删除文件/目录  | path, options    |
-| `fs_copy`      | 复制文件/目录  | src, dest        |
-| `fs_move`      | 移动/重命名    | src, dest        |
-| `fs_stat`      | 获取文件状态   | path             |
-| `fs_exists`    | 检查是否存在   | path             |
-| `fs_readJson`  | 读取 JSON 文件 | path             |
-| `fs_writeJson` | 写入 JSON 文件 | path, data       |
-| `fs_glob`      | Glob 模式匹配  | pattern, options |
-
-### HTTP 工具
-
-| 工具名          | 描述           | 参数                       |
-| --------------- | -------------- | -------------------------- |
-| `http_request`  | 通用 HTTP 请求 | url, method, headers, body |
-| `http_get`      | GET 请求       | url, query, headers        |
-| `http_post`     | POST 请求      | url, body, query           |
-| `http_download` | 下载文件       | url, path                  |
-
-### 数据库工具
-
-| 工具名      | 描述          | 参数                |
-| ----------- | ------------- | ------------------- |
-| `db_query`  | 执行 SQL 查询 | dbPath, sql, params |
-| `db_init`   | 初始化数据库  | dbPath, tables      |
-| `db_list`   | 列出所有表    | dbPath              |
-| `db_schema` | 获取表结构    | dbPath, table       |
-
-### Shell 工具
-
-| 工具名             | 描述           | 参数                  |
-| ------------------ | -------------- | --------------------- |
-| `shell_exec`       | 执行命令       | command, cwd, timeout |
-| `shell_exec_async` | 异步执行       | command, cwd          |
-| `shell_test`       | 测试命令可用性 | command               |
-| `shell_kill`       | 终止进程       | pid, signal           |
-
-### Git 工具
-
-| 工具名       | 描述     | 参数                |
-| ------------ | -------- | ------------------- |
-| `git_status` | 获取状态 | cwd                 |
-| `git_log`    | 提交历史 | cwd, maxCount       |
-| `git_branch` | 分支列表 | cwd, all            |
-| `git_commit` | 创建提交 | cwd, message        |
-| `git_push`   | 推送     | cwd, remote, branch |
-| `git_pull`   | 拉取     | cwd, remote, branch |
-| `git_diff`   | 查看差异 | cwd, file, staged   |
-
-### Memory 工具
-
-| 工具名          | 描述       | 参数            |
-| --------------- | ---------- | --------------- |
-| `memory_set`    | 存储数据   | key, value, ttl |
-| `memory_get`    | 获取数据   | key             |
-| `memory_delete` | 删除数据   | key             |
-| `memory_list`   | 列出所有键 | -               |
-| `memory_clear`  | 清空内存   | -               |
-| `memory_stats`  | 内存统计   | -               |
-
-### 代码执行工具
-
-| 工具名             | 描述           | 参数                    |
-| ------------------ | -------------- | ----------------------- |
-| `code_execute`     | 执行代码       | code, language, timeout |
-| `code_eval_js`     | 执行 JS (沙箱) | code, timeout           |
-| `code_eval_python` | 执行 Python    | code, timeout           |
-| `code_test`        | 测试语言可用性 | code, language          |
-
-### 通知工具
-
-| 工具名           | 描述         | 参数                    |
-| ---------------- | ------------ | ----------------------- |
-| `notify_slack`   | 发送 Slack   | webhookUrl, message     |
-| `notify_discord` | 发送 Discord | webhookUrl, message     |
-| `notify_email`   | 发送邮件     | from, to, subject, body |
-| `notify_webhook` | 通用 Webhook | url, method, body       |
-
-## 本地开发测试
-
-```bash
-# 构建项目
-npm run build
-
-# 启动 MCP 服务器 (stdio 模式)
-npm run mcp:start
-
-# 或使用 CLI
-taskflow mcp start
-```
-
-## 环境变量
-
-| 变量名                 | 描述         |
-| ---------------------- | ------------ |
-| `TASKFLOW_API_KEY`     | API 密钥     |
-| `TASKFLOW_CONFIG_PATH` | 配置文件路径 |
-| `TASKFLOW_LOG_LEVEL`   | 日志级别     |
-
-## 安全说明
-
-- Shell 执行需要明确授权
-- 代码执行在沙箱环境中运行
-- 所有操作都有审计日志
-- 敏感操作需要 API 密钥
-
-## 常见问题
-
-### Q: MCP 服务器启动失败？
-
-```bash
-# 检查 Node.js 版本
-node --version  # 需要 >= 18
-
-# 重新安装
-npm install -g taskflow-ai
-```
-
-### Q: 工具调用超时？
-
-增加超时时间:
+配置文件：`~/.config/Windsurf/mcp.json`
 
 ```json
 {
-  "shell_exec": {
-    "timeout": 60
+  "mcpServers": {
+    "taskflow": {
+      "command": "taskflow",
+      "args": ["mcp", "start"]
+    }
   }
 }
 ```
 
-### Q: 如何添加更多工具？
+## 工具列表
 
-使用 `ToolRegistry` 注册自定义工具:
+TaskFlow AI 提供 38 个内置工具，分为以下类别：
 
-```typescript
-import { toolRegistry } from 'taskflow-ai';
+### 文件系统 (8)
 
-toolRegistry.register({
-  name: 'custom_tool',
-  description: '自定义工具',
-  inputSchema: { ... },
-  handler: async (input) => { ... }
-});
+| 工具 | 功能 | 安全级别 |
+|------|------|----------|
+| `fs_read` | 读取文件内容 | High |
+| `fs_write` | 写入文件内容 | High |
+| `fs_append` | 追加内容到文件 | High |
+| `fs_delete` | 删除文件 | High |
+| `fs_list` | 列出目录内容 | Low |
+| `fs_search` | 搜索文件 | Low |
+| `fs_copy` | 复制文件 | High |
+| `fs_move` | 移动/重命名文件 | High |
+
+**安全特性**：
+- ✅ 路径遍历防护
+- ✅ 敏感目录保护
+- ✅ 文件大小限制 (10MB)
+
+### HTTP 请求 (7)
+
+| 工具 | 功能 | 安全级别 |
+|------|------|----------|
+| `http_get` | GET 请求 | Medium |
+| `http_post` | POST 请求 | Medium |
+| `http_put` | PUT 请求 | Medium |
+| `http_delete` | DELETE 请求 | Medium |
+| `http_download` | 下载文件 | Medium |
+| `http_head` | HEAD 请求 | Low |
+| `http_options` | OPTIONS 请求 | Low |
+
+**安全特性**：
+- ✅ SSRF 防护（禁止访问私有 IP）
+- ✅ URL 协议验证
+- ✅ 响应大小限制 (5MB)
+- ✅ 30 秒超时
+
+### 数据库 (5)
+
+| 工具 | 功能 | 安全级别 |
+|------|------|----------|
+| `db_query` | 执行 SQL 查询 | Medium |
+| `db_init` | 初始化数据库 | Medium |
+| `db_schema` | 获取数据库 Schema | Low |
+| `db_tables` | 列出所有表 | Low |
+| `db_backup` | 备份数据库 | Medium |
+
+**安全特性**：
+- ✅ SQL 注入防护
+- ✅ 只读模式支持
+- ✅ 查询结果限制
+
+### Shell 命令 (3)
+
+| 工具 | 功能 | 安全级别 |
+|------|------|----------|
+| `shell_exec` | 执行 Shell 命令（同步） | High |
+| `shell_exec_async` | 异步执行 Shell 命令 | High |
+| `shell_test` | 测试命令是否可用 | Low |
+
+**安全特性**：
+- ✅ 命令白名单（只允许安全命令）
+- ✅ 危险字符过滤 (`&&`, `||`, `;`, `|`, `$()`, `` ` ``)
+- ✅ 30 秒超时保护
+- ✅ 禁止命令链和管道
+
+**白名单命令**：
+- `ls`, `cd`, `pwd`, `cat`, `head`, `tail`, `grep`, `find`
+- `git`, `npm`, `yarn`, `pnpm`, `node`, `python`, `python3`
+- `cp`, `mv`, `rm`, `mkdir`, `touch`
+- `echo`, `printf`, `sed`, `awk`
+
+### Git 操作 (8)
+
+| 工具 | 功能 | 安全级别 |
+|------|------|----------|
+| `git_status` | 查看 Git 状态 | Low |
+| `git_log` | 查看提交历史 | Low |
+| `git_commit` | 提交更改 | Medium |
+| `git_push` | 推送更改 | Medium |
+| `git_pull` | 拉取更改 | Medium |
+| `git_branch` | 分支管理 | Medium |
+| `git_checkout` | 切换分支 | Medium |
+| `git_diff` | 查看差异 | Low |
+
+**安全特性**：
+- ✅ Credential 安全管理
+- ✅ 只操作当前仓库
+- ✅ 敏感信息自动脱敏
+
+### 记忆管理 (4)
+
+| 工具 | 功能 | 安全级别 |
+|------|------|----------|
+| `memory_set` | 设置记忆 | Low |
+| `memory_get` | 获取记忆 | Low |
+| `memory_clear` | 清除记忆 | Medium |
+| `memory_list` | 列出所有记忆 | Low |
+
+**安全特性**：
+- ✅ 本地存储
+- ✅ 自动过期机制
+- ✅ 大小限制 (1GB)
+
+### 代码执行 (3)
+
+| 工具 | 功能 | 安全级别 |
+|------|------|----------|
+| `code_execute` | 执行代码 | High |
+| `code_eval_js` | 评估 JavaScript | Medium |
+| `code_eval_python` | 评估 Python | Medium |
+
+**安全特性**：
+- ✅ 执行超时限制 (30 秒)
+- ✅ 内存限制 (512MB)
+- ✅ 沙箱环境
+
+## 使用示例
+
+### 示例 1: 读取文件
+
+```bash
+# Claude Desktop 中的对话
+用户：帮我读取 README.md 的内容
+
+Claude: （自动调用 fs_read 工具）
+文件内容：...
 ```
+
+### 示例 2: 发送 HTTP 请求
+
+```bash
+# Cursor 中的对话
+用户：帮我获取 GitHub API 的仓库信息
+
+Cursor: （自动调用 http_get 工具）
+GET https://api.github.com/repos/Agions/taskflow-ai
+
+返回：...
+```
+
+### 示例 3: 执行 Shell 命令
+
+```bash
+# Windsurf 中的对话
+用户：帮我查看当前目录的文件
+
+Windsurf: （自动调用 shell_exec 工具）
+执行：ls -la
+
+返回：...
+```
+
+## 安全最佳实践
+
+1. **启用所有安全层** - 不要禁用任何安全检查
+2. **定期更新** - 保持 TaskFlow AI 最新版本
+3. **审查日志** - 定期检查 MCP Server 日志
+4. **最小权限** - 只启用必要的工具
+5. **环境隔离** - 生产环境使用专用配置
+
+## 故障排除
+
+### MCP Server 未启动
+
+```bash
+# 检查 MCP Server 状态
+taskflow mcp status
+
+# 手动启动
+taskflow mcp start
+
+# 查看日志
+taskflow mcp logs
+```
+
+### 工具执行失败
+
+1. 检查命令白名单
+2. 查看安全日志
+3. 验证权限设置
+
+### 性能问题
+
+```bash
+# 查看性能统计
+taskflow mcp stats
+
+# 清理缓存
+taskflow mcp clean
+```
+
+## 配置文件
+
+### 全局配置
+
+位置：`~/.taskflow/config.yaml`
+
+```yaml
+mcp:
+  server:
+    port: 3000
+    host: "127.0.0.1"
+    timeout: 30000
+
+  security:
+    enabled: true
+    strictMode: true
+
+  tools:
+    enabled:
+      - fs_read
+      - fs_write
+      - http_get
+      - git_commit
+```
+
+## 相关文档
+
+- [架构设计](../architecture.md)
+- [安全防护](../security.md)
+- [CLI 命令](../cli/commands.md)

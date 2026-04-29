@@ -44,8 +44,45 @@ interface TaskCreateArgs {
 }
 
 export class MCPToolExecutor {
+  /** 默认超时时间（毫秒）*/
+  private readonly DEFAULT_TIMEOUT = 30000; // 30秒
+
+  /**
+   * 执行工具（带超时控制）
+   */
   async execute(name: string, args: Record<string, unknown>): Promise<ToolResponse<unknown>> {
     const startTime = Date.now();
+    const timeoutMs = (args.timeout as number) || this.DEFAULT_TIMEOUT;
+
+    try {
+      // 使用 Promise.race 实现超时控制
+      const result = await Promise.race([
+        this.executeInternal(name, args, startTime),
+        this.createTimeoutPromise(timeoutMs, name)
+      ]);
+      return result;
+    } catch (error) {
+      if (error === 'TIMEOUT') {
+        return toolError('TIMEOUT', `Tool execution timeout after ${timeoutMs}ms`, {
+          tool: name,
+          duration: Date.now() - startTime,
+        });
+      }
+      return toolError('EXECUTION_ERROR', error instanceof Error ? error.message : String(error), {
+        tool: name,
+        duration: Date.now() - startTime,
+      });
+    }
+  }
+
+  /**
+   * 内部执行逻辑
+   */
+  private async executeInternal(
+    name: string, 
+    args: Record<string, unknown>,
+    startTime: number
+  ): Promise<ToolResponse<unknown>> {
     try {
       switch (name) {
         case 'terminal_execute':
@@ -71,11 +108,19 @@ export class MCPToolExecutor {
           });
       }
     } catch (error) {
-      return toolError('EXECUTION_ERROR', error instanceof Error ? error.message : String(error), {
-        tool: name,
-        duration: Date.now() - startTime,
-      });
+      throw error; // 重新抛出错误，由外部处理
     }
+  }
+
+  /**
+   * 创建超时 Promise
+   */
+  private createTimeoutPromise(timeoutMs: number, toolName: string): Promise<never> {
+    return new Promise((_, reject) => {
+      setTimeout(() => {
+        reject('TIMEOUT');
+      }, timeoutMs);
+    });
   }
 
   private executeTerminal(args: TerminalArgs): { output: string; command: string } {

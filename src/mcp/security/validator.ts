@@ -119,16 +119,70 @@ const INTERNAL_HOSTS = [
 export function validateCommand(command: string): { valid: boolean; reason?: string } {
   const trimmed = command.trim();
 
-  // 检查危险模式
-  for (const pattern of DANGEROUS_PATTERNS) {
-    if (pattern.test(trimmed)) {
-      return { valid: false, reason: `命令包含危险模式: ${pattern}` };
+  // 第一层：检查绝对禁止的危险字符（优先级最高）
+  const absolutelyForbidden = ['${', '`', '\\$\\(', '\\\\x00', '\\\\n', '\\\\r'];
+  for (const forbidden of absolutelyForbidden) {
+    const regex = new RegExp(forbidden);
+    if (regex.test(trimmed)) {
+      return { valid: false, reason: `命令包含绝对禁止的字符: ${forbidden}` };
     }
   }
 
-  // 检查是否在白名单中（仅检查第一个命令）
-  const firstCmd = trimmed.split(/\s+/)[0];
-  if (firstCmd && !ALLOWED_COMMANDS.has(firstCmd)) {
+  // 第二层：检查危险模式
+  for (const pattern of DANGEROUS_PATTERNS) {
+    // 使用 strict 模式匹配，防止 ReDoS
+    try {
+      if (pattern.test(trimmed)) {
+        return { valid: false, reason: `命令包含危险模式` };
+      }
+    } catch (e) {
+      // 正则表达式错误，保守对待
+      return { valid: false, reason: '命令验证失败：正则表达式错误' };
+    }
+  }
+
+  // 检查命令链（&&, ||, ;）- 防止命令链接攻击
+  if (trimmed.includes('&&') || trimmed.includes('||') || trimmed.includes(';')) {
+    return { valid: false, reason: '禁止使用命令链接操作符（&&, ||, ;）' };
+  }
+
+  // 检查命令管道 - 禁止管道
+  if (trimmed.includes('|') || trimmed.includes('\\|')) {
+    return { valid: false, reason: '禁止使用命令管道（|）' };
+  }
+
+  // 检查命令替换 - 禁止 $() 或 ``
+  if (trimmed.includes('$(') || trimmed.includes('`')) {
+    return { valid: false, reason: '禁止使用命令替换（$(), `）' };
+  }
+
+  // 检查重定向 - 禁止输入输出重定向
+  if (trimmed.includes('>')) {
+    return { valid: false, reason: '禁止使用文件重定向操作符（>）' };
+  }
+
+  // 检查是否在白名单中（检查所有命令）
+  const parts = trimmed.split(/\s+/);
+  for (const part of parts) {
+    const cleanPart = part.trim();
+    if (cleanPart && ALLOWED_COMMANDS.has(cleanPart)) {
+      // 白名单命令可以继续
+      continue;
+    } else if (cleanPart && cleanPart.startsWith('-')) {
+      // 选项可以继续
+      continue;
+    } else if (cleanPart && cleanPart.startsWith('/')) {
+      // 路径可以继续
+      continue;
+    } else if (cleanPart && !cleanPart.match(/^[a-zA-Z0-9_\-./@]+$/)) {
+      // 其他非标准字符作为潜在命令，拒绝
+      return { valid: false, reason: `命令包含非法字符或未授权命令: ${cleanPart}` };
+    }
+  }
+
+  // 至少要有一个白名单命令
+  const firstCmd = parts[0].trim();
+  if (!firstCmd || !ALLOWED_COMMANDS.has(firstCmd)) {
     return { valid: false, reason: `命令不在白名单中: ${firstCmd}` };
   }
 
