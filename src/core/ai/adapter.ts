@@ -94,7 +94,45 @@ export abstract class BaseAdapter {
     }
   }
 
-  /** 测试连接 */
+  /**
+   * 流式请求 (别名 for stream)
+   * @deprecated Use stream() instead
+   */
+  async streamRequest(
+    endpoint: string,
+    body: Record<string, unknown>,
+    onChunk: (chunk: string) => void
+  ): Promise<void> {
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      method: 'POST',
+      headers: this.buildHeaders(),
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error ${response.status}`);
+    }
+
+    const reader = (response as Response).body?.getReader();
+    if (!reader) {
+      throw new Error('No response body');
+    }
+
+    const decoder = new TextDecoder();
+    let done = false;
+    while (!done) {
+      const { done: streamDone, value } = await reader.read();
+      done = streamDone;
+      if (value) {
+        const chunk = decoder.decode(value, { stream: !done });
+        onChunk(chunk);
+      }
+    }
+  }
+
+  /**
+   * 流式聊天请求
+   */
   async test(): Promise<{ success: boolean; latency: number; error?: string }> {
     const start = Date.now();
     try {
