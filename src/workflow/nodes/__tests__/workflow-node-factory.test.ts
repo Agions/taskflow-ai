@@ -1,7 +1,7 @@
-import { WorkflowNodeDefinition, NodeExecutor } from '../../../types/workflow';
-
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
+import { WorkflowNodeDefinition, NodeExecutor } from '../../../types/workflow';
+
 import { WorkflowNodeFactory } from '../workflow-node-factory';
 
 describe('WorkflowNodeFactory', () => {
