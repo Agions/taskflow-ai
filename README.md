@@ -496,7 +496,6 @@ npm test
 
 - 📧 Email: [1051736049@qq.com](mailto:1051736049@qq.com)
 - 🐛 Issues: [GitHub Issues](https://github.com/Agions/taskflow-ai/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/Agions/taskflow-ai/discussions)
 
 ---
 
