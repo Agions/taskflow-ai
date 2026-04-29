@@ -10,6 +10,9 @@ import {
   ExtensionStatus,
   EXTENSION_STATUS_VALUES
 } from '../../types/extensions';
+
+// Re-export for convenience
+export { ExtensionStatus } from '../../types/extensions';
 import { Logger } from '../../utils/logger';
 import { getEventBus } from '../events';
 import { ExtensionRegistry } from './registry';
