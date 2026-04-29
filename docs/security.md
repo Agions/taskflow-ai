@@ -19,14 +19,6 @@
 - **建议修复**: 如有修复建议请提供
 - **您的信息**: 姓名/组织和联系方式（可选）
 
-### PGP 密钥
-
-```
-Key fingerprint: 3B82 F6AB C123 DEF0 4567
-               89AB CDEF 0123 4567 89AB
-```
-
-公钥下载: https://agions.com/pgp-key.asc
 
 ---
 
