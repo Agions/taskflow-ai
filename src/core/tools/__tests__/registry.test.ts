@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, jest, afterEach } from '@jest/globals';
-
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
+import { describe, it, expect, beforeEach, jest, afterEach } from '@jest/globals';
+
 import { ToolRegistry } from '../registry';
 import {
   Tool,

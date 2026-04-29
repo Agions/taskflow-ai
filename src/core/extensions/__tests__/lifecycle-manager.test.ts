@@ -1,7 +1,6 @@
-import { ExtensionLifecycleManager, ExtensionLifecycle, ExtensionStatus, ExtensionDefinition } from '../lifecycle-manager';
-
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
+import { ExtensionLifecycleManager, ExtensionLifecycle, ExtensionStatus, ExtensionDefinition } from '../lifecycle-manager';
 
 describe('ExtensionLifecycleManager', () => {
   let lifecycleManager: ExtensionLifecycleManager;

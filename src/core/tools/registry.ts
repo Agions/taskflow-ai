@@ -182,6 +182,82 @@ export class ToolRegistry {
   }
 
   /**
+   * 列出内置工具
+   */
+  listBuiltIn(): BuiltInToolInfo[] {
+    return BUILT_IN_TOOLS;
+  }
+
+  /**
+   * 获取内置工具类别列表
+   */
+  getBuiltInCategories(): ToolCategory[] {
+    const categories: ToolCategory[] = [];
+    for (const tool of Array.from(BUILT_IN_TOOLS)) {
+      if (!categories.includes(tool.category)) {
+        categories.push(tool.category);
+      }
+    }
+    return categories;
+  }
+
+  /**
+   * 列出所有工具 (alias for getAll)
+   */
+  list(): Tool[] {
+    return this.getAll();
+  }
+
+  /**
+   * 按类别列出工具 (alias for getByCategory)
+   */
+  listByCategory(category: ToolCategory): Tool[] {
+    return this.getByCategory(category);
+  }
+
+  /**
+   * 设置最大历史记录大小
+   */
+  setMaxHistorySize(size: number): void {
+    this.maxCallHistory = size;
+  }
+
+  /**
+   * 获取执行统计
+   */
+  getStatistics(): {
+    totalExecutions: number;
+    successfulExecutions: number;
+    failedExecutions: number;
+    cacheHits: number;
+    cacheMisses: number;
+    averageExecutionTime: number;
+  } {
+    return {
+      totalExecutions: this.metrics.totalCalls,
+      successfulExecutions: this.metrics.successfulCalls,
+      failedExecutions: this.metrics.failedCalls,
+      cacheHits: this.metrics.cacheHits,
+      cacheMisses: this.metrics.cacheMisses,
+      averageExecutionTime: this.metrics.averageExecutionTime,
+    };
+  }
+
+  /**
+   * 重置统计
+   */
+  resetStatistics(): void {
+    this.metrics = {
+      totalCalls: 0,
+      successfulCalls: 0,
+      failedCalls: 0,
+      cacheHits: 0,
+      cacheMisses: 0,
+      averageExecutionTime: 0,
+    };
+  }
+
+  /**
    * 移除工具
    */
   unregister(name: string): boolean {
@@ -339,7 +415,7 @@ export class ToolRegistry {
     return Promise.race([
       handler(params, context),
       new Promise<ToolResult>((_, reject) =>
-        setTimeout(() => reject(new Error(`工具执行超时 (${timeout}ms)`)), timeout)
+        setTimeout(() => reject(new Error(`Tool execution timeout (${timeout}ms)`)), timeout)
       ),
     ]);
   }
@@ -379,10 +455,39 @@ export class ToolRegistry {
   /**
    * 获取调用历史
    */
-  getCallHistory(limit?: number): ToolCall[] {
-    // 优化：避免创建临时数组多次
+  getCallHistory(limitOrToolName?: number | string): ToolCall[] {
+    if (typeof limitOrToolName === 'string') {
+      // Filter by tool name
+      const toolName = limitOrToolName;
+      const calls = Array.from(this.toolCalls.values())
+        .filter(call => call.toolName === toolName)
+        .sort((a, b) => b.startTime - a.startTime);
+      return calls;
+    }
+    const limit = limitOrToolName;
     const calls = Array.from(this.toolCalls.values()).sort((a, b) => b.startTime - a.startTime);
     return limit ? calls.slice(0, limit) : calls;
+  }
+
+  /**
+   * 清除调用历史
+   */
+  clearCallHistory(toolName?: string): void {
+    if (toolName) {
+      // Clear history for specific tool
+      const toDelete: string[] = [];
+      for (const [id, call] of Array.from(this.toolCalls.entries())) {
+        if (call.toolName === toolName) {
+          toDelete.push(id);
+        }
+      }
+      for (const id of toDelete) {
+        this.toolCalls.delete(id);
+      }
+    } else {
+      // Clear all history
+      this.toolCalls.clear();
+    }
   }
 
   /**
