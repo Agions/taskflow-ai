@@ -1,5 +1,8 @@
 /**
- * 沙箱管理
+ * 沙箱管理（已弃用 - 使用严格的输入验证代替）
+ * 
+ * 注意：Node.js 的 vm.runInNewContext 不是真正的沙箱，可能存在安全漏洞。
+ * 因此，我们不使用沙箱，而是依赖严格的输入验证、命令白名单和权限控制。
  */
 
 import { SecuritySettings } from './types';
@@ -16,51 +19,36 @@ export class SandboxManager {
     logger?: Logger
   ) {
     this.logger = logger || Logger.getInstance('SandboxManager');
-  }
-
-  /**
-   * 创建沙箱
-   */
-  createSandbox(): any {
-    if (!this.settings.enabled) {
-      return null;
-    }
-
-    return {
-      timeout: this.settings.timeout,
-      memoryLimit: this.settings.memoryLimit,
-      allowedModules: ['fs', 'path', 'util'],
-      blockedModules: ['child_process', 'cluster', 'net', 'dgram'],
-      executeInContext: (code: string, context: any) => this.executeInContext(code, context),
-    };
-  }
-
-  /**
-   * 在沙箱上下文中执行代码
-   */
-  private executeInContext(code: string, context: any): any {
-    try {
-      const vm = require('vm');
-      const sandbox = {
-        ...context,
-        console: {
-          log: (...args: any[]) => this.logger.debug('Sandbox:', ...args),
-        },
-      };
-
-      return vm.runInNewContext(code, sandbox, {
-        timeout: this.settings.timeout,
-      });
-    } catch (error: any) {
-      throw new Error(`沙箱执行失败: ${error.message}`);
+    
+    // 沙箱功能已禁用，记录警告
+    if (this.settings.enabled) {
+      this.logger.warn(
+        'Sandbox functionality is disabled for security reasons. ' +
+        'Strict input validation and command whitelisting are used instead.'
+      );
     }
   }
 
   /**
-   * 检查是否启用
+   * 创建沙箱（已停用）
+   * 
+   * 返回 null 表示不使用沙箱，依赖其他安全机制：
+   * - 命令白名单验证 (validator.validateCommand)
+   * - 路径遍历防护 (validator.validateFilePath)
+   * - SSRF 防护 (validator.validateUrl)
+   * - 工具执行超时控制 (executor timeout)
+   */
+  createSandbox(): null {
+    // 始终返回 null，不使用沙箱
+    return null;
+  }
+
+  /**
+   * 检查是否启用（始终返回 false）
    */
   isEnabled(): boolean {
-    return this.settings.enabled;
+    // 沙箱功能已完全禁用
+    return false;
   }
 
   /**
