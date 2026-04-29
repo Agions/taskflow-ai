@@ -187,7 +187,9 @@ describe('BaseAdapter', () => {
         text: async () => 'Unauthorized',
       } as Response;
       
-      (global.fetch as jest.Mock).mockResolvedValueOnce(mockErrorResponse);
+      // Reset mock and set error response
+      (global.fetch as jest.Mock).mockReset();
+      (global.fetch as jest.Mock).mockResolvedValue(mockErrorResponse);
       
       await expect(adapter.sendRequest('/test', {})).rejects.toThrow();
     });

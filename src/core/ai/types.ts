@@ -39,6 +39,8 @@ export interface ModelConfig {
   costPer1MInput?: number;
   /** 输出价格 (美元/1M tokens) */
   costPer1MOutput?: number;
+  /** 自定义请求头 */
+  headers?: Record<string, string>;
 }
 
 export interface ModelInfo {

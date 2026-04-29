@@ -184,9 +184,7 @@ export abstract class BaseAdapter {
 
   /** 构建请求头 */
   protected buildHeaders(): Record<string, string> {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
+    const headers: Record<string, string> = {};
 
     // Add Authorization for any provider that has an apiKey
     if (this.config.apiKey) {
@@ -194,6 +192,16 @@ export abstract class BaseAdapter {
         headers['anthropic-version'] = '2023-06-01';
       }
       headers['Authorization'] = `Bearer ${this.config.apiKey}`;
+    }
+
+    // Merge config headers (config headers override defaults)
+    if (this.config.headers) {
+      Object.assign(headers, this.config.headers);
+    }
+
+    // Set default Content-Type if not overridden
+    if (!headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
     }
 
     return headers;
