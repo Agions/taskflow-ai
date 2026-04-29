@@ -13,7 +13,7 @@
 [![codecov](https://img.shields.io/codecov/c/github/Agions/taskflow-ai?style=for-the-badge)](https://codecov.io/gh/Agions/taskflow-ai)
 [![GitHub Stars](https://img.shields.io/github/stars/Agions/taskflow-ai?style=for-the-badge)](https://github.com/Agions/taskflow-ai/stargazers)
 
-> **📦 最新版本: v4.1.0** — 专注 MCP Server · 极简架构 · 企业级安全 · 2024-04-30
+> **📦 最新版本: v5.0.0** — 专注 MCP Server · 极简架构 · 企业级安全 · 2026-04-30
 
 > **🚨 架构升级**: 移除 Agent 系统，专注成为精品 MCP Server，代码减少 40%+
 
@@ -39,9 +39,9 @@
 
 TaskFlow AI 是一款**精品 MCP (Model Context Protocol) Server**，专为 AI 编辑器设计。提供 40+ 内置工具，覆盖文件系统、HTTP 请求、数据库、Git 操作等常见场景。
 
-### v4.1.0 架构亮点
+### v5.0.0 架构亮点
 
-| 指标 | v4.0.0 | v4.1.0 | 改进 |
+| 指标 | v4.x | v5.0.0 | 改进 |
 |------|--------|--------|------|
 | **代码行数** | ~25k | **~14k** | ↓ 44% |
 | **架构复杂度** | 高 (Multi-Agent) | **低 (MCP Only)** | ↓ 40% |

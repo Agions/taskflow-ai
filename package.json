@@ -1,6 +1,6 @@
 {
   "name": "taskflow-ai",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "private": false,
   "description": "TaskFlow AI - 精品 MCP Server，为 Claude / Cursor / Windsurf 等 AI 编辑器提供 40+ 强大工具能力，专注于 MCP 协议的完整实现",
   "logo": "assets/logo.svg",
@@ -68,26 +68,17 @@
     "postinstall": "echo '🎉 TaskFlow AI 安装成功！运行 taskflow --help 开始使用'"
   },
   "keywords": [
-    "ai",
-    "task-management",
-    "prd-parser",
-    "project-planning",
     "mcp",
-    "model-context-protocol",
     "mcp-server",
-    "docker-mcp-registry",
-    "ai-orchestration",
-    "project-orchestration",
+    "model-context-protocol",
+    "claude-desktop",
     "cursor",
     "windsurf",
-    "trae",
     "vscode",
-    "claude-desktop",
-    "deepseek",
-    "zhipu",
-    "qwen",
-    "cli-tool",
-    "typescript"
+    "ai-tools",
+    "workflow-engine",
+    "typescript",
+    "cli-tool"
   ],
   "author": {
     "name": "Agions",
