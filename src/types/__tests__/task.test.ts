@@ -1,7 +1,6 @@
-import { Task, TaskStatus, TaskExecutionContext, TaskResult as TaskResultType } from '../task';
-
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
+import { Task, TaskStatus, TaskExecutionContext, TaskResult as TaskResultType } from '../task';
 
 describe('Task Types', () => {
   it('should create a valid task', () => {
